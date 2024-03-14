@@ -1,0 +1,23 @@
+[package]
+name = "reffect"
+version = "0.1.0"
+edition = "2021"
+authors = ["Zerthox"]
+
+[dependencies]
+arcdps-imgui = { version = "0.8.0", features = ["tables-api"] }
+arc_util =  { git = "https://github.com/zerthox/arcdps-utils" }
+# libloading = "0.8.3"
+log = { version = "0.4.18", features = ["release_max_level_info"] }
+num_enum = "0.7.1"
+semver = { version = "1.0.17", features = ["serde"] }
+serde = { version = "1.0.163", features = ["derive"] }
+serde_yaml = "0.9.21"
+strum = { version = "0.26.1", features = ["derive"] }
+windows = { version = "0.54.0", features = [
+    "System",
+    "Win32_Foundation",
+    "Win32_Graphics_Dxgi_Common",
+    "Win32_Graphics_Direct3D",
+    "Win32_Graphics_Direct3D11",
+] }

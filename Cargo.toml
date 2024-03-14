@@ -1,0 +1,13 @@
+[workspace]
+members = [
+    "reffect",
+    "reffect_arcdps",
+    "reffect_nexus",
+]
+default-members = [
+    "reffect_arcdps"
+]
+resolver = "2"
+
+[profile.release]
+lto = "thin"
