@@ -7,7 +7,9 @@ use std::path::PathBuf;
 use url::Url;
 use uuid::Uuid;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+use crate::texture_manager::TEXTURE_MANAGER;
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum IconSource {
     Empty,
     Url(String),
@@ -19,7 +21,15 @@ impl IconSource {
         format!("REFFECT_ICON_{}", Uuid::new_v4().simple())
     }
 
-    pub fn load_texture(&self) -> Option<TextureId> {
+    pub fn load(&self) {
+        TEXTURE_MANAGER.add_texture(self)
+    }
+
+    pub fn get_texture(&self) -> TextureId {
+        TEXTURE_MANAGER.get_texture(self)
+    }
+
+    pub fn force_load_texture(&self) -> Option<TextureId> {
         let id = self.gen_id();
         let result = match self {
             Self::Empty => None,

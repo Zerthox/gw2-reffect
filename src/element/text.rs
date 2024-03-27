@@ -1,12 +1,13 @@
-use super::{util::add_pos, Render, State};
+use super::{util::add_pos, Context, Render};
+use crate::trigger::BuffTrigger;
 use nexus::imgui::{ImColor32, Ui};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Text {
-    pub buff: u32,
-    pub pos: [f32; 2],
+    pub buff: BuffTrigger,
+    pub offset: [f32; 2],
     pub color: [u8; 4],
     pub text: String,
 }
@@ -21,9 +22,9 @@ impl Text {
         ImColor32::from_rgba(r, g, b, a)
     }
 
-    pub fn process_text(&self, state: &State) -> Option<String> {
-        state
-            .stacks_of(self.buff)
+    pub fn process_text(&self, ctx: &Context) -> Option<String> {
+        self.buff
+            .get_stacks(ctx)
             .map(|stacks| self.text.replace(replace::STACKS, &stacks.to_string()))
     }
 }
@@ -31,11 +32,11 @@ impl Text {
 impl Render for Text {
     fn load(&mut self) {}
 
-    fn render(&mut self, ui: &Ui, state: &State) {
-        if let Some(text) = self.process_text(state) {
+    fn render(&mut self, ui: &Ui, ctx: &Context) {
+        if let Some(text) = self.process_text(ctx) {
             let cursor = ui.cursor_screen_pos();
             let draw_list = ui.get_window_draw_list();
-            let pos = add_pos(cursor, self.pos);
+            let pos = add_pos(cursor, self.offset);
             draw_list.add_text(pos, self.color(), text);
         }
     }
@@ -44,8 +45,8 @@ impl Render for Text {
 impl Default for Text {
     fn default() -> Self {
         Self {
-            buff: 0,
-            pos: [0.0, 0.0],
+            buff: BuffTrigger::default(),
+            offset: [0.0, 0.0],
             color: [255, 255, 255, 255],
             text: String::new(),
         }

@@ -1,22 +1,25 @@
+mod anchor;
 mod group;
 mod icon;
 mod icon_element;
 mod icon_group;
 mod icon_source;
+mod pack;
 mod text;
 mod util;
 
-pub use self::{group::*, icon::*, icon_element::*, icon_group::*, icon_source::*, text::*};
+pub use self::{
+    anchor::*, group::*, icon::*, icon_element::*, icon_group::*, icon_source::*, pack::*, text::*,
+};
 
-use crate::state::State;
+use crate::context::Context;
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
-use std::{fs::File, io::BufReader, path::Path};
 
 pub trait Render {
     fn load(&mut self);
 
-    fn render(&mut self, ui: &Ui, state: &State);
+    fn render(&mut self, ui: &Ui, ctx: &Context);
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -25,13 +28,6 @@ pub enum Element {
     IconGroup(IconGroup),
     Icon(IconElement),
     Text(Text),
-}
-
-impl Element {
-    pub fn from_file(path: impl AsRef<Path>) -> Option<Self> {
-        let file = File::open(path.as_ref()).ok()?;
-        serde_json::from_reader(BufReader::new(file)).ok()
-    }
 }
 
 impl Render for Element {
@@ -44,12 +40,12 @@ impl Render for Element {
         }
     }
 
-    fn render(&mut self, ui: &Ui, state: &State) {
+    fn render(&mut self, ui: &Ui, ctx: &Context) {
         match self {
-            Self::Group(anchor) => anchor.render(ui, state),
-            Self::IconGroup(group) => group.render(ui, state),
-            Self::Icon(icon) => icon.render(ui, state),
-            Self::Text(text) => text.render(ui, state),
+            Self::Group(anchor) => anchor.render(ui, ctx),
+            Self::IconGroup(group) => group.render(ui, ctx),
+            Self::Icon(icon) => icon.render(ui, ctx),
+            Self::Text(text) => text.render(ui, ctx),
         }
     }
 }

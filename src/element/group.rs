@@ -1,4 +1,4 @@
-use super::{util::with_offset, Element, Render, State};
+use super::{util::with_offset, Context, Element, Render};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 #[serde(default)]
 pub struct Group {
     pub name: String,
-    pub pos: [f32; 2],
+    pub offset: [f32; 2],
     pub members: Vec<Element>,
 }
 
@@ -17,10 +17,10 @@ impl Render for Group {
         }
     }
 
-    fn render(&mut self, ui: &Ui, state: &State) {
-        with_offset(ui, self.pos, || {
+    fn render(&mut self, ui: &Ui, ctx: &Context) {
+        with_offset(ui, self.offset, || {
             for member in &mut self.members {
-                member.render(ui, state);
+                member.render(ui, ctx);
             }
         })
     }
@@ -31,7 +31,7 @@ impl Default for Group {
         Self {
             name: "Unnamed".into(),
             members: Vec::new(),
-            pos: [0.0, 0.0],
+            offset: [0.0, 0.0],
         }
     }
 }

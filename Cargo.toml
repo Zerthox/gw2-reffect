@@ -5,14 +5,16 @@ edition = "2021"
 authors = ["Zerthox"]
 
 [dependencies]
-nexus = { git = "https://github.com/zerthox/nexus-rs", features = ["mumble"] }
+include_img = { git = "https://github.com/zerthox/include-img" }
 log = { version = "0.4.18", features = ["release_max_level_info"] }
+nexus = { git = "https://github.com/zerthox/nexus-rs", features = ["mumble"] }
 num_enum = "0.7.1"
 semver = { version = "1.0.17", features = ["serde"] }
 serde = { version = "1.0.163", features = ["derive"] }
 serde_json = "1.0.115"
 strum = { version = "0.26.1", features = ["derive"] }
 url = "2.5.0"
+uuid = { version="1.8.0", features = ["v4"] }
 windows = { version = "0.54.0", features = [
     "System",
     "Win32_Foundation",
@@ -20,4 +22,3 @@ windows = { version = "0.54.0", features = [
     "Win32_Graphics_Direct3D",
     "Win32_Graphics_Direct3D11",
 ] }
-uuid = { version="1.8.0", features = ["v4"] }

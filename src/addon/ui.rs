@@ -1,24 +1,17 @@
 use super::Addon;
-use crate::{
-    element::Render,
-    get_buffs::get_buffs,
-    state::{MapInfo, State},
-};
-use nexus::{
-    data_link::get_mumble_link,
-    imgui::{Ui, Window},
-};
+use crate::{context::Context, element::Render, get_buffs::get_buffs};
+use nexus::imgui::{Ui, Window};
 
 impl Addon {
     pub fn render(&mut self, ui: &Ui) {
+        self.perform_updates();
+
         match unsafe { get_buffs() } {
             Ok(buffs) => {
-                let mumble = unsafe { get_mumble_link().as_ref() };
-                let map_info = mumble.map(|mumble| MapInfo::from_mumble(&mumble.context));
-                let state = State::new(buffs, map_info);
+                let ctx = Context::new(self.editing, &self.player, buffs);
 
-                for element in &mut self.elements {
-                    element.render(ui, &state);
+                for pack in &mut self.packs {
+                    pack.render(ui, &ctx);
                 }
             }
             Err(err) => {
@@ -32,12 +25,24 @@ impl Addon {
     }
 
     pub fn render_options(&mut self, ui: &Ui) {
-        let count = self.elements.len();
-        ui.text(format!("{count} elements loaded"));
+        let count = self.packs.len();
+        for pack in &self.packs {
+            ui.text(format!(
+                "{} by {}: {}",
+                pack.name,
+                pack.author,
+                pack.file.display()
+            ));
+        }
 
-        if ui.button("Reload elements") {
-            self.elements.clear();
-            self.load_elements();
+        ui.spacing();
+        ui.text(format!("Packs loaded: {count}"));
+        if ui.button("Reload packs") {
+            self.packs.clear();
+            self.load_packs();
+        }
+        if ui.button("Save packs") {
+            self.save_packs();
         }
     }
 }

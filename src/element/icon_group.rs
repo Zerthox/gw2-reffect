@@ -1,6 +1,6 @@
 use super::{
     util::{add_pos, with_offset},
-    Icon, Render, State,
+    Context, Icon, Render,
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
@@ -12,20 +12,20 @@ pub struct IconGroup {
     pub direction: Direction,
     pub size: [f32; 2],
     pub padding: f32,
-    pub pos: [f32; 2],
+    pub offset: [f32; 2],
     pub icons: Vec<Icon>,
 }
 
 impl Render for IconGroup {
     fn load(&mut self) {}
 
-    fn render(&mut self, ui: &Ui, state: &State) {
-        with_offset(ui, self.pos, || {
+    fn render(&mut self, ui: &Ui, ctx: &Context) {
+        with_offset(ui, self.offset, || {
             let initial_pos = ui.cursor_screen_pos();
             let icons = self
                 .icons
                 .iter_mut()
-                .filter(|icon| icon.needs_render(state))
+                .filter(|icon| icon.is_active(ctx))
                 .collect::<Vec<_>>();
             let icon_count = icons.len();
 
@@ -45,7 +45,7 @@ impl Default for IconGroup {
             direction: Direction::Right,
             padding: 5.0,
             size: [32.0, 32.0],
-            pos: [0.0, 0.0],
+            offset: [0.0, 0.0],
             icons: Vec::new(),
         }
     }
@@ -67,10 +67,10 @@ impl Direction {
         let i = element as f32;
         let half = 0.5 * total as f32;
         match self {
-            Self::Right => [i * width, 0.5 * height],
-            Self::Left => [-i * width, 0.5 * height],
-            Self::Up => [0.5 * width, -i * height],
-            Self::Down => [0.5 * width, i * height],
+            Self::Right => [i * width, -0.5 * height],
+            Self::Left => [-i * width, -0.5 * height],
+            Self::Up => [-0.5 * width, -i * height],
+            Self::Down => [-0.5 * width, i * height],
             Self::Vertical => [-half * width + 0.5 * i * width, 0.5 * height],
             Self::Horizontal => [0.5 * width, -half * height + 0.5 * i * height],
         }

@@ -1,6 +1,10 @@
 use super::Addon;
-use crate::element::Element;
+use crate::{
+    element::{Pack, Render},
+    get_buffs::get_buffs,
+};
 use nexus::{
+    data_link::get_mumble_link,
     gui::{register_render, RenderType},
     paths::get_addon_dir,
 };
@@ -22,10 +26,14 @@ impl Addon {
         )
         .revert_on_unload();
 
-        Self::lock().load_elements();
+        Self::lock().load_packs();
     }
 
-    pub fn load_elements(&mut self) {
+    pub fn unload() {
+        Self::lock().save_packs();
+    }
+
+    pub fn load_packs(&mut self) {
         let addon_dir = get_addon_dir(ADDON_NAME).expect("invalid addon directory");
 
         let files = fs::read_dir(addon_dir)
@@ -39,8 +47,27 @@ impl Addon {
             });
 
         for file in files {
-            if let Some(element) = Element::from_file(&file.path()) {
-                self.elements.push(element);
+            if let Some(mut pack) = Pack::load_from_file(&file.path()) {
+                pack.load();
+                self.packs.push(pack);
+            }
+        }
+    }
+
+    pub fn save_packs(&self) {
+        for pack in &self.packs {
+            pack.save_to_file();
+        }
+    }
+
+    pub fn perform_updates(&mut self) {
+        if let Some(mumble) = unsafe { get_mumble_link().as_ref() } {
+            let tick = mumble.ui_tick;
+            if self.buffs_update.triggered(tick) {
+                self.buffs = unsafe { get_buffs() }.map(|buffs| buffs.into());
+            }
+            if self.player_update.triggered(tick) {
+                self.player.update(mumble);
             }
         }
     }

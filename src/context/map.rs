@@ -1,44 +1,22 @@
-#![allow(dead_code)]
-
-use crate::get_buffs::StackedBuff;
 use nexus::data_link::mumble::{map_type, Context};
-
-#[derive(Debug)]
-pub struct State<'a> {
-    buffs: &'a [StackedBuff],
-    map: Option<MapInfo>,
-}
-
-impl<'a> State<'a> {
-    pub const fn new(buffs: &'a [StackedBuff], map: Option<MapInfo>) -> Self {
-        Self { buffs, map }
-    }
-
-    pub fn buff(&self, id: u32) -> Option<&StackedBuff> {
-        self.buffs.iter().find(|entry| entry.id == id)
-    }
-
-    pub fn has_buff(&self, id: u32) -> bool {
-        self.buffs.iter().any(|entry| entry.id == id)
-    }
-
-    pub fn stacks_of(&self, id: u32) -> Option<i32> {
-        self.buff(id).map(|entry| entry.count)
-    }
-}
 
 #[derive(Debug, Clone)]
 pub struct MapInfo {
-    id: u32,
-    kind: MapKind,
+    pub id: u32,
+    pub kind: MapKind,
 }
 
 impl MapInfo {
-    pub fn from_mumble(context: &Context) -> Self {
+    pub const fn empty() -> Self {
         Self {
-            id: context.map_id,
-            kind: context.map_type.into(),
+            id: 0,
+            kind: MapKind::Unknown,
         }
+    }
+
+    pub fn update(&mut self, context: &Context) {
+        self.id = context.map_id;
+        self.kind = context.map_type.into();
     }
 }
 
