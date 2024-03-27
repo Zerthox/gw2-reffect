@@ -8,6 +8,7 @@
         },
         "map": "Any"
     },
+    "anchor": "TopLeft",
     "pos": [0.0, 0.0],
     "elements": [
         {
