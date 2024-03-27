@@ -6,8 +6,8 @@ fn main() {
     let manifest = env::var_os("CARGO_MANIFEST_DIR").unwrap();
     let profile = env::var("PROFILE").unwrap();
 
-    // target path of parent workspace
-    let target = Path::new(&manifest).join("..").join("target").join(profile);
+    // target path
+    let target = Path::new(&manifest).join("target").join(profile);
 
     let deps = Path::new(&manifest).join(DEPS_PATH);
     for entry in deps.read_dir().unwrap() {

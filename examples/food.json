@@ -1,0 +1,32 @@
+{
+    "Group": {
+        "name": "Food Buffs Static Group",
+        "pos": [0.0, 0.0],
+        "members": [
+            {
+                "IconGroup": {
+                    "name": "Food Buffs Dynamic Group",
+                    "direction": "Horizontal",
+                    "size": [32.0, 32.0],
+                    "pos": [0.0, 0.0],
+                    "icons": [
+                        {
+                            "name": "Malnourished",
+                            "buff": 46587,
+                            "icon": {
+                                "Url": "https://wiki.guildwars2.com/images/6/67/Malnourished.png"
+                            }
+                        },
+                        {
+                            "name": "Diminished",
+                            "buff": 46668,
+                            "icon": {
+                                "Url": "https://wiki.guildwars2.com/images/7/71/Diminished.png"
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
