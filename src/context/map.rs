@@ -1,27 +1,28 @@
 use nexus::data_link::mumble::{map_type, Context};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone)]
 pub struct MapInfo {
     pub id: u32,
-    pub kind: MapKind,
+    pub category: MapCategory,
 }
 
 impl MapInfo {
     pub const fn empty() -> Self {
         Self {
             id: 0,
-            kind: MapKind::Unknown,
+            category: MapCategory::Unknown,
         }
     }
 
     pub fn update(&mut self, context: &Context) {
         self.id = context.map_id;
-        self.kind = context.map_type.into();
+        self.category = context.map_type.into();
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum MapKind {
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+pub enum MapCategory {
     Pve,
     Pvp,
     Wvw,
@@ -29,7 +30,7 @@ pub enum MapKind {
     Unknown,
 }
 
-impl From<u32> for MapKind {
+impl From<u32> for MapCategory {
     fn from(value: u32) -> Self {
         match value {
             map_type::PVE | map_type::PVE_MINI => Self::Pve,
