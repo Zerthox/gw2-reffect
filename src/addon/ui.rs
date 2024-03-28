@@ -1,5 +1,7 @@
 use super::Addon;
-use crate::{context::Context, element::Render, get_buffs::get_buffs};
+use crate::{
+    context::Context, element::Render, get_buffs::get_buffs, texture_manager::TextureManager,
+};
 use nexus::imgui::{Ui, Window};
 
 impl Addon {
@@ -25,7 +27,9 @@ impl Addon {
     }
 
     pub fn render_options(&mut self, ui: &Ui) {
-        let count = self.packs.len();
+        ui.text(format!("Packs loaded: {} total", self.packs.len()));
+
+        ui.indent();
         for pack in &self.packs {
             ui.text(format!(
                 "{} by {}: {}",
@@ -34,15 +38,22 @@ impl Addon {
                 pack.file.display()
             ));
         }
+        ui.unindent();
 
-        ui.spacing();
-        ui.text(format!("Packs loaded: {count}"));
-        if ui.button("Reload packs") {
+        if ui.button("Reload pack files") {
             self.packs.clear();
             self.load_packs();
         }
-        if ui.button("Save packs") {
+        if ui.button("Save pack changes") {
             self.save_packs();
+        }
+
+        ui.spacing();
+        if ui.button("Reload icons") {
+            TextureManager::clear();
+            for pack in &mut self.packs {
+                pack.load();
+            }
         }
     }
 }

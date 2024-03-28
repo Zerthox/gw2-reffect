@@ -2,6 +2,7 @@ use super::Addon;
 use crate::{
     element::{Pack, Render},
     get_buffs::get_buffs,
+    texture_manager::TextureManager,
 };
 use nexus::{
     data_link::get_mumble_link,
@@ -14,6 +15,8 @@ const ADDON_NAME: &str = "reffect";
 
 impl Addon {
     pub fn load() {
+        TextureManager::load();
+
         register_render(
             RenderType::Render,
             nexus::gui::render!(|ui| Addon::lock().render(ui)),
