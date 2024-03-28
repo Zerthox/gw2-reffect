@@ -1,7 +1,4 @@
-use crate::{
-    assets::MONSTER_ICON,
-    element::{Icon, IconSource},
-};
+use crate::{assets::MONSTER_ICON, element::IconSource};
 use nexus::{
     imgui::TextureId,
     texture::{
