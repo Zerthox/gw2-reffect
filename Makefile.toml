@@ -1,0 +1,37 @@
+env_scripts = [
+"""
+#!@duckscript
+if is_empty ${GW2_PATH}
+    gw2_path = set "C:/Program Files/Guild Wars 2"
+
+    steam_path = set "C:/Program Files (x86)/Steam/steamapps/common/Guild Wars 2"
+    if is_path_exists ${steam_path}
+        gw2_path = set ${steam_path}
+    end
+
+    set_env GW2_PATH ${gw2_path}
+end
+"""
+]
+
+[tasks.copy-release]
+script = "cp \"${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/release/${CARGO_MAKE_CRATE_NAME}.dll\" \"${GW2_PATH}\""
+script_runner = "@shell"
+
+[tasks.copy-debug]
+script = "cp \"${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/debug/${CARGO_MAKE_CRATE_NAME}.dll\" \"${GW2_PATH}\""
+script_runner = "@shell"
+
+[tasks.remove]
+script = "rm \"${GW2_PATH}/${CARGO_MAKE_CRATE_NAME}.dll\""
+script_runner = "@shell"
+
+[tasks.install]
+run_task = { name = ["build-release", "copy-release"] }
+
+[tasks.uninstall]
+alias = "remove"
+
+[tasks.dev]
+run_task = { name = ["build", "copy-debug"] }
+watch = true
