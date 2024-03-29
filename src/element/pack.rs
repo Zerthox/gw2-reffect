@@ -1,6 +1,6 @@
-use super::{util::with_offset, Anchor, Context, Element, Render};
+use super::{util::add_pos, Anchor, Context, Element, Render, State};
 use crate::trigger::{PackTrigger, Trigger};
-use nexus::imgui::Ui;
+use nexus::imgui::{ImColor32, Ui};
 use serde::{Deserialize, Serialize};
 use std::{
     fs::File,
@@ -11,6 +11,7 @@ use std::{
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Pack {
+    pub enabled: bool,
     pub name: String,
     pub author: String,
     pub trigger: PackTrigger,
@@ -38,6 +39,10 @@ impl Pack {
         let writer = BufWriter::new(file);
         serde_json::to_writer_pretty(writer, self).ok()
     }
+
+    pub fn pos(&self, ui: &Ui) -> [f32; 2] {
+        add_pos(self.anchor.pos(ui), self.pos)
+    }
 }
 
 impl Render for Pack {
@@ -47,14 +52,23 @@ impl Render for Pack {
         }
     }
 
-    fn render(&mut self, ui: &Ui, ctx: &Context) {
-        if self.trigger.is_active(ctx) {
-            self.anchor.set_cursor(ui);
-            with_offset(ui, self.pos, || {
-                for element in &mut self.elements {
-                    element.render(ui, ctx)
-                }
-            })
+    fn render(&mut self, ui: &Ui, ctx: &Context, state: &mut State) {
+        if self.enabled && self.trigger.is_active(ctx) {
+            state.pos = self.pos(ui);
+            let [x, y] = state.pos;
+
+            for element in &mut self.elements {
+                element.render(ui, ctx, state);
+            }
+            if ctx.edit {
+                const SIZE: f32 = 3.0;
+                let start = [x - SIZE, y - SIZE];
+                let end = [x + SIZE, y + SIZE];
+                ui.get_window_draw_list()
+                    .add_rect(start, end, ImColor32::from_rgb(255, 0, 0))
+                    .filled(true)
+                    .build()
+            }
         }
     }
 }
@@ -62,6 +76,7 @@ impl Render for Pack {
 impl Default for Pack {
     fn default() -> Self {
         Self {
+            enabled: false,
             name: "Unnamed".into(),
             author: "Unknown".into(),
             trigger: PackTrigger::default(),

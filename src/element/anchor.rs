@@ -33,12 +33,6 @@ impl Anchor {
         }
     }
 
-    /// Sets the cursor to the anchor position.
-    pub fn set_cursor(&self, ui: &Ui) {
-        let pos = self.pos(ui);
-        ui.set_cursor_screen_pos(pos);
-    }
-
     /// Renders a select for the anchor.
     pub fn render_select(&mut self, ui: &Ui) {
         ui.group(|| {

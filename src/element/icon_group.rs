@@ -1,7 +1,4 @@
-use super::{
-    util::{add_pos, with_offset},
-    Context, Icon, Render,
-};
+use super::{util::add_pos, Context, Icon, Render, State};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
@@ -17,11 +14,14 @@ pub struct IconGroup {
 }
 
 impl Render for IconGroup {
-    fn load(&mut self) {}
+    fn load(&mut self) {
+        for icon in &mut self.icons {
+            icon.load();
+        }
+    }
 
-    fn render(&mut self, ui: &Ui, ctx: &Context) {
-        with_offset(ui, self.offset, || {
-            let initial_pos = ui.cursor_screen_pos();
+    fn render(&mut self, ui: &Ui, ctx: &Context, state: &mut State) {
+        state.with_offset(self.offset, |state| {
             let icons = self
                 .icons
                 .iter_mut()
@@ -29,10 +29,13 @@ impl Render for IconGroup {
                 .collect::<Vec<_>>();
             let icon_count = icons.len();
 
+            let start_pos = add_pos(state.pos, self.direction.initial_offset(self.size));
             for (i, icon) in icons.into_iter().enumerate() {
-                let offset = self.direction.offset_for(self.size, i, icon_count);
-                ui.set_cursor_screen_pos(add_pos(initial_pos, offset));
-                icon.render(ui, self.size);
+                let offset = self
+                    .direction
+                    .offset_for(self.size, self.padding, i, icon_count);
+                let pos = add_pos(start_pos, offset);
+                icon.render(ui, pos, self.size);
             }
         })
     }
@@ -57,22 +60,33 @@ pub enum Direction {
     Left,
     Up,
     Down,
-    Vertical,
     Horizontal,
+    Vertical,
 }
 
 impl Direction {
-    pub fn offset_for(&self, size: [f32; 2], element: usize, total: usize) -> [f32; 2] {
+    pub fn initial_offset(&self, size: [f32; 2]) -> [f32; 2] {
+        let [width, height] = size;
+        match self {
+            Self::Right | Self::Left | Self::Horizontal => [0.0, -0.5 * height], // center horizontally
+            Self::Up | Self::Down | Self::Vertical => [-0.5 * width, 0.0], // center vertically
+        }
+    }
+
+    pub fn offset_for(&self, size: [f32; 2], pad: f32, element: usize, total: usize) -> [f32; 2] {
         let [width, height] = size;
         let i = element as f32;
+        let offset_x = i * (width + pad);
+        let offset_y = i * (height + pad);
         let half = 0.5 * total as f32;
+        let half_pad = 0.5 * total.saturating_sub(1) as f32 * pad;
         match self {
-            Self::Right => [i * width, -0.5 * height],
-            Self::Left => [-i * width, -0.5 * height],
-            Self::Up => [-0.5 * width, -i * height],
-            Self::Down => [-0.5 * width, i * height],
-            Self::Vertical => [-half * width + 0.5 * i * width, 0.5 * height],
-            Self::Horizontal => [0.5 * width, -half * height + 0.5 * i * height],
+            Self::Right => [offset_x, 0.0],
+            Self::Left => [-offset_x, 0.0],
+            Self::Up => [0.0, -offset_y],
+            Self::Down => [0.0, offset_x],
+            Self::Horizontal => [offset_x - half * width - half_pad, 0.0],
+            Self::Vertical => [0.0, offset_y - half * height - half_pad],
         }
     }
 }

@@ -1,9 +1,5 @@
 use super::Addon;
-use crate::{
-    element::{Pack, Render},
-    get_buffs::get_buffs,
-    texture_manager::TextureManager,
-};
+use crate::{element::Pack, get_buffs::get_buffs, texture_manager::TextureManager};
 use nexus::{
     data_link::get_mumble_link,
     gui::{register_render, RenderType},
@@ -15,6 +11,7 @@ const ADDON_NAME: &str = "reffect";
 
 impl Addon {
     pub fn load() {
+        log::info!("Addon load");
         TextureManager::load();
 
         register_render(
@@ -33,13 +30,16 @@ impl Addon {
     }
 
     pub fn unload() {
+        log::info!("Addon unload");
         Self::lock().save_packs();
     }
 
     pub fn load_packs(&mut self) {
         let addon_dir = get_addon_dir(ADDON_NAME).expect("invalid addon directory");
+        log::info!("Loading packs from {}", addon_dir.display());
 
-        let files = fs::read_dir(addon_dir)
+        let _ = fs::create_dir(&addon_dir);
+        let files = fs::read_dir(&addon_dir)
             .expect("failed to read addon directory")
             .filter_map(|entry| entry.ok())
             .filter(|entry| {
@@ -50,14 +50,15 @@ impl Addon {
             });
 
         for file in files {
-            if let Some(mut pack) = Pack::load_from_file(&file.path()) {
-                pack.load();
+            if let Some(pack) = Pack::load_from_file(&file.path()) {
                 self.packs.push(pack);
             }
         }
+        log::info!("Loaded {} packs", self.packs.len());
     }
 
     pub fn save_packs(&self) {
+        log::info!("Saving packs");
         for pack in &self.packs {
             pack.save_to_file();
         }

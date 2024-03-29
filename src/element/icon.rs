@@ -1,6 +1,6 @@
 use super::{util::add_pos, Context, IconSource};
 use crate::trigger::{BuffTrigger, Trigger};
-use nexus::imgui::Ui;
+use nexus::imgui::{ImColor32, Ui};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -9,6 +9,8 @@ pub struct Icon {
     pub name: String,
     pub buff: BuffTrigger,
     pub icon: IconSource,
+    pub tint: [u8; 3],
+    pub opacity: f32,
 }
 
 impl Icon {
@@ -20,12 +22,21 @@ impl Icon {
         self.buff.is_active(ctx)
     }
 
-    pub fn render(&mut self, ui: &Ui, size: [f32; 2]) {
-        let cursor = ui.cursor_screen_pos();
-        let end = add_pos(cursor, size);
-        let texture = self.icon.get_texture();
-        let draw_list = ui.get_window_draw_list();
-        draw_list.add_image(texture, cursor, end).build();
+    fn color(&self) -> [f32; 4] {
+        let [r, g, b] = self.tint;
+        let [r, g, b, _] = ImColor32::from_rgb(r, g, b).to_rgba_f32s();
+        [r, g, b, self.opacity]
+    }
+
+    pub fn render(&mut self, ui: &Ui, pos: [f32; 2], size: [f32; 2]) {
+        if let Some(texture) = self.icon.get_texture() {
+            let end = add_pos(pos, size);
+            let draw_list = ui.get_window_draw_list();
+            draw_list
+                .add_image(texture, pos, end)
+                .col(self.color())
+                .build();
+        }
     }
 }
 
@@ -35,6 +46,8 @@ impl Default for Icon {
             buff: BuffTrigger::default(),
             name: "Unnamed".into(),
             icon: IconSource::Empty,
+            tint: [255, 255, 255],
+            opacity: 1.0,
         }
     }
 }

@@ -15,7 +15,7 @@ impl IconSource {
         TextureManager::add_source(self)
     }
 
-    pub fn get_texture(&self) -> TextureId {
+    pub fn get_texture(&self) -> Option<TextureId> {
         TextureManager::get_texture(self)
     }
 }
