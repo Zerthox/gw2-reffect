@@ -31,7 +31,8 @@ impl Addon {
 
     pub fn unload() {
         log::info!("Addon unload");
-        Self::lock().save_packs();
+        // TODO: enable when editor
+        // Self::lock().save_packs();
     }
 
     pub fn load_packs(&mut self) {
