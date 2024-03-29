@@ -2,7 +2,6 @@ use super::Addon;
 use crate::{
     context::Context,
     element::{Render, State},
-    texture_manager::TextureManager,
 };
 use nexus::imgui::{Condition, StyleColor, Ui, Window};
 
@@ -82,14 +81,6 @@ impl Addon {
         }
 
         ui.spacing();
-        if ui.button("Reload icons") {
-            log::debug!("Reloading icons");
-            TextureManager::clear();
-            for pack in &mut self.packs {
-                pack.load();
-            }
-        }
-        ui.same_line();
         ui.checkbox("Debug", &mut self.debug);
     }
 }

@@ -13,7 +13,6 @@ use std::{
     sync::{Mutex, MutexGuard, OnceLock},
 };
 use url::Url;
-use uuid::Uuid;
 
 static TEXTURE_MANAGER: OnceLock<Mutex<TextureManager>> = OnceLock::new();
 
@@ -34,17 +33,16 @@ impl TextureManager {
     }
 
     fn with_default(mut self) -> Self {
-        const ID: &str = "REFFECT_MONSTER_ICON";
-        const SOURCE: IconSource = IconSource::Empty;
-
-        if let Some(texture) = get_texture(ID) {
+        // check for the texture ourselves to avoid recursive locking
+        let id = IconSource::DEFAULT_ID;
+        if let Some(texture) = get_texture(id) {
             let texture_id = texture.id();
             self.default = Some(texture_id);
             log::debug!("Already loaded default icon: id {}", texture_id.id());
         } else {
             log::debug!("Requesting default icon load");
-            self.pending.insert(ID.into(), SOURCE);
-            load_texture_from_memory(ID, MONSTER_ICON, Some(Self::RECEIVE_TEXTURE));
+            self.pending.insert(id.into(), IconSource::Empty);
+            load_texture_from_memory(id, MONSTER_ICON, Some(Self::RECEIVE_TEXTURE));
         };
 
         self
@@ -58,29 +56,27 @@ impl TextureManager {
         Self::load().lock().unwrap()
     }
 
-    pub fn clear() {
-        Self::lock().loaded.clear()
-    }
-
     pub fn get_texture(source: &IconSource) -> Option<TextureId> {
         let textures = Self::lock();
         textures.loaded.get(source).copied().or(textures.default)
     }
 
     pub fn add_source(source: &IconSource) {
+        // TODO: spawn separate thread for loading?
         let mut textures = Self::lock();
         if !textures.loaded.contains_key(source) {
-            // TODO: load in separate thread?
             match source {
                 IconSource::Empty => {}
                 IconSource::File(path) => {
                     let id = textures.add_pending(source.clone());
+                    drop(textures); // drop to avoid recursive locking
                     Self::load_from_file(&id, path);
                 }
                 IconSource::Url(url) => {
                     let id = textures.add_pending(source.clone());
+                    drop(textures); // drop to avoid recursive locking
                     Self::load_from_url(&id, url)
-                        .unwrap_or_else(|| log::warn!("Failed to parse icon url {url}"));
+                        .unwrap_or_else(|| log::warn!("Failed to parse icon url \"{url}\""));
                 }
             }
         }
@@ -114,12 +110,8 @@ impl TextureManager {
     const RECEIVE_TEXTURE: RawTextureReceiveCallback =
         texture_receive!(TextureManager::receive_texture);
 
-    fn next_id(&mut self) -> String {
-        format!("REFFECT_ICON_{}", Uuid::new_v4().as_simple())
-    }
-
     fn add_pending(&mut self, source: IconSource) -> String {
-        let id = self.next_id();
+        let id = source.generate_id();
         self.pending.insert(id.clone(), source);
         id
     }
@@ -129,16 +121,21 @@ impl TextureManager {
             .pending
             .remove(pending_id)
             .expect("received load for non-pending texture");
+
         if let Some(texture_id) = texture_id {
             if let IconSource::Empty = source {
                 log::debug!("Loaded default icon: id {}", texture_id.id());
                 self.default = Some(texture_id);
             } else {
-                log::debug!("Loaded icon source {source:?}: id {}", texture_id.id());
+                log::debug!(
+                    "Loaded icon source {}: id {}",
+                    source.pretty_print(),
+                    texture_id.id()
+                );
                 self.loaded.insert(source, texture_id);
             }
         } else {
-            log::warn!("Failed to load icon source {source:?}");
+            log::warn!("Failed to load icon source {}", source.pretty_print());
         }
     }
 }

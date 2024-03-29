@@ -37,7 +37,7 @@ impl Addon {
 
     pub fn load_packs(&mut self) {
         let addon_dir = get_addon_dir(ADDON_NAME).expect("invalid addon directory");
-        log::info!("Loading packs from {}", addon_dir.display());
+        log::info!("Loading packs from \"{}\"", addon_dir.display());
 
         let _ = fs::create_dir(&addon_dir);
         let files = fs::read_dir(&addon_dir)
