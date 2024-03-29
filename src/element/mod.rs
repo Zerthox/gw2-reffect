@@ -7,11 +7,12 @@ mod icon_source;
 mod pack;
 mod state;
 mod text;
+mod text_align;
 mod util;
 
 pub use self::{
     anchor::*, group::*, icon::*, icon_element::*, icon_group::*, icon_source::*, pack::*,
-    state::*, text::*,
+    state::*, text::*, text_align::*,
 };
 
 use crate::context::Context;

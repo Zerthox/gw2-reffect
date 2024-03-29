@@ -1,28 +1,53 @@
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
+use strum::{AsRefStr, EnumIter, IntoEnumIterator};
 
 /// Screen anchor point.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    EnumIter,
+    AsRefStr,
+    Serialize,
+    Deserialize,
+)]
 pub enum Anchor {
-    /// Anchored to top left of screen.
+    #[strum(serialize = "Top left")]
     TopLeft,
 
-    /// Anchored to top right of screen.
+    #[strum(serialize = "Top center")]
+    TopCenter,
+
+    #[strum(serialize = "Top right")]
     TopRight,
 
-    /// Anchored to bottom left of screen.
+    #[strum(serialize = "Bottom left")]
     BottomLeft,
 
-    /// Anchored to bottom right of screen.
+    #[strum(serialize = "Bottom center")]
+    BottomCenter,
+
+    #[strum(serialize = "Bottom right")]
     BottomRight,
 
-    /// Anchored to center of screen.
     Center,
+
+    #[strum(serialize = "Left Center")]
+    LeftCenter,
+
+    #[strum(serialize = "Right Center")]
+    RightCenter,
 }
 
 impl Anchor {
     /// Calculates the screen position.
-    pub fn pos(&self, ui: &Ui) -> [f32; 2] {
+    pub fn calc_pos(&self, ui: &Ui) -> [f32; 2] {
         let [screen_x, screen_y] = ui.io().display_size;
         match self {
             Self::TopLeft => [0.0, 0.0],
@@ -30,17 +55,19 @@ impl Anchor {
             Self::BottomLeft => [0.0, screen_y],
             Self::BottomRight => [screen_x, screen_y],
             Self::Center => [0.5 * screen_x, 0.5 * screen_y],
+            Self::TopCenter => [0.5 * screen_x, 0.0],
+            Self::BottomCenter => [0.5 * screen_x, screen_y],
+            Self::LeftCenter => [0.0, 0.5 * screen_y],
+            Self::RightCenter => [screen_x, 0.5 * screen_y],
         }
     }
 
     /// Renders a select for the anchor.
     pub fn render_select(&mut self, ui: &Ui) {
         ui.group(|| {
-            ui.radio_button("Top left", self, Self::TopLeft);
-            ui.radio_button("Top right", self, Self::TopRight);
-            ui.radio_button("Bottom left", self, Self::BottomLeft);
-            ui.radio_button("Bottom right", self, Self::BottomRight);
-            ui.radio_button("Center", self, Self::Center);
+            for entry in Self::iter() {
+                ui.radio_button(entry, self, entry);
+            }
         });
     }
 }

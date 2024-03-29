@@ -1,4 +1,4 @@
-use super::{util::add_pos, Context, Render, State};
+use super::{util::add_pos, Context, Render, State, TextAlign};
 use crate::trigger::BuffTrigger;
 use nexus::imgui::{ImColor32, Ui};
 use serde::{Deserialize, Serialize};
@@ -9,6 +9,7 @@ pub struct Text {
     pub text: String,
     pub buff: BuffTrigger,
     pub offset: [f32; 2],
+    pub align: TextAlign,
     pub color: [u8; 4],
     pub size: f32,
 }
@@ -35,10 +36,14 @@ impl Render for Text {
 
     fn render(&mut self, ui: &Ui, ctx: &Context, state: &mut State) {
         if let Some(text) = self.process_text(ctx) {
-            let pos = add_pos(state.pos, self.offset);
-            ui.set_cursor_screen_pos(pos);
             ui.set_window_font_scale(self.size);
+
+            let offset = add_pos(self.offset, self.align.calc_pos(ui, &text));
+            let pos = add_pos(state.pos, offset);
+            ui.set_cursor_screen_pos(pos);
             ui.text_colored(self.color(), text);
+
+            ui.set_window_font_scale(1.0);
         }
     }
 }
@@ -49,6 +54,7 @@ impl Default for Text {
             text: String::new(),
             buff: BuffTrigger::default(),
             offset: [0.0, 0.0],
+            align: TextAlign::Center,
             color: [255, 255, 255, 255],
             size: 1.0,
         }
