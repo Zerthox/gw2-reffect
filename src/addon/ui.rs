@@ -44,11 +44,8 @@ impl Addon {
 
     pub fn render_options(&mut self, ui: &Ui) {
         ui.text(format!("Packs loaded: {}", self.packs.len()));
-        for pack in &mut self.packs {
-            ui.checkbox(
-                format!("{} by {}:", pack.name, pack.author),
-                &mut pack.enabled,
-            );
+        for (i, pack) in self.packs.iter_mut().enumerate() {
+            ui.checkbox(format!("{}##pack-{i}", pack.name), &mut pack.enabled);
             ui.same_line();
             let [r, g, b, a] = ui.style_color(StyleColor::Text);
             let file = pack

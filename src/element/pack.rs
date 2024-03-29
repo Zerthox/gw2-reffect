@@ -1,6 +1,6 @@
 use super::{util::add_pos, Anchor, Context, Element, Render, State};
 use crate::trigger::{PackTrigger, Trigger};
-use nexus::imgui::{ImColor32, Ui};
+use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 use std::{
     fs::File,
@@ -13,7 +13,6 @@ use std::{
 pub struct Pack {
     pub enabled: bool,
     pub name: String,
-    pub author: String,
     pub trigger: PackTrigger,
     pub anchor: Anchor,
     pub pos: [f32; 2],
@@ -41,7 +40,7 @@ impl Pack {
     }
 
     pub fn pos(&self, ui: &Ui) -> [f32; 2] {
-        add_pos(self.anchor.pos(ui), self.pos)
+        add_pos(self.anchor.calc_pos(ui), self.pos)
     }
 }
 
@@ -60,14 +59,19 @@ impl Render for Pack {
             for element in &mut self.elements {
                 element.render(ui, ctx, state);
             }
+
             if ctx.edit {
                 const SIZE: f32 = 3.0;
                 let start = [x - SIZE, y - SIZE];
                 let end = [x + SIZE, y + SIZE];
+                const COLOR: [f32; 4] = [1.0, 0.0, 0.0, 0.8];
                 ui.get_window_draw_list()
-                    .add_rect(start, end, ImColor32::from_rgb(255, 0, 0))
+                    .add_rect(start, end, COLOR)
                     .filled(true)
-                    .build()
+                    .build();
+
+                ui.set_cursor_screen_pos([x, y]);
+                ui.text_colored(COLOR, &self.name);
             }
         }
     }
@@ -78,7 +82,6 @@ impl Default for Pack {
         Self {
             enabled: false,
             name: "Unnamed".into(),
-            author: "Unknown".into(),
             trigger: PackTrigger::default(),
             anchor: Anchor::TopLeft,
             pos: [0.0, 0.0],
