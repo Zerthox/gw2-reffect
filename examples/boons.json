@@ -1,0 +1,81 @@
+{
+    "enabled": true,
+    "name": "Important Boons",
+    "trigger": {
+        "player": {
+            "profs": [],
+            "specs": []
+        },
+        "map": "Any"
+    },
+    "anchor": "BottomCenter",
+    "pos": [0.0, -250.0],
+    "elements": [
+        {
+            "IconGroup": {
+                "name": "Boon Icons",
+                "direction": "Horizontal",
+                "size": [32.0, 32.0],
+                "padding": 2.0,
+                "offset": [0.0, 0.0],
+                "icons": [
+                    {
+                        "name": "Aegis",
+                        "buff": {
+                            "Single": 743
+                        },
+                        "icon": {
+                            "Url": "https://wiki.guildwars2.com/images/e/e5/Aegis.png"
+                        },
+                        "tint": [255, 255, 255],
+                        "opacity": 0.8
+                    },
+                    {
+                        "name": "Might",
+                        "buff": {
+                            "Single": 740
+                        },
+                        "icon": {
+                            "Url": "https://wiki.guildwars2.com/images/7/7c/Might.png"
+                        },
+                        "tint": [255, 255, 255],
+                        "opacity": 0.8
+                    },
+                    {
+                        "name": "Quickness",
+                        "buff": {
+                            "Single": 1187
+                        },
+                        "icon": {
+                            "Url": "https://wiki.guildwars2.com/images/b/b4/Quickness.png"
+                        },
+                        "tint": [255, 255, 255],
+                        "opacity": 0.8
+                    },
+                    {
+                        "name": "Alacrity",
+                        "buff": {
+                            "Single": 30328
+                        },
+                        "icon": {
+                            "Url": "https://wiki.guildwars2.com/images/4/4c/Alacrity.png"
+                        },
+                        "tint": [255, 255, 255],
+                        "opacity": 0.8
+                    },
+                    {
+                        "name": "Stability",
+                        "buff": {
+                            "Single": 1122
+                        },
+                        "icon": {
+                            "Url": "https://wiki.guildwars2.com/images/a/ae/Stability.png"
+                        },
+                        "tint": [255, 255, 255],
+                        "opacity": 0.8
+                    }
+                ]
+            }
+        }
+    ]
+}
