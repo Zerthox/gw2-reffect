@@ -18,7 +18,7 @@ impl Render for IconElement {
     fn render(&mut self, ui: &Ui, ctx: &Context, state: &mut State) {
         state.with_offset(self.offset, |state| {
             if self.icon.is_active(ctx) {
-                self.icon.render(ui, state.pos, self.size)
+                self.icon.render(ui, ctx, state.pos, self.size)
             }
         })
     }

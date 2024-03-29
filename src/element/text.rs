@@ -1,4 +1,4 @@
-use super::{util::add_pos, Context, Render, State, TextAlign};
+use super::{util::ComponentWise, Context, Render, State, TextAlign};
 use crate::trigger::BuffTrigger;
 use nexus::imgui::{ImColor32, Ui};
 use serde::{Deserialize, Serialize};
@@ -38,8 +38,8 @@ impl Render for Text {
         if let Some(text) = self.process_text(ctx) {
             ui.set_window_font_scale(self.size);
 
-            let offset = add_pos(self.offset, self.align.calc_pos(ui, &text));
-            let pos = add_pos(state.pos, offset);
+            let offset = self.align.calc_pos(ui, &text).add(self.offset);
+            let pos = state.pos.add(offset);
             ui.set_cursor_screen_pos(pos);
             ui.text_colored(self.color(), text);
 

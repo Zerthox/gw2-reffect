@@ -1,4 +1,4 @@
-use super::{util::add_pos, Anchor, Context, Element, Render, State};
+use super::{util::ComponentWise, Anchor, Context, Element, Render, State};
 use crate::trigger::{PackTrigger, Trigger};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
@@ -19,7 +19,7 @@ pub struct Pack {
     pub elements: Vec<Element>,
 
     #[serde(skip)]
-    pub editing: bool,
+    pub edit: bool,
 
     #[serde(skip)]
     pub file: PathBuf,
@@ -43,38 +43,38 @@ impl Pack {
     }
 
     pub fn pos(&self, ui: &Ui) -> [f32; 2] {
-        add_pos(self.anchor.calc_pos(ui), self.pos)
+        self.anchor.calc_pos(ui).add(self.pos)
     }
-}
 
-impl Render for Pack {
-    fn load(&mut self) {
+    pub fn load(&mut self) {
         for element in &mut self.elements {
             element.load();
         }
     }
 
-    fn render(&mut self, ui: &Ui, ctx: &Context, state: &mut State) {
-        let ctx = ctx.with_edit(self.editing);
-        if ctx.edit || (self.enabled && self.trigger.is_active(&ctx)) {
-            state.pos = self.pos(ui);
-            let [x, y] = state.pos;
+    pub fn render(&mut self, ui: &Ui, ctx: &Context) {
+        if self.edit || (self.enabled && self.trigger.is_active(ctx)) {
+            let ctx = ctx.with_edit(self.edit);
+            let pos = self.pos(ui);
+            let mut state = State::with_pos(pos);
 
             for element in &mut self.elements {
-                element.render(ui, &ctx, state);
+                element.render(ui, &ctx, &mut state);
             }
 
-            if ctx.edit {
+            if self.edit {
                 const SIZE: f32 = 3.0;
-                let start = [x - SIZE, y - SIZE];
-                let end = [x + SIZE, y + SIZE];
                 const COLOR: [f32; 4] = [1.0, 0.0, 0.0, 0.8];
+
+                let offset = [SIZE, SIZE];
+                let start = pos.sub(offset);
+                let end = pos.add(offset);
                 ui.get_window_draw_list()
                     .add_rect(start, end, COLOR)
                     .filled(true)
                     .build();
 
-                ui.set_cursor_screen_pos([x, y]);
+                ui.set_cursor_screen_pos(pos.add([SIZE, 0.0]));
                 ui.text_colored(COLOR, &self.name);
             }
         }
@@ -90,7 +90,7 @@ impl Default for Pack {
             anchor: Anchor::TopLeft,
             pos: [0.0, 0.0],
             elements: Vec::new(),
-            editing: false,
+            edit: false,
             file: PathBuf::new(),
         }
     }

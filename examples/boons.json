@@ -27,6 +27,7 @@
                         "icon": {
                             "Url": "https://wiki.guildwars2.com/images/e/e5/Aegis.png"
                         },
+                        "stacks": true,
                         "tint": [255, 255, 255],
                         "opacity": 0.8
                     },
@@ -38,6 +39,7 @@
                         "icon": {
                             "Url": "https://wiki.guildwars2.com/images/7/7c/Might.png"
                         },
+                        "stacks": false,
                         "tint": [255, 255, 255],
                         "opacity": 0.8
                     },
@@ -49,6 +51,7 @@
                         "icon": {
                             "Url": "https://wiki.guildwars2.com/images/b/b4/Quickness.png"
                         },
+                        "stacks": false,
                         "tint": [255, 255, 255],
                         "opacity": 0.8
                     },
@@ -60,6 +63,7 @@
                         "icon": {
                             "Url": "https://wiki.guildwars2.com/images/4/4c/Alacrity.png"
                         },
+                        "stacks": false,
                         "tint": [255, 255, 255],
                         "opacity": 0.8
                     },
@@ -71,6 +75,7 @@
                         "icon": {
                             "Url": "https://wiki.guildwars2.com/images/a/ae/Stability.png"
                         },
+                        "stacks": true,
                         "tint": [255, 255, 255],
                         "opacity": 0.8
                     }

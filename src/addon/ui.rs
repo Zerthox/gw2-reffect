@@ -1,8 +1,5 @@
 use super::Addon;
-use crate::{
-    context::Context,
-    element::{Render, State},
-};
+use crate::context::Context;
 use nexus::imgui::{Condition, StyleColor, Ui, Window};
 
 impl Addon {
@@ -21,10 +18,8 @@ impl Addon {
                 .focus_on_appearing(false)
                 .build(ui, || {
                     let ctx = Context::new(false, &self.player, buffs);
-                    let mut state = State::new();
-
                     for pack in &mut self.packs {
-                        pack.render(ui, &ctx, &mut state);
+                        pack.render(ui, &ctx);
                     }
                 });
         }
@@ -63,7 +58,7 @@ impl Addon {
                 .to_string_lossy();
             ui.text_colored([r, g, b, a * 0.5], file);
             ui.same_line();
-            pack.editing = if pack.editing {
+            pack.edit = if pack.edit {
                 !ui.button(format!("Done##pack{i}"))
             } else {
                 ui.button(format!("Edit##pack{i}"))

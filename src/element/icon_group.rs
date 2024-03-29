@@ -1,4 +1,4 @@
-use super::{util::add_pos, Context, Icon, Render, State};
+use super::{util::ComponentWise, Context, Icon, Render, State};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
@@ -29,13 +29,13 @@ impl Render for IconGroup {
                 .collect::<Vec<_>>();
             let icon_count = icons.len();
 
-            let start_pos = add_pos(state.pos, self.direction.initial_offset(self.size));
+            let start_pos = state.pos.add(self.direction.initial_offset(self.size));
             for (i, icon) in icons.into_iter().enumerate() {
                 let offset = self
                     .direction
                     .offset_for(self.size, self.padding, i, icon_count);
-                let pos = add_pos(start_pos, offset);
-                icon.render(ui, pos, self.size);
+                let pos = start_pos.add(offset);
+                icon.render(ui, ctx, pos, self.size);
             }
         })
     }

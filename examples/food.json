@@ -69,6 +69,7 @@
                         "icon": {
                             "Url": "https://wiki.guildwars2.com/images/6/67/Malnourished.png"
                         },
+                        "stacks": false,
                         "tint": [255, 255, 255],
                         "opacity": 0.7
                     },
@@ -80,6 +81,7 @@
                         "icon": {
                             "Url": "https://wiki.guildwars2.com/images/7/71/Diminished.png"
                         },
+                        "stacks": false,
                         "tint": [255, 255, 255],
                         "opacity": 0.7
                     }
