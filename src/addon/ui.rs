@@ -2,7 +2,6 @@ use super::Addon;
 use crate::{
     context::Context,
     element::{Render, State},
-    get_buffs::get_buffs,
     texture_manager::TextureManager,
 };
 use nexus::imgui::{Condition, StyleColor, Ui, Window};
@@ -11,41 +10,50 @@ impl Addon {
     pub fn render(&mut self, ui: &Ui) {
         self.perform_updates();
 
-        match unsafe { get_buffs() } {
-            Ok(buffs) => {
-                let screen_size = ui.io().display_size;
-                Window::new("##reffect-displays")
-                    .position([0.0, 0.0], Condition::Always)
-                    .content_size(screen_size)
-                    .draw_background(false)
-                    .no_decoration()
-                    .no_inputs()
-                    .movable(false)
-                    .focus_on_appearing(false)
-                    .build(ui, || {
-                        let ctx = Context::new(self.editing, &self.player, buffs);
-                        let mut state = State::new();
+        if let Ok(buffs) = &self.buffs {
+            let screen_size = ui.io().display_size;
+            Window::new("##reffect-displays")
+                .position([0.0, 0.0], Condition::Always)
+                .content_size(screen_size)
+                .draw_background(false)
+                .no_decoration()
+                .no_inputs()
+                .movable(false)
+                .focus_on_appearing(false)
+                .build(ui, || {
+                    let ctx = Context::new(false, &self.player, buffs);
+                    let mut state = State::new();
 
-                        for pack in &mut self.packs {
-                            pack.render(ui, &ctx, &mut state);
-                        }
-                    });
-            }
-            Err(err) => {
-                Window::new("Reffect Error##reffect-getbuffs-error")
-                    .collapsible(false)
-                    .always_auto_resize(true)
-                    .build(ui, || {
-                        ui.text_colored([1.0, 0.0, 0.0, 1.0], format!("{err}"));
-                    });
-            }
+                    for pack in &mut self.packs {
+                        pack.render(ui, &ctx, &mut state);
+                    }
+                });
+        }
+
+        if self.debug {
+            Window::new("Reffect Debug")
+                .collapsible(false)
+                .always_auto_resize(true)
+                .opened(&mut self.debug)
+                .build(ui, || {
+                    ui.text("Buffs status:");
+                    ui.same_line();
+                    match self.buffs {
+                        Ok(_) => ui.text_colored([0.0, 1.0, 0.0, 1.0], "Ok"),
+                        Err(err) => ui.text_colored([1.0, 0.0, 0.0, 1.0], err.to_string()),
+                    }
+                    ui.text(format!("Player profession: {}", self.player.prof));
+                    ui.text(format!("Player specialization: {}", self.player.spec));
+                    ui.text(format!("Map id: {}", self.player.map.id));
+                    ui.text(format!("Map category: {}", self.player.map.category));
+                });
         }
     }
 
     pub fn render_options(&mut self, ui: &Ui) {
         ui.text(format!("Packs loaded: {}", self.packs.len()));
         for (i, pack) in self.packs.iter_mut().enumerate() {
-            ui.checkbox(format!("{}##pack-{i}", pack.name), &mut pack.enabled);
+            ui.checkbox(format!("{}##pack{i}", pack.name), &mut pack.enabled);
             ui.same_line();
             let [r, g, b, a] = ui.style_color(StyleColor::Text);
             let file = pack
@@ -55,6 +63,12 @@ impl Addon {
                 .unwrap_or_default()
                 .to_string_lossy();
             ui.text_colored([r, g, b, a * 0.5], file);
+            ui.same_line();
+            pack.editing = if pack.editing {
+                !ui.button(format!("Done##pack{i}"))
+            } else {
+                ui.button(format!("Edit##pack{i}"))
+            };
         }
 
         ui.spacing();
@@ -68,9 +82,6 @@ impl Addon {
         }
 
         ui.spacing();
-        ui.checkbox("Edit mode", &mut self.editing);
-
-        ui.spacing();
         if ui.button("Reload icons") {
             log::debug!("Reloading icons");
             TextureManager::clear();
@@ -78,5 +89,7 @@ impl Addon {
                 pack.load();
             }
         }
+        ui.same_line();
+        ui.checkbox("Debug", &mut self.debug);
     }
 }

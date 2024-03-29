@@ -18,9 +18,12 @@ impl PlayerContext {
     }
 
     pub fn update(&mut self, mumble: &MumbleLink) {
-        if let Ok(identity) = mumble.parse_identity() {
-            self.prof = identity.profession;
-            self.spec = identity.spec;
+        match mumble.parse_identity() {
+            Ok(identity) => {
+                self.prof = identity.profession;
+                self.spec = identity.spec;
+            }
+            Err(err) => log::warn!("Failed to parse mumble identity: {err}"),
         }
         self.map.update(&mumble.context);
     }

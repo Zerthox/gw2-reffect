@@ -70,6 +70,7 @@ impl TextureManager {
     pub fn add_source(source: &IconSource) {
         let mut textures = Self::lock();
         if !textures.loaded.contains_key(source) {
+            // TODO: load in separate thread?
             match source {
                 IconSource::Empty => {}
                 IconSource::File(path) => {

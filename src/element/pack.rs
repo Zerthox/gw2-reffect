@@ -19,6 +19,9 @@ pub struct Pack {
     pub elements: Vec<Element>,
 
     #[serde(skip)]
+    pub editing: bool,
+
+    #[serde(skip)]
     pub file: PathBuf,
 }
 
@@ -52,12 +55,13 @@ impl Render for Pack {
     }
 
     fn render(&mut self, ui: &Ui, ctx: &Context, state: &mut State) {
-        if self.enabled && self.trigger.is_active(ctx) {
+        let ctx = ctx.with_edit(self.editing);
+        if ctx.edit || (self.enabled && self.trigger.is_active(&ctx)) {
             state.pos = self.pos(ui);
             let [x, y] = state.pos;
 
             for element in &mut self.elements {
-                element.render(ui, ctx, state);
+                element.render(ui, &ctx, state);
             }
 
             if ctx.edit {
@@ -86,6 +90,7 @@ impl Default for Pack {
             anchor: Anchor::TopLeft,
             pos: [0.0, 0.0],
             elements: Vec::new(),
+            editing: false,
             file: PathBuf::new(),
         }
     }

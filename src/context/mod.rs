@@ -21,6 +21,14 @@ impl<'a> Context<'a> {
         }
     }
 
+    pub fn with_edit(&self, edit: bool) -> Self {
+        Self {
+            edit,
+            player: self.player,
+            buffs: self.buffs,
+        }
+    }
+
     pub fn buff(&self, id: u32) -> Option<&StackedBuff> {
         self.buffs.iter().find(|entry| entry.id == id)
     }

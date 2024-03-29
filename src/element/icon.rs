@@ -29,6 +29,7 @@ impl Icon {
     }
 
     pub fn render(&mut self, ui: &Ui, pos: [f32; 2], size: [f32; 2]) {
+        // TODO: optional stacks display
         if let Some(texture) = self.icon.get_texture() {
             let end = add_pos(pos, size);
             let draw_list = ui.get_window_draw_list();

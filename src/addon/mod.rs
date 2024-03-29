@@ -17,8 +17,8 @@ const PLAYER_INTERVAL: u32 = 100;
 
 #[derive(Debug)]
 pub struct Addon {
+    debug: bool,
     packs: Vec<Pack>,
-    editing: bool,
     buffs: Result<Vec<StackedBuff>, GetBuffsError>,
     player: PlayerContext,
     buffs_update: Interval,
@@ -28,8 +28,8 @@ pub struct Addon {
 impl Addon {
     pub fn new() -> Self {
         Self {
+            debug: false,
             packs: Vec::new(),
-            editing: false,
             buffs: Ok(Vec::new()),
             player: PlayerContext::empty(),
             buffs_update: Interval::new(BUFFS_INTERVAL),
