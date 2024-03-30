@@ -95,7 +95,7 @@
                     },
                     {
                         "Text": {
-                            "text": "Rebuff!",
+                            "text": "Rebuff",
                             "buff": {
                                 "Any": [46587, 46668]
                             },
@@ -103,7 +103,7 @@
                             "align": "Center",
                             "size": 2.5,
                             "color": [255, 0, 0, 180],
-                            "decoration": "Shadow"
+                            "decoration": "None"
                         }
                     }
                 ]
