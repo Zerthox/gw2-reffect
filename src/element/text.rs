@@ -1,4 +1,5 @@
-use super::{util::ComponentWise, Context, Render, State, TextAlign};
+use super::{Context, Render, State, TextAlign, TextDecoration};
+use crate::component_wise::ComponentWise;
 use crate::trigger::BuffTrigger;
 use nexus::imgui::{ImColor32, Ui};
 use serde::{Deserialize, Serialize};
@@ -10,8 +11,9 @@ pub struct Text {
     pub buff: BuffTrigger,
     pub offset: [f32; 2],
     pub align: TextAlign,
-    pub color: [u8; 4],
     pub size: f32,
+    pub color: [u8; 4],
+    pub decoration: TextDecoration,
 }
 
 mod replace {
@@ -41,7 +43,9 @@ impl Render for Text {
             let offset = self.align.calc_pos(ui, &text).add(self.offset);
             let pos = state.pos.add(offset);
             ui.set_cursor_screen_pos(pos);
-            ui.text_colored(self.color(), text);
+            let color @ [_, _, _, alpha] = self.color();
+            self.decoration.render(ui, &text, [0.0, 0.0, 0.0, alpha]);
+            ui.text_colored(color, &text);
 
             ui.set_window_font_scale(1.0);
         }
@@ -55,8 +59,9 @@ impl Default for Text {
             buff: BuffTrigger::default(),
             offset: [0.0, 0.0],
             align: TextAlign::Center,
-            color: [255, 255, 255, 255],
             size: 1.0,
+            color: [255, 255, 255, 255],
+            decoration: TextDecoration::Shadow,
         }
     }
 }

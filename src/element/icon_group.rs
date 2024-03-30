@@ -1,4 +1,5 @@
-use super::{util::ComponentWise, Context, Icon, Render, State};
+use super::{Context, Icon, Render, State};
+use crate::component_wise::ComponentWise;
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 

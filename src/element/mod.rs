@@ -8,11 +8,11 @@ mod pack;
 mod state;
 mod text;
 mod text_align;
-mod util;
+mod text_decoration;
 
 pub use self::{
     anchor::*, group::*, icon::*, icon_element::*, icon_group::*, icon_source::*, pack::*,
-    state::*, text::*, text_align::*,
+    state::*, text::*, text_align::*, text_decoration::*,
 };
 
 use crate::context::Context;

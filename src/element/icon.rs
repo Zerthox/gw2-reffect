@@ -1,7 +1,5 @@
-use super::{
-    util::{text_outline, ComponentWise},
-    Context, IconSource, TextAlign,
-};
+use super::{Context, IconSource, TextAlign, TextDecoration};
+use crate::component_wise::ComponentWise;
 use crate::trigger::{BuffTrigger, Trigger};
 use nexus::imgui::{ImColor32, Ui};
 use serde::{Deserialize, Serialize};
@@ -50,12 +48,12 @@ impl Icon {
                     ui.set_window_font_scale(font_scale);
                     let text = stacks.to_string();
                     let [x_offset, _] = TextAlign::Right.calc_pos(ui, &text);
-                    let pad = [2.0, 0.0]; // TODO: customizable offset?
+                    let pad = [1.0, 1.0]; // TODO: customizable offset!
                     let line_height = ui.text_line_height();
                     let text_pos = end.add([x_offset, -line_height]).sub(pad);
 
                     ui.set_cursor_screen_pos(text_pos);
-                    text_outline(ui, &text, [0.0, 0.0, 0.0, self.opacity]);
+                    TextDecoration::Shadow.render(ui, &text, [0.0, 0.0, 0.0, self.opacity]);
                     ui.text_colored(color, &text);
 
                     ui.set_window_font_scale(1.0);

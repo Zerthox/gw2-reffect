@@ -4,10 +4,6 @@ pub struct State {
 }
 
 impl State {
-    pub const fn empty() -> Self {
-        Self::with_pos([0.0, 0.0])
-    }
-
     pub const fn with_pos(pos: [f32; 2]) -> Self {
         Self { pos }
     }

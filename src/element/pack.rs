@@ -1,4 +1,5 @@
-use super::{util::ComponentWise, Anchor, Context, Element, Render, State};
+use super::{Anchor, Context, Element, Render, State};
+use crate::component_wise::ComponentWise;
 use crate::trigger::{PackTrigger, Trigger};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
@@ -11,8 +12,8 @@ use std::{
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Pack {
-    pub enabled: bool,
     pub name: String,
+    pub enabled: bool,
     pub trigger: PackTrigger,
     pub anchor: Anchor,
     pub pos: [f32; 2],
@@ -84,8 +85,8 @@ impl Pack {
 impl Default for Pack {
     fn default() -> Self {
         Self {
-            enabled: false,
             name: "Unnamed".into(),
+            enabled: false,
             trigger: PackTrigger::default(),
             anchor: Anchor::TopLeft,
             pos: [0.0, 0.0],

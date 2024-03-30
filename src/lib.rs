@@ -1,5 +1,6 @@
 mod addon;
 mod assets;
+mod component_wise;
 mod context;
 mod element;
 mod get_buffs;

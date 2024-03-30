@@ -11,6 +11,10 @@ pub enum IconSource {
 }
 
 impl IconSource {
+    pub fn needs_load(&self) -> bool {
+        !matches!(self, Self::Empty)
+    }
+
     pub fn load(&self) {
         TextureManager::add_source(self)
     }
@@ -33,7 +37,7 @@ impl IconSource {
         match self {
             Self::Empty => "empty".into(),
             Self::File(path) => format!("file \"{}\"", path.display()),
-            Self::Url(url) => format!("url \"{url}\""),
+            Self::Url(url) => format!("url \"{}\"", url.replace('%', "%%")), // TODO: remove once fixed in nexus
         }
     }
 }
