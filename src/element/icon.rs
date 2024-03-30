@@ -41,7 +41,7 @@ impl Icon {
 
             // render stack count
             if self.stacks {
-                if let Some(stacks @ 2..) = self.buff.get_stacks(ctx) {
+                if let Some(stacks) = self.buff.get_stacks(ctx) {
                     ui.set_window_font_scale(1.0);
 
                     let [_, height] = size;
