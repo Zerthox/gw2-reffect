@@ -1,6 +1,6 @@
 {
-    "enabled": true,
     "name": "Important Boons",
+    "enabled": true,
     "trigger": {
         "player": {
             "profs": [],
@@ -39,7 +39,7 @@
                         "icon": {
                             "Url": "https://wiki.guildwars2.com/images/7/7c/Might.png"
                         },
-                        "stacks": false,
+                        "stacks": true,
                         "tint": [255, 255, 255],
                         "opacity": 0.8
                     },

@@ -1,6 +1,6 @@
 {
-    "enabled": true,
     "name": "Food Reminder",
+    "enabled": true,
     "trigger": {
         "player": {
             "profs": [],
@@ -96,8 +96,9 @@
                 },
                 "offset": [0.0, 25.0],
                 "align": "Center",
+                "size": 2.5,
                 "color": [255, 0, 0, 180],
-                "size": 2.5
+                "decoration": "None"
             }
         }
     ]
