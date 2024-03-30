@@ -3,8 +3,9 @@ use nexus::imgui::TextureId;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum IconSource {
+    #[default]
     Empty,
     File(PathBuf),
     Url(String),

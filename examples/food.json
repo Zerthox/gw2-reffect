@@ -54,51 +54,59 @@
     "pos": [500.0, 300.0],
     "elements": [
         {
-            "IconGroup": {
-                "name": "Food Reminder Icons",
-                "direction": "Horizontal",
-                "size": [48.0, 48.0],
-                "padding": 5.0,
-                "offset": [0.0, 0.0],
-                "icons": [
+            "Animation": {
+                "animation": "Pulse",
+                "period": 3000,
+                "elements": [
                     {
-                        "name": "Malnourished",
-                        "buff": {
-                            "Single": 46587
-                        },
-                        "icon": {
-                            "Url": "https://wiki.guildwars2.com/images/6/67/Malnourished.png"
-                        },
-                        "stacks": false,
-                        "tint": [255, 255, 255],
-                        "opacity": 0.7
+                        "IconGroup": {
+                            "name": "Food Reminder Icons",
+                            "direction": "Horizontal",
+                            "size": [48.0, 48.0],
+                            "padding": 5.0,
+                            "offset": [0.0, 0.0],
+                            "icons": [
+                                {
+                                    "name": "Malnourished",
+                                    "buff": {
+                                        "Single": 46587
+                                    },
+                                    "icon": {
+                                        "Url": "https://wiki.guildwars2.com/images/6/67/Malnourished.png"
+                                    },
+                                    "stacks": false,
+                                    "tint": [255, 255, 255],
+                                    "opacity": 0.7
+                                },
+                                {
+                                    "name": "Diminished",
+                                    "buff": {
+                                        "Single": 46668
+                                    },
+                                    "icon": {
+                                        "Url": "https://wiki.guildwars2.com/images/7/71/Diminished.png"
+                                    },
+                                    "stacks": false,
+                                    "tint": [255, 255, 255],
+                                    "opacity": 0.7
+                                }
+                            ]
+                        }
                     },
                     {
-                        "name": "Diminished",
-                        "buff": {
-                            "Single": 46668
-                        },
-                        "icon": {
-                            "Url": "https://wiki.guildwars2.com/images/7/71/Diminished.png"
-                        },
-                        "stacks": false,
-                        "tint": [255, 255, 255],
-                        "opacity": 0.7
+                        "Text": {
+                            "text": "Rebuff!",
+                            "buff": {
+                                "Any": [46587, 46668]
+                            },
+                            "offset": [0.0, 25.0],
+                            "align": "Center",
+                            "size": 2.5,
+                            "color": [255, 0, 0, 180],
+                            "decoration": "Shadow"
+                        }
                     }
                 ]
-            }
-        },
-        {
-            "Text": {
-                "text": "Rebuff!",
-                "buff": {
-                    "Any": [46587, 46668]
-                },
-                "offset": [0.0, 25.0],
-                "align": "Center",
-                "size": 2.5,
-                "color": [255, 0, 0, 180],
-                "decoration": "None"
             }
         }
     ]

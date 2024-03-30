@@ -1,4 +1,5 @@
 mod anchor;
+mod animation;
 mod group;
 mod icon;
 mod icon_element;
@@ -11,8 +12,8 @@ mod text_align;
 mod text_decoration;
 
 pub use self::{
-    anchor::*, group::*, icon::*, icon_element::*, icon_group::*, icon_source::*, pack::*,
-    state::*, text::*, text_align::*, text_decoration::*,
+    anchor::*, animation::*, group::*, icon::*, icon_element::*, icon_group::*, icon_source::*,
+    pack::*, state::*, text::*, text_align::*, text_decoration::*,
 };
 
 use crate::context::Context;
@@ -31,6 +32,7 @@ pub enum Element {
     IconGroup(IconGroup),
     Icon(IconElement),
     Text(Text),
+    Animation(Animation),
 }
 
 impl Render for Element {
@@ -40,6 +42,7 @@ impl Render for Element {
             Self::IconGroup(group) => group.load(),
             Self::Icon(icon) => icon.load(),
             Self::Text(text) => text.load(),
+            Self::Animation(animation) => animation.load(),
         }
     }
 
@@ -49,6 +52,7 @@ impl Render for Element {
             Self::IconGroup(group) => group.render(ui, ctx, state),
             Self::Icon(icon) => icon.render(ui, ctx, state),
             Self::Text(text) => text.render(ui, ctx, state),
+            Self::Animation(animation) => animation.render(ui, ctx, state),
         }
     }
 }

@@ -24,17 +24,18 @@ impl Icon {
         self.buff.is_active(ctx)
     }
 
-    fn color(&self) -> [f32; 4] {
+    fn color(&self, ui: &Ui) -> [f32; 4] {
         let [r, g, b] = self.tint;
         let [r, g, b, _] = ImColor32::from_rgb(r, g, b).to_rgba_f32s();
-        [r, g, b, self.opacity]
+        let global_alpha = ui.clone_style().alpha;
+        [r, g, b, self.opacity * global_alpha]
     }
 
     pub fn render(&mut self, ui: &Ui, ctx: &Context, pos: [f32; 2], size: [f32; 2]) {
         if let Some(texture) = self.icon.get_texture() {
             let end = pos.add(size);
             let draw_list = ui.get_window_draw_list();
-            let color = self.color();
+            let color = self.color(ui);
             draw_list.add_image(texture, pos, end).col(color).build();
             drop(draw_list);
 

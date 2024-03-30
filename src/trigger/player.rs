@@ -4,6 +4,7 @@ use nexus::data_link::mumble::Profession;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[serde(default)]
 pub struct PlayerTrigger {
     pub profs: Vec<Profession>,
     pub specs: Vec<u32>,
