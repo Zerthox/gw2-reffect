@@ -23,7 +23,7 @@ impl<'a> Context<'a> {
 
     pub fn with_edit(&self, edit: bool) -> Self {
         Self {
-            edit,
+            edit: self.edit || edit,
             player: self.player,
             buffs: self.buffs,
         }

@@ -54,8 +54,8 @@ impl Pack {
     }
 
     pub fn render(&mut self, ui: &Ui, ctx: &Context) {
-        if self.edit || (self.enabled && self.trigger.is_active(ctx)) {
-            let ctx = ctx.with_edit(self.edit);
+        let ctx = ctx.with_edit(self.edit);
+        if ctx.edit || (self.enabled && self.trigger.is_active(&ctx)) {
             let pos = self.pos(ui);
             let mut state = State::with_pos(pos);
 
@@ -63,7 +63,7 @@ impl Pack {
                 element.render(ui, &ctx, &mut state);
             }
 
-            if self.edit {
+            if ctx.edit {
                 const SIZE: f32 = 3.0;
                 const COLOR: [f32; 4] = [1.0, 0.0, 0.0, 0.8];
 

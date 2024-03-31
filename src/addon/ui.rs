@@ -17,7 +17,7 @@ impl Addon {
                 .movable(false)
                 .focus_on_appearing(false)
                 .build(ui, || {
-                    let ctx = Context::new(false, &self.player, buffs);
+                    let ctx = Context::new(self.edit_all, &self.player, buffs);
                     for pack in &mut self.packs {
                         pack.render(ui, &ctx);
                     }
@@ -76,6 +76,7 @@ impl Addon {
         }
 
         ui.spacing();
-        ui.checkbox("Debug", &mut self.debug);
+        ui.checkbox("Show all", &mut self.edit_all);
+        ui.checkbox("Debug window", &mut self.debug);
     }
 }
