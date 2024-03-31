@@ -50,15 +50,12 @@ impl Addon {
         ui.text(format!("Packs loaded: {}", self.packs.len()));
         for (i, pack) in self.packs.iter_mut().enumerate() {
             ui.checkbox(format!("{}##pack{i}", pack.name), &mut pack.enabled);
-            ui.same_line();
-            let [r, g, b, a] = ui.style_color(StyleColor::Text);
-            let file = pack
-                .file
-                .as_path()
-                .file_name()
-                .unwrap_or_default()
-                .to_string_lossy();
-            ui.text_colored([r, g, b, a * 0.5], file);
+            if ui.is_item_hovered() {
+                ui.tooltip(|| {
+                    let [r, g, b, a] = ui.style_color(StyleColor::Text);
+                    ui.text_colored([r, g, b, a * 0.5], pack.file.display().to_string());
+                });
+            }
             ui.same_line();
             pack.edit = if pack.edit {
                 !ui.button(format!("Done##pack{i}"))
