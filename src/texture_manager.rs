@@ -55,10 +55,7 @@ impl TextureManager {
                                 let id = textures.add_pending(source.clone());
                                 drop(textures); // drop to avoid recursive locking
                                 Self::load_from_url(&id, url).unwrap_or_else(|| {
-                                    log::warn!(
-                                        "Failed to parse icon url \"{}\"",
-                                        url.replace('%', "%%")
-                                    )
+                                    log::warn!("Failed to parse icon url \"{url}\"")
                                 });
                             }
                         }
@@ -76,9 +73,7 @@ impl TextureManager {
         if let Some(texture) = get_texture(id) {
             let texture_id = texture.id();
             self.default = Some(texture_id);
-            log::debug!("Already loaded default icon: id {}", texture_id.id());
         } else {
-            log::debug!("Requesting default icon load");
             self.pending.insert(id.into(), IconSource::Empty);
             load_texture_from_memory(id, MONSTER_ICON, Some(Self::RECEIVE_TEXTURE));
         };
@@ -150,14 +145,8 @@ impl TextureManager {
 
         if let Some(texture_id) = texture_id {
             if let IconSource::Empty = source {
-                log::debug!("Loaded default icon: id {}", texture_id.id());
                 self.default = Some(texture_id);
             } else {
-                log::debug!(
-                    "Loaded icon source {}: id {}",
-                    source.pretty_print(),
-                    texture_id.id()
-                );
                 self.loaded.insert(source, texture_id);
             }
         } else {

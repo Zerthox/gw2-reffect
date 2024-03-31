@@ -38,7 +38,7 @@ impl IconSource {
         match self {
             Self::Empty => "empty".into(),
             Self::File(path) => format!("file \"{}\"", path.display()),
-            Self::Url(url) => format!("url \"{}\"", url.replace('%', "%%")), // TODO: remove once fixed in nexus
+            Self::Url(url) => format!("url \"{url}\""),
         }
     }
 }
