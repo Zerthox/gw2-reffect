@@ -1,4 +1,4 @@
-use super::{Context, Render, State, TextAlign, TextDecoration};
+use super::{Context, Render, RenderState, TextAlign, TextDecoration};
 use crate::component_wise::ComponentWise;
 use crate::trigger::BuffTrigger;
 use nexus::imgui::{ImColor32, Ui};
@@ -36,7 +36,7 @@ impl Text {
 impl Render for Text {
     fn load(&mut self) {}
 
-    fn render(&mut self, ui: &Ui, ctx: &Context, state: &mut State) {
+    fn render(&mut self, ui: &Ui, ctx: &Context, state: &mut RenderState) {
         if let Some(text) = self.process_text(ctx) {
             ui.set_window_font_scale(self.size);
 

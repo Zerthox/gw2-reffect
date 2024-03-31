@@ -1,9 +1,9 @@
 #[derive(Debug, Clone)]
-pub struct State {
+pub struct RenderState {
     pub pos: [f32; 2],
 }
 
-impl State {
+impl RenderState {
     pub const fn with_pos(pos: [f32; 2]) -> Self {
         Self { pos }
     }
@@ -15,7 +15,7 @@ impl State {
         *y += offset_y;
     }
 
-    pub fn with_offset(&mut self, offset: [f32; 2], body: impl FnOnce(&mut State)) {
+    pub fn with_offset(&mut self, offset: [f32; 2], body: impl FnOnce(&mut RenderState)) {
         let saved = self.pos;
         self.add_offset(offset);
         body(self);

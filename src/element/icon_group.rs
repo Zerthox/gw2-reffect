@@ -1,4 +1,4 @@
-use super::{Context, Icon, Render, State};
+use super::{Context, Icon, Render, RenderState};
 use crate::component_wise::ComponentWise;
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
@@ -21,7 +21,7 @@ impl Render for IconGroup {
         }
     }
 
-    fn render(&mut self, ui: &Ui, ctx: &Context, state: &mut State) {
+    fn render(&mut self, ui: &Ui, ctx: &Context, state: &mut RenderState) {
         state.with_offset(self.offset, |state| {
             let icons = self
                 .icons

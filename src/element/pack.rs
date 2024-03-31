@@ -1,4 +1,4 @@
-use super::{Anchor, Context, Element, Render, State};
+use super::{Anchor, Context, Element, Render, RenderState};
 use crate::component_wise::ComponentWise;
 use crate::trigger::{PackTrigger, Trigger};
 use nexus::imgui::Ui;
@@ -57,7 +57,7 @@ impl Pack {
         let ctx = ctx.with_edit(self.edit);
         if ctx.edit || (self.enabled && self.trigger.is_active(&ctx)) {
             let pos = self.pos(ui);
-            let mut state = State::with_pos(pos);
+            let mut state = RenderState::with_pos(pos);
 
             for element in &mut self.elements {
                 element.render(ui, &ctx, &mut state);

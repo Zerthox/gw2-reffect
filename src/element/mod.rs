@@ -6,14 +6,14 @@ mod icon_element;
 mod icon_group;
 mod icon_source;
 mod pack;
-mod state;
+mod render_state;
 mod text;
 mod text_align;
 mod text_decoration;
 
 pub use self::{
     anchor::*, animation::*, group::*, icon::*, icon_element::*, icon_group::*, icon_source::*,
-    pack::*, state::*, text::*, text_align::*, text_decoration::*,
+    pack::*, render_state::*, text::*, text_align::*, text_decoration::*,
 };
 
 use crate::context::Context;
@@ -23,7 +23,7 @@ use serde::{Deserialize, Serialize};
 pub trait Render {
     fn load(&mut self);
 
-    fn render(&mut self, ui: &Ui, ctx: &Context, state: &mut State);
+    fn render(&mut self, ui: &Ui, ctx: &Context, state: &mut RenderState);
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -46,7 +46,7 @@ impl Render for Element {
         }
     }
 
-    fn render(&mut self, ui: &Ui, ctx: &Context, state: &mut State) {
+    fn render(&mut self, ui: &Ui, ctx: &Context, state: &mut RenderState) {
         match self {
             Self::Group(anchor) => anchor.render(ui, ctx, state),
             Self::IconGroup(group) => group.render(ui, ctx, state),
