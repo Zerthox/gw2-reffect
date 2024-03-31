@@ -1,6 +1,8 @@
 use super::MapInfo;
 use nexus::data_link::mumble::{Context, MumbleLink, Profession, UiState};
 
+// TODO: race, mount?
+
 #[derive(Debug, Clone)]
 pub struct PlayerContext {
     pub prof: Profession,

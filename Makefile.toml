@@ -22,12 +22,16 @@ script_runner = "@shell"
 script = "cp \"${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/debug/${CARGO_MAKE_CRATE_NAME}.dll\" \"${GW2_PATH}/addons\""
 script_runner = "@shell"
 
+[tasks.copy-deps]
+script = "cp \"${CARGO_MAKE_CURRENT_TASK_INITIAL_MAKEFILE_DIRECTORY}/deps/*.dll\" \"${GW2_PATH}/addons\""
+script_runner = "@shell"
+
 [tasks.remove]
 script = "rm \"${GW2_PATH}/${CARGO_MAKE_CRATE_NAME}.dll\""
 script_runner = "@shell"
 
 [tasks.install]
-run_task = { name = ["build-release", "copy-release"] }
+run_task = { name = ["build-release", "copy-deps", "copy-release"] }
 
 [tasks.install-examples]
 script = "cp \"${CARGO_MAKE_CURRENT_TASK_INITIAL_MAKEFILE_DIRECTORY}/examples/*\" \"${GW2_PATH}/addons/reffect\""
@@ -37,5 +41,5 @@ script_runner = "@shell"
 alias = "remove"
 
 [tasks.dev]
-run_task = { name = ["build", "copy-debug"] }
+run_task = { name = ["build", "copy-deps", "copy-debug"] }
 watch = true
