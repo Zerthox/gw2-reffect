@@ -55,7 +55,8 @@ impl Pack {
 
     pub fn render(&mut self, ui: &Ui, ctx: &Context) {
         let ctx = ctx.with_edit(self.edit);
-        if ctx.edit || (self.enabled && self.trigger.is_active(&ctx)) {
+        if ctx.edit || (self.enabled && ctx.player.should_render() && self.trigger.is_active(&ctx))
+        {
             let pos = self.pos(ui);
             let mut state = RenderState::with_pos(pos);
 

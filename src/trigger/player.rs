@@ -15,6 +15,9 @@ impl Trigger for PlayerTrigger {
     fn is_active(&self, ctx: &Context) -> bool {
         (self.profs.is_empty() || self.profs.contains(&ctx.player.prof))
             && (self.specs.is_empty() || self.specs.contains(&ctx.player.spec))
-            && (self.combat == Some(ctx.player.in_combat))
+            && self
+                .combat
+                .map(|combat| combat == ctx.player.combat)
+                .unwrap_or(true)
     }
 }

@@ -6,24 +6,22 @@ impl Addon {
     pub fn render(&mut self, ui: &Ui) {
         self.perform_updates();
 
-        if !self.player.map_open {
-            if let Ok(buffs) = &self.buffs {
-                let screen_size = ui.io().display_size;
-                Window::new("##reffect-displays")
-                    .position([0.0, 0.0], Condition::Always)
-                    .content_size(screen_size)
-                    .draw_background(false)
-                    .no_decoration()
-                    .no_inputs()
-                    .movable(false)
-                    .focus_on_appearing(false)
-                    .build(ui, || {
-                        let ctx = Context::new(self.edit_all, &self.player, buffs);
-                        for pack in &mut self.packs {
-                            pack.render(ui, &ctx);
-                        }
-                    });
-            }
+        if let Ok(buffs) = &self.buffs {
+            let screen_size = ui.io().display_size;
+            Window::new("##reffect-displays")
+                .position([0.0, 0.0], Condition::Always)
+                .content_size(screen_size)
+                .draw_background(false)
+                .no_decoration()
+                .no_inputs()
+                .movable(false)
+                .focus_on_appearing(false)
+                .build(ui, || {
+                    let ctx = Context::new(self.edit_all, &self.player, buffs);
+                    for pack in &mut self.packs {
+                        pack.render(ui, &ctx);
+                    }
+                });
         }
 
         if self.debug {
@@ -38,8 +36,10 @@ impl Addon {
                         Ok(_) => ui.text_colored([0.0, 1.0, 0.0, 1.0], "Ok"),
                         Err(err) => ui.text_colored([1.0, 0.0, 0.0, 1.0], err.to_string()),
                     }
+                    ui.text(format!("Show elements: {}", self.player.should_render()));
                     ui.text(format!("Player profession: {}", self.player.prof));
                     ui.text(format!("Player specialization: {}", self.player.spec));
+                    ui.text(format!("Player combat: {}", self.player.combat));
                     ui.text(format!("Map id: {}", self.player.map.id));
                     ui.text(format!("Map category: {}", self.player.map.category));
                 });
