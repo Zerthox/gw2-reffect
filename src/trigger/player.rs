@@ -8,11 +8,13 @@ use serde::{Deserialize, Serialize};
 pub struct PlayerTrigger {
     pub profs: Vec<Profession>,
     pub specs: Vec<u32>,
+    pub combat: Option<bool>,
 }
 
 impl Trigger for PlayerTrigger {
     fn is_active(&self, ctx: &Context) -> bool {
         (self.profs.is_empty() || self.profs.contains(&ctx.player.prof))
             && (self.specs.is_empty() || self.specs.contains(&ctx.player.spec))
+            && (self.combat == Some(ctx.player.in_combat))
     }
 }

@@ -20,6 +20,8 @@ use crate::context::Context;
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
+// TODO: conditions, e.g. lower opacity out of combat, color change based on stack threshold
+
 pub trait Render {
     fn load(&mut self);
 

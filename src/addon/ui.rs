@@ -6,22 +6,24 @@ impl Addon {
     pub fn render(&mut self, ui: &Ui) {
         self.perform_updates();
 
-        if let Ok(buffs) = &self.buffs {
-            let screen_size = ui.io().display_size;
-            Window::new("##reffect-displays")
-                .position([0.0, 0.0], Condition::Always)
-                .content_size(screen_size)
-                .draw_background(false)
-                .no_decoration()
-                .no_inputs()
-                .movable(false)
-                .focus_on_appearing(false)
-                .build(ui, || {
-                    let ctx = Context::new(self.edit_all, &self.player, buffs);
-                    for pack in &mut self.packs {
-                        pack.render(ui, &ctx);
-                    }
-                });
+        if !self.player.map_open {
+            if let Ok(buffs) = &self.buffs {
+                let screen_size = ui.io().display_size;
+                Window::new("##reffect-displays")
+                    .position([0.0, 0.0], Condition::Always)
+                    .content_size(screen_size)
+                    .draw_background(false)
+                    .no_decoration()
+                    .no_inputs()
+                    .movable(false)
+                    .focus_on_appearing(false)
+                    .build(ui, || {
+                        let ctx = Context::new(self.edit_all, &self.player, buffs);
+                        for pack in &mut self.packs {
+                            pack.render(ui, &ctx);
+                        }
+                    });
+            }
         }
 
         if self.debug {

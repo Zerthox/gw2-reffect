@@ -4,7 +4,8 @@
     "trigger": {
         "player": {
             "profs": [],
-            "specs": []
+            "specs": [],
+            "combat": null
         },
         "map": {
             "Ids": [
