@@ -3,9 +3,9 @@ use nexus::imgui::{Condition, StyleColor, Ui, Window};
 
 impl Addon {
     pub fn render(&mut self, ui: &Ui) {
-        self.ctx.update(ui.time());
+        self.context.update(ui.time());
 
-        if let Some(ctx) = self.ctx.as_render() {
+        if let Some(ctx) = self.context.as_render() {
             let screen_size = ui.io().display_size;
             Window::new("##reffect-displays")
                 .position([0.0, 0.0], Condition::Always)
@@ -31,20 +31,22 @@ impl Addon {
                     const GREEN: [f32; 4] = [0.0, 1.0, 0.0, 1.0];
                     const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
 
-                    ui.text(format!("Show elements: {}", self.ctx.ui.should_render()));
+                    let ctx = &self.context;
+
+                    ui.text(format!("Show elements: {}", ctx.ui.should_render()));
 
                     ui.text("Buffs status:");
                     ui.same_line();
-                    match self.ctx.buffs {
+                    match ctx.buffs {
                         Ok(_) => ui.text_colored(GREEN, "Ok"),
                         Err(err) => ui.text_colored(RED, err.to_string()),
                     }
 
-                    ui.text(format!("Combat: {}", self.ctx.ui.combat));
-                    ui.text(format!("Player profession: {}", self.ctx.player.prof));
-                    ui.text(format!("Player specialization: {}", self.ctx.player.spec));
-                    ui.text(format!("Map id: {}", self.ctx.map.id));
-                    ui.text(format!("Map category: {}", self.ctx.map.category));
+                    ui.text(format!("Combat: {}", ctx.ui.combat));
+                    ui.text(format!("Player profession: {}", ctx.player.prof));
+                    ui.text(format!("Player specialization: {}", ctx.player.spec));
+                    ui.text(format!("Map id: {}", ctx.map.id));
+                    ui.text(format!("Map category: {}", ctx.map.category));
                 });
         }
     }
@@ -78,7 +80,7 @@ impl Addon {
         }
 
         ui.spacing();
-        ui.checkbox("Show all", &mut self.ctx.edit);
+        ui.checkbox("Show all", &mut self.context.edit);
         ui.checkbox("Debug window", &mut self.debug);
     }
 }

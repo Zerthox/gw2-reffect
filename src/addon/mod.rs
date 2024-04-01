@@ -10,7 +10,7 @@ static ADDON: OnceLock<Mutex<Addon>> = OnceLock::new();
 pub struct Addon {
     debug: bool,
     packs: Vec<Pack>,
-    ctx: Context,
+    context: Context,
 }
 
 impl Addon {
@@ -18,7 +18,7 @@ impl Addon {
         Self {
             debug: false,
             packs: Vec::new(),
-            ctx: Context::new(),
+            context: Context::new(),
         }
     }
 
