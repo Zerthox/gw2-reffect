@@ -5,22 +5,21 @@ impl Addon {
     pub fn render(&mut self, ui: &Ui) {
         self.context.update(ui.time());
 
-        if let Some(ctx) = self.context.as_render() {
-            let screen_size = ui.io().display_size;
-            Window::new("##reffect-displays")
-                .position([0.0, 0.0], Condition::Always)
-                .content_size(screen_size)
-                .draw_background(false)
-                .no_decoration()
-                .no_inputs()
-                .movable(false)
-                .focus_on_appearing(false)
-                .build(ui, || {
-                    for pack in &mut self.packs {
-                        pack.render(ui, &ctx);
-                    }
-                });
-        }
+        let screen_size = ui.io().display_size;
+        Window::new("##reffect-displays")
+            .position([0.0, 0.0], Condition::Always)
+            .content_size(screen_size)
+            .draw_background(false)
+            .no_decoration()
+            .no_inputs()
+            .movable(false)
+            .focus_on_appearing(false)
+            .build(ui, || {
+                let ctx = self.context.as_render();
+                for pack in &mut self.packs {
+                    pack.render(ui, &ctx);
+                }
+            });
 
         if self.debug {
             Window::new("Reffect Debug")
@@ -52,7 +51,6 @@ impl Addon {
     }
 
     pub fn render_options(&mut self, ui: &Ui) {
-        ui.text(format!("Packs loaded: {}", self.packs.len()));
         for (i, pack) in self.packs.iter_mut().enumerate() {
             ui.checkbox(format!("{}##pack{i}", pack.name), &mut pack.enabled);
             if ui.is_item_hovered() {
@@ -70,6 +68,7 @@ impl Addon {
         }
 
         ui.spacing();
+        ui.text(format!("Packs loaded: {}", self.packs.len()));
         if ui.button("Reload pack files") {
             self.packs.clear();
             self.load_packs();

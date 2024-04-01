@@ -37,17 +37,18 @@ impl Context {
         }
     }
 
-    pub fn as_render(&self) -> Option<RenderContext> {
-        self.buffs
-            .as_ref()
-            .map(|buffs| RenderContext {
-                edit: self.edit,
-                ui: &self.ui,
-                player: &self.player,
-                map: &self.map,
-                buffs: buffs.as_slice(),
-            })
-            .ok()
+    pub fn as_render(&self) -> RenderContext {
+        RenderContext {
+            edit: self.edit,
+            ui: &self.ui,
+            player: &self.player,
+            map: &self.map,
+            buffs: self
+                .buffs
+                .as_ref()
+                .map(|buffs| buffs.as_slice())
+                .unwrap_or(&[]),
+        }
     }
 
     pub fn update(&mut self, time: f64) {
