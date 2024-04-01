@@ -30,6 +30,7 @@ impl TextDecoration {
     }
 
     pub fn render(&self, ui: &Ui, text: impl AsRef<str>, color: [f32; 4]) {
+        // TODO: shadow not behind transparent text?
         let text = text.as_ref();
         let cursor = ui.cursor_pos();
         match self {
