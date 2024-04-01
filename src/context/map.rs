@@ -1,6 +1,5 @@
 use nexus::data_link::mumble::{map_type, Context};
 use serde::{Deserialize, Serialize};
-use strum::Display;
 
 #[derive(Debug, Clone)]
 pub struct MapInfo {
@@ -23,7 +22,7 @@ impl MapInfo {
 }
 
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, Display,
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, strum::Display,
 )]
 pub enum MapCategory {
     Pve,

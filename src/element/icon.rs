@@ -33,10 +33,12 @@ impl Icon {
 
     pub fn render(&mut self, ui: &Ui, ctx: &Context, pos: [f32; 2], size: [f32; 2]) {
         if let Some(texture) = self.icon.get_texture() {
-            let end = pos.add(size);
+            let half_size = size.mul_scalar(0.5);
+            let start = pos.sub(half_size);
+            let end = pos.add(half_size);
             let draw_list = ui.get_window_draw_list();
             let color = self.color(ui);
-            draw_list.add_image(texture, pos, end).col(color).build();
+            draw_list.add_image(texture, start, end).col(color).build();
             drop(draw_list);
 
             // render stack count

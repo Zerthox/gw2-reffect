@@ -1,4 +1,7 @@
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, strum::Display)]
+use num_enum::{IntoPrimitive, TryFromPrimitive};
+use strum::Display;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Display)]
 pub enum GetBuffsError {
     #[strum(to_string = "received null pointer")]
     Null,
@@ -21,9 +24,9 @@ impl From<RawError> for GetBuffsError {
     PartialOrd,
     Ord,
     Hash,
-    num_enum::TryFromPrimitive,
-    num_enum::IntoPrimitive,
-    strum::Display,
+    TryFromPrimitive,
+    IntoPrimitive,
+    Display,
 )]
 #[repr(i32)]
 pub enum RawError {

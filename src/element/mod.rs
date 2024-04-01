@@ -1,5 +1,6 @@
 mod anchor;
 mod animation;
+mod direction;
 mod group;
 mod icon;
 mod icon_element;
@@ -12,8 +13,8 @@ mod text_align;
 mod text_decoration;
 
 pub use self::{
-    anchor::*, animation::*, group::*, icon::*, icon_element::*, icon_group::*, icon_source::*,
-    pack::*, render_state::*, text::*, text_align::*, text_decoration::*,
+    anchor::*, animation::*, direction::*, group::*, icon::*, icon_element::*, icon_group::*,
+    icon_source::*, pack::*, render_state::*, text::*, text_align::*, text_decoration::*,
 };
 
 use crate::context::Context;
