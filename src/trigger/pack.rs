@@ -1,5 +1,5 @@
 use super::{MapTrigger, PlayerTrigger, Trigger};
-use crate::context::Context;
+use crate::context::RenderContext;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
@@ -10,7 +10,7 @@ pub struct PackTrigger {
 }
 
 impl Trigger for PackTrigger {
-    fn is_active(&self, ctx: &Context) -> bool {
+    fn is_active(&self, ctx: &RenderContext) -> bool {
         self.player.is_active(ctx) && self.map.is_active(ctx)
     }
 }

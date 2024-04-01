@@ -17,7 +17,7 @@ pub use self::{
     icon_source::*, pack::*, render_state::*, text::*, text_align::*, text_decoration::*,
 };
 
-use crate::context::Context;
+use crate::context::RenderContext;
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
@@ -26,7 +26,7 @@ use serde::{Deserialize, Serialize};
 pub trait Render {
     fn load(&mut self);
 
-    fn render(&mut self, ui: &Ui, ctx: &Context, state: &mut RenderState);
+    fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &mut RenderState);
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -49,7 +49,7 @@ impl Render for Element {
         }
     }
 
-    fn render(&mut self, ui: &Ui, ctx: &Context, state: &mut RenderState) {
+    fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &mut RenderState) {
         match self {
             Self::Group(anchor) => anchor.render(ui, ctx, state),
             Self::IconGroup(group) => group.render(ui, ctx, state),

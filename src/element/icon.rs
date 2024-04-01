@@ -1,4 +1,4 @@
-use super::{Context, IconSource, TextAlign, TextDecoration};
+use super::{IconSource, RenderContext, TextAlign, TextDecoration};
 use crate::component_wise::ComponentWise;
 use crate::trigger::{BuffTrigger, Trigger};
 use nexus::imgui::{ImColor32, Ui};
@@ -20,7 +20,7 @@ impl Icon {
         self.icon.load();
     }
 
-    pub fn is_active(&self, ctx: &Context) -> bool {
+    pub fn is_active(&self, ctx: &RenderContext) -> bool {
         self.buff.is_active(ctx)
     }
 
@@ -31,7 +31,7 @@ impl Icon {
         [r, g, b, self.opacity * global_alpha]
     }
 
-    pub fn render(&mut self, ui: &Ui, ctx: &Context, pos: [f32; 2], size: [f32; 2]) {
+    pub fn render(&mut self, ui: &Ui, ctx: &RenderContext, pos: [f32; 2], size: [f32; 2]) {
         if let Some(texture) = self.icon.get_texture() {
             let half_size = size.mul_scalar(0.5);
             let start = pos.sub(half_size);

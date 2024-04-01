@@ -2,12 +2,12 @@ use nexus::data_link::mumble::{map_type, Context};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone)]
-pub struct MapInfo {
+pub struct MapContext {
     pub id: u32,
     pub category: MapCategory,
 }
 
-impl MapInfo {
+impl MapContext {
     pub const fn empty() -> Self {
         Self {
             id: 0,
@@ -18,6 +18,10 @@ impl MapInfo {
     pub fn update(&mut self, context: &Context) {
         self.id = context.map_id;
         self.category = context.map_type.into();
+    }
+
+    pub fn is_on_map(&self, id: u32) -> bool {
+        self.id == id
     }
 }
 

@@ -1,12 +1,11 @@
 use super::Addon;
-use crate::context::Context;
 use nexus::imgui::{Condition, StyleColor, Ui, Window};
 
 impl Addon {
     pub fn render(&mut self, ui: &Ui) {
-        self.perform_updates();
+        self.ctx.update(ui.time());
 
-        if let Ok(buffs) = &self.buffs {
+        if let Some(ctx) = self.ctx.as_render() {
             let screen_size = ui.io().display_size;
             Window::new("##reffect-displays")
                 .position([0.0, 0.0], Condition::Always)
@@ -17,7 +16,6 @@ impl Addon {
                 .movable(false)
                 .focus_on_appearing(false)
                 .build(ui, || {
-                    let ctx = Context::new(self.edit_all, &self.player, buffs);
                     for pack in &mut self.packs {
                         pack.render(ui, &ctx);
                     }
@@ -30,18 +28,23 @@ impl Addon {
                 .always_auto_resize(true)
                 .opened(&mut self.debug)
                 .build(ui, || {
+                    const GREEN: [f32; 4] = [0.0, 1.0, 0.0, 1.0];
+                    const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
+
+                    ui.text(format!("Show elements: {}", self.ctx.ui.should_render()));
+
                     ui.text("Buffs status:");
                     ui.same_line();
-                    match self.buffs {
-                        Ok(_) => ui.text_colored([0.0, 1.0, 0.0, 1.0], "Ok"),
-                        Err(err) => ui.text_colored([1.0, 0.0, 0.0, 1.0], err.to_string()),
+                    match self.ctx.buffs {
+                        Ok(_) => ui.text_colored(GREEN, "Ok"),
+                        Err(err) => ui.text_colored(RED, err.to_string()),
                     }
-                    ui.text(format!("Show elements: {}", self.player.should_render()));
-                    ui.text(format!("Player profession: {}", self.player.prof));
-                    ui.text(format!("Player specialization: {}", self.player.spec));
-                    ui.text(format!("Player combat: {}", self.player.combat));
-                    ui.text(format!("Map id: {}", self.player.map.id));
-                    ui.text(format!("Map category: {}", self.player.map.category));
+
+                    ui.text(format!("Combat: {}", self.ctx.ui.combat));
+                    ui.text(format!("Player profession: {}", self.ctx.player.prof));
+                    ui.text(format!("Player specialization: {}", self.ctx.player.spec));
+                    ui.text(format!("Map id: {}", self.ctx.map.id));
+                    ui.text(format!("Map category: {}", self.ctx.map.category));
                 });
         }
     }
@@ -75,7 +78,7 @@ impl Addon {
         }
 
         ui.spacing();
-        ui.checkbox("Show all", &mut self.edit_all);
+        ui.checkbox("Show all", &mut self.ctx.edit);
         ui.checkbox("Debug window", &mut self.debug);
     }
 }

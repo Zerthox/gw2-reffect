@@ -1,5 +1,5 @@
 use super::Trigger;
-use crate::context::Context;
+use crate::context::RenderContext;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -11,7 +11,7 @@ pub enum BuffTrigger {
 }
 
 impl BuffTrigger {
-    pub fn get_stacks(&self, ctx: &Context) -> Option<i32> {
+    pub fn get_stacks(&self, ctx: &RenderContext) -> Option<i32> {
         if ctx.edit {
             Some(1)
         } else {
@@ -29,7 +29,7 @@ impl BuffTrigger {
 }
 
 impl Trigger for BuffTrigger {
-    fn is_active(&self, ctx: &Context) -> bool {
+    fn is_active(&self, ctx: &RenderContext) -> bool {
         ctx.edit
             || match self {
                 Self::Single(id) => ctx.has_buff(*id),

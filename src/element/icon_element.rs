@@ -1,4 +1,4 @@
-use super::{Context, Icon, Render, RenderState};
+use super::{Icon, Render, RenderContext, RenderState};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
@@ -15,7 +15,7 @@ impl Render for IconElement {
         self.icon.load();
     }
 
-    fn render(&mut self, ui: &Ui, ctx: &Context, state: &mut RenderState) {
+    fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &mut RenderState) {
         state.with_offset(self.offset, |state| {
             if self.icon.is_active(ctx) {
                 self.icon.render(ui, ctx, state.pos, self.size)

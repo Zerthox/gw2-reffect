@@ -1,58 +1,65 @@
+mod links;
 mod map;
 mod player;
+mod render;
+mod ui;
 
-pub use self::{map::*, player::*};
+pub use self::{links::*, map::*, player::*, render::*, ui::*};
 
-use crate::get_buffs::StackedBuff;
-use std::borrow::Borrow;
+use crate::{
+    get_buffs::{get_buffs, GetBuffsError, StackedBuff},
+    interval::Interval,
+};
 
 #[derive(Debug)]
-pub struct Context<'a> {
+pub struct Context {
     pub edit: bool,
-    pub player: &'a PlayerContext,
-    pub buffs: &'a [StackedBuff],
+    pub ui: UiContext,
+    pub map: MapContext,
+    pub player: PlayerContext,
+    pub buffs: Result<Vec<StackedBuff>, GetBuffsError>,
+    links: Links,
+    buffs_update: Interval,
+    slow_update: Interval,
 }
 
-impl<'a> Context<'a> {
-    pub const fn new(edit: bool, player: &'a PlayerContext, buffs: &'a [StackedBuff]) -> Self {
+impl Context {
+    pub fn new() -> Self {
         Self {
-            edit,
-            player,
-            buffs,
+            edit: false,
+            ui: UiContext::empty(),
+            player: PlayerContext::empty(),
+            map: MapContext::empty(),
+            buffs: Err(GetBuffsError::Null),
+            links: Links::load(),
+            buffs_update: Interval::new(0.040),
+            slow_update: Interval::new(1.000),
         }
     }
 
-    pub fn with_edit(&self, edit: bool) -> Self {
-        Self {
-            edit: self.edit || edit,
-            player: self.player,
-            buffs: self.buffs,
+    pub fn as_render(&self) -> Option<RenderContext> {
+        self.buffs
+            .as_ref()
+            .map(|buffs| RenderContext {
+                edit: self.edit,
+                ui: &self.ui,
+                player: &self.player,
+                map: &self.map,
+                buffs: buffs.as_slice(),
+            })
+            .ok()
+    }
+
+    pub fn update(&mut self, time: f64) {
+        self.ui.update(&self.links);
+        if self.buffs_update.triggered(time) {
+            self.buffs = unsafe { get_buffs() }.map(|buffs| buffs.into());
         }
-    }
-
-    pub fn buff(&self, id: u32) -> Option<&StackedBuff> {
-        self.buffs.iter().find(|entry| entry.id == id)
-    }
-
-    pub fn has_buff(&self, id: u32) -> bool {
-        self.buffs.iter().any(|entry| entry.id == id)
-    }
-
-    pub fn has_buffs_any(&self, ids: impl IntoIterator<Item = impl Borrow<u32>>) -> bool {
-        ids.into_iter().any(|id| self.has_buff(*id.borrow()))
-    }
-
-    pub fn has_buffs_all(&self, ids: impl IntoIterator<Item = impl Borrow<u32>>) -> bool {
-        ids.into_iter().all(|id| self.has_buff(*id.borrow()))
-    }
-
-    pub fn stacks_of(&self, id: u32) -> Option<i32> {
-        self.buff(id).map(|entry| entry.count)
-    }
-
-    pub fn stacks_of_summed(&self, ids: impl IntoIterator<Item = impl Borrow<u32>>) -> i32 {
-        ids.into_iter()
-            .filter_map(|id| self.stacks_of(*id.borrow()))
-            .sum()
+        if self.slow_update.triggered(time) {
+            if let Some(mumble) = self.links.mumble() {
+                self.player.update(mumble);
+                self.map.update(&mumble.context);
+            }
+        }
     }
 }

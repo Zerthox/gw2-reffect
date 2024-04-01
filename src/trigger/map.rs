@@ -1,5 +1,5 @@
 use super::Trigger;
-use crate::context::{Context, MapCategory};
+use crate::context::{MapCategory, RenderContext};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
@@ -11,11 +11,11 @@ pub enum MapTrigger {
 }
 
 impl Trigger for MapTrigger {
-    fn is_active(&self, ctx: &Context) -> bool {
+    fn is_active(&self, ctx: &RenderContext) -> bool {
         match self {
             Self::Any => true,
-            Self::Category(category) => ctx.player.map.category == *category,
-            Self::Ids(ids) => ids.iter().copied().any(|id| ctx.player.is_on_map(id)),
+            Self::Category(category) => ctx.map.category == *category,
+            Self::Ids(ids) => ids.iter().copied().any(|id| ctx.map.is_on_map(id)),
         }
     }
 }

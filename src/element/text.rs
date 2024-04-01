@@ -1,4 +1,4 @@
-use super::{Context, Render, RenderState, TextAlign, TextDecoration};
+use super::{Render, RenderContext, RenderState, TextAlign, TextDecoration};
 use crate::component_wise::ComponentWise;
 use crate::trigger::BuffTrigger;
 use nexus::imgui::{ImColor32, Ui};
@@ -26,7 +26,7 @@ impl Text {
         ImColor32::from_rgba(r, g, b, a).to_rgba_f32s()
     }
 
-    pub fn process_text(&self, ctx: &Context) -> Option<String> {
+    pub fn process_text(&self, ctx: &RenderContext) -> Option<String> {
         self.buff
             .get_stacks(ctx)
             .map(|stacks| self.text.replace(replace::STACKS, &stacks.to_string()))
@@ -36,7 +36,7 @@ impl Text {
 impl Render for Text {
     fn load(&mut self) {}
 
-    fn render(&mut self, ui: &Ui, ctx: &Context, state: &mut RenderState) {
+    fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &mut RenderState) {
         if let Some(text) = self.process_text(ctx) {
             ui.set_window_font_scale(self.size);
 

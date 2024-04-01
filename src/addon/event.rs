@@ -1,7 +1,6 @@
 use super::Addon;
-use crate::{element::Pack, get_buffs::get_buffs, texture_manager::TextureManager};
+use crate::{element::Pack, texture_manager::TextureManager};
 use nexus::{
-    data_link::get_mumble_link,
     gui::{register_render, RenderType},
     paths::get_addon_dir,
 };
@@ -62,18 +61,6 @@ impl Addon {
         log::info!("Saving packs");
         for pack in &self.packs {
             pack.save_to_file();
-        }
-    }
-
-    pub fn perform_updates(&mut self) {
-        if let Some(mumble) = unsafe { get_mumble_link().as_ref() } {
-            let tick = mumble.ui_tick;
-            if self.buffs_update.triggered(tick) {
-                self.buffs = unsafe { get_buffs() }.map(|buffs| buffs.into());
-            }
-            if self.player_update.triggered(tick) {
-                self.player.update(mumble);
-            }
         }
     }
 }

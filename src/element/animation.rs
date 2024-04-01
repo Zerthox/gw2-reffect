@@ -1,5 +1,5 @@
 use super::{Element, Render, RenderState};
-use crate::context::Context;
+use crate::context::RenderContext;
 use nexus::imgui::{StyleVar, Ui};
 use serde::{Deserialize, Serialize};
 
@@ -22,7 +22,7 @@ impl Render for Animation {
         }
     }
 
-    fn render(&mut self, ui: &Ui, ctx: &Context, state: &mut RenderState) {
+    fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &mut RenderState) {
         let time = (1000.0 * ui.time()) as u64;
         let passed = time % self.period;
         let progress = passed as f32 / self.period as f32;

@@ -1,4 +1,4 @@
-use super::{Context, Element, Render, RenderState};
+use super::{Element, Render, RenderContext, RenderState};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
@@ -17,7 +17,7 @@ impl Render for Group {
         }
     }
 
-    fn render(&mut self, ui: &Ui, ctx: &Context, state: &mut RenderState) {
+    fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &mut RenderState) {
         state.with_offset(self.offset, |state| {
             for member in &mut self.members {
                 member.render(ui, ctx, state);

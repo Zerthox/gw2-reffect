@@ -1,5 +1,5 @@
 use super::Trigger;
-use crate::context::Context;
+use crate::context::RenderContext;
 use nexus::data_link::mumble::Profession;
 use serde::{Deserialize, Serialize};
 
@@ -12,12 +12,12 @@ pub struct PlayerTrigger {
 }
 
 impl Trigger for PlayerTrigger {
-    fn is_active(&self, ctx: &Context) -> bool {
+    fn is_active(&self, ctx: &RenderContext) -> bool {
         (self.profs.is_empty() || self.profs.contains(&ctx.player.prof))
             && (self.specs.is_empty() || self.specs.contains(&ctx.player.spec))
             && self
                 .combat
-                .map(|combat| combat == ctx.player.combat)
+                .map(|combat| combat == ctx.ui.combat)
                 .unwrap_or(true)
     }
 }
