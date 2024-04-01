@@ -18,11 +18,11 @@ impl BuffTrigger {
             match self {
                 Self::Single(id) => ctx.stacks_of(*id),
                 Self::Not(inner) => (!inner.is_active(ctx)).then_some(0),
-                Self::Any(ids) => ids.iter().copied().find_map(|id| ctx.stacks_of(id)),
-                Self::All(ids) => {
-                    let sum = ids.iter().copied().filter_map(|id| ctx.stacks_of(id)).sum();
+                Self::Any(ids) => {
+                    let sum = ctx.stacks_of_summed(ids);
                     (sum > 0).then_some(sum)
                 }
+                Self::All(ids) => ctx.has_buffs_all(ids).then(|| ctx.stacks_of_summed(ids)),
             }
         }
     }
@@ -34,8 +34,8 @@ impl Trigger for BuffTrigger {
             || match self {
                 Self::Single(id) => ctx.has_buff(*id),
                 Self::Not(inner) => !inner.is_active(ctx),
-                Self::Any(ids) => ids.iter().copied().any(|buff| ctx.has_buff(buff)),
-                Self::All(ids) => ids.iter().copied().all(|buff| ctx.has_buff(buff)),
+                Self::Any(ids) => ctx.has_buffs_any(ids),
+                Self::All(ids) => ctx.has_buffs_all(ids),
             }
     }
 }

@@ -76,7 +76,7 @@ impl Pack {
                     .filled(true)
                     .build();
 
-                ui.set_cursor_screen_pos(pos.add([SIZE, 0.0]));
+                ui.set_cursor_screen_pos(pos.add([SIZE + 1.0, 0.0]));
                 ui.text_colored(COLOR, &self.name);
             }
         }

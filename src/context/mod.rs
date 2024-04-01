@@ -4,6 +4,7 @@ mod player;
 pub use self::{map::*, player::*};
 
 use crate::get_buffs::StackedBuff;
+use std::borrow::Borrow;
 
 #[derive(Debug)]
 pub struct Context<'a> {
@@ -37,7 +38,21 @@ impl<'a> Context<'a> {
         self.buffs.iter().any(|entry| entry.id == id)
     }
 
+    pub fn has_buffs_any(&self, ids: impl IntoIterator<Item = impl Borrow<u32>>) -> bool {
+        ids.into_iter().any(|id| self.has_buff(*id.borrow()))
+    }
+
+    pub fn has_buffs_all(&self, ids: impl IntoIterator<Item = impl Borrow<u32>>) -> bool {
+        ids.into_iter().all(|id| self.has_buff(*id.borrow()))
+    }
+
     pub fn stacks_of(&self, id: u32) -> Option<i32> {
         self.buff(id).map(|entry| entry.count)
+    }
+
+    pub fn stacks_of_summed(&self, ids: impl IntoIterator<Item = impl Borrow<u32>>) -> i32 {
+        ids.into_iter()
+            .filter_map(|id| self.stacks_of(*id.borrow()))
+            .sum()
     }
 }
