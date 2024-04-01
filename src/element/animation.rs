@@ -4,6 +4,7 @@ use nexus::imgui::{StyleVar, Ui};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
 pub struct Animation {
     /// Kind of animation.
     pub animation: AnimationKind,
@@ -31,6 +32,16 @@ impl Render for Animation {
                 element.render(ui, ctx, state)
             }
         });
+    }
+}
+
+impl Default for Animation {
+    fn default() -> Self {
+        Self {
+            animation: AnimationKind::Pulse,
+            period: 3000,
+            elements: Vec::new(),
+        }
     }
 }
 
