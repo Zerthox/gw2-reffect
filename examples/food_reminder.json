@@ -112,7 +112,7 @@
                         "Text": {
                             "text": "Rebuff",
                             "buff": {
-                                "Any": [46587, 46668]
+                                "Any": [46587, 46668, 9283]
                             },
                             "offset": [0.0, 25.0],
                             "align": "Center",
