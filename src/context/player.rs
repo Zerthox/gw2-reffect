@@ -17,12 +17,15 @@ impl PlayerContext {
     }
 
     pub fn update(&mut self, mumble: &MumbleLink) {
-        match mumble.parse_identity() {
-            Ok(identity) => {
-                self.prof = identity.profession;
-                self.spec = identity.spec;
+        // only attempt parse after first tick
+        if mumble.ui_tick > 0 {
+            match mumble.parse_identity() {
+                Ok(identity) => {
+                    self.prof = identity.profession;
+                    self.spec = identity.spec;
+                }
+                Err(err) => log::warn!("Failed to parse mumble identity: {err}"),
             }
-            Err(err) => log::warn!("Failed to parse mumble identity: {err}"),
         }
     }
 }
