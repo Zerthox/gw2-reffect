@@ -12,7 +12,7 @@ use std::{
 #[serde(default)]
 pub struct Pack {
     pub name: String,
-    pub enabled: bool,
+    pub enabled: bool, // TODO: store enabled separately in addon settings?
     pub layer: i32,
     pub anchor: Anchor,
     pub pos: [f32; 2],

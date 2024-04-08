@@ -12,6 +12,7 @@ use crate::{
 };
 
 // TODO: optional no edit in combat
+// TODO: customizable update intervals? hidden behind advanced
 
 #[derive(Debug)]
 pub struct Context {
