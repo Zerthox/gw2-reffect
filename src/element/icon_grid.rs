@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
-pub struct IconGroup {
+pub struct IconGrid {
     pub name: String,
     pub direction: Direction,
     pub size: [f32; 2],
@@ -14,7 +14,7 @@ pub struct IconGroup {
     pub icons: Vec<Icon>,
 }
 
-impl Render for IconGroup {
+impl Render for IconGrid {
     fn load(&mut self) {
         for icon in &mut self.icons {
             icon.load();
@@ -42,7 +42,7 @@ impl Render for IconGroup {
     }
 }
 
-impl Default for IconGroup {
+impl Default for IconGrid {
     fn default() -> Self {
         Self {
             name: "Unnamed".into(),

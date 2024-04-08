@@ -23,6 +23,10 @@ impl<'a> RenderContext<'a> {
         }
     }
 
+    pub fn should_show(&self) -> bool {
+        self.edit || self.ui.should_show()
+    }
+
     pub fn buff(&self, id: u32) -> Option<&StackedBuff> {
         self.buffs.iter().find(|entry| entry.id == id)
     }

@@ -32,7 +32,7 @@ impl Addon {
 
                     let ctx = &self.context;
 
-                    ui.text(format!("Show elements: {}", ctx.ui.should_render()));
+                    ui.text(format!("Show elements: {}", ctx.ui.should_show()));
 
                     ui.text("Buffs status:");
                     ui.same_line();

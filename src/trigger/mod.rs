@@ -1,9 +1,9 @@
 mod buff;
 mod map;
-mod pack;
+mod meta;
 mod player;
 
-pub use self::{buff::*, map::*, pack::*, player::*};
+pub use self::{buff::*, map::*, meta::*, player::*};
 
 use crate::context::RenderContext;
 

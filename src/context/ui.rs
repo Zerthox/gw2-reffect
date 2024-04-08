@@ -28,7 +28,7 @@ impl UiContext {
         }
     }
 
-    pub fn should_render(&self) -> bool {
+    pub fn should_show(&self) -> bool {
         self.gameplay && !self.map_open
     }
 }

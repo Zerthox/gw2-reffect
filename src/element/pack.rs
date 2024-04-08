@@ -1,6 +1,5 @@
 use super::{Anchor, Element, Render, RenderContext, RenderState};
 use crate::component_wise::ComponentWise;
-use crate::trigger::{PackTrigger, Trigger};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -14,7 +13,6 @@ use std::{
 pub struct Pack {
     pub name: String,
     pub enabled: bool,
-    pub trigger: PackTrigger,
     pub anchor: Anchor,
     pub pos: [f32; 2],
     pub elements: Vec<Element>,
@@ -55,7 +53,7 @@ impl Pack {
 
     pub fn render(&mut self, ui: &Ui, ctx: &RenderContext) {
         let ctx = ctx.with_edit(self.edit);
-        if ctx.edit || (self.enabled && ctx.ui.should_render() && self.trigger.is_active(&ctx)) {
+        if self.enabled && ctx.should_show() {
             let pos = self.pos(ui);
             let mut state = RenderState::with_pos(pos);
 
@@ -87,7 +85,6 @@ impl Default for Pack {
         Self {
             name: "Unnamed".into(),
             enabled: false,
-            trigger: PackTrigger::default(),
             anchor: Anchor::TopLeft,
             pos: [0.0, 0.0],
             elements: Vec::new(),

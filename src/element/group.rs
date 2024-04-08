@@ -1,4 +1,5 @@
-use super::{Element, Render, RenderContext, RenderState};
+use super::{Animation, Element, Render, RenderContext, RenderState};
+use crate::trigger::{MetaTrigger, Trigger};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
@@ -7,6 +8,8 @@ use serde::{Deserialize, Serialize};
 pub struct Group {
     pub name: String,
     pub offset: [f32; 2],
+    pub animation: Option<Animation>,
+    pub condition: MetaTrigger,
     pub members: Vec<Element>,
 }
 
@@ -18,11 +21,21 @@ impl Render for Group {
     }
 
     fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &mut RenderState) {
-        state.with_offset(self.offset, |state| {
-            for member in &mut self.members {
-                member.render(ui, ctx, state);
-            }
-        })
+        if self.condition.is_active(ctx) {
+            state.with_offset(self.offset, |state| {
+                let mut body = || {
+                    for member in &mut self.members {
+                        member.render(ui, ctx, state);
+                    }
+                };
+
+                if let Some(animation) = &mut self.animation {
+                    animation.render(ui, body);
+                } else {
+                    body();
+                }
+            });
+        }
     }
 }
 
@@ -30,8 +43,10 @@ impl Default for Group {
     fn default() -> Self {
         Self {
             name: "Unnamed".into(),
-            members: Vec::new(),
             offset: [0.0, 0.0],
+            animation: None,
+            condition: MetaTrigger::default(),
+            members: Vec::new(),
         }
     }
 }

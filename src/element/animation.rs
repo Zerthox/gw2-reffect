@@ -1,5 +1,3 @@
-use super::{Element, Render, RenderState};
-use crate::context::RenderContext;
 use nexus::imgui::{StyleVar, Ui};
 use serde::{Deserialize, Serialize};
 
@@ -7,40 +5,26 @@ use serde::{Deserialize, Serialize};
 #[serde(default)]
 pub struct Animation {
     /// Kind of animation.
-    pub animation: AnimationKind,
+    pub kind: AnimationKind,
 
     /// Animation period in milliseconds.
     pub period: u64,
-
-    /// Elements being animated.
-    pub elements: Vec<Element>,
 }
 
-impl Render for Animation {
-    fn load(&mut self) {
-        for element in &mut self.elements {
-            element.load()
-        }
-    }
-
-    fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &mut RenderState) {
+impl Animation {
+    pub fn render(&mut self, ui: &Ui, body: impl FnOnce()) {
         let time = (1000.0 * ui.time()) as u64;
         let passed = time % self.period;
         let progress = passed as f32 / self.period as f32;
-        self.animation.animate(ui, progress, || {
-            for element in &mut self.elements {
-                element.render(ui, ctx, state)
-            }
-        });
+        self.kind.animate(ui, progress, body);
     }
 }
 
 impl Default for Animation {
     fn default() -> Self {
         Self {
-            animation: AnimationKind::Pulse,
+            kind: AnimationKind::Pulse,
             period: 3000,
-            elements: Vec::new(),
         }
     }
 }

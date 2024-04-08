@@ -1,13 +1,15 @@
 use super::Trigger;
-use crate::context::RenderContext;
-use nexus::data_link::mumble::Profession;
+use crate::{
+    context::RenderContext,
+    player::{Profession, Specialization},
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct PlayerTrigger {
     pub profs: Vec<Profession>,
-    pub specs: Vec<u32>,
+    pub specs: Vec<Specialization>,
     pub combat: Option<bool>,
 }
 

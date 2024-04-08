@@ -1,128 +1,93 @@
 {
     "name": "Food Reminder",
     "enabled": true,
-    "trigger": {
-        "player": {
-            "profs": [],
-            "specs": [],
-            "combat": null
-        },
-        "map": {
-            "Ids": [
-                1155,
-                1154,
-                1062,
-                1149,
-                1156,
-                1188,
-                1264,
-                1303,
-                1323,
-                872,
-                954,
-                947,
-                948,
-                950,
-                949,
-                952,
-                951,
-                953,
-                958,
-                955,
-                959,
-                956,
-                957,
-                960,
-                1164,
-                1177,
-                1205,
-                1267,
-                1290,
-                1309,
-                1384,
-                1500,
-                1432,
-                1450,
-                1451,
-                1437,
-                1485,
-                1515,
-                1520
-            ]
-        }
-    },
     "anchor": "TopLeft",
     "pos": [500.0, 300.0],
     "elements": [
         {
-            "Animation": {
-                "animation": "Pulse",
-                "period": 3000,
-                "elements": [
-                    {
-                        "IconGroup": {
-                            "name": "Food Reminder Icons",
-                            "direction": "Horizontal",
-                            "size": [48.0, 48.0],
-                            "padding": 5.0,
-                            "offset": [0.0, 0.0],
-                            "icons": [
-                                {
-                                    "name": "Malnourished",
-                                    "buff": {
-                                        "Single": 46587
-                                    },
-                                    "icon": {
-                                        "Url": "https://wiki.guildwars2.com/images/6/67/Malnourished.png"
-                                    },
-                                    "stacks": false,
-                                    "tint": [255, 255, 255],
-                                    "opacity": 0.7
-                                },
-                                {
-                                    "name": "Diminished",
-                                    "buff": {
-                                        "Single": 46668
-                                    },
-                                    "icon": {
-                                        "Url": "https://wiki.guildwars2.com/images/7/71/Diminished.png"
-                                    },
-                                    "stacks": false,
-                                    "tint": [255, 255, 255],
-                                    "opacity": 0.7
-                                },
-                                {
-                                    "name": "Reinforced",
-                                    "buff": {
-                                        "Not": {
-                                            "Single": 9283
-                                        }
-                                    },
-                                    "icon": {
-                                        "Url": "https://wiki.guildwars2.com/images/8/83/Reinforced_Armor.png"
-                                    },
-                                    "stacks": false,
-                                    "tint": [255, 255, 255],
-                                    "opacity": 0.7
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        "Text": {
-                            "text": "Rebuff",
+            "type": "Group",
+            "name": "Food Reminder Group",
+            "offset": [0.0, 0.0],
+            "condition": {
+                "player": {
+                    "profs": [],
+                    "specs": [],
+                    "combat": null
+                },
+                "map": {
+                    "Ids": [
+                        1155, 1154, 1062, 1149, 1156, 1188, 1264, 1303, 1323, 872, 954, 947, 948, 950, 949,
+                        952, 951, 953, 958, 955, 959, 956, 957, 960, 1164, 1177, 1205, 1267, 1290, 1309,
+                        1384, 1500, 1432, 1450, 1451, 1437, 1485, 1515, 1520
+                    ]
+                }
+            },
+            "animation": {
+                "kind": "Pulse",
+                "period": 3000
+            },
+            "members": [
+                {
+                    "type": "IconGrid",
+                    "name": "Food Reminder Icons",
+                    "direction": "Horizontal",
+                    "size": [48.0, 48.0],
+                    "padding": 5.0,
+                    "offset": [0.0, 0.0],
+                    "icons": [
+                        {
+                            "name": "Malnourished",
                             "buff": {
-                                "Any": [46587, 46668, 9283]
+                                "Single": 46587
                             },
-                            "offset": [0.0, 40.0],
-                            "align": "Center",
-                            "size": 2.5,
-                            "color": [255, 0, 0, 180],
-                            "decoration": "None"
+                            "icon": {
+                                "Url": "https://wiki.guildwars2.com/images/6/67/Malnourished.png"
+                            },
+                            "stacks": false,
+                            "tint": [255, 255, 255],
+                            "opacity": 0.7
+                        },
+                        {
+                            "name": "Diminished",
+                            "buff": {
+                                "Single": 46668
+                            },
+                            "icon": {
+                                "Url": "https://wiki.guildwars2.com/images/7/71/Diminished.png"
+                            },
+                            "stacks": false,
+                            "tint": [255, 255, 255],
+                            "opacity": 0.7
+                        },
+                        {
+                            "name": "Reinforced",
+                            "buff": {
+                                "Not": {
+                                    "Single": 9283
+                                }
+                            },
+                            "icon": {
+                                "Url": "https://wiki.guildwars2.com/images/8/83/Reinforced_Armor.png"
+                            },
+                            "stacks": false,
+                            "tint": [255, 255, 255],
+                            "opacity": 0.7
                         }
-                    }
-                ]
-            }
+                    ]
+                },
+                {
+                    "type": "Text",
+                    "text": "Rebuff",
+                    "buff": {
+                        "Any": [46587, 46668, 9283]
+                    },
+                    "offset": [0.0, 40.0],
+                    "align": "Center",
+                    "size": 2.5,
+                    "color": [255, 0, 0, 180],
+                    "decoration": "None"
+                }
+            ]
         }
     ]
 }

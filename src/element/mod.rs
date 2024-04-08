@@ -4,7 +4,7 @@ mod direction;
 mod group;
 mod icon;
 mod icon_element;
-mod icon_group;
+mod icon_grid;
 mod icon_source;
 mod pack;
 mod render_state;
@@ -13,7 +13,7 @@ mod text_align;
 mod text_decoration;
 
 pub use self::{
-    anchor::*, animation::*, direction::*, group::*, icon::*, icon_element::*, icon_group::*,
+    anchor::*, animation::*, direction::*, group::*, icon::*, icon_element::*, icon_grid::*,
     icon_source::*, pack::*, render_state::*, text::*, text_align::*, text_decoration::*,
 };
 
@@ -30,32 +30,30 @@ pub trait Render {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "type")]
 pub enum Element {
     Group(Group),
-    IconGroup(IconGroup),
+    IconGrid(IconGrid),
     Icon(IconElement),
     Text(Text),
-    Animation(Animation),
 }
 
 impl Render for Element {
     fn load(&mut self) {
         match self {
-            Self::Group(anchor) => anchor.load(),
-            Self::IconGroup(group) => group.load(),
+            Self::Group(group) => group.load(),
+            Self::IconGrid(group) => group.load(),
             Self::Icon(icon) => icon.load(),
             Self::Text(text) => text.load(),
-            Self::Animation(animation) => animation.load(),
         }
     }
 
     fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &mut RenderState) {
         match self {
             Self::Group(anchor) => anchor.render(ui, ctx, state),
-            Self::IconGroup(group) => group.render(ui, ctx, state),
+            Self::IconGrid(group) => group.render(ui, ctx, state),
             Self::Icon(icon) => icon.render(ui, ctx, state),
             Self::Text(text) => text.render(ui, ctx, state),
-            Self::Animation(animation) => animation.render(ui, ctx, state),
         }
     }
 }

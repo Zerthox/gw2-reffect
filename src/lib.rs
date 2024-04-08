@@ -5,6 +5,7 @@ mod context;
 mod element;
 mod get_buffs;
 mod interval;
+mod player;
 mod texture_manager;
 mod trigger;
 
