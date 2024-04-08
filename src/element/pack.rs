@@ -13,6 +13,7 @@ use std::{
 pub struct Pack {
     pub name: String,
     pub enabled: bool,
+    pub layer: i32,
     pub anchor: Anchor,
     pub pos: [f32; 2],
     pub elements: Vec<Element>,
@@ -85,6 +86,7 @@ impl Default for Pack {
         Self {
             name: "Unnamed".into(),
             enabled: false,
+            layer: 0,
             anchor: Anchor::TopLeft,
             pos: [0.0, 0.0],
             elements: Vec::new(),

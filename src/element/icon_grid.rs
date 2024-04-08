@@ -3,6 +3,9 @@ use crate::component_wise::ComponentWise;
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
+// TODO: wrapping options
+// TODO: sorting options
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct IconGrid {

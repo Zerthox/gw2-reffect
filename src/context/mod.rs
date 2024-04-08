@@ -11,6 +11,8 @@ use crate::{
     interval::Interval,
 };
 
+// TODO: optional no edit in combat
+
 #[derive(Debug)]
 pub struct Context {
     pub edit: bool,

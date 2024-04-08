@@ -51,10 +51,15 @@ impl Addon {
 
         for file in files {
             if let Some(pack) = Pack::load_from_file(&file.path()) {
-                self.packs.push(pack);
+                self.add_pack(pack);
             }
         }
         log::info!("Loaded {} packs", self.packs.len());
+    }
+
+    pub fn add_pack(&mut self, new: Pack) {
+        let index = self.packs.partition_point(|entry| entry.layer <= new.layer);
+        self.packs.insert(index, new);
     }
 
     pub fn save_packs(&self) {

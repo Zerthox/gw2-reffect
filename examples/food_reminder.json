@@ -1,6 +1,7 @@
 {
     "name": "Food Reminder",
     "enabled": true,
+    "layer": 1,
     "anchor": "TopLeft",
     "pos": [500.0, 300.0],
     "elements": [

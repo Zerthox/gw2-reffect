@@ -1,6 +1,7 @@
 {
     "name": "Important Boons",
     "enabled": true,
+    "layer": 0,
     "anchor": "BottomCenter",
     "pos": [0.0, -250.0],
     "elements": [
