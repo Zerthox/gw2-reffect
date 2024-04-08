@@ -23,7 +23,7 @@ script = "cp \"${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/debug/${CARGO_MAKE_CRATE_NAM
 script_runner = "@shell"
 
 [tasks.copy-deps]
-script = "cp \"${CARGO_MAKE_CURRENT_TASK_INITIAL_MAKEFILE_DIRECTORY}/deps/*.dll\" \"${GW2_PATH}/addons\""
+script = "cp \"${CARGO_MAKE_CURRENT_TASK_INITIAL_MAKEFILE_DIRECTORY}/deps/*.dll\" \"${GW2_PATH}\""
 script_runner = "@shell"
 
 [tasks.remove]
