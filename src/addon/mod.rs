@@ -29,5 +29,3 @@ impl Addon {
             .unwrap()
     }
 }
-
-unsafe impl Send for Addon {}

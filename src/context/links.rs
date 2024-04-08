@@ -1,21 +1,20 @@
 use nexus::data_link::{get_mumble_link, get_nexus_link, MumbleLink, NexusLink};
-use std::ptr::NonNull;
 
 #[derive(Debug)]
 pub struct Links {
-    mumble: Option<NonNull<MumbleLink>>,
-    nexus: Option<NonNull<NexusLink>>,
+    mumble: *const MumbleLink,
+    nexus: *const NexusLink,
 }
 
 impl Links {
     pub fn load() -> Self {
-        let mumble = unsafe { get_mumble_link().as_ref() }.map(Into::into);
-        if mumble.is_none() {
+        let mumble = get_mumble_link();
+        if mumble.is_null() {
             log::warn!("Failed to get Mumble link")
         }
 
-        let nexus = unsafe { get_nexus_link().as_ref() }.map(Into::into);
-        if nexus.is_none() {
+        let nexus = get_nexus_link();
+        if nexus.is_null() {
             log::warn!("Failed to get Nexus link")
         }
 
@@ -23,10 +22,12 @@ impl Links {
     }
 
     pub fn mumble(&self) -> Option<&MumbleLink> {
-        self.mumble.map(|ptr| unsafe { ptr.as_ref() })
+        unsafe { self.mumble.as_ref() }
     }
 
     pub fn nexus(&self) -> Option<&NexusLink> {
-        self.nexus.map(|ptr| unsafe { ptr.as_ref() })
+        unsafe { self.nexus.as_ref() }
     }
 }
+
+unsafe impl Send for Links {}

@@ -43,9 +43,9 @@ checksum = "cf4b9d6a944f767f8e5e0db018570623c85f3d925ac718db4e06d0187adb21c1"
 
 [[package]]
 name = "cc"
-version = "1.0.90"
+version = "1.0.92"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8cd6604a82acf3039f1144f54b8eb34e91ffba622051189e71b781822d5ee1f5"
+checksum = "2678b2e3449475e95b0aa6f9b506a28e61b3dc8996592b983695e8ebb58a8b41"
 
 [[package]]
 name = "cfg-if"
@@ -167,7 +167,7 @@ checksum = "6c8640c5d730cb13ebd907d8d04b52f55ac9a2eec55b440c8892f40d56c76c1d"
 [[package]]
 name = "nexus"
 version = "0.1.0"
-source = "git+https://github.com/zerthox/nexus-rs#5a8da86b4043bfd8424344143d9188501b969101"
+source = "git+https://github.com/zerthox/nexus-rs#07c02fdc0819940d0ee159724b805f53dfec7296"
 dependencies = [
  "arcdps-imgui",
  "bitflags 2.5.0",
@@ -181,7 +181,7 @@ dependencies = [
 [[package]]
 name = "nexus_codegen"
 version = "0.1.0"
-source = "git+https://github.com/zerthox/nexus-rs#5a8da86b4043bfd8424344143d9188501b969101"
+source = "git+https://github.com/zerthox/nexus-rs#07c02fdc0819940d0ee159724b805f53dfec7296"
 dependencies = [
  "cfg-if",
  "paste",
@@ -300,9 +300,9 @@ dependencies = [
 
 [[package]]
 name = "rustversion"
-version = "1.0.14"
+version = "1.0.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7ffc183a10b4478d04cbbbfc96d0873219d962dd5accaff2ffbd4ceb7df837f4"
+checksum = "80af6f9131f277a45a3fba6ce8e2258037bb0477a67e610d3c1fe046ab31de47"
 
 [[package]]
 name = "ryu"
@@ -397,9 +397,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "2.0.57"
+version = "2.0.58"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "11a6ae1e52eb25aab8f3fb9fca13be982a373b8f1157ca14b897a825ba4a2d35"
+checksum = "44cfb93f38070beee36b3fef7d4f5a16f27751d94b187b666a5cc5e9b0d30687"
 dependencies = [
  "proc-macro2",
  "quote",
