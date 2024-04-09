@@ -30,10 +30,17 @@ impl Pack {
         let path = path.into();
         let file = File::open(&path).ok()?;
         let reader = BufReader::new(file);
-        let mut pack: Self = serde_json::from_reader(reader).ok()?;
-        pack.file = path;
-        pack.load();
-        Some(pack)
+        match serde_json::from_reader::<_, Self>(reader) {
+            Ok(mut pack) => {
+                pack.file = path;
+                pack.load();
+                Some(pack)
+            }
+            Err(err) => {
+                log::warn!("Failed to parse pack \"{}\": {}", path.display(), err);
+                None
+            }
+        }
     }
 
     pub fn save_to_file(&self) -> Option<()> {

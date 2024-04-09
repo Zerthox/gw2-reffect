@@ -7,13 +7,14 @@ pub enum BuffTrigger {
     #[default]
     Always,
 
-    Single(u32),
-
     Not(Box<BuffTrigger>),
 
-    Any(Vec<u32>),
+    Any(Vec<BuffTrigger>),
 
-    All(Vec<u32>),
+    All(Vec<BuffTrigger>),
+
+    #[serde(untagged)]
+    Single(u32),
 }
 
 impl BuffTrigger {
@@ -23,13 +24,23 @@ impl BuffTrigger {
         } else {
             match self {
                 Self::Always => Some(0),
-                Self::Single(id) => ctx.stacks_of(*id),
                 Self::Not(inner) => (!inner.is_active(ctx)).then_some(0),
-                Self::Any(ids) => {
-                    let sum = ctx.stacks_of_summed(ids);
-                    (sum > 0).then_some(sum)
+                Self::Any(inner) => {
+                    let mut iter = inner.iter().filter_map(|entry| entry.get_stacks(ctx));
+                    iter.next().map(|first| first + iter.sum::<i32>())
                 }
-                Self::All(ids) => ctx.has_buffs_all(ids).then(|| ctx.stacks_of_summed(ids)),
+                Self::All(inner) => {
+                    let mut sum = 0;
+                    for entry in inner {
+                        if let Some(stacks) = entry.get_stacks(ctx) {
+                            sum += stacks;
+                        } else {
+                            return None;
+                        }
+                    }
+                    Some(sum)
+                }
+                Self::Single(id) => ctx.stacks_of(*id),
             }
         }
     }
@@ -40,10 +51,10 @@ impl Trigger for BuffTrigger {
         ctx.edit
             || match self {
                 Self::Always => true,
-                Self::Single(id) => ctx.has_buff(*id),
                 Self::Not(inner) => !inner.is_active(ctx),
-                Self::Any(ids) => ctx.has_buffs_any(ids),
-                Self::All(ids) => ctx.has_buffs_all(ids),
+                Self::Any(inner) => inner.iter().any(|entry| entry.is_active(ctx)),
+                Self::All(inner) => inner.iter().all(|entry| entry.is_active(ctx)),
+                Self::Single(id) => ctx.has_buff(*id),
             }
     }
 }

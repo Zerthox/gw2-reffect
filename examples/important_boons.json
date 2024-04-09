@@ -15,9 +15,7 @@
             "icons": [
                 {
                     "name": "Aegis",
-                    "buff": {
-                        "Single": 743
-                    },
+                    "buff": 743,
                     "icon": {
                         "Url": "https://wiki.guildwars2.com/images/e/e5/Aegis.png"
                     },
@@ -27,9 +25,7 @@
                 },
                 {
                     "name": "Might",
-                    "buff": {
-                        "Single": 740
-                    },
+                    "buff": 740,
                     "icon": {
                         "Url": "https://wiki.guildwars2.com/images/7/7c/Might.png"
                     },
@@ -39,9 +35,7 @@
                 },
                 {
                     "name": "Quickness",
-                    "buff": {
-                        "Single": 1187
-                    },
+                    "buff": 1187,
                     "icon": {
                         "Url": "https://wiki.guildwars2.com/images/b/b4/Quickness.png"
                     },
@@ -51,9 +45,7 @@
                 },
                 {
                     "name": "Alacrity",
-                    "buff": {
-                        "Single": 30328
-                    },
+                    "buff": 30328,
                     "icon": {
                         "Url": "https://wiki.guildwars2.com/images/4/4c/Alacrity.png"
                     },
@@ -63,9 +55,7 @@
                 },
                 {
                     "name": "Stability",
-                    "buff": {
-                        "Single": 1122
-                    },
+                    "buff": 1122,
                     "icon": {
                         "Url": "https://wiki.guildwars2.com/images/a/ae/Stability.png"
                     },
