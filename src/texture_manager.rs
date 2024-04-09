@@ -19,14 +19,14 @@ static TEXTURE_MANAGER: OnceLock<Mutex<TextureManager>> = OnceLock::new();
 
 #[derive(Debug)]
 pub struct TextureManager {
-    sender: mpsc::Sender<IconSource>,
+    sender: mpsc::Sender<Message>,
     pending: HashMap<String, IconSource>,
     loaded: HashMap<IconSource, TextureId>,
     default: Option<TextureId>,
 }
 
 impl TextureManager {
-    fn new(sender: mpsc::Sender<IconSource>) -> Self {
+    fn new(sender: mpsc::Sender<Message>) -> Self {
         Self {
             sender,
             pending: HashMap::new(),
@@ -36,29 +36,34 @@ impl TextureManager {
     }
 
     fn init() -> Self {
-        let (sender, receiver) = mpsc::channel::<IconSource>();
+        let (sender, receiver) = mpsc::channel::<Message>();
 
         thread::Builder::new()
             .name("reffect-texture-loader".into())
             .spawn(move || {
-                while let Ok(source) = receiver.recv() {
-                    let mut textures = Self::lock();
-                    if !textures.loaded.contains_key(&source) {
-                        match &source {
-                            IconSource::Empty => {}
-                            IconSource::File(path) => {
-                                let id = textures.add_pending(source.clone());
-                                drop(textures); // drop to avoid recursive locking
-                                Self::load_from_file(&id, path);
-                            }
-                            IconSource::Url(url) => {
-                                let id = textures.add_pending(source.clone());
-                                drop(textures); // drop to avoid recursive locking
-                                Self::load_from_url(&id, url).unwrap_or_else(|| {
-                                    log::warn!("Failed to parse icon url \"{url}\"")
-                                });
+                while let Ok(msg) = receiver.recv() {
+                    match msg {
+                        Message::Load(source) => {
+                            let mut textures = Self::lock();
+                            if !textures.loaded.contains_key(&source) {
+                                match &source {
+                                    IconSource::Empty => {}
+                                    IconSource::File(path) => {
+                                        let id = textures.add_pending(source.clone());
+                                        drop(textures); // drop to avoid recursive locking
+                                        Self::load_from_file(&id, path);
+                                    }
+                                    IconSource::Url(url) => {
+                                        let id = textures.add_pending(source.clone());
+                                        drop(textures); // drop to avoid recursive locking
+                                        Self::load_from_url(&id, url).unwrap_or_else(|| {
+                                            log::warn!("Failed to parse icon url \"{url}\"")
+                                        });
+                                    }
+                                }
                             }
                         }
+                        Message::Exit => return,
                     }
                 }
             })
@@ -97,7 +102,11 @@ impl TextureManager {
     pub fn add_source(source: &IconSource) {
         if source.needs_load() {
             // send to loader thread
-            if Self::lock().sender.send(source.clone()).is_err() {
+            if Self::lock()
+                .sender
+                .send(Message::Load(source.clone()))
+                .is_err()
+            {
                 log::error!("texture loading thread receiver disconnected");
             }
         }
@@ -153,4 +162,16 @@ impl TextureManager {
             log::warn!("Failed to load icon source {}", source.pretty_print());
         }
     }
+}
+
+impl Drop for TextureManager {
+    fn drop(&mut self) {
+        let _ = self.sender.send(Message::Exit);
+    }
+}
+
+#[derive(Debug, Clone)]
+enum Message {
+    Load(IconSource),
+    Exit,
 }
