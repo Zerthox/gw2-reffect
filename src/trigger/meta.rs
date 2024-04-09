@@ -11,6 +11,6 @@ pub struct MetaTrigger {
 
 impl Trigger for MetaTrigger {
     fn is_active(&self, ctx: &RenderContext) -> bool {
-        self.player.is_active(ctx) && self.map.is_active(ctx)
+        ctx.edit || self.player.is_active(ctx) && self.map.is_active(ctx)
     }
 }
