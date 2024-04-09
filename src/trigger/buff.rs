@@ -7,11 +7,11 @@ pub enum BuffTrigger {
     #[default]
     Always,
 
-    Not(Box<BuffTrigger>),
+    Any(Vec<u32>),
 
-    Any(Vec<BuffTrigger>),
+    All(Vec<u32>),
 
-    All(Vec<BuffTrigger>),
+    Not(u32),
 
     #[serde(untagged)]
     Single(u32),
@@ -24,15 +24,14 @@ impl BuffTrigger {
         } else {
             match self {
                 Self::Always => Some(0),
-                Self::Not(inner) => (!inner.is_active(ctx)).then_some(0),
-                Self::Any(inner) => {
-                    let mut iter = inner.iter().filter_map(|entry| entry.get_stacks(ctx));
+                Self::Any(ids) => {
+                    let mut iter = ids.iter().filter_map(|id| ctx.stacks_of(*id));
                     iter.next().map(|first| first + iter.sum::<i32>())
                 }
-                Self::All(inner) => {
+                Self::All(ids) => {
                     let mut sum = 0;
-                    for entry in inner {
-                        if let Some(stacks) = entry.get_stacks(ctx) {
+                    for id in ids {
+                        if let Some(stacks) = ctx.stacks_of(*id) {
                             sum += stacks;
                         } else {
                             return None;
@@ -40,6 +39,7 @@ impl BuffTrigger {
                     }
                     Some(sum)
                 }
+                Self::Not(id) => (!ctx.has_buff(*id)).then_some(0),
                 Self::Single(id) => ctx.stacks_of(*id),
             }
         }
@@ -51,9 +51,9 @@ impl Trigger for BuffTrigger {
         ctx.edit
             || match self {
                 Self::Always => true,
-                Self::Not(inner) => !inner.is_active(ctx),
-                Self::Any(inner) => inner.iter().any(|entry| entry.is_active(ctx)),
-                Self::All(inner) => inner.iter().all(|entry| entry.is_active(ctx)),
+                Self::Any(ids) => ids.iter().any(|id| ctx.has_buff(*id)),
+                Self::All(ids) => ids.iter().any(|id| ctx.has_buff(*id)),
+                Self::Not(id) => !ctx.has_buff(*id),
                 Self::Single(id) => ctx.has_buff(*id),
             }
     }

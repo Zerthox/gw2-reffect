@@ -55,18 +55,6 @@
                             "stacks": false,
                             "tint": [255, 255, 255],
                             "opacity": 0.7
-                        },
-                        {
-                            "name": "Reinforced",
-                            "buff": {
-                                "Not": 9283
-                            },
-                            "icon": {
-                                "Url": "https://wiki.guildwars2.com/images/8/83/Reinforced_Armor.png"
-                            },
-                            "stacks": false,
-                            "tint": [255, 255, 255],
-                            "opacity": 0.7
                         }
                     ]
                 },
@@ -74,7 +62,7 @@
                     "type": "Text",
                     "text": "Rebuff",
                     "buff": {
-                        "Any": [46587, 46668, { "Not": 9283 }]
+                        "Any": [46587, 46668]
                     },
                     "offset": [0.0, 40.0],
                     "align": "Center",
