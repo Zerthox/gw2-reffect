@@ -2,7 +2,11 @@ mod event;
 mod ui;
 
 use crate::{context::Context, element::Pack};
-use std::sync::{Mutex, MutexGuard, OnceLock};
+use nexus::paths::get_addon_dir;
+use std::{
+    path::PathBuf,
+    sync::{Mutex, MutexGuard, OnceLock},
+};
 
 static ADDON: OnceLock<Mutex<Addon>> = OnceLock::new();
 
@@ -27,5 +31,9 @@ impl Addon {
             .get_or_init(|| Mutex::new(Addon::new()))
             .lock()
             .unwrap()
+    }
+
+    pub fn addon_dir() -> PathBuf {
+        get_addon_dir("reffect").expect("invalid addon directory")
     }
 }

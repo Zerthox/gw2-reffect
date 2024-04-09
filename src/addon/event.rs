@@ -1,9 +1,6 @@
 use super::Addon;
 use crate::{element::Pack, texture_manager::TextureManager};
-use nexus::{
-    gui::{register_render, RenderType},
-    paths::get_addon_dir,
-};
+use nexus::gui::{register_render, RenderType};
 use std::fs;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -25,6 +22,7 @@ impl Addon {
         )
         .revert_on_unload();
 
+        let _ = fs::create_dir(Self::addon_dir());
         Self::lock().load_packs();
     }
 
@@ -35,11 +33,10 @@ impl Addon {
     }
 
     pub fn load_packs(&mut self) {
-        let addon_dir = get_addon_dir("reffect").expect("invalid addon directory");
-        log::info!("Loading packs from \"{}\"", addon_dir.display());
+        let dir = Self::addon_dir();
+        log::info!("Loading packs from \"{}\"", dir.display());
 
-        let _ = fs::create_dir(&addon_dir);
-        let files = fs::read_dir(&addon_dir)
+        let files = fs::read_dir(&dir)
             .expect("failed to read addon directory")
             .filter_map(|entry| entry.ok())
             .filter(|entry| {

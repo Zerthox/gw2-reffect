@@ -77,6 +77,10 @@ impl Addon {
         if ui.button("Save pack changes") {
             self.save_packs();
         }
+        ui.same_line();
+        if ui.button("Open packs folder") {
+            let _ = open::that(Self::addon_dir());
+        }
 
         ui.spacing();
         ui.checkbox("Show all", &mut self.context.edit);
