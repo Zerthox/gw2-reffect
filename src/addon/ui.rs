@@ -22,31 +22,7 @@ impl Addon {
             });
 
         if self.debug {
-            Window::new("Reffect Debug")
-                .collapsible(false)
-                .always_auto_resize(true)
-                .opened(&mut self.debug)
-                .build(ui, || {
-                    const GREEN: [f32; 4] = [0.0, 1.0, 0.0, 1.0];
-                    const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
-
-                    let ctx = &self.context;
-
-                    ui.text(format!("Show elements: {}", ctx.ui.should_show()));
-
-                    ui.text("Buffs status:");
-                    ui.same_line();
-                    match ctx.buffs {
-                        Ok(_) => ui.text_colored(GREEN, "Ok"),
-                        Err(err) => ui.text_colored(RED, err.to_string()),
-                    }
-
-                    ui.text(format!("Combat: {}", ctx.ui.combat));
-                    ui.text(format!("Player profession: {}", ctx.player.prof));
-                    ui.text(format!("Player specialization: {}", ctx.player.spec));
-                    ui.text(format!("Map id: {}", ctx.map.id));
-                    ui.text(format!("Map category: {}", ctx.map.category));
-                });
+            self.render_debug(ui);
         }
     }
 
@@ -87,5 +63,35 @@ impl Addon {
         ui.spacing();
         ui.checkbox("Show all", &mut self.context.edit);
         ui.checkbox("Debug window", &mut self.debug);
+    }
+
+    pub fn render_debug(&mut self, ui: &Ui) {
+        Window::new("Reffect Debug")
+            .collapsible(false)
+            .always_auto_resize(true)
+            .opened(&mut self.debug)
+            .build(ui, || {
+                const GREEN: [f32; 4] = [0.0, 1.0, 0.0, 1.0];
+                const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
+
+                let ctx = &self.context;
+
+                ui.text(format!("Show elements: {}", ctx.ui.should_show()));
+
+                ui.text("Buffs status:");
+                ui.same_line();
+                match ctx.buffs {
+                    Ok(_) => ui.text_colored(GREEN, "ok"),
+                    Err(err) => ui.text_colored(RED, err.to_string()),
+                }
+
+                ui.text(format!("Combat: {}", ctx.ui.combat));
+                ui.text(format!("Player profession: {}", ctx.player.prof));
+                ui.text(format!("Player specialization: {}", ctx.player.spec));
+                ui.text(format!("Player race: {}", ctx.player.race));
+                ui.text(format!("Player mount: {}", ctx.player.mount));
+                ui.text(format!("Map id: {}", ctx.map.id));
+                ui.text(format!("Map category: {}", ctx.map.category));
+            });
     }
 }
