@@ -10,12 +10,12 @@ impl Links {
     pub fn load() -> Self {
         let mumble = get_mumble_link();
         if mumble.is_null() {
-            log::warn!("Failed to get Mumble link")
+            log::error!("Failed to get Mumble link")
         }
 
         let nexus = get_nexus_link();
         if nexus.is_null() {
-            log::warn!("Failed to get Nexus link")
+            log::error!("Failed to get Nexus link")
         }
 
         Self { mumble, nexus }

@@ -98,7 +98,7 @@ impl TextureManager {
         if source.needs_load() {
             // send to loader thread
             if Self::lock().sender.send(source.clone()).is_err() {
-                log::warn!("texture loading thread receiver disconnected");
+                log::error!("texture loading thread receiver disconnected");
             }
         }
     }

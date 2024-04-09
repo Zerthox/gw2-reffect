@@ -25,7 +25,7 @@ impl PlayerContext {
                     self.prof = (identity.profession as u8).into();
                     self.spec = identity.spec.into();
                 }
-                Err(err) => log::warn!("Failed to parse mumble identity: {err}"),
+                Err(err) => log::error!("Failed to parse mumble identity: {err}"),
             }
         }
     }
