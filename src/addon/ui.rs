@@ -79,7 +79,9 @@ impl Addon {
         }
         ui.same_line();
         if ui.button("Open packs folder") {
-            let _ = open::that(Self::addon_dir());
+            if let Err(err) = open::that(Self::addon_dir()) {
+                log::error!("Failed to open packs folder: {err}");
+            }
         }
 
         ui.spacing();
