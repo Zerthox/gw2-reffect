@@ -1,5 +1,5 @@
 use super::Links;
-use nexus::data_link::mumble::{Context, UiState};
+use nexus::data_link::mumble::UiState;
 
 #[derive(Debug, Clone)]
 pub struct UiContext {
@@ -19,10 +19,10 @@ impl UiContext {
 
     pub fn update(&mut self, links: &Links) {
         if let Some(nexus) = links.nexus() {
-            self.gameplay = nexus.is_gameplay
+            self.gameplay = nexus.is_gameplay;
         }
         if let Some(mumble) = links.mumble() {
-            let Context { ui_state, .. } = mumble.context;
+            let ui_state = mumble.read_ui_state();
             self.combat = ui_state.contains(UiState::IS_IN_COMBAT);
             self.map_open = ui_state.contains(UiState::IS_MAP_OPEN);
         }

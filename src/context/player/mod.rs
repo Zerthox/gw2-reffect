@@ -5,7 +5,7 @@ mod specialization;
 
 pub use self::{mount::*, profession::*, race::*, specialization::*};
 
-use nexus::data_link::mumble::MumbleLink;
+use nexus::data_link::mumble::MumblePtr;
 
 #[derive(Debug, Clone)]
 pub struct PlayerContext {
@@ -25,13 +25,13 @@ impl PlayerContext {
         }
     }
 
-    pub fn update_fast(&mut self, mumble: &MumbleLink) {
-        self.mount = (mumble.context.mount_index as u8).into();
+    pub fn update_fast(&mut self, mumble: MumblePtr) {
+        self.mount = (mumble.read_mount_index() as u8).into();
     }
 
-    pub fn update_slow(&mut self, mumble: &MumbleLink) {
+    pub fn update_slow(&mut self, mumble: MumblePtr) {
         // only attempt parse after first tick
-        if mumble.ui_tick > 0 {
+        if mumble.read_ui_tick() > 0 {
             match mumble.parse_identity() {
                 Ok(identity) => {
                     self.prof = (identity.profession as u8).into();

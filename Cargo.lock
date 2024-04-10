@@ -76,8 +76,8 @@ dependencies = [
 
 [[package]]
 name = "gw2_mumble"
-version = "0.1.4"
-source = "git+https://github.com/zerthox/gw2-mumble-rs#6ea8ca3bea2ee8ab27eb752a7feb3fa5285a8649"
+version = "0.2.0"
+source = "git+https://github.com/zerthox/gw2-mumble-rs#8b87bd8701171eb44f2be2b3e8d2cda4f0bff3c8"
 dependencies = [
  "bitflags 2.5.0",
  "num_enum",
@@ -186,7 +186,7 @@ checksum = "6c8640c5d730cb13ebd907d8d04b52f55ac9a2eec55b440c8892f40d56c76c1d"
 [[package]]
 name = "nexus"
 version = "0.1.0"
-source = "git+https://github.com/zerthox/nexus-rs#07c02fdc0819940d0ee159724b805f53dfec7296"
+source = "git+https://github.com/zerthox/nexus-rs#57c3c545b8606cebf5dde6117c386d3d8e6194e1"
 dependencies = [
  "arcdps-imgui",
  "bitflags 2.5.0",
@@ -200,7 +200,7 @@ dependencies = [
 [[package]]
 name = "nexus_codegen"
 version = "0.1.0"
-source = "git+https://github.com/zerthox/nexus-rs#07c02fdc0819940d0ee159724b805f53dfec7296"
+source = "git+https://github.com/zerthox/nexus-rs#57c3c545b8606cebf5dde6117c386d3d8e6194e1"
 dependencies = [
  "cfg-if",
  "paste",
@@ -310,9 +310,9 @@ dependencies = [
 
 [[package]]
 name = "quote"
-version = "1.0.35"
+version = "1.0.36"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "291ec9ab5efd934aaf503a6466c5d5251535d108ee747472c3977cc5acc868ef"
+checksum = "0fa76aaf39101c457836aec0ce2316dbdc3ab723cdda1c6bd4e6ad4208acaca7"
 dependencies = [
  "proc-macro2",
 ]

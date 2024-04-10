@@ -1,15 +1,15 @@
-use nexus::data_link::{get_mumble_link, get_nexus_link, MumbleLink, NexusLink};
+use nexus::data_link::{get_mumble_link, get_nexus_link, mumble::MumblePtr, NexusLink};
 
 #[derive(Debug)]
 pub struct Links {
-    mumble: *const MumbleLink,
+    mumble: Option<MumblePtr>,
     nexus: *const NexusLink,
 }
 
 impl Links {
     pub fn load() -> Self {
         let mumble = get_mumble_link();
-        if mumble.is_null() {
+        if mumble.is_none() {
             log::error!("Failed to get Mumble link")
         }
 
@@ -21,8 +21,8 @@ impl Links {
         Self { mumble, nexus }
     }
 
-    pub fn mumble(&self) -> Option<&MumbleLink> {
-        unsafe { self.mumble.as_ref() }
+    pub fn mumble(&self) -> Option<MumblePtr> {
+        self.mumble
     }
 
     pub fn nexus(&self) -> Option<&NexusLink> {

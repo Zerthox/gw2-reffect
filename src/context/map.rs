@@ -1,4 +1,4 @@
-use nexus::data_link::mumble::{map_type, Context};
+use nexus::data_link::mumble::{map_type, MumblePtr};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone)]
@@ -15,9 +15,9 @@ impl MapContext {
         }
     }
 
-    pub fn update(&mut self, context: &Context) {
-        self.id = context.map_id;
-        self.category = context.map_type.into();
+    pub fn update(&mut self, mumble: MumblePtr) {
+        self.id = mumble.read_map_id();
+        self.category = mumble.read_map_type().into();
     }
 
     pub fn is_on_map(&self, id: u32) -> bool {

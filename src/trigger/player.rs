@@ -8,7 +8,7 @@ pub struct PlayerTrigger {
     pub combat: Option<bool>,
     pub profs: Vec<Profession>,
     pub specs: Vec<Specialization>,
-    pub mounts: Vec<Mount>,
+    pub mounts: Vec<Mount>, // TODO: mount example?
 }
 
 impl Trigger for PlayerTrigger {

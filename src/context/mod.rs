@@ -66,7 +66,7 @@ impl Context {
 
             if self.slow_update.triggered(time) {
                 self.player.update_slow(mumble);
-                self.map.update(&mumble.context);
+                self.map.update(mumble);
             }
         }
     }
