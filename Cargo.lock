@@ -76,8 +76,8 @@ dependencies = [
 
 [[package]]
 name = "gw2_mumble"
-version = "0.1.3"
-source = "git+https://github.com/zerthox/gw2-mumble-rs#48a03ac23d209bd4fbd6b6318015a7617f857310"
+version = "0.1.4"
+source = "git+https://github.com/zerthox/gw2-mumble-rs#6ea8ca3bea2ee8ab27eb752a7feb3fa5285a8649"
 dependencies = [
  "bitflags 2.5.0",
  "num_enum",
@@ -401,9 +401,9 @@ dependencies = [
 
 [[package]]
 name = "serde_repr"
-version = "0.1.18"
+version = "0.1.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0b2e6b945e9d3df726b65d6ee24060aff8e3533d431f677a9695db04eff9dfdb"
+checksum = "6c64451ba24fc7a6a2d60fc75dd9c83c90903b19028d4eff35e88fc1e86564e9"
 dependencies = [
  "proc-macro2",
  "quote",
