@@ -28,6 +28,7 @@ impl Addon {
 
     pub fn unload() {
         log::info!("Reffect v{VERSION} unload");
+        TextureManager::unload();
         // TODO: enable when editor
         // Self::lock().save_packs();
     }

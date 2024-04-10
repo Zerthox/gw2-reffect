@@ -17,59 +17,60 @@ use url::Url;
 
 static TEXTURE_MANAGER: OnceLock<Mutex<TextureManager>> = OnceLock::new();
 
+type Message = IconSource;
+
 #[derive(Debug)]
 pub struct TextureManager {
-    sender: mpsc::Sender<Message>,
+    sender: Option<mpsc::Sender<Message>>,
     pending: HashMap<String, IconSource>,
     loaded: HashMap<IconSource, TextureId>,
     default: Option<TextureId>,
 }
 
 impl TextureManager {
-    fn new(sender: mpsc::Sender<Message>) -> Self {
+    fn new() -> Self {
         Self {
-            sender,
+            sender: None,
             pending: HashMap::new(),
             loaded: HashMap::new(),
             default: None,
         }
+        .init_thread()
     }
 
-    fn init() -> Self {
-        let (sender, receiver) = mpsc::channel::<Message>();
+    fn init_thread(mut self) -> Self {
+        let (sender, receiver) = mpsc::channel();
 
         thread::Builder::new()
             .name("reffect-texture-loader".into())
             .spawn(move || {
-                while let Ok(msg) = receiver.recv() {
-                    match msg {
-                        Message::Load(source) => {
-                            let mut textures = Self::lock();
-                            if !textures.loaded.contains_key(&source) {
-                                match &source {
-                                    IconSource::Empty => {}
-                                    IconSource::File(path) => {
-                                        let id = textures.add_pending(source.clone());
-                                        drop(textures); // drop to avoid recursive locking
-                                        Self::load_from_file(&id, path);
-                                    }
-                                    IconSource::Url(url) => {
-                                        let id = textures.add_pending(source.clone());
-                                        drop(textures); // drop to avoid recursive locking
-                                        Self::load_from_url(&id, url).unwrap_or_else(|| {
-                                            log::warn!("Failed to parse icon url \"{url}\"")
-                                        });
-                                    }
-                                }
+                log::debug!("Texture thread spawn");
+                while let Ok(source) = receiver.recv() {
+                    let mut textures = Self::lock();
+                    if !textures.loaded.contains_key(&source) {
+                        match &source {
+                            IconSource::Empty => {}
+                            IconSource::File(path) => {
+                                let id = textures.add_pending(source.clone());
+                                drop(textures); // drop to avoid recursive locking
+                                Self::load_from_file(&id, path);
+                            }
+                            IconSource::Url(url) => {
+                                let id = textures.add_pending(source.clone());
+                                drop(textures); // drop to avoid recursive locking
+                                Self::load_from_url(&id, url).unwrap_or_else(|| {
+                                    log::warn!("Failed to parse icon url \"{url}\"")
+                                });
                             }
                         }
-                        Message::Exit => return,
                     }
                 }
+                log::debug!("Texture thread exit");
             })
             .expect("failed to spawn texture loading thread");
 
-        Self::new(sender)
+        self.sender = Some(sender);
+        self
     }
 
     fn with_default(mut self) -> Self {
@@ -87,11 +88,15 @@ impl TextureManager {
     }
 
     pub fn load() -> &'static Mutex<TextureManager> {
-        TEXTURE_MANAGER.get_or_init(|| Mutex::new(Self::init().with_default()))
+        TEXTURE_MANAGER.get_or_init(|| Mutex::new(Self::new().with_default()))
     }
 
     fn lock() -> MutexGuard<'static, TextureManager> {
         Self::load().lock().unwrap()
+    }
+
+    pub fn unload() {
+        Self::lock().sender = None;
     }
 
     pub fn get_texture(source: &IconSource) -> Option<TextureId> {
@@ -102,12 +107,13 @@ impl TextureManager {
     pub fn add_source(source: &IconSource) {
         if source.needs_load() {
             // send to loader thread
-            if Self::lock()
-                .sender
-                .send(Message::Load(source.clone()))
-                .is_err()
-            {
-                log::error!("texture loading thread receiver disconnected");
+            let textures = Self::lock();
+            if let Some(sender) = &textures.sender {
+                if sender.send(source.clone()).is_err() {
+                    log::error!("Texture loading thread receiver disconnected");
+                }
+            } else {
+                log::error!("Texture loading thread sender disconnected");
             }
         }
     }
@@ -162,16 +168,4 @@ impl TextureManager {
             log::warn!("Failed to load icon source {}", source.pretty_print());
         }
     }
-}
-
-impl Drop for TextureManager {
-    fn drop(&mut self) {
-        let _ = self.sender.send(Message::Exit);
-    }
-}
-
-#[derive(Debug, Clone)]
-enum Message {
-    Load(IconSource),
-    Exit,
 }
