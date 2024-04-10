@@ -25,7 +25,11 @@ impl PlayerContext {
         }
     }
 
-    pub fn update(&mut self, mumble: &MumbleLink) {
+    pub fn update_fast(&mut self, mumble: &MumbleLink) {
+        self.mount = (mumble.context.mount_index as u8).into();
+    }
+
+    pub fn update_slow(&mut self, mumble: &MumbleLink) {
         // only attempt parse after first tick
         if mumble.ui_tick > 0 {
             match mumble.parse_identity() {
@@ -33,7 +37,6 @@ impl PlayerContext {
                     self.prof = (identity.profession as u8).into();
                     self.spec = identity.spec.into();
                     self.race = (identity.race as u8).into();
-                    self.mount = (mumble.context.mount_index as u8).into();
                 }
                 Err(err) => log::error!("Failed to parse mumble identity: {err}"),
             }

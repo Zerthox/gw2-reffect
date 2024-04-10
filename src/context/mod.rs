@@ -56,12 +56,16 @@ impl Context {
 
     pub fn update(&mut self, time: f64) {
         self.ui.update(&self.links);
+
         if self.buffs_update.triggered(time) {
             self.buffs = unsafe { get_buffs() }.map(|buffs| buffs.into());
         }
-        if self.slow_update.triggered(time) {
-            if let Some(mumble) = self.links.mumble() {
-                self.player.update(mumble);
+
+        if let Some(mumble) = self.links.mumble() {
+            self.player.update_fast(mumble);
+
+            if self.slow_update.triggered(time) {
+                self.player.update_slow(mumble);
                 self.map.update(&mumble.context);
             }
         }
