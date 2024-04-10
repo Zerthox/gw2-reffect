@@ -18,7 +18,7 @@ impl UiContext {
     }
 
     pub fn update(&mut self, links: &Links) {
-        if let Some(nexus) = links.nexus() {
+        if let Some(nexus) = unsafe { links.nexus() } {
             self.gameplay = nexus.is_gameplay;
         }
         if let Some(mumble) = links.mumble() {

@@ -25,9 +25,11 @@ impl Links {
         self.mumble
     }
 
-    pub fn nexus(&self) -> Option<&NexusLink> {
-        unsafe { self.nexus.as_ref() }
+    pub unsafe fn nexus(&self) -> Option<&NexusLink> {
+        self.nexus.as_ref()
     }
 }
 
 unsafe impl Send for Links {}
+
+unsafe impl Sync for Links {}
