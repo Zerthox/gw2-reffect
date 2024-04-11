@@ -1,5 +1,5 @@
 use super::Addon;
-use nexus::imgui::{Condition, StyleColor, Ui, Window};
+use nexus::imgui::{ChildWindow, Condition, StyleColor, Ui, Window};
 
 impl Addon {
     pub fn render(&mut self, ui: &Ui) {
@@ -27,6 +27,27 @@ impl Addon {
     }
 
     pub fn render_options(&mut self, ui: &Ui) {
+        ui.text_disabled("Packs");
+        ui.text(format!("Loaded: {}", self.packs.len()));
+        if ui.button("Reload packs") {
+            self.packs.clear();
+            self.load_packs();
+        }
+        ui.same_line();
+        if ui.button("Save changes") {
+            self.save_packs();
+        }
+        ui.same_line();
+        if ui.button("Open folder") {
+            if let Err(err) = open::that(Self::addon_dir()) {
+                log::error!("Failed to open packs folder: {err}");
+            }
+        }
+        ui.spacing();
+        ui.checkbox("Show all", &mut self.context.edit);
+        ui.checkbox("Debug window", &mut self.debug);
+
+        ui.spacing();
         for (i, pack) in self.packs.iter_mut().enumerate() {
             ui.checkbox(format!("{}##pack{i}", pack.name), &mut pack.enabled);
             if ui.is_item_hovered() {
@@ -44,25 +65,22 @@ impl Addon {
         }
 
         ui.spacing();
-        ui.text(format!("Packs loaded: {}", self.packs.len()));
-        if ui.button("Reload pack files") {
-            self.packs.clear();
-            self.load_packs();
-        }
-        ui.same_line();
-        if ui.button("Save pack changes") {
-            self.save_packs();
-        }
-        ui.same_line();
-        if ui.button("Open packs folder") {
-            if let Err(err) = open::that(Self::addon_dir()) {
-                log::error!("Failed to open packs folder: {err}");
-            }
-        }
+        ui.text_disabled("Pack Edit");
+        ChildWindow::new("element-select")
+            .size([200.0, 0.0])
+            .always_vertical_scrollbar(true)
+            .build(ui, || {
+                for pack in &mut self.packs {
+                    pack.render_select_tree(ui, &mut self.options_state);
+                }
+            });
 
-        ui.spacing();
-        ui.checkbox("Show all", &mut self.context.edit);
-        ui.checkbox("Debug window", &mut self.debug);
+        ui.same_line();
+        ui.group(|| {
+            self.packs
+                .iter_mut()
+                .any(|pack| pack.try_render_options(ui, &self.options_state))
+        });
     }
 
     pub fn render_debug(&mut self, ui: &Ui) {

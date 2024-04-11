@@ -1,17 +1,18 @@
-use super::{Render, RenderContext, RenderState, TextAlign, TextDecoration};
-use crate::component_wise::ComponentWise;
+use super::{Element, Node, Render, TextAlign, TextDecoration};
+use crate::context::RenderContext;
+use crate::state::RenderState;
 use crate::trigger::BuffTrigger;
+use crate::{component_wise::ComponentWise, util::enum_combo};
 use nexus::imgui::{ImColor32, Ui};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Text {
-    pub text: String,
     pub buff: BuffTrigger,
-    pub offset: [f32; 2],
-    pub align: TextAlign,
+    pub text: String,
     pub size: f32,
+    pub align: TextAlign,
     pub color: [u8; 4],
     pub decoration: TextDecoration,
 }
@@ -33,15 +34,19 @@ impl Text {
     }
 }
 
-impl Render for Text {
-    fn load(&mut self) {}
+impl Node for Text {
+    fn children(&mut self) -> &mut [Element] {
+        &mut []
+    }
+}
 
+impl Render for Text {
     fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &mut RenderState) {
         if let Some(text) = self.process_text(ctx) {
             ui.set_window_font_scale(self.size);
 
-            let offset = self.align.calc_pos(ui, &text).add(self.offset);
-            let pos = state.pos.add(offset);
+            let align = self.align.calc_pos(ui, &text);
+            let pos = state.pos.add(align);
             ui.set_cursor_screen_pos(pos);
             let color @ [_, _, _, alpha] = self.color();
             self.decoration.render(ui, &text, [0.0, 0.0, 0.0, alpha]);
@@ -50,6 +55,24 @@ impl Render for Text {
             ui.set_window_font_scale(1.0);
         }
     }
+
+    fn render_options(&mut self, ui: &Ui) {
+        self.buff.render_options(ui);
+
+        ui.align_text_to_frame_padding();
+        ui.text("Text");
+        ui.same_line();
+        ui.input_text("##text", &mut self.text).build();
+
+        ui.align_text_to_frame_padding();
+        ui.text("Size");
+        ui.same_line();
+        ui.input_float("##size", &mut self.size).build();
+
+        self.align.render_combo(ui);
+
+        enum_combo(ui, "Decoration", &mut self.decoration);
+    }
 }
 
 impl Default for Text {
@@ -57,7 +80,6 @@ impl Default for Text {
         Self {
             text: String::new(),
             buff: BuffTrigger::default(),
-            offset: [0.0, 0.0],
             align: TextAlign::Center,
             size: 1.0,
             color: [255, 255, 255, 255],

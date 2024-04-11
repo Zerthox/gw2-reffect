@@ -1,5 +1,6 @@
-use super::{IconSource, RenderContext, TextAlign, TextDecoration};
+use super::{IconSource, Node, TextAlign, TextDecoration};
 use crate::component_wise::ComponentWise;
+use crate::context::RenderContext;
 use crate::trigger::{BuffTrigger, Trigger};
 use nexus::imgui::{ImColor32, Ui};
 use serde::{Deserialize, Serialize};
@@ -7,7 +8,6 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Icon {
-    pub name: String,
     pub buff: BuffTrigger,
     pub icon: IconSource,
     pub stacks: bool,
@@ -16,10 +16,6 @@ pub struct Icon {
 }
 
 impl Icon {
-    pub fn load(&mut self) {
-        self.icon.load();
-    }
-
     pub fn is_active(&self, ctx: &RenderContext) -> bool {
         self.buff.is_active(ctx)
     }
@@ -64,12 +60,27 @@ impl Icon {
             }
         }
     }
+
+    pub fn render_options(&mut self, ui: &Ui) {
+        self.buff.render_options(ui);
+        self.icon.render_select(ui);
+        ui.checkbox("Stacks", &mut self.stacks);
+    }
+}
+
+impl Node for Icon {
+    fn load(&mut self) {
+        self.icon.load();
+    }
+
+    fn children(&mut self) -> &mut [super::Element] {
+        &mut []
+    }
 }
 
 impl Default for Icon {
     fn default() -> Self {
         Self {
-            name: "Unnamed".into(),
             buff: BuffTrigger::default(),
             icon: IconSource::Empty,
             stacks: false,

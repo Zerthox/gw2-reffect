@@ -1,5 +1,10 @@
-use super::{Anchor, Element, Render, RenderContext, RenderState};
-use crate::component_wise::ComponentWise;
+use super::{Anchor, Element, Node, Render};
+use crate::{
+    component_wise::ComponentWise,
+    context::RenderContext,
+    state::{render_or_children, OptionsState, RenderState},
+    util::{enum_combo, position_input},
+};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -7,22 +12,26 @@ use std::{
     io::{BufReader, BufWriter},
     path::PathBuf,
 };
+use uuid::Uuid;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Pack {
-    pub name: String,
     pub enabled: bool, // TODO: store enabled separately in addon settings?
+    pub name: String,
     pub layer: i32,
     pub anchor: Anchor,
     pub pos: [f32; 2],
     pub elements: Vec<Element>,
 
     #[serde(skip)]
+    pub file: PathBuf,
+
+    #[serde(skip)]
     pub edit: bool,
 
     #[serde(skip)]
-    pub file: PathBuf,
+    pub guid: Uuid,
 }
 
 impl Pack {
@@ -86,6 +95,38 @@ impl Pack {
             }
         }
     }
+
+    pub fn render_select_tree(&mut self, ui: &Ui, state: &mut OptionsState) {
+        state.render_select_tree(ui, self.guid, &self.name, &mut self.elements)
+    }
+
+    pub fn try_render_options(&mut self, ui: &Ui, state: &OptionsState) -> bool {
+        render_or_children!(self, ui, state)
+    }
+
+    pub fn render_options(&mut self, ui: &Ui) {
+        ui.checkbox("Enabled", &mut self.enabled);
+
+        ui.align_text_to_frame_padding();
+        ui.text("Name");
+        ui.same_line();
+        ui.input_text("##name", &mut self.name).build();
+
+        ui.text("Layer");
+        ui.same_line();
+        ui.text_disabled("coming soon"); // TODO: layer input, then sort packs
+
+        enum_combo(ui, "Anchor", &mut self.anchor);
+
+        let [x, y] = &mut self.pos;
+        position_input(ui, x, y);
+    }
+}
+
+impl Node for Pack {
+    fn children(&mut self) -> &mut [Element] {
+        &mut self.elements
+    }
 }
 
 impl Default for Pack {
@@ -97,8 +138,9 @@ impl Default for Pack {
             anchor: Anchor::TopLeft,
             pos: [0.0, 0.0],
             elements: Vec::new(),
-            edit: false,
             file: PathBuf::new(),
+            edit: false,
+            guid: Uuid::new_v4(),
         }
     }
 }

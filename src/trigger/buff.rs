@@ -1,5 +1,6 @@
 use super::Trigger;
 use crate::context::RenderContext;
+use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
@@ -15,6 +16,19 @@ pub enum BuffTrigger {
 
     #[serde(untagged)]
     Single(u32),
+}
+
+impl Trigger for BuffTrigger {
+    fn is_active(&self, ctx: &RenderContext) -> bool {
+        ctx.edit
+            || match self {
+                Self::Always => true,
+                Self::Any(ids) => ids.iter().any(|id| ctx.has_buff(*id)),
+                Self::All(ids) => ids.iter().any(|id| ctx.has_buff(*id)),
+                Self::Not(id) => !ctx.has_buff(*id),
+                Self::Single(id) => ctx.has_buff(*id),
+            }
+    }
 }
 
 impl BuffTrigger {
@@ -44,17 +58,6 @@ impl BuffTrigger {
             }
         }
     }
-}
 
-impl Trigger for BuffTrigger {
-    fn is_active(&self, ctx: &RenderContext) -> bool {
-        ctx.edit
-            || match self {
-                Self::Always => true,
-                Self::Any(ids) => ids.iter().any(|id| ctx.has_buff(*id)),
-                Self::All(ids) => ids.iter().any(|id| ctx.has_buff(*id)),
-                Self::Not(id) => !ctx.has_buff(*id),
-                Self::Single(id) => ctx.has_buff(*id),
-            }
-    }
+    pub fn render_options(&mut self, ui: &Ui) {}
 }

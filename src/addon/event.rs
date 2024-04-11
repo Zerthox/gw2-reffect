@@ -1,5 +1,5 @@
 use super::Addon;
-use crate::{element::Pack, texture_manager::TextureManager};
+use crate::{elements::Pack, texture_manager::TextureManager};
 use nexus::gui::{register_render, RenderType};
 use std::fs;
 

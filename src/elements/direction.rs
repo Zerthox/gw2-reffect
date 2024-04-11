@@ -1,6 +1,20 @@
 use serde::{Deserialize, Serialize};
+use strum::{AsRefStr, EnumIter};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    AsRefStr,
+    EnumIter,
+    Serialize,
+    Deserialize,
+)]
 pub enum Direction {
     Right,
     Left,

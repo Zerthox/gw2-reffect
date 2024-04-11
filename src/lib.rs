@@ -2,11 +2,13 @@ mod addon;
 mod assets;
 mod component_wise;
 mod context;
-mod element;
+mod elements;
 mod get_buffs;
 mod interval;
+mod state;
 mod texture_manager;
 mod trigger;
+mod util;
 
 use addon::Addon;
 

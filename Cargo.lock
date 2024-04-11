@@ -75,9 +75,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "getrandom"
+version = "0.2.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "94b22e06ecb0110981051723910cbf0b5f5e09a2062dd7663334ee79a9d1286c"
+dependencies = [
+ "cfg-if",
+ "libc",
+ "wasi",
+]
+
+[[package]]
 name = "gw2_mumble"
 version = "0.2.0"
-source = "git+https://github.com/zerthox/gw2-mumble-rs#8b87bd8701171eb44f2be2b3e8d2cda4f0bff3c8"
+source = "git+https://github.com/zerthox/gw2-mumble-rs#5a127ee6d4ae09f4f30c7030ec2e7724ac8e15ea"
 dependencies = [
  "bitflags 2.5.0",
  "num_enum",
@@ -186,7 +197,7 @@ checksum = "6c8640c5d730cb13ebd907d8d04b52f55ac9a2eec55b440c8892f40d56c76c1d"
 [[package]]
 name = "nexus"
 version = "0.1.0"
-source = "git+https://github.com/zerthox/nexus-rs#57c3c545b8606cebf5dde6117c386d3d8e6194e1"
+source = "git+https://github.com/zerthox/nexus-rs#b6d4ed21188404f4b3acb03984a1ffbc61839dd4"
 dependencies = [
  "arcdps-imgui",
  "bitflags 2.5.0",
@@ -200,7 +211,7 @@ dependencies = [
 [[package]]
 name = "nexus_codegen"
 version = "0.1.0"
-source = "git+https://github.com/zerthox/nexus-rs#57c3c545b8606cebf5dde6117c386d3d8e6194e1"
+source = "git+https://github.com/zerthox/nexus-rs#b6d4ed21188404f4b3acb03984a1ffbc61839dd4"
 dependencies = [
  "cfg-if",
  "paste",
@@ -339,6 +350,7 @@ dependencies = [
  "serde_json",
  "strum",
  "url",
+ "uuid",
 ]
 
 [[package]]
@@ -532,6 +544,21 @@ dependencies = [
  "idna",
  "percent-encoding",
 ]
+
+[[package]]
+name = "uuid"
+version = "1.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a183cf7feeba97b4dd1c0d46788634f6221d87fa961b305bed08c851829efcc0"
+dependencies = [
+ "getrandom",
+]
+
+[[package]]
+name = "wasi"
+version = "0.11.0+wasi-snapshot-preview1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9c8d87e72b64a3b4db28d11ce29237c246188f4f51057d65a7eab63b7987e423"
 
 [[package]]
 name = "winapi"

@@ -61,13 +61,4 @@ impl Anchor {
             Self::RightCenter => [screen_x, 0.5 * screen_y],
         }
     }
-
-    /// Renders a select for the anchor.
-    pub fn render_select(&mut self, ui: &Ui) {
-        ui.group(|| {
-            for entry in Self::iter() {
-                ui.radio_button(entry, self, entry);
-            }
-        });
-    }
 }
