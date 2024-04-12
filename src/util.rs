@@ -2,14 +2,11 @@ use nexus::imgui::{sys, InputTextFlags, Selectable, StyleColor, StyleVar, TreeNo
 use std::{borrow::Cow, ffi::CString};
 use strum::IntoEnumIterator;
 
-pub fn ch_width(ui: &Ui, count: f32) -> f32 {
-    count * ui.calc_text_size("0")[0]
-}
-
-pub fn text_label(ui: &Ui, label: impl AsRef<str>) {
-    ui.align_text_to_frame_padding();
-    ui.text(label);
-    ui.same_line();
+pub fn input_u32(ui: &Ui, label: impl AsRef<str>, value: &mut u32) {
+    let mut int = *value as _;
+    if ui.input_int(label, &mut int).step(0).step_fast(0).build() {
+        *value = int as _;
+    }
 }
 
 pub fn input_float_with_format(

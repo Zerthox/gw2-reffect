@@ -1,6 +1,10 @@
 use super::{Direction, Element, Icon, Node, Render, RenderState};
-use crate::{context::RenderContext, trigger::Trigger, util::enum_combo};
-use nexus::imgui::Ui;
+use crate::{
+    context::RenderContext,
+    trigger::Trigger,
+    util::{enum_combo, input_float_with_format},
+};
+use nexus::imgui::{InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
 
 // TODO: wrapping options
@@ -11,7 +15,7 @@ use serde::{Deserialize, Serialize};
 pub struct IconGrid {
     pub direction: Direction,
     pub size: [f32; 2],
-    pub padding: f32,
+    pub pad: f32,
     pub icons: Vec<Icon>,
 }
 
@@ -39,13 +43,21 @@ impl Render for IconGrid {
         for (i, icon) in icons.into_iter().enumerate() {
             let offset = self
                 .direction
-                .offset_for(self.size, self.padding, i, icon_count);
+                .offset_for(self.size, self.pad, i, icon_count);
             icon.render(ui, ctx, &state.with_offset(offset), self.size);
         }
     }
 
     fn render_options(&mut self, ui: &Ui) {
         enum_combo(ui, "Direction", &mut self.direction);
+
+        let [x, y] = &mut self.size;
+        input_float_with_format("Size x", x, 1.0, 10.0, "%0.f", InputTextFlags::empty());
+        input_float_with_format("Size y", y, 1.0, 10.0, "%0.f", InputTextFlags::empty());
+
+        input_float_with_format("padding", y, 1.0, 10.0, "%0.f", InputTextFlags::empty());
+
+        // TODO: icons
     }
 }
 
@@ -53,7 +65,7 @@ impl Default for IconGrid {
     fn default() -> Self {
         Self {
             direction: Direction::Right,
-            padding: 5.0,
+            pad: 3.0,
             size: [32.0, 32.0],
             icons: Vec::new(),
         }

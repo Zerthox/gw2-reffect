@@ -38,6 +38,7 @@ impl Element {
     /// Renders the element options.
     fn render_options(&mut self, ui: &Ui) {
         ui.group(|| {
+            // TODO: tab bar?
             ui.text_disabled(format!("{} Options", self.kind.type_name()));
             ui.spacing();
 

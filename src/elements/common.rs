@@ -1,4 +1,4 @@
-use nexus::imgui::{InputTextFlags, StyleColor, Ui};
+use nexus::imgui::{InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -6,7 +6,7 @@ use super::{Element, RenderState};
 use crate::{
     component_wise::ComponentWise,
     context::{EditState, RenderContext},
-    util::{ch_width, input_float_with_format, text_label, tree_select},
+    util::{input_float_with_format, tree_select},
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -89,17 +89,11 @@ impl Common {
 
     /// Renders the common options.
     pub fn render_options(&mut self, ui: &Ui) {
-        text_label(ui, "Name");
-        ui.input_text("##name", &mut self.name).build();
+        ui.input_text("Name", &mut self.name).build();
 
         let [x, y] = &mut self.pos;
-        let size = ch_width(ui, 12.0);
-        text_label(ui, "Position x");
-        ui.set_next_item_width(size);
-        input_float_with_format("##posx", x, 1.0, 10.0, "%0.f", InputTextFlags::empty());
-        text_label(ui, "Position x");
-        ui.set_next_item_width(size);
-        input_float_with_format("##posy", y, 1.0, 10.0, "%0.f", InputTextFlags::empty());
+        input_float_with_format("Position x", x, 1.0, 10.0, "%0.f", InputTextFlags::empty());
+        input_float_with_format("Position y", y, 1.0, 10.0, "%0.f", InputTextFlags::empty());
     }
 }
 

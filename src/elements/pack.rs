@@ -3,7 +3,7 @@ use crate::{
     context::{EditState, RenderContext},
     util::enum_combo,
 };
-use nexus::imgui::{StyleColor, Ui};
+use nexus::imgui::{StyleVar, Ui};
 use serde::{Deserialize, Serialize};
 use std::{
     fs::File,
@@ -83,20 +83,23 @@ impl Pack {
 
     /// Renders the pack options.
     fn render_options(&mut self, ui: &Ui) {
-        ui.checkbox("Enabled", &mut self.enabled);
+        ui.text_disabled("Pack Options");
+        if let Some(file) = self.file.file_name().and_then(|file| file.to_str()) {
+            ui.same_line();
+            ui.text_disabled(format!("({file})"));
+        }
+        ui.spacing();
 
-        ui.text("File:");
-        let [r, g, b, a] = ui.style_color(StyleColor::Text);
-        ui.same_line();
-        ui.text_colored([r, g, b, a * 0.5], self.file.display().to_string());
+        ui.checkbox("Enabled", &mut self.enabled);
 
         self.common.render_options(ui);
 
         enum_combo(ui, "Anchor", &mut self.anchor);
 
-        ui.text("Layer");
-        ui.same_line();
-        ui.text_disabled("coming soon"); // TODO: layer input, then sort packs
+        {
+            let _style = ui.push_style_var(StyleVar::Alpha(0.7));
+            ui.input_int("Layer", &mut self.layer).build();
+        }
     }
 }
 

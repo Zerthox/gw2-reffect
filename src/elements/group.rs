@@ -39,5 +39,7 @@ impl Render for Group {
         }
     }
 
-    fn render_options(&mut self, _ui: &Ui) {}
+    fn render_options(&mut self, _ui: &Ui) {
+        // TODO: animation & condition options
+    }
 }

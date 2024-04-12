@@ -2,7 +2,7 @@ use super::{IconSource, Node, RenderState, TextAlign, TextDecoration};
 use crate::component_wise::ComponentWise;
 use crate::context::RenderContext;
 use crate::trigger::BuffTrigger;
-use nexus::imgui::{ImColor32, Ui};
+use nexus::imgui::{ColorEdit, ColorPreview, Ui};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -11,16 +11,14 @@ pub struct Icon {
     pub buff: BuffTrigger,
     pub icon: IconSource,
     pub stacks: bool,
-    pub tint: [u8; 3],
-    pub opacity: f32,
+    pub color: [f32; 4],
 }
 
 impl Icon {
     fn color(&self, ui: &Ui) -> [f32; 4] {
-        let [r, g, b] = self.tint;
-        let [r, g, b, _] = ImColor32::from_rgb(r, g, b).to_rgba_f32s();
+        let [r, g, b, a] = self.color;
         let global_alpha = ui.clone_style().alpha;
-        [r, g, b, self.opacity * global_alpha]
+        [r, g, b, a * global_alpha]
     }
 
     pub fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &RenderState, size: [f32; 2]) {
@@ -47,9 +45,11 @@ impl Icon {
                     let line_height = ui.text_line_height();
                     let text_pos = end.add([x_offset, -line_height]).sub(pad);
 
+                    let white = [1.0, 1.0, 1.0, 1.0];
+                    let black = [0.0, 0.0, 0.0, 1.0];
                     ui.set_cursor_screen_pos(text_pos);
-                    TextDecoration::Shadow.render(ui, &text, [0.0, 0.0, 0.0, self.opacity]);
-                    ui.text_colored(color, &text);
+                    TextDecoration::Shadow.render(ui, &text, black);
+                    ui.text_colored(white, &text);
 
                     ui.set_window_font_scale(1.0);
                 }
@@ -59,8 +59,14 @@ impl Icon {
 
     pub fn render_options(&mut self, ui: &Ui) {
         self.buff.render_options(ui);
+
         self.icon.render_select(ui);
+
         ui.checkbox("Stacks", &mut self.stacks);
+
+        ColorEdit::new("Color", &mut self.color)
+            .preview(ColorPreview::Alpha)
+            .build(ui);
     }
 }
 
@@ -80,8 +86,7 @@ impl Default for Icon {
             buff: BuffTrigger::default(),
             icon: IconSource::Empty,
             stacks: false,
-            tint: [255, 255, 255],
-            opacity: 1.0,
+            color: [1.0, 1.0, 1.0, 1.0],
         }
     }
 }

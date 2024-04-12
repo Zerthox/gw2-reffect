@@ -55,10 +55,11 @@ impl Addon {
             });
 
         ui.same_line();
-        ui.group(|| {
+        ChildWindow::new("element-options").build(ui, || {
+            // short circuit after we find the element that has to render
             self.packs
                 .iter_mut()
-                .any(|pack| pack.try_render_options(ui, &self.context.edit))
+                .any(|pack| pack.try_render_options(ui, &self.context.edit));
         });
     }
 

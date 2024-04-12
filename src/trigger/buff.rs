@@ -1,21 +1,26 @@
 use super::Trigger;
-use crate::{context::RenderContext, elements::RenderState};
+use crate::{
+    context::RenderContext,
+    elements::RenderState,
+    util::{enum_combo, input_u32},
+};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
+use strum::{AsRefStr, EnumDiscriminants, EnumIter};
 
-#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, EnumDiscriminants, Serialize, Deserialize)]
+#[strum_discriminants(derive(AsRefStr, EnumIter))]
 pub enum BuffTrigger {
     #[default]
     Always,
 
-    Any(Vec<u32>),
-
-    All(Vec<u32>),
+    Has(u32),
 
     Not(u32),
 
-    #[serde(untagged)]
-    Single(u32),
+    Any(Vec<u32>),
+
+    All(Vec<u32>),
 }
 
 impl Trigger for BuffTrigger {
@@ -25,7 +30,7 @@ impl Trigger for BuffTrigger {
             Self::Any(ids) => ids.iter().any(|id| ctx.has_buff(*id)),
             Self::All(ids) => ids.iter().any(|id| ctx.has_buff(*id)),
             Self::Not(id) => !ctx.has_buff(*id),
-            Self::Single(id) => ctx.has_buff(*id),
+            Self::Has(id) => ctx.has_buff(*id),
         }
     }
 }
@@ -50,7 +55,7 @@ impl BuffTrigger {
                 Some(sum)
             }
             Self::Not(id) => (!ctx.has_buff(*id)).then_some(0),
-            Self::Single(id) => ctx.stacks_of(*id),
+            Self::Has(id) => ctx.stacks_of(*id),
         }
     }
 
@@ -62,5 +67,52 @@ impl BuffTrigger {
         }
     }
 
-    pub fn render_options(&mut self, ui: &Ui) {}
+    fn to_discrim(&self) -> BuffTriggerDiscriminants {
+        match self {
+            Self::Always => BuffTriggerDiscriminants::Always,
+            Self::Any(_) => BuffTriggerDiscriminants::Any,
+            Self::All(_) => BuffTriggerDiscriminants::All,
+            Self::Not(_) => BuffTriggerDiscriminants::Not,
+            Self::Has(_) => BuffTriggerDiscriminants::Has,
+        }
+    }
+
+    fn from_discrim(discrim: BuffTriggerDiscriminants) -> Self {
+        match discrim {
+            BuffTriggerDiscriminants::Always => Self::Always,
+            BuffTriggerDiscriminants::Any => Self::Any(Vec::new()),
+            BuffTriggerDiscriminants::All => Self::All(Vec::new()),
+            BuffTriggerDiscriminants::Not => Self::Not(0),
+            BuffTriggerDiscriminants::Has => Self::Has(0),
+        }
+    }
+
+    pub fn render_options(&mut self, ui: &Ui) {
+        ui.group(|| {
+            let mut discrim = self.to_discrim();
+            if enum_combo(ui, "Trigger", &mut discrim) {
+                *self = Self::from_discrim(discrim);
+            }
+
+            match self {
+                BuffTrigger::Always => {}
+                BuffTrigger::Any(ids) | BuffTrigger::All(ids) => {
+                    // TODO: as single text input?
+                    for (i, id) in ids.iter_mut().enumerate() {
+                        input_u32(ui, format!("Id {}", i + 1), id);
+                    }
+                    if ui.button("+") {
+                        ids.push(0);
+                    }
+                    ui.same_line();
+                    if ui.button("-") {
+                        ids.pop();
+                    }
+                }
+                BuffTrigger::Not(id) | BuffTrigger::Has(id) => {
+                    input_u32(ui, "Id", id);
+                }
+            }
+        })
+    }
 }

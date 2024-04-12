@@ -61,23 +61,26 @@ impl IconSource {
     }
 
     pub fn render_select(&mut self, ui: &Ui) {
-        let mut discrim = self.to_discrim();
-        if enum_combo::<IconSourceDiscriminants>(ui, "Icon", &mut discrim) {
-            *self = Self::from_discrim(discrim);
-        }
+        ui.group(|| {
+            let mut discrim = self.to_discrim();
 
-        ui.same_line();
-        match self {
-            Self::Empty => {}
-            Self::File(path) => {
-                let mut string = path.to_str().expect("invalid path string").into();
-                if ui.input_text("##path", &mut string).build() {
-                    *path = string.into();
+            if enum_combo(ui, "Icon", &mut discrim) {
+                *self = Self::from_discrim(discrim);
+            }
+
+            ui.same_line();
+            match self {
+                Self::Empty => {}
+                Self::File(path) => {
+                    let mut string = path.to_str().expect("invalid path string").into();
+                    if ui.input_text("##path", &mut string).build() {
+                        *path = string.into();
+                    }
+                }
+                Self::Url(url) => {
+                    ui.input_text("##url", url).build();
                 }
             }
-            Self::Url(url) => {
-                ui.input_text("##url", url).build();
-            }
-        }
+        })
     }
 }
