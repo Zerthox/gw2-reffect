@@ -97,8 +97,13 @@ impl Pack {
         enum_combo(ui, "Anchor", &mut self.anchor);
 
         {
-            let _style = ui.push_style_var(StyleVar::Alpha(0.7));
-            ui.input_int("Layer", &mut self.layer).build();
+            // TODO: layer input
+            let _style = ui.push_style_var(StyleVar::Alpha(0.5));
+            let mut layer = self.layer;
+            ui.input_int("Layer", &mut layer)
+                .step(0)
+                .step_fast(0)
+                .build();
         }
     }
 }

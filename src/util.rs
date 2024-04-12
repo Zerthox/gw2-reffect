@@ -1,6 +1,12 @@
-use nexus::imgui::{sys, InputTextFlags, Selectable, StyleColor, StyleVar, TreeNode, Ui};
+use nexus::imgui::{
+    sys, InputTextFlags, Selectable, StyleColor, StyleStackToken, StyleVar, TreeNode, Ui,
+};
 use std::{borrow::Cow, ffi::CString};
 use strum::IntoEnumIterator;
+
+pub fn small_padding<'ui>(ui: &'ui Ui) -> StyleStackToken<'ui> {
+    ui.push_style_var(StyleVar::FramePadding([1.0, 1.0]))
+}
 
 pub fn input_u32(ui: &Ui, label: impl AsRef<str>, value: &mut u32) {
     let mut int = *value as _;

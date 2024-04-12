@@ -1,8 +1,11 @@
 use super::{Element, Node, Render, RenderState, TextAlign, TextDecoration};
 use crate::{
-    component_wise::ComponentWise, context::RenderContext, trigger::BuffTrigger, util::enum_combo,
+    component_wise::ComponentWise,
+    context::RenderContext,
+    trigger::BuffTrigger,
+    util::{enum_combo, input_float_with_format},
 };
-use nexus::imgui::{ColorEdit, ColorPreview, Ui};
+use nexus::imgui::{ColorEdit, ColorPreview, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -55,7 +58,14 @@ impl Render for Text {
 
         ui.input_text("Text", &mut self.text).build();
 
-        ui.input_float("Size", &mut self.size).build();
+        input_float_with_format(
+            "Size",
+            &mut self.size,
+            0.1,
+            1.0,
+            "%.2f",
+            InputTextFlags::empty(),
+        );
 
         self.align.render_combo(ui);
 
