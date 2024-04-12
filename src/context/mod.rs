@@ -1,11 +1,11 @@
-mod edit;
+mod edit_state;
 mod links;
 mod map;
 mod player;
 mod render;
 mod ui;
 
-pub use self::{edit::*, links::*, map::*, player::*, render::*, ui::*};
+pub use self::{edit_state::*, links::*, map::*, player::*, render::*, ui::*};
 
 use crate::{
     get_buffs::{get_buffs, GetBuffsError, StackedBuff},

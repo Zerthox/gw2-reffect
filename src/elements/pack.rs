@@ -56,9 +56,9 @@ impl Pack {
 
     /// Renders the pack.
     pub fn render(&mut self, ui: &Ui, ctx: &RenderContext) {
-        if (self.enabled && ctx.ui.should_show()) || ctx.edit.is_active_or_parent(self.common.id) {
+        if self.edit || (self.enabled && ctx.ui.should_show()) {
             let pos = self.anchor.calc_pos(ui);
-            let state = RenderState::new(pos);
+            let state = RenderState::new(self.edit, pos);
             self.common.render(ui, ctx, &state, |state| {
                 for element in &mut self.elements {
                     element.render(ui, ctx, state);
@@ -69,12 +69,10 @@ impl Pack {
 
     /// Renders the select tree.
     pub fn render_select_tree(&mut self, ui: &Ui, state: &mut EditState) {
-        let child_selected = self
+        let active = self
             .common
             .render_select_tree(ui, state, "Pack", &mut self.elements);
-        if child_selected {
-            state.parent_pack = self.common.id;
-        }
+        self.edit = active;
     }
 
     /// Attempts to render options if selected.

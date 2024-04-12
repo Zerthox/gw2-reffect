@@ -1,4 +1,4 @@
-use nexus::imgui::{InputTextFlags, Ui};
+use nexus::imgui::{InputTextFlags, StyleColor, Ui};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -20,6 +20,10 @@ pub struct Common {
 }
 
 impl Common {
+    pub fn id_string(&self) -> String {
+        self.id.simple().to_string()
+    }
+
     pub fn render(
         &self,
         ui: &Ui,
@@ -27,29 +31,28 @@ impl Common {
         state: &RenderState,
         children: impl FnOnce(&RenderState),
     ) {
-        let edit = ctx.edit.is_active_or_parent(self.id);
-        let state = state.with_edit(edit).with_offset(self.pos);
+        let state = state.with_offset(self.pos);
         children(&state);
 
         if ctx.edit.is_active(self.id) {
-            self.render_edit_indicator(ui);
+            self.render_edit_indicator(ui, &state);
         }
     }
 
-    fn render_edit_indicator(&self, ui: &Ui) {
+    fn render_edit_indicator(&self, ui: &Ui, state: &RenderState) {
         const SIZE: f32 = 5.0;
-        const HALF_SIZE: f32 = SIZE / 2.0;
+        const HALF_SIZE: f32 = 0.5 * SIZE;
         const OFFSET: [f32; 2] = [HALF_SIZE, HALF_SIZE];
         const COLOR: [f32; 4] = [1.0, 0.0, 0.0, 0.8];
 
-        let start = self.pos.sub(OFFSET);
-        let end = self.pos.add(OFFSET);
+        let start = state.pos.sub(OFFSET);
+        let end = state.pos.add(OFFSET);
         ui.get_window_draw_list()
             .add_rect(start, end, COLOR)
             .filled(true)
             .build();
 
-        ui.set_cursor_screen_pos(self.pos.add([HALF_SIZE + 1.0, 0.0]));
+        ui.set_cursor_screen_pos(state.pos.add([HALF_SIZE + 1.0, 0.0]));
         ui.text_colored(COLOR, &self.name);
     }
 
@@ -62,21 +65,26 @@ impl Common {
         kind: &str,
         children: &mut [Element],
     ) -> bool {
-        let id = self.id.simple().to_string();
+        let id = self.id_string();
         let label = format!("{kind}: {}##{id}", self.name);
-        let is_selected = state.is_active(self.id);
-        if tree_select(ui, id, label, is_selected, children.is_empty(), || {
-            for child in children {
-                child.render_select_tree(ui, state);
-            }
-        }) {
-            if is_selected {
-                state.selected = Uuid::nil();
-            } else {
-                state.selected = self.id;
-            }
+
+        let mut child_active = false;
+        if tree_select(
+            ui,
+            id,
+            label,
+            state.is_active(self.id),
+            children.is_empty(),
+            || {
+                for child in children {
+                    child_active |= child.render_select_tree(ui, state);
+                }
+            },
+        ) {
+            state.select(self.id);
         }
-        state.selected == self.id
+
+        child_active || state.is_active(self.id)
     }
 
     /// Renders the common options.
@@ -85,7 +93,7 @@ impl Common {
         ui.input_text("##name", &mut self.name).build();
 
         let [x, y] = &mut self.pos;
-        let size = ch_width(ui, 12);
+        let size = ch_width(ui, 12.0);
         text_label(ui, "Position x");
         ui.set_next_item_width(size);
         input_float_with_format("##posx", x, 1.0, 10.0, "%0.f", InputTextFlags::empty());

@@ -2,8 +2,8 @@ use nexus::imgui::{sys, InputTextFlags, Selectable, StyleColor, StyleVar, TreeNo
 use std::{borrow::Cow, ffi::CString};
 use strum::IntoEnumIterator;
 
-pub fn ch_width(ui: &Ui, count: usize) -> f32 {
-    ui.calc_text_size("0".repeat(count))[0]
+pub fn ch_width(ui: &Ui, count: f32) -> f32 {
+    count * ui.calc_text_size("0")[0]
 }
 
 pub fn text_label(ui: &Ui, label: impl AsRef<str>) {

@@ -10,8 +10,8 @@ pub struct RenderState {
 }
 
 impl RenderState {
-    pub const fn new(pos: [f32; 2]) -> Self {
-        Self { edit: false, pos }
+    pub const fn new(edit: bool, pos: [f32; 2]) -> Self {
+        Self { edit, pos }
     }
 
     pub fn with_offset(&self, offset: [f32; 2]) -> Self {
@@ -21,9 +21,11 @@ impl RenderState {
         }
     }
 
-    pub fn with_edit(&self, edit: bool) -> Self {
+    // TODO: use for displaying only parents during edit?
+    #[allow(unused)]
+    pub fn and_edit(&self, edit: bool) -> Self {
         Self {
-            edit,
+            edit: self.edit || edit,
             pos: self.pos,
         }
     }
