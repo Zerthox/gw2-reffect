@@ -6,10 +6,9 @@ use crate::{
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
-use strum::{AsRefStr, EnumDiscriminants, EnumIter};
+use strum::{AsRefStr, EnumIter, IntoStaticStr};
 
-#[derive(Debug, Default, Clone, EnumDiscriminants, Serialize, Deserialize)]
-#[strum_discriminants(derive(AsRefStr, EnumIter))]
+#[derive(Debug, Default, Clone, AsRefStr, IntoStaticStr, EnumIter, Serialize, Deserialize)]
 pub enum BuffTrigger {
     #[default]
     Always,
@@ -67,32 +66,9 @@ impl BuffTrigger {
         }
     }
 
-    fn to_discrim(&self) -> BuffTriggerDiscriminants {
-        match self {
-            Self::Always => BuffTriggerDiscriminants::Always,
-            Self::Any(_) => BuffTriggerDiscriminants::Any,
-            Self::All(_) => BuffTriggerDiscriminants::All,
-            Self::Not(_) => BuffTriggerDiscriminants::Not,
-            Self::Has(_) => BuffTriggerDiscriminants::Has,
-        }
-    }
-
-    fn from_discrim(discrim: BuffTriggerDiscriminants) -> Self {
-        match discrim {
-            BuffTriggerDiscriminants::Always => Self::Always,
-            BuffTriggerDiscriminants::Any => Self::Any(Vec::new()),
-            BuffTriggerDiscriminants::All => Self::All(Vec::new()),
-            BuffTriggerDiscriminants::Not => Self::Not(0),
-            BuffTriggerDiscriminants::Has => Self::Has(0),
-        }
-    }
-
     pub fn render_options(&mut self, ui: &Ui) {
         ui.group(|| {
-            let mut discrim = self.to_discrim();
-            if enum_combo(ui, "Trigger", &mut discrim) {
-                *self = Self::from_discrim(discrim);
-            }
+            enum_combo(ui, "Trigger", self);
 
             match self {
                 BuffTrigger::Always => {}

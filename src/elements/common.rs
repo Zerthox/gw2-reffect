@@ -1,12 +1,13 @@
-use nexus::imgui::{InputTextFlags, Ui};
+use nexus::imgui::{InputTextFlags, MenuItem, Ui};
 use serde::{Deserialize, Serialize};
+use strum::IntoEnumIterator;
 use uuid::Uuid;
 
-use super::{Element, RenderState};
+use super::{Element, ElementType, RenderState};
 use crate::{
     component_wise::ComponentWise,
     context::{EditState, RenderContext},
-    util::{input_float_with_format, tree_select},
+    util::{input_float_with_format, item_context_menu, tree_select},
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -71,7 +72,7 @@ impl Common {
         let mut child_active = false;
         if tree_select(
             ui,
-            id,
+            &id,
             label,
             state.is_active(self.id),
             children.is_empty(),
@@ -83,6 +84,34 @@ impl Common {
         ) {
             state.select(self.id);
         }
+
+        item_context_menu(&id, || {
+            ui.menu("Create", || {
+                for element in ElementType::iter() {
+                    let name = element.as_ref();
+                    if MenuItem::new(name).build(ui) {
+                        log::debug!("Creating new {name}");
+                        // TODO: push element
+                    }
+                }
+            });
+            if MenuItem::new("Cut").build(ui) {
+                log::debug!("Cutting {kind}");
+                // TODO: remove from parent (indicate via return) & save in clipboard
+            }
+            if MenuItem::new("Copy").build(ui) {
+                log::debug!("Copying {kind}");
+                // TODO: create copy & save in clipboard
+            }
+            if MenuItem::new("Paste").build(ui) {
+                log::debug!("Pasting unknown");
+                // TODO: append element from clipboard
+            }
+            if MenuItem::new("Delete").build(ui) {
+                log::debug!("Deleting {kind}");
+                // TODO: remove from parent (indicate via return)
+            }
+        });
 
         child_active || state.is_active(self.id)
     }

@@ -2,10 +2,21 @@ use crate::{texture_manager::TextureManager, util::enum_combo};
 use nexus::imgui::{TextureId, Ui};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
-use strum::{AsRefStr, EnumDiscriminants, EnumIter};
+use strum::{AsRefStr, EnumIter, IntoStaticStr};
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, EnumDiscriminants, Serialize, Deserialize)]
-#[strum_discriminants(derive(AsRefStr, EnumIter))]
+#[derive(
+    Debug,
+    Default,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    IntoStaticStr,
+    AsRefStr,
+    EnumIter,
+    Serialize,
+    Deserialize,
+)]
 pub enum IconSource {
     #[default]
     Empty,
@@ -44,29 +55,9 @@ impl IconSource {
         }
     }
 
-    fn to_discrim(&self) -> IconSourceDiscriminants {
-        match self {
-            Self::Empty => IconSourceDiscriminants::Empty,
-            Self::File(_) => IconSourceDiscriminants::File,
-            Self::Url(_) => IconSourceDiscriminants::Url,
-        }
-    }
-
-    fn from_discrim(discrim: IconSourceDiscriminants) -> Self {
-        match discrim {
-            IconSourceDiscriminants::Empty => Self::Empty,
-            IconSourceDiscriminants::File => Self::File(PathBuf::new()),
-            IconSourceDiscriminants::Url => Self::Url(String::new()),
-        }
-    }
-
     pub fn render_select(&mut self, ui: &Ui) {
         ui.group(|| {
-            let mut discrim = self.to_discrim();
-
-            if enum_combo(ui, "Icon", &mut discrim) {
-                *self = Self::from_discrim(discrim);
-            }
+            enum_combo(ui, "Icon", self);
 
             ui.same_line();
             match self {

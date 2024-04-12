@@ -1,5 +1,5 @@
 use super::Addon;
-use nexus::imgui::{ChildWindow, Condition, Ui, Window};
+use nexus::imgui::{ChildWindow, Condition, StyleVar, Ui, Window};
 
 impl Addon {
     pub fn render(&mut self, ui: &Ui) {
@@ -27,8 +27,6 @@ impl Addon {
     }
 
     pub fn render_options(&mut self, ui: &Ui) {
-        ui.text_disabled("Packs");
-        ui.text(format!("Loaded: {}", self.packs.len()));
         if ui.button("Reload packs") {
             self.packs.clear();
             self.load_packs();
@@ -43,12 +41,14 @@ impl Addon {
                 log::error!("Failed to open packs folder: {err}");
             }
         }
+        ui.same_line();
         ui.checkbox("Debug window", &mut self.debug);
 
         ui.spacing();
         ChildWindow::new("element-select")
             .size([250.0, 0.0])
             .build(ui, || {
+                ui.text_disabled("Elements");
                 for pack in &mut self.packs {
                     pack.render_select_tree(ui, &mut self.context.edit);
                 }
@@ -56,6 +56,7 @@ impl Addon {
 
         ui.same_line();
         ChildWindow::new("element-options").build(ui, || {
+            let _style = ui.push_style_var(StyleVar::FramePadding([2.0, 2.0]));
             // short circuit after we find the element that has to render
             self.packs
                 .iter_mut()

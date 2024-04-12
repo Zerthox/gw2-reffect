@@ -55,7 +55,7 @@ impl Render for IconGrid {
         input_float_with_format("Size x", x, 1.0, 10.0, "%.2f", InputTextFlags::empty());
         input_float_with_format("Size y", y, 1.0, 10.0, "%.2f", InputTextFlags::empty());
 
-        input_float_with_format("padding", y, 1.0, 10.0, "%.2f", InputTextFlags::empty());
+        input_float_with_format("Padding", y, 1.0, 10.0, "%.2f", InputTextFlags::empty());
 
         // TODO: icons
     }

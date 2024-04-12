@@ -1,12 +1,6 @@
-use nexus::imgui::{
-    sys, InputTextFlags, Selectable, StyleColor, StyleStackToken, StyleVar, TreeNode, Ui,
-};
-use std::{borrow::Cow, ffi::CString};
+use nexus::imgui::{sys, InputTextFlags, Selectable, StyleColor, StyleVar, TreeNode, Ui};
+use std::{ffi::CString, mem};
 use strum::IntoEnumIterator;
-
-pub fn small_padding<'ui>(ui: &'ui Ui) -> StyleStackToken<'ui> {
-    ui.push_style_var(StyleVar::FramePadding([1.0, 1.0]))
-}
 
 pub fn input_u32(ui: &Ui, label: impl AsRef<str>, value: &mut u32) {
     let mut int = *value as _;
@@ -39,33 +33,19 @@ pub fn input_float_with_format(
     }
 }
 
-pub fn combo<T>(
-    ui: &Ui,
-    label: impl AsRef<str>,
-    all: impl IntoIterator<Item = T>,
-    current: &mut T,
-    item_label: impl Fn(&T) -> Cow<str>,
-    item_color: impl Fn(&T) -> Option<[f32; 4]>,
-) -> bool
+pub fn enum_combo<T>(ui: &Ui, label: impl AsRef<str>, current: &mut T) -> bool
 where
-    T: PartialEq,
+    T: AsRef<str> + IntoEnumIterator,
 {
     let mut changed = false;
-    if let Some(_token) = ui.begin_combo(label, item_label(current).as_ref()) {
-        for entry in all {
-            let selected = entry == *current;
-
-            // apply color to selectable
-            let style =
-                item_color(&entry).map(|color| ui.push_style_color(StyleColor::Text, color));
-            if Selectable::new(item_label(&entry).as_ref())
-                .selected(selected)
-                .build(ui)
-            {
+    if let Some(_token) = ui.begin_combo(label, current.as_ref()) {
+        for entry in T::iter() {
+            // distinguish only discriminants
+            let selected = mem::discriminant(&entry) == mem::discriminant(current);
+            if Selectable::new(entry.as_ref()).selected(selected).build(ui) {
                 changed = true;
                 *current = entry;
             }
-            drop(style);
 
             // handle focus
             if selected {
@@ -74,20 +54,6 @@ where
         }
     }
     changed
-}
-
-pub fn enum_combo<T>(ui: &Ui, label: impl AsRef<str>, current: &mut T) -> bool
-where
-    T: PartialEq + AsRef<str> + IntoEnumIterator,
-{
-    combo(
-        ui,
-        label,
-        T::iter(),
-        current,
-        |item| item.as_ref().into(),
-        |_| None,
-    )
 }
 
 pub fn tree_select(
@@ -125,4 +91,18 @@ pub fn tree_select(
     }
 
     clicked
+}
+
+pub fn item_context_menu(str_id: impl Into<String>, contents: impl FnOnce()) {
+    if let Ok(str_id) = CString::new(str_id.into()) {
+        if unsafe {
+            sys::igBeginPopupContextItem(
+                str_id.as_ptr(),
+                sys::ImGuiPopupFlags_MouseButtonRight as i32,
+            )
+        } {
+            contents();
+            unsafe { sys::igEndPopup() };
+        }
+    }
 }

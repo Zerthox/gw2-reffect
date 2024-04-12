@@ -2,25 +2,19 @@ use super::{Element, Group, IconElement, IconGrid, Node, Render, RenderState, Te
 use crate::context::RenderContext;
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
+use strum::{AsRefStr, EnumIter, IntoStaticStr};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, EnumIter, AsRefStr, IntoStaticStr, Serialize, Deserialize)]
 #[serde(tag = "type")]
 pub enum ElementType {
     Group(Group),
-    IconGrid(IconGrid),
-    Icon(IconElement),
-    Text(Text),
-}
 
-impl ElementType {
-    pub fn type_name(&self) -> &'static str {
-        match self {
-            Self::Group(_) => "Group",
-            Self::IconGrid(_) => "IconGrid",
-            Self::Icon(_) => "Icon",
-            Self::Text(_) => "Text",
-        }
-    }
+    #[strum(serialize = "Icon Grid")]
+    IconGrid(IconGrid),
+
+    Icon(IconElement),
+
+    Text(Text),
 }
 
 impl Node for ElementType {

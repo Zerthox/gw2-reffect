@@ -25,8 +25,9 @@ impl Element {
     /// Renders the select tree.
     /// Returns `true` if a child is selected.
     pub fn render_select_tree(&mut self, ui: &Ui, state: &mut EditState) -> bool {
+        let kind = (&self.kind).into(); // borrow here to keep ownership
         self.common
-            .render_select_tree(ui, state, self.kind.type_name(), self.kind.children())
+            .render_select_tree(ui, state, kind, self.kind.children())
     }
 
     /// Attempts to render options if selected.
@@ -39,7 +40,7 @@ impl Element {
     fn render_options(&mut self, ui: &Ui) {
         ui.group(|| {
             // TODO: tab bar?
-            ui.text_disabled(format!("{} Options", self.kind.type_name()));
+            ui.text_disabled(format!("{} Options", self.kind.as_ref()));
             ui.spacing();
 
             self.common.render_options(ui);
