@@ -1,6 +1,6 @@
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
-use strum::{AsRefStr, EnumIter, IntoEnumIterator};
+use strum::{AsRefStr, EnumIter};
 
 /// Screen anchor point.
 #[derive(

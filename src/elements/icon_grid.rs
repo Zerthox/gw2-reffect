@@ -1,7 +1,5 @@
-use super::{Direction, Element, Icon, Node, Render};
-use crate::{
-    component_wise::ComponentWise, context::RenderContext, state::RenderState, util::enum_combo,
-};
+use super::{Direction, Element, Icon, Node, Render, RenderState};
+use crate::{context::RenderContext, trigger::Trigger, util::enum_combo};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
@@ -30,21 +28,19 @@ impl Node for IconGrid {
 }
 
 impl Render for IconGrid {
-    fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &mut RenderState) {
+    fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &RenderState) {
         let icons = self
             .icons
             .iter_mut()
-            .filter(|icon| icon.is_active(ctx))
+            .filter(|icon| icon.buff.is_active_or_edit(ctx, state))
             .collect::<Vec<_>>();
         let icon_count = icons.len();
 
-        let start_pos = state.pos;
         for (i, icon) in icons.into_iter().enumerate() {
             let offset = self
                 .direction
                 .offset_for(self.size, self.padding, i, icon_count);
-            let pos = start_pos.add(offset);
-            icon.render(ui, ctx, pos, self.size);
+            icon.render(ui, ctx, &state.with_offset(offset), self.size);
         }
     }
 

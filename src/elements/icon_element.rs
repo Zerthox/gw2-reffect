@@ -1,5 +1,5 @@
-use super::{Element, Icon, Node, Render};
-use crate::{context::RenderContext, state::RenderState};
+use super::{Element, Icon, Node, Render, RenderState};
+use crate::{context::RenderContext, trigger::Trigger};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
@@ -21,9 +21,9 @@ impl Node for IconElement {
 }
 
 impl Render for IconElement {
-    fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &mut RenderState) {
-        if self.icon.is_active(ctx) {
-            self.icon.render(ui, ctx, state.pos, self.size)
+    fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &RenderState) {
+        if self.icon.buff.is_active_or_edit(ctx, state) {
+            self.icon.render(ui, ctx, state, self.size)
         }
     }
 

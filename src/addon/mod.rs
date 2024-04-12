@@ -1,7 +1,7 @@
 mod event;
 mod ui;
 
-use crate::{context::Context, elements::Pack, state::OptionsState};
+use crate::{context::Context, elements::Pack};
 use nexus::paths::get_addon_dir;
 use std::{
     path::PathBuf,
@@ -15,7 +15,6 @@ pub struct Addon {
     debug: bool,
     packs: Vec<Pack>,
     context: Context,
-    options_state: OptionsState,
 }
 
 impl Addon {
@@ -24,7 +23,6 @@ impl Addon {
             debug: false,
             packs: Vec::new(),
             context: Context::new(),
-            options_state: OptionsState::default(),
         }
     }
 

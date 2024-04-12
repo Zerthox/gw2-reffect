@@ -1,10 +1,11 @@
+mod edit;
 mod links;
 mod map;
 mod player;
 mod render;
 mod ui;
 
-pub use self::{links::*, map::*, player::*, render::*, ui::*};
+pub use self::{edit::*, links::*, map::*, player::*, render::*, ui::*};
 
 use crate::{
     get_buffs::{get_buffs, GetBuffsError, StackedBuff},
@@ -16,7 +17,7 @@ use crate::{
 
 #[derive(Debug)]
 pub struct Context {
-    pub edit: bool,
+    pub edit: EditState,
     pub ui: UiContext,
     pub map: MapContext,
     pub player: PlayerContext,
@@ -29,7 +30,7 @@ pub struct Context {
 impl Context {
     pub fn new() -> Self {
         Self {
-            edit: false,
+            edit: EditState::default(),
             ui: UiContext::empty(),
             player: PlayerContext::empty(),
             map: MapContext::empty(),
@@ -42,7 +43,7 @@ impl Context {
 
     pub fn as_render(&self) -> RenderContext {
         RenderContext {
-            edit: self.edit,
+            edit: &self.edit,
             ui: &self.ui,
             player: &self.player,
             map: &self.map,

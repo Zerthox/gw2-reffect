@@ -6,6 +6,12 @@ pub fn ch_width(ui: &Ui, count: usize) -> f32 {
     ui.calc_text_size("0".repeat(count))[0]
 }
 
+pub fn text_label(ui: &Ui, label: impl AsRef<str>) {
+    ui.align_text_to_frame_padding();
+    ui.text(label);
+    ui.same_line();
+}
+
 pub fn input_float_with_format(
     label: impl Into<String>,
     value: &mut f32,
@@ -28,20 +34,6 @@ pub fn input_float_with_format(
     } else {
         false
     }
-}
-
-pub fn position_input(ui: &Ui, x: &mut f32, y: &mut f32) -> (bool, bool) {
-    let size = ch_width(ui, 12);
-
-    ui.set_next_item_width(size);
-    let x_changed =
-        input_float_with_format("Offset x", x, 1.0, 10.0, "%0.f", InputTextFlags::empty());
-
-    ui.set_next_item_width(size);
-    let y_changed =
-        input_float_with_format("Offset y", y, 1.0, 10.0, "%0.f", InputTextFlags::empty());
-
-    (x_changed, y_changed)
 }
 
 pub fn combo<T>(

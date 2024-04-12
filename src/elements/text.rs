@@ -1,8 +1,7 @@
-use super::{Element, Node, Render, TextAlign, TextDecoration};
-use crate::context::RenderContext;
-use crate::state::RenderState;
-use crate::trigger::BuffTrigger;
-use crate::{component_wise::ComponentWise, util::enum_combo};
+use super::{Element, Node, Render, RenderState, TextAlign, TextDecoration};
+use crate::{
+    component_wise::ComponentWise, context::RenderContext, trigger::BuffTrigger, util::enum_combo,
+};
 use nexus::imgui::{ImColor32, Ui};
 use serde::{Deserialize, Serialize};
 
@@ -27,9 +26,9 @@ impl Text {
         ImColor32::from_rgba(r, g, b, a).to_rgba_f32s()
     }
 
-    pub fn process_text(&self, ctx: &RenderContext) -> Option<String> {
+    pub fn process_text(&self, ctx: &RenderContext, state: &RenderState) -> Option<String> {
         self.buff
-            .get_stacks(ctx)
+            .get_stacks_or_edit(ctx, state)
             .map(|stacks| self.text.replace(replace::STACKS, &stacks.to_string()))
     }
 }
@@ -41,8 +40,8 @@ impl Node for Text {
 }
 
 impl Render for Text {
-    fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &mut RenderState) {
-        if let Some(text) = self.process_text(ctx) {
+    fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &RenderState) {
+        if let Some(text) = self.process_text(ctx, state) {
             ui.set_window_font_scale(self.size);
 
             let align = self.align.calc_pos(ui, &text);

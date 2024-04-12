@@ -1,5 +1,5 @@
 use super::Addon;
-use nexus::imgui::{ChildWindow, Condition, StyleColor, Ui, Window};
+use nexus::imgui::{ChildWindow, Condition, Ui, Window};
 
 impl Addon {
     pub fn render(&mut self, ui: &Ui) {
@@ -43,35 +43,14 @@ impl Addon {
                 log::error!("Failed to open packs folder: {err}");
             }
         }
-        ui.spacing();
-        ui.checkbox("Show all", &mut self.context.edit);
         ui.checkbox("Debug window", &mut self.debug);
 
         ui.spacing();
-        for (i, pack) in self.packs.iter_mut().enumerate() {
-            ui.checkbox(format!("{}##pack{i}", pack.name), &mut pack.enabled);
-            if ui.is_item_hovered() {
-                ui.tooltip(|| {
-                    let [r, g, b, a] = ui.style_color(StyleColor::Text);
-                    ui.text_colored([r, g, b, a * 0.5], pack.file.display().to_string());
-                });
-            }
-            ui.same_line();
-            pack.edit = if pack.edit {
-                !ui.button(format!("Done##pack{i}"))
-            } else {
-                ui.button(format!("Edit##pack{i}"))
-            };
-        }
-
-        ui.spacing();
-        ui.text_disabled("Pack Edit");
         ChildWindow::new("element-select")
             .size([250.0, 0.0])
-            .always_vertical_scrollbar(true)
             .build(ui, || {
                 for pack in &mut self.packs {
-                    pack.render_select_tree(ui, &mut self.options_state);
+                    pack.render_select_tree(ui, &mut self.context.edit);
                 }
             });
 
@@ -79,7 +58,7 @@ impl Addon {
         ui.group(|| {
             self.packs
                 .iter_mut()
-                .any(|pack| pack.try_render_options(ui, &self.options_state))
+                .any(|pack| pack.try_render_options(ui, &self.context.edit))
         });
     }
 

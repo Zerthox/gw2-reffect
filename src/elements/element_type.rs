@@ -1,5 +1,5 @@
-use super::{Element, Group, IconElement, IconGrid, Node, Render, Text};
-use crate::{context::RenderContext, state::RenderState};
+use super::{Element, Group, IconElement, IconGrid, Node, Render, RenderState, Text};
+use crate::context::RenderContext;
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
@@ -44,7 +44,7 @@ impl Node for ElementType {
 }
 
 impl Render for ElementType {
-    fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &mut RenderState) {
+    fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &RenderState) {
         match self {
             Self::Group(group) => group.render(ui, ctx, state),
             Self::IconGrid(grid) => grid.render(ui, ctx, state),

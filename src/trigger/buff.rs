@@ -1,5 +1,5 @@
 use super::Trigger;
-use crate::context::RenderContext;
+use crate::{context::RenderContext, elements::RenderState};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
@@ -20,42 +20,45 @@ pub enum BuffTrigger {
 
 impl Trigger for BuffTrigger {
     fn is_active(&self, ctx: &RenderContext) -> bool {
-        ctx.edit
-            || match self {
-                Self::Always => true,
-                Self::Any(ids) => ids.iter().any(|id| ctx.has_buff(*id)),
-                Self::All(ids) => ids.iter().any(|id| ctx.has_buff(*id)),
-                Self::Not(id) => !ctx.has_buff(*id),
-                Self::Single(id) => ctx.has_buff(*id),
-            }
+        match self {
+            Self::Always => true,
+            Self::Any(ids) => ids.iter().any(|id| ctx.has_buff(*id)),
+            Self::All(ids) => ids.iter().any(|id| ctx.has_buff(*id)),
+            Self::Not(id) => !ctx.has_buff(*id),
+            Self::Single(id) => ctx.has_buff(*id),
+        }
     }
 }
 
 impl BuffTrigger {
-    pub fn get_stacks(&self, ctx: &RenderContext) -> Option<i32> {
-        if ctx.edit {
+    fn get_stacks(&self, ctx: &RenderContext) -> Option<i32> {
+        match self {
+            Self::Always => Some(0),
+            Self::Any(ids) => {
+                let mut iter = ids.iter().filter_map(|id| ctx.stacks_of(*id));
+                iter.next().map(|first| first + iter.sum::<i32>())
+            }
+            Self::All(ids) => {
+                let mut sum = 0;
+                for id in ids {
+                    if let Some(stacks) = ctx.stacks_of(*id) {
+                        sum += stacks;
+                    } else {
+                        return None;
+                    }
+                }
+                Some(sum)
+            }
+            Self::Not(id) => (!ctx.has_buff(*id)).then_some(0),
+            Self::Single(id) => ctx.stacks_of(*id),
+        }
+    }
+
+    pub fn get_stacks_or_edit(&self, ctx: &RenderContext, state: &RenderState) -> Option<i32> {
+        if state.edit {
             Some(1)
         } else {
-            match self {
-                Self::Always => Some(0),
-                Self::Any(ids) => {
-                    let mut iter = ids.iter().filter_map(|id| ctx.stacks_of(*id));
-                    iter.next().map(|first| first + iter.sum::<i32>())
-                }
-                Self::All(ids) => {
-                    let mut sum = 0;
-                    for id in ids {
-                        if let Some(stacks) = ctx.stacks_of(*id) {
-                            sum += stacks;
-                        } else {
-                            return None;
-                        }
-                    }
-                    Some(sum)
-                }
-                Self::Not(id) => (!ctx.has_buff(*id)).then_some(0),
-                Self::Single(id) => ctx.stacks_of(*id),
-            }
+            self.get_stacks(ctx)
         }
     }
 
