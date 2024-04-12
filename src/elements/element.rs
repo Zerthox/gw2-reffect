@@ -29,7 +29,13 @@ impl Element {
     }
 
     pub fn render_select_tree(&mut self, ui: &Ui, state: &mut OptionsState) {
-        state.render_select_tree(ui, self.guid, &self.name, self.kind.children())
+        state.render_select_tree(
+            ui,
+            self.guid,
+            &self.name,
+            self.kind.type_name(),
+            self.kind.children(),
+        )
     }
 
     pub fn try_render_options(&mut self, ui: &Ui, state: &OptionsState) -> bool {
@@ -38,6 +44,10 @@ impl Element {
 
     pub fn render_options(&mut self, ui: &Ui) {
         ui.group(|| {
+            ui.text_disabled(format!("{} Options", self.kind.type_name()));
+
+            ui.spacing();
+
             ui.align_text_to_frame_padding();
             ui.text("Name");
             ui.same_line();

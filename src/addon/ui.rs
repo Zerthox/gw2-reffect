@@ -67,7 +67,7 @@ impl Addon {
         ui.spacing();
         ui.text_disabled("Pack Edit");
         ChildWindow::new("element-select")
-            .size([200.0, 0.0])
+            .size([250.0, 0.0])
             .always_vertical_scrollbar(true)
             .build(ui, || {
                 for pack in &mut self.packs {

@@ -12,11 +12,12 @@ impl OptionsState {
         &mut self,
         ui: &Ui,
         guid: Uuid,
-        name: impl AsRef<str>,
+        name: &str,
+        kind: &str,
         children: &mut [Element],
     ) {
         let id = guid.simple().to_string();
-        let label = format!("{}##{id}", name.as_ref());
+        let label = format!("{kind}: {name}##{id}");
         if tree_select(
             ui,
             id,

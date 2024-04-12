@@ -12,6 +12,17 @@ pub enum ElementType {
     Text(Text),
 }
 
+impl ElementType {
+    pub fn type_name(&self) -> &'static str {
+        match self {
+            Self::Group(_) => "Group",
+            Self::IconGrid(_) => "IconGrid",
+            Self::Icon(_) => "Icon",
+            Self::Text(_) => "Text",
+        }
+    }
+}
+
 impl Node for ElementType {
     fn load(&mut self) {
         match self {

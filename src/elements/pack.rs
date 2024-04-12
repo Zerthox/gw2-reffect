@@ -1,4 +1,4 @@
-use super::{Anchor, Element, Node, Render};
+use super::{Anchor, Element, Node};
 use crate::{
     component_wise::ComponentWise,
     context::RenderContext,
@@ -18,7 +18,7 @@ use uuid::Uuid;
 #[serde(default)]
 pub struct Pack {
     pub enabled: bool, // TODO: store enabled separately in addon settings?
-    pub name: String,
+    pub name: String,  // TODO: group things common between pack & element in struct?
     pub layer: i32,
     pub anchor: Anchor,
     pub pos: [f32; 2],
@@ -97,7 +97,7 @@ impl Pack {
     }
 
     pub fn render_select_tree(&mut self, ui: &Ui, state: &mut OptionsState) {
-        state.render_select_tree(ui, self.guid, &self.name, &mut self.elements)
+        state.render_select_tree(ui, self.guid, &self.name, "Pack", &mut self.elements)
     }
 
     pub fn try_render_options(&mut self, ui: &Ui, state: &OptionsState) -> bool {
