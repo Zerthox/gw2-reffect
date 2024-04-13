@@ -1,14 +1,14 @@
 {
-    "name": "Food Reminder",
     "enabled": true,
-    "layer": 1,
-    "anchor": "TopLeft",
+    "name": "Food Reminder",
     "pos": [500.0, 300.0],
+    "anchor": "TopLeft",
+    "layer": 1,
     "elements": [
         {
+            "name": "Reminder Group",
+            "pos": [0.0, 0.0],
             "type": "Group",
-            "name": "Food Reminder Group",
-            "offset": [0.0, 0.0],
             "condition": {
                 "player": {
                     "profs": [],
@@ -29,45 +29,44 @@
             },
             "members": [
                 {
+                    "name": "Reminder Icons",
+                    "pos": [0.0, 0.0],
                     "type": "IconGrid",
-                    "name": "Food Reminder Icons",
                     "direction": "Horizontal",
                     "size": [48.0, 48.0],
-                    "padding": 5.0,
-                    "offset": [0.0, 0.0],
+                    "pad": 5.0,
                     "icons": [
                         {
                             "name": "Malnourished",
-                            "buff": 46587,
+                            "buff": { "Has": 46587 },
                             "icon": {
                                 "Url": "https://wiki.guildwars2.com/images/6/67/Malnourished.png"
                             },
                             "stacks": false,
-                            "tint": [255, 255, 255],
-                            "opacity": 0.7
+                            "color": [1.0, 1.0, 1.0, 0.7]
                         },
                         {
                             "name": "Diminished",
-                            "buff": 46668,
+                            "buff": { "Has": 46668 },
                             "icon": {
                                 "Url": "https://wiki.guildwars2.com/images/7/71/Diminished.png"
                             },
                             "stacks": false,
-                            "tint": [255, 255, 255],
-                            "opacity": 0.7
+                            "color": [1.0, 1.0, 1.0, 0.7]
                         }
                     ]
                 },
                 {
+                    "name": "Reminder Text",
+                    "pos": [0.0, 40.0],
                     "type": "Text",
                     "text": "Rebuff",
                     "buff": {
                         "Any": [46587, 46668]
                     },
-                    "offset": [0.0, 40.0],
-                    "align": "Center",
                     "size": 2.5,
-                    "color": [255, 0, 0, 180],
+                    "align": "Center",
+                    "color": [1.0, 0, 0, 0.7],
                     "decoration": "None"
                 }
             ]

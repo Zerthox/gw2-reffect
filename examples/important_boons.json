@@ -1,67 +1,62 @@
 {
-    "name": "Important Boons",
     "enabled": true,
-    "layer": 0,
-    "anchor": "BottomCenter",
+    "name": "Important Boons",
     "pos": [0.0, -250.0],
+    "anchor": "BottomCenter",
+    "layer": 0,
     "elements": [
         {
-            "type": "IconGrid",
             "name": "Boon Icons",
+            "pos": [0.0, 0.0],
+            "type": "IconGrid",
             "direction": "Horizontal",
             "size": [32.0, 32.0],
-            "padding": 2.0,
-            "offset": [0.0, 0.0],
+            "pad": 2.0,
             "icons": [
                 {
                     "name": "Aegis",
-                    "buff": 743,
+                    "buff": { "Has": 743 },
                     "icon": {
                         "Url": "https://wiki.guildwars2.com/images/e/e5/Aegis.png"
                     },
                     "stacks": false,
-                    "tint": [255, 255, 255],
-                    "opacity": 0.8
+                    "color": [1.0, 1.0, 1.0, 0.8]
                 },
                 {
                     "name": "Might",
-                    "buff": 740,
+                    "buff": { "Has": 740 },
                     "icon": {
                         "Url": "https://wiki.guildwars2.com/images/7/7c/Might.png"
                     },
                     "stacks": true,
-                    "tint": [255, 255, 255],
-                    "opacity": 0.8
+                    "color": [1.0, 1.0, 1.0, 0.8]
                 },
                 {
                     "name": "Quickness",
-                    "buff": 1187,
+                    "buff": { "Has": 1187 },
                     "icon": {
                         "Url": "https://wiki.guildwars2.com/images/b/b4/Quickness.png"
                     },
                     "stacks": false,
-                    "tint": [255, 255, 255],
-                    "opacity": 0.8
+                    "color": [1.0, 1.0, 1.0, 0.8]
                 },
                 {
                     "name": "Alacrity",
-                    "buff": 30328,
+                    "buff": { "Has": 30328 },
                     "icon": {
                         "Url": "https://wiki.guildwars2.com/images/4/4c/Alacrity.png"
                     },
                     "stacks": false,
-                    "tint": [255, 255, 255],
-                    "opacity": 0.8
+                    "color": [1.0, 1.0, 1.0, 0.8]
                 },
                 {
                     "name": "Stability",
-                    "buff": 1122,
+                    "buff": { "Has": 1122 },
                     "icon": {
                         "Url": "https://wiki.guildwars2.com/images/a/ae/Stability.png"
                     },
                     "stacks": true,
-                    "tint": [255, 255, 255],
-                    "opacity": 0.8
+                    "color": [1.0, 1.0, 1.0, 0.8]
                 }
             ]
         }
