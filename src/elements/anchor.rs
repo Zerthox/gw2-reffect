@@ -2,6 +2,8 @@ use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter};
 
+use crate::util::impl_static_variants;
+
 /// Screen anchor point.
 #[derive(
     Debug,
@@ -44,6 +46,8 @@ pub enum Anchor {
     #[strum(serialize = "Right Center")]
     RightCenter,
 }
+
+impl_static_variants!(Anchor);
 
 impl Anchor {
     /// Calculates the screen position.

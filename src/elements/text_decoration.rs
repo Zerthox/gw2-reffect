@@ -1,4 +1,4 @@
-use crate::component_wise::ComponentWise;
+use crate::{component_wise::ComponentWise, util::impl_static_variants};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter};
@@ -22,6 +22,8 @@ pub enum TextDecoration {
     Shadow,
     Outline,
 }
+
+impl_static_variants!(TextDecoration);
 
 impl TextDecoration {
     fn render_at(ui: &Ui, pos: [f32; 2], text: &str, color: [f32; 4]) {

@@ -1,4 +1,7 @@
-use crate::{texture_manager::TextureManager, util::enum_combo};
+use crate::{
+    texture_manager::TextureManager,
+    util::{enum_combo, impl_static_variants},
+};
 use nexus::imgui::{TextureId, Ui};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
@@ -23,6 +26,8 @@ pub enum IconSource {
     File(PathBuf),
     Url(String),
 }
+
+impl_static_variants!(IconSource);
 
 impl IconSource {
     pub const DEFAULT_ID: &'static str = "REFFECT_ICON_DEFAULT";

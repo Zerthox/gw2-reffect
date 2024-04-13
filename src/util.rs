@@ -1,6 +1,5 @@
 use nexus::imgui::{sys, InputTextFlags, Selectable, StyleVar, TreeNode, Ui};
 use std::{ffi::CString, mem};
-use strum::IntoEnumIterator;
 
 pub fn input_u32(ui: &Ui, label: impl AsRef<str>, value: &mut u32) {
     let mut int = *value as _;
@@ -33,18 +32,39 @@ pub fn input_float_with_format(
     }
 }
 
+pub trait EnumStaticVariants: Sized {
+    fn static_variants() -> &'static [Self];
+}
+
+/// Helper to implement [`EnumStaticVariants`] for enums already implementing [`IntoEnumIterator`].
+macro_rules! impl_static_variants {
+    ($ty:ty) => {
+        impl $crate::util::EnumStaticVariants for $ty {
+            fn static_variants() -> &'static [Self] {
+                use ::std::sync::OnceLock;
+                use ::strum::IntoEnumIterator;
+
+                static VARIANTS: OnceLock<Vec<$ty>> = OnceLock::new();
+                VARIANTS.get_or_init(|| <Self as IntoEnumIterator>::iter().collect())
+            }
+        }
+    };
+}
+
+pub(crate) use impl_static_variants;
+
 pub fn enum_combo<T>(ui: &Ui, label: impl AsRef<str>, current: &mut T) -> bool
 where
-    T: AsRef<str> + IntoEnumIterator,
+    T: Clone + AsRef<str> + EnumStaticVariants + 'static,
 {
     let mut changed = false;
     if let Some(_token) = ui.begin_combo(label, current.as_ref()) {
-        for entry in T::iter() {
+        for entry in T::static_variants() {
             // distinguish only discriminants
-            let selected = mem::discriminant(&entry) == mem::discriminant(current);
+            let selected = mem::discriminant(entry) == mem::discriminant(current);
             if Selectable::new(entry.as_ref()).selected(selected).build(ui) {
                 changed = true;
-                *current = entry;
+                *current = entry.clone();
             }
 
             // handle focus

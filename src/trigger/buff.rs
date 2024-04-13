@@ -2,7 +2,7 @@ use super::Trigger;
 use crate::{
     context::RenderContext,
     elements::RenderState,
-    util::{enum_combo, input_u32},
+    util::{enum_combo, impl_static_variants, input_u32},
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
@@ -21,6 +21,8 @@ pub enum BuffTrigger {
 
     All(Vec<u32>),
 }
+
+impl_static_variants!(BuffTrigger);
 
 impl Trigger for BuffTrigger {
     fn is_active(&self, ctx: &RenderContext) -> bool {
