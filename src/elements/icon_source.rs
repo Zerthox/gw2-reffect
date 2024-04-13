@@ -56,21 +56,23 @@ impl IconSource {
     }
 
     pub fn render_select(&mut self, ui: &Ui) {
-        ui.group(|| {
-            enum_combo(ui, "Icon", self);
+        enum_combo(ui, "Icon", self);
 
-            match self {
-                Self::Empty => {}
-                Self::File(path) => {
-                    let mut string = path.to_str().expect("invalid path string").into();
-                    if ui.input_text("Path", &mut string).build() {
-                        *path = string.into();
-                    }
-                }
-                Self::Url(url) => {
-                    ui.input_text("Url", url).build();
+        match self {
+            Self::Empty => {}
+            Self::File(path) => {
+                let mut string = path.to_str().expect("invalid path string").into();
+                if ui.input_text("##path", &mut string).build() {
+                    *path = string.into();
                 }
             }
-        })
+            Self::Url(url) => {
+                ui.input_text("##url", url).build();
+            }
+        }
+
+        if ui.button("Apply") {
+            self.load();
+        }
     }
 }
