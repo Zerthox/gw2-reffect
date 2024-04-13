@@ -65,20 +65,23 @@ impl Pack {
                 }
             });
         }
+
+        // reset edit in case options were closed
+        // it should be set again before the next render if options are still open
+        self.edit = false;
     }
 
     /// Renders the select tree.
     pub fn render_select_tree(&mut self, ui: &Ui, state: &mut EditState) {
-        let active = self
-            .common
+        self.common
             .render_select_tree(ui, state, "Pack", &mut self.elements);
-        self.edit = active;
     }
 
     /// Attempts to render options if selected.
     /// Returns `true` if the pack or a child rendered.
     pub fn try_render_options(&mut self, ui: &Ui, state: &EditState) -> bool {
-        render_or_children!(self, ui, state)
+        self.edit = render_or_children!(self, ui, state);
+        self.edit
     }
 
     /// Renders the pack options.

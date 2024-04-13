@@ -59,17 +59,16 @@ impl IconSource {
         ui.group(|| {
             enum_combo(ui, "Icon", self);
 
-            ui.same_line();
             match self {
                 Self::Empty => {}
                 Self::File(path) => {
                     let mut string = path.to_str().expect("invalid path string").into();
-                    if ui.input_text("##path", &mut string).build() {
+                    if ui.input_text("Path", &mut string).build() {
                         *path = string.into();
                     }
                 }
                 Self::Url(url) => {
-                    ui.input_text("##url", url).build();
+                    ui.input_text("Url", url).build();
                 }
             }
         })

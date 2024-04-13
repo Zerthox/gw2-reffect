@@ -11,8 +11,8 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Group {
-    pub animation: Option<Animation>,
     pub condition: MetaTrigger,
+    pub animation: Option<Animation>,
     pub members: Vec<Element>,
 }
 

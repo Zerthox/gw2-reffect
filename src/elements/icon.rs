@@ -1,7 +1,5 @@
 use super::{IconSource, Node, RenderState, TextAlign, TextDecoration};
-use crate::component_wise::ComponentWise;
-use crate::context::RenderContext;
-use crate::trigger::BuffTrigger;
+use crate::{component_wise::ComponentWise, context::RenderContext, trigger::BuffTrigger};
 use nexus::imgui::{ColorEdit, ColorPreview, Ui};
 use serde::{Deserialize, Serialize};
 

@@ -24,7 +24,7 @@ impl Element {
 
     /// Renders the select tree.
     /// Returns `true` if a child is selected.
-    pub fn render_select_tree(&mut self, ui: &Ui, state: &mut EditState) -> bool {
+    pub fn render_select_tree(&mut self, ui: &Ui, state: &mut EditState) {
         let kind = (&self.kind).into(); // borrow here to keep ownership
         self.common
             .render_select_tree(ui, state, kind, self.kind.children())

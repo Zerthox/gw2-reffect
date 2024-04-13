@@ -1,4 +1,4 @@
-use nexus::imgui::{sys, InputTextFlags, Selectable, StyleColor, StyleVar, TreeNode, Ui};
+use nexus::imgui::{sys, InputTextFlags, Selectable, StyleVar, TreeNode, Ui};
 use std::{ffi::CString, mem};
 use strum::IntoEnumIterator;
 
@@ -58,38 +58,24 @@ where
 
 pub fn tree_select(
     ui: &Ui,
-    tree_id: impl AsRef<str>,
-    select_label: impl AsRef<str>,
+    id: impl AsRef<str>,
+    label: impl AsRef<str>,
     selected: bool,
     leaf: bool,
     children: impl FnOnce(),
 ) -> bool {
     let _style = ui.push_style_var(StyleVar::IndentSpacing(10.0));
-    let token = {
-        let transparent = [0.0, 0.0, 0.0, 0.0];
-        let _color = ui.push_style_color(StyleColor::Header, transparent);
-        let _color = ui.push_style_color(StyleColor::HeaderHovered, transparent);
-        let _color = ui.push_style_color(StyleColor::HeaderActive, transparent);
-
-        TreeNode::new(tree_id)
-            .label::<&str, _>("") // FIXME: unnecessary type param in imgui-rs
-            .allow_item_overlap(true)
-            .open_on_arrow(true)
-            .default_open(false)
-            .leaf(leaf)
-            .push(ui)
-    };
-
-    ui.same_line();
-    let clicked = Selectable::new(select_label)
-        .close_popups(false)
+    let token = TreeNode::new(id)
+        .label::<&str, _>(label.as_ref()) // FIXME: unnecessary type param in imgui-rs
+        .open_on_arrow(true)
         .selected(selected)
-        .build(ui);
-
+        .leaf(leaf)
+        .tree_push_on_open(!leaf)
+        .push(ui);
+    let clicked = ui.is_item_clicked() && !ui.is_item_toggled_open();
     if token.is_some() {
         children();
     }
-
     clicked
 }
 
@@ -98,7 +84,7 @@ pub fn item_context_menu(str_id: impl Into<String>, contents: impl FnOnce()) {
         if unsafe {
             sys::igBeginPopupContextItem(
                 str_id.as_ptr(),
-                sys::ImGuiPopupFlags_MouseButtonRight as i32,
+                sys::ImGuiPopupFlags_MouseButtonRight as _,
             )
         } {
             contents();

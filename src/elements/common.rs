@@ -65,23 +65,16 @@ impl Common {
         state: &mut EditState,
         kind: &str,
         children: &mut [Element],
-    ) -> bool {
+    ) {
         let id = self.id_string();
-        let label = format!("{kind}: {}##{id}", self.name);
-
-        let mut child_active = false;
-        if tree_select(
-            ui,
-            &id,
-            label,
-            state.is_active(self.id),
-            children.is_empty(),
-            || {
-                for child in children {
-                    child_active |= child.render_select_tree(ui, state);
-                }
-            },
-        ) {
+        let label = format!("{kind}: {}", self.name);
+        let active = state.is_active(self.id);
+        let changed = tree_select(ui, &id, label, active, children.is_empty(), || {
+            for child in children {
+                child.render_select_tree(ui, state);
+            }
+        });
+        if changed {
             state.select(self.id);
         }
 
@@ -112,8 +105,6 @@ impl Common {
                 // TODO: remove from parent (indicate via return)
             }
         });
-
-        child_active || state.is_active(self.id)
     }
 
     /// Renders the common options.
@@ -136,6 +127,7 @@ impl Default for Common {
     }
 }
 
+/// Helper to generate options render.
 macro_rules! render_or_children {
     ( $self:ident, $ui:expr, $state:expr ) => {
         if $state.is_active($self.common.id) {

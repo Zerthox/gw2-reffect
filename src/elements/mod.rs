@@ -8,6 +8,7 @@ mod group;
 mod icon;
 mod icon_element;
 mod icon_grid;
+mod icon_named;
 mod icon_source;
 mod pack;
 mod render_state;
@@ -18,6 +19,6 @@ mod traits;
 
 pub use self::{
     anchor::*, animation::*, common::*, direction::*, element::*, element_type::*, group::*,
-    icon::*, icon_element::*, icon_grid::*, icon_source::*, pack::*, render_state::*, text::*,
-    text_align::*, text_decoration::*, traits::*,
+    icon::*, icon_element::*, icon_grid::*, icon_named::*, icon_source::*, pack::*,
+    render_state::*, text::*, text_align::*, text_decoration::*, traits::*,
 };

@@ -1,10 +1,10 @@
-use super::{Direction, Element, Icon, Node, Render, RenderState};
+use super::{Direction, Element, IconNamed, Node, Render, RenderState};
 use crate::{
     context::RenderContext,
     trigger::Trigger,
     util::{enum_combo, input_float_with_format},
 };
-use nexus::imgui::{InputTextFlags, Ui};
+use nexus::imgui::{CollapsingHeader, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
 
 // TODO: wrapping options
@@ -16,7 +16,7 @@ pub struct IconGrid {
     pub direction: Direction,
     pub size: [f32; 2],
     pub pad: f32,
-    pub icons: Vec<Icon>,
+    pub icons: Vec<IconNamed>,
 }
 
 impl Node for IconGrid {
@@ -36,7 +36,7 @@ impl Render for IconGrid {
         let icons = self
             .icons
             .iter_mut()
-            .filter(|icon| icon.buff.is_active_or_edit(ctx, state))
+            .filter(|icon| icon.inner.buff.is_active_or_edit(ctx, state))
             .collect::<Vec<_>>();
         let icon_count = icons.len();
 
@@ -57,7 +57,23 @@ impl Render for IconGrid {
 
         input_float_with_format("Padding", y, 1.0, 10.0, "%.2f", InputTextFlags::empty());
 
-        // TODO: icons
+        let mut remove = None;
+        for (i, icon) in self.icons.iter_mut().enumerate() {
+            let _id = ui.push_id(i as i32);
+            let mut open = true;
+            if CollapsingHeader::new(&icon.name).build_with_close_button(ui, &mut open) {
+                icon.render_options(ui);
+            }
+            if !open {
+                remove = Some(i);
+            }
+        }
+        if ui.button("Add Icon") {
+            self.icons.push(IconNamed::default());
+        }
+        if let Some(index) = remove {
+            self.icons.remove(index);
+        }
     }
 }
 
