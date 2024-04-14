@@ -14,12 +14,16 @@ pub enum BuffTrigger {
     #[default]
     Always,
 
+    #[strum(serialize = "Has")]
     Has(u32),
 
+    #[strum(serialize = "Missing")]
     Not(u32),
 
+    #[strum(serialize = "Any of")]
     Any(Vec<u32>),
 
+    #[strum(serialize = "All of")]
     All(Vec<u32>),
 }
 
@@ -74,7 +78,7 @@ impl RenderOptions for BuffTrigger {
     fn render_options(&mut self, ui: &Ui) {
         ui.group(|| {
             // TODO: propagate ids when selecting another trigger?
-            enum_combo(ui, "Trigger", self, ComboBoxFlags::empty());
+            enum_combo(ui, "Buff", self, ComboBoxFlags::empty());
 
             match self {
                 BuffTrigger::Always => {}
