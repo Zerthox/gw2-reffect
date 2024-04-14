@@ -2,7 +2,7 @@ use crate::{
     texture_manager::TextureManager,
     util::{enum_combo, impl_static_variants},
 };
-use nexus::imgui::{TextureId, Ui};
+use nexus::imgui::{ComboBoxFlags, TextureId, Ui};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use strum::{AsRefStr, EnumIter, IntoStaticStr};
@@ -61,7 +61,7 @@ impl IconSource {
     }
 
     pub fn render_select(&mut self, ui: &Ui) {
-        enum_combo(ui, "Icon", self);
+        enum_combo(ui, "Icon", self, ComboBoxFlags::empty());
 
         match self {
             Self::Empty => {}
@@ -75,7 +75,7 @@ impl IconSource {
                 ui.input_text("##url", url).build();
             }
         }
-
+        ui.same_line();
         if ui.button("Apply") {
             self.load();
         }

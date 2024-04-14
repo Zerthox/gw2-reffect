@@ -1,9 +1,9 @@
-use super::{render_or_children, Anchor, Common, Element, Node, RenderState};
+use super::{render_or_children, Anchor, Common, Element, HasOptions, Node, RenderState};
 use crate::{
     context::{EditState, RenderContext},
     util::enum_combo,
 };
-use nexus::imgui::{StyleVar, Ui};
+use nexus::imgui::{ComboBoxFlags, StyleVar, Ui};
 use serde::{Deserialize, Serialize};
 use std::{
     fs::File,
@@ -65,10 +65,6 @@ impl Pack {
                 }
             });
         }
-
-        // reset edit in case options were closed
-        // it should be set again before the next render if options are still open
-        self.edit = false;
     }
 
     /// Renders the select tree.
@@ -97,7 +93,7 @@ impl Pack {
 
         self.common.render_options(ui);
 
-        enum_combo(ui, "Anchor", &mut self.anchor);
+        enum_combo(ui, "Anchor", &mut self.anchor, ComboBoxFlags::empty());
 
         {
             // TODO: layer input

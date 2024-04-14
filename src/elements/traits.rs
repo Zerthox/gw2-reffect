@@ -16,10 +16,12 @@ pub trait Node {
 }
 
 /// Interface for UI elements that can be rendered.
-pub trait Render {
+pub trait Render: HasOptions {
     /// Renders the UI element.
     fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &RenderState);
+}
 
-    /// Renders options for the UI element.
+pub trait HasOptions {
+    /// Renders options for the type.
     fn render_options(&mut self, ui: &Ui);
 }

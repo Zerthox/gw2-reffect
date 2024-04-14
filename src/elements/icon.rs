@@ -1,4 +1,4 @@
-use super::{IconSource, Node, RenderState, TextAlign, TextDecoration};
+use super::{HasOptions, IconSource, Node, RenderState, TextAlign, TextDecoration};
 use crate::{component_wise::ComponentWise, context::RenderContext, trigger::BuffTrigger};
 use nexus::imgui::{ColorEdit, ColorPreview, Ui};
 use serde::{Deserialize, Serialize};
@@ -54,18 +54,6 @@ impl Icon {
             }
         }
     }
-
-    pub fn render_options(&mut self, ui: &Ui) {
-        self.buff.render_options(ui);
-
-        self.icon.render_select(ui);
-
-        ui.checkbox("Stacks", &mut self.stacks);
-
-        ColorEdit::new("Color", &mut self.color)
-            .preview(ColorPreview::Alpha)
-            .build(ui);
-    }
 }
 
 impl Node for Icon {
@@ -75,6 +63,20 @@ impl Node for Icon {
 
     fn children(&mut self) -> &mut [super::Element] {
         &mut []
+    }
+}
+
+impl HasOptions for Icon {
+    fn render_options(&mut self, ui: &Ui) {
+        self.buff.render_options(ui);
+
+        self.icon.render_select(ui);
+
+        ui.checkbox("Stacks", &mut self.stacks);
+
+        ColorEdit::new("Color", &mut self.color)
+            .preview(ColorPreview::Alpha)
+            .build(ui);
     }
 }
 

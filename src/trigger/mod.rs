@@ -1,9 +1,10 @@
 mod buff;
+mod combat;
 mod map;
 mod meta;
 mod player;
 
-pub use self::{buff::*, map::*, meta::*, player::*};
+pub use self::{buff::*, combat::*, map::*, meta::*, player::*};
 
 use crate::{context::RenderContext, elements::RenderState};
 

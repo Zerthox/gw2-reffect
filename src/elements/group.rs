@@ -1,9 +1,9 @@
-use super::{Animation, Element, Node, Render, RenderState};
+use super::{Animation, Element, HasOptions, Node, Render, RenderState};
 use crate::{
     context::RenderContext,
     trigger::{MetaTrigger, Trigger},
 };
-use nexus::imgui::Ui;
+use nexus::imgui::{CollapsingHeader, Ui};
 use serde::{Deserialize, Serialize};
 
 // TODO: move animation & condition to element?
@@ -38,8 +38,26 @@ impl Render for Group {
             }
         }
     }
+}
 
-    fn render_options(&mut self, _ui: &Ui) {
-        // TODO: animation & condition options
+impl HasOptions for Group {
+    fn render_options(&mut self, ui: &Ui) {
+        if CollapsingHeader::new("Condition").build(ui) {
+            self.condition.render_options(ui);
+        }
+
+        if CollapsingHeader::new("Animation").build(ui) {
+            if self.animation.is_some() {
+                if ui.checkbox("Enabled", &mut true) {
+                    self.animation = None;
+                }
+            } else if ui.checkbox("Enabled", &mut false) {
+                self.animation = Some(Animation::default());
+            }
+
+            if let Some(animation) = &mut self.animation {
+                animation.render_options(ui);
+            }
+        }
     }
 }

@@ -1,6 +1,6 @@
 use num_enum::{FromPrimitive, IntoPrimitive};
 use serde::{Deserialize, Serialize};
-use strum::{AsRefStr, Display, EnumIter};
+use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
 
 #[derive(
     Debug,
@@ -13,8 +13,10 @@ use strum::{AsRefStr, Display, EnumIter};
     Ord,
     Hash,
     AsRefStr,
+    IntoStaticStr,
     Display,
     EnumIter,
+    VariantArray,
     FromPrimitive,
     IntoPrimitive,
     Serialize,

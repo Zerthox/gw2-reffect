@@ -1,10 +1,10 @@
-use super::{Direction, Element, IconNamed, Node, Render, RenderState};
+use super::{Direction, Element, HasOptions, IconNamed, Node, Render, RenderState};
 use crate::{
     context::RenderContext,
     trigger::Trigger,
     util::{enum_combo, input_float_with_format},
 };
-use nexus::imgui::{CollapsingHeader, InputTextFlags, Ui};
+use nexus::imgui::{CollapsingHeader, ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
 
 // TODO: wrapping options
@@ -47,9 +47,11 @@ impl Render for IconGrid {
             icon.render(ui, ctx, &state.with_offset(offset), self.size);
         }
     }
+}
 
+impl HasOptions for IconGrid {
     fn render_options(&mut self, ui: &Ui) {
-        enum_combo(ui, "Direction", &mut self.direction);
+        enum_combo(ui, "Direction", &mut self.direction, ComboBoxFlags::empty());
 
         let [x, y] = &mut self.size;
         input_float_with_format("Size x", x, 1.0, 10.0, "%.2f", InputTextFlags::empty());
@@ -57,20 +59,27 @@ impl Render for IconGrid {
 
         input_float_with_format("Padding", y, 1.0, 10.0, "%.2f", InputTextFlags::empty());
 
+        ui.spacing();
+        ui.text_disabled("Icons");
+
         let mut remove = None;
         for (i, icon) in self.icons.iter_mut().enumerate() {
             let _id = ui.push_id(i as i32);
-            let mut open = true;
-            if CollapsingHeader::new(&icon.name).build_with_close_button(ui, &mut open) {
+            let mut remains = true;
+            if CollapsingHeader::new(format!("{}###icon{i}", icon.name))
+                .build_with_close_button(ui, &mut remains)
+            {
                 icon.render_options(ui);
+                ui.spacing();
             }
-            if !open {
+            if !remains {
                 remove = Some(i);
             }
         }
         if ui.button("Add Icon") {
             self.icons.push(IconNamed::default());
         }
+
         if let Some(index) = remove {
             self.icons.remove(index);
         }

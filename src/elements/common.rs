@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 use uuid::Uuid;
 
-use super::{Element, ElementType, RenderState};
+use super::{Element, ElementType, HasOptions, RenderState};
 use crate::{
     component_wise::ComponentWise,
     context::{EditState, RenderContext},
@@ -106,9 +106,10 @@ impl Common {
             }
         });
     }
+}
 
-    /// Renders the common options.
-    pub fn render_options(&mut self, ui: &Ui) {
+impl HasOptions for Common {
+    fn render_options(&mut self, ui: &Ui) {
         ui.input_text("Name", &mut self.name).build();
 
         let [x, y] = &mut self.pos;

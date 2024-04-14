@@ -75,7 +75,7 @@ impl Addon {
 
                 let ctx = &self.context;
 
-                ui.text(format!("Show elements: {}", ctx.ui.should_show()));
+                ui.text(format!("Show Elements: {}", ctx.ui.should_show()));
 
                 ui.text("Buffs status:");
                 ui.same_line();
@@ -85,10 +85,10 @@ impl Addon {
                 }
 
                 ui.text(format!("Combat: {}", ctx.ui.combat));
-                ui.text(format!("Player profession: {}", ctx.player.prof));
-                ui.text(format!("Player specialization: {}", ctx.player.spec));
-                ui.text(format!("Player race: {}", ctx.player.race));
-                ui.text(format!("Player mount: {}", ctx.player.mount));
+                ui.text(format!("Profession: {}", ctx.player.prof));
+                ui.text(format!("Specialization: {}", ctx.player.spec));
+                ui.text(format!("Race: {}", ctx.player.race));
+                ui.text(format!("Mount: {}", ctx.player.mount));
                 ui.text(format!("Map id: {}", ctx.map.id));
                 ui.text(format!("Map category: {}", ctx.map.category));
             });

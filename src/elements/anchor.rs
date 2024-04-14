@@ -20,31 +20,31 @@ use crate::util::impl_static_variants;
     Deserialize,
 )]
 pub enum Anchor {
-    #[strum(serialize = "Top left")]
+    #[strum(serialize = "Top Left")]
     TopLeft,
 
-    #[strum(serialize = "Top center")]
+    #[strum(serialize = "Top Center")]
     TopCenter,
 
-    #[strum(serialize = "Top right")]
+    #[strum(serialize = "Top Right")]
     TopRight,
-
-    #[strum(serialize = "Bottom left")]
-    BottomLeft,
-
-    #[strum(serialize = "Bottom center")]
-    BottomCenter,
-
-    #[strum(serialize = "Bottom right")]
-    BottomRight,
-
-    Center,
 
     #[strum(serialize = "Left Center")]
     LeftCenter,
 
+    Center,
+
     #[strum(serialize = "Right Center")]
     RightCenter,
+
+    #[strum(serialize = "Bottom Left")]
+    BottomLeft,
+
+    #[strum(serialize = "Bottom Center")]
+    BottomCenter,
+
+    #[strum(serialize = "Bottom Right")]
+    BottomRight,
 }
 
 impl_static_variants!(Anchor);

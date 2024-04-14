@@ -1,4 +1,4 @@
-use super::{Element, Icon, Node, Render, RenderState};
+use super::{Element, HasOptions, Icon, Node, Render, RenderState};
 use crate::{context::RenderContext, trigger::Trigger};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
@@ -26,7 +26,9 @@ impl Render for IconElement {
             self.icon.render(ui, ctx, state, self.size)
         }
     }
+}
 
+impl HasOptions for IconElement {
     fn render_options(&mut self, ui: &Ui) {
         ui.text("Icon");
         ui.same_line();

@@ -1,5 +1,10 @@
-use nexus::imgui::{StyleVar, Ui};
+use nexus::imgui::{ComboBoxFlags, StyleVar, Ui};
 use serde::{Deserialize, Serialize};
+use strum::{AsRefStr, EnumIter, VariantArray};
+
+use crate::util::{enum_combo, input_u32};
+
+use super::HasOptions;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
@@ -8,15 +13,25 @@ pub struct Animation {
     pub kind: AnimationKind,
 
     /// Animation period in milliseconds.
-    pub period: u64,
+    pub period: u32,
 }
 
 impl Animation {
     pub fn render(&mut self, ui: &Ui, body: impl FnOnce()) {
-        let time = (1000.0 * ui.time()) as u64;
+        let time = (1000.0 * ui.time()) as u32;
         let passed = time % self.period;
         let progress = passed as f32 / self.period as f32;
         self.kind.animate(ui, progress, body);
+    }
+}
+
+impl HasOptions for Animation {
+    fn render_options(&mut self, ui: &Ui) {
+        enum_combo(ui, "Animation", &mut self.kind, unsafe {
+            ComboBoxFlags::from_bits_unchecked(1 >> 7)
+        });
+
+        input_u32(ui, "Period", &mut self.period);
     }
 }
 
@@ -30,7 +45,21 @@ impl Default for Animation {
 }
 
 // TODO: tint animation changing color via state?
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    AsRefStr,
+    EnumIter,
+    VariantArray,
+    Serialize,
+    Deserialize,
+)]
 pub enum AnimationKind {
     Pulse,
 }

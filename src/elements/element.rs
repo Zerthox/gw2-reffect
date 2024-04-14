@@ -1,4 +1,4 @@
-use super::{render_or_children, Common, ElementType, Node, Render, RenderState};
+use super::{render_or_children, Common, ElementType, HasOptions, Node, Render, RenderState};
 use crate::context::{EditState, RenderContext};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
@@ -38,15 +38,12 @@ impl Element {
 
     /// Renders the element options.
     fn render_options(&mut self, ui: &Ui) {
-        ui.group(|| {
-            // TODO: tab bar?
-            ui.text_disabled(format!("{} Options", self.kind.as_ref()));
-            ui.spacing();
+        ui.text_disabled(format!("{} Options", self.kind.as_ref()));
+        ui.spacing();
 
-            self.common.render_options(ui);
+        self.common.render_options(ui);
 
-            self.kind.render_options(ui);
-        });
+        self.kind.render_options(ui);
     }
 }
 

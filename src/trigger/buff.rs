@@ -1,10 +1,10 @@
 use super::Trigger;
 use crate::{
     context::RenderContext,
-    elements::RenderState,
+    elements::{HasOptions, RenderState},
     util::{enum_combo, impl_static_variants, input_u32},
 };
-use nexus::imgui::Ui;
+use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, IntoStaticStr};
 
@@ -67,10 +67,13 @@ impl BuffTrigger {
             self.get_stacks(ctx)
         }
     }
+}
 
-    pub fn render_options(&mut self, ui: &Ui) {
+impl HasOptions for BuffTrigger {
+    fn render_options(&mut self, ui: &Ui) {
         ui.group(|| {
-            enum_combo(ui, "Trigger", self);
+            // TODO: propagate ids when selecting another trigger?
+            enum_combo(ui, "Trigger", self, ComboBoxFlags::empty());
 
             match self {
                 BuffTrigger::Always => {}

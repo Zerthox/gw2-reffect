@@ -1,10 +1,13 @@
 use nexus::imgui::{sys, InputTextFlags, Selectable, StyleVar, TreeNode, Ui};
 use std::{ffi::CString, mem};
+use strum::VariantArray;
 
 pub fn input_u32(ui: &Ui, label: impl AsRef<str>, value: &mut u32) {
     let mut int = *value as _;
     if ui.input_int(label, &mut int).step(0).step_fast(0).build() {
-        *value = int as _;
+        if let Ok(new) = u32::try_from(int) {
+            *value = new;
+        }
     }
 }
 
@@ -36,6 +39,15 @@ pub trait EnumStaticVariants: Sized {
     fn static_variants() -> &'static [Self];
 }
 
+impl<T> EnumStaticVariants for T
+where
+    T: VariantArray,
+{
+    fn static_variants() -> &'static [Self] {
+        Self::VARIANTS
+    }
+}
+
 /// Helper to implement [`EnumStaticVariants`] for enums already implementing [`IntoEnumIterator`].
 macro_rules! impl_static_variants {
     ($ty:ty) => {
@@ -53,12 +65,17 @@ macro_rules! impl_static_variants {
 
 pub(crate) use impl_static_variants;
 
-pub fn enum_combo<T>(ui: &Ui, label: impl AsRef<str>, current: &mut T) -> bool
+pub fn enum_combo<T>(
+    ui: &Ui,
+    label: impl AsRef<str>,
+    current: &mut T,
+    flags: nexus::imgui::ComboBoxFlags,
+) -> bool
 where
     T: Clone + AsRef<str> + EnumStaticVariants + 'static,
 {
     let mut changed = false;
-    if let Some(_token) = ui.begin_combo(label, current.as_ref()) {
+    if let Some(_token) = ui.begin_combo_with_flags(label, current.as_ref(), flags) {
         for entry in T::static_variants() {
             // distinguish only discriminants
             let selected = mem::discriminant(entry) == mem::discriminant(current);
