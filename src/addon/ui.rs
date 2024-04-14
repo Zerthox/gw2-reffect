@@ -54,6 +54,7 @@ impl Addon {
                 ui.spacing();
 
                 for pack in &mut self.packs {
+                    pack.edit = false;
                     pack.render_select_tree(ui, &mut self.context.edit);
                 }
             });
@@ -61,10 +62,14 @@ impl Addon {
         ui.same_line();
         ChildWindow::new("element-options").build(ui, || {
             let _style = ui.push_style_var(StyleVar::FramePadding([2.0, 2.0]));
-            // short circuit after we find the element that has to render
-            self.packs
-                .iter_mut()
-                .any(|pack| pack.try_render_options(ui, &self.context.edit));
+            for pack in &mut self.packs {
+                let rendered = pack.try_render_options(ui, &self.context.edit);
+                if rendered {
+                    // end after we find the element that has to render
+                    pack.edit = true;
+                    break;
+                }
+            }
         });
     }
 
