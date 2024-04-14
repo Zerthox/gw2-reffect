@@ -112,6 +112,24 @@ impl Addon {
                 ui.text(format!("Mount: {}", ctx.player.mount));
                 ui.text(format!("Map id: {}", ctx.map.id));
                 ui.text(format!("Map category: {}", ctx.map.category));
+
+                ui.spacing();
+                ui.text(format!(
+                    "Selected Element: {}",
+                    self.context.edit.active.simple()
+                ));
+                ui.text("Edited Packs:");
+                ui.indent();
+                for pack in &mut self.packs {
+                    if pack.edit {
+                        ui.text(format!(
+                            "{} ({})",
+                            pack.common.name,
+                            pack.common.id_string()
+                        ))
+                    }
+                }
+                ui.unindent();
             });
     }
 }
