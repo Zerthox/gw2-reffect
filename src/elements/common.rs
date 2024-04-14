@@ -2,7 +2,7 @@ use super::{Element, ElementType, RenderState};
 use crate::{
     component_wise::ComponentWise,
     context::{EditState, RenderContext},
-    render_util::{input_float_with_format, item_context_menu, tree_select},
+    render_util::{input_float_with_format, item_context_menu, tree_select_custom},
     traits::RenderOptions,
 };
 use nexus::imgui::{InputTextFlags, MenuItem, Ui};
@@ -67,13 +67,24 @@ impl Common {
         children: &mut [Element],
     ) {
         let id = self.id_string();
-        let label = format!("{kind}: {}", self.name);
         let active = state.is_active(self.id);
-        let changed = tree_select(ui, &id, label, active, children.is_empty(), || {
-            for child in children {
-                child.render_select_tree(ui, state);
-            }
-        });
+        let changed = tree_select_custom(
+            ui,
+            &id,
+            active,
+            children.is_empty(),
+            || {
+                ui.same_line();
+                ui.text_disabled(kind);
+                ui.same_line();
+                ui.text(&self.name);
+            },
+            || {
+                for child in children {
+                    child.render_select_tree(ui, state);
+                }
+            },
+        );
         if changed {
             state.select(self.id);
         }
@@ -105,6 +116,12 @@ impl Common {
                 // TODO: remove from parent (indicate via return)
             }
         });
+    }
+
+    pub fn render_debug(&mut self, ui: &Ui) {
+        ui.text("Id:");
+        ui.same_line();
+        ui.text_disabled(self.id_string());
     }
 }
 

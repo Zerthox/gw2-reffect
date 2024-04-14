@@ -12,7 +12,7 @@ use strum::{AsRefStr, EnumIter, IntoStaticStr};
 pub enum ElementType {
     Group(Group),
 
-    #[strum(serialize = "Icon Grid")]
+    #[strum(serialize = "Grid")]
     IconGrid(IconGrid),
 
     Icon(IconElement),

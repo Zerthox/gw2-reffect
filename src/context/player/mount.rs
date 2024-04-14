@@ -55,7 +55,6 @@ pub enum Mount {
     Skiff = 9,
 }
 
-// TODO: mount colors
 impl Colored for Mount {
     fn colored(&self) -> Option<Color> {
         match self {

@@ -48,6 +48,7 @@ impl Addon {
         ChildWindow::new("element-select")
             .size([250.0, 0.0])
             .build(ui, || {
+                // TODO: search?
                 ui.text_disabled("Elements");
                 ui.separator();
                 ui.spacing();

@@ -8,7 +8,7 @@ use std::slice;
 
 // link as raw dynamic library (windows only)
 // see https://doc.rust-lang.org/reference/items/external-blocks.html#dylib-versus-raw-dylib
-// TODO: required to be next to exe! manual load instead?
+// FIXME: required to be next to exe! manual load instead?
 #[link(name = "getbuffs", kind = "raw-dylib")]
 extern "C" {
     fn GetCurrentPlayerStackedBuffs() -> *const StackedBuff;

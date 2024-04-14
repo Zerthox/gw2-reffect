@@ -1,5 +1,6 @@
 use nexus::imgui::{
-    sys, ComboBoxFlags, InputTextFlags, Selectable, StyleColor, StyleVar, TreeNode, Ui,
+    sys, ComboBoxFlags, InputTextFlags, Selectable, StyleColor, StyleVar, TreeNode, TreeNodeFlags,
+    Ui,
 };
 use std::{ffi::CString, mem};
 use strum::VariantArray;
@@ -144,26 +145,32 @@ where
     changed
 }
 
-pub fn tree_select(
+pub fn tree_select_custom(
     ui: &Ui,
     id: impl AsRef<str>,
-    label: impl AsRef<str>,
     selected: bool,
     leaf: bool,
+    label: impl FnOnce(),
     children: impl FnOnce(),
 ) -> bool {
     let _style = ui.push_style_var(StyleVar::IndentSpacing(10.0));
     let token = TreeNode::new(id)
-        .label::<&str, _>(label.as_ref()) // FIXME: unnecessary type param in imgui-rs
+        .label::<&str, _>("") // FIXME: unused type param in imgui-rs
+        .flags(TreeNodeFlags::SPAN_AVAIL_WIDTH)
         .open_on_arrow(true)
         .selected(selected)
         .leaf(leaf)
         .tree_push_on_open(!leaf)
         .push(ui);
     let clicked = ui.is_item_clicked() && !ui.is_item_toggled_open();
+
+    ui.same_line();
+    label();
+
     if token.is_some() {
         children();
     }
+
     clicked
 }
 

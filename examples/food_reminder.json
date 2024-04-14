@@ -9,7 +9,7 @@
             "name": "Reminder Group",
             "pos": [0.0, 0.0],
             "type": "Group",
-            "condition": {
+            "trigger": {
                 "player": {
                     "profs": [],
                     "specs": [],

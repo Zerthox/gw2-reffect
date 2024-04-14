@@ -83,28 +83,33 @@ impl Pack {
 
     /// Renders the pack options.
     fn render_options(&mut self, ui: &Ui) {
-        ui.text_disabled("Pack Options");
-        if let Some(file) = self.file.file_name().and_then(|file| file.to_str()) {
-            ui.same_line();
-            ui.text_disabled(format!("({file})"));
-        }
-        ui.separator();
-        ui.spacing();
+        if let Some(_token) = ui.tab_bar("pack-options") {
+            if let Some(_token) = ui.tab_item("Pack") {
+                ui.checkbox("Enabled", &mut self.enabled);
 
-        ui.checkbox("Enabled", &mut self.enabled);
+                self.common.render_options(ui);
 
-        self.common.render_options(ui);
+                enum_combo(ui, "Anchor", &mut self.anchor, ComboBoxFlags::empty());
 
-        enum_combo(ui, "Anchor", &mut self.anchor, ComboBoxFlags::empty());
+                {
+                    // TODO: layer input
+                    let _style = ui.push_style_var(StyleVar::Alpha(0.5));
+                    let mut layer = self.layer;
+                    ui.input_int("Layer", &mut layer)
+                        .step(0)
+                        .step_fast(0)
+                        .build();
+                }
+            }
+            if let Some(_token) = ui.tab_item("?") {
+                self.common.render_debug(ui);
 
-        {
-            // TODO: layer input
-            let _style = ui.push_style_var(StyleVar::Alpha(0.5));
-            let mut layer = self.layer;
-            ui.input_int("Layer", &mut layer)
-                .step(0)
-                .step_fast(0)
-                .build();
+                ui.text("File:");
+                if let Some(file) = self.file.file_name().and_then(|file| file.to_str()) {
+                    ui.same_line();
+                    ui.text_disabled(file);
+                }
+            }
         }
     }
 }

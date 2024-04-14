@@ -1,7 +1,8 @@
-use super::{render_or_children, Common, ElementType, RenderState};
+use super::{render_or_children, Animation, Common, ElementType, RenderState};
 use crate::{
     context::{EditState, RenderContext},
     traits::{Node, Render, RenderOptions},
+    trigger::{MetaTrigger, Trigger},
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
@@ -14,6 +15,10 @@ pub struct Element {
     #[serde(flatten)]
     pub common: Common,
 
+    pub trigger: MetaTrigger,
+
+    pub animation: Option<Animation>,
+
     #[serde(flatten)]
     pub kind: ElementType,
 }
@@ -21,8 +26,18 @@ pub struct Element {
 impl Element {
     /// Renders the element.
     pub fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &RenderState) {
-        self.common
-            .render(ui, ctx, state, |state| self.kind.render(ui, ctx, state))
+        if self.trigger.is_active_or_edit(ctx, state) {
+            let mut body = || {
+                self.common
+                    .render(ui, ctx, state, |state| self.kind.render(ui, ctx, state))
+            };
+
+            if let Some(animation) = &mut self.animation {
+                animation.render(ui, body);
+            } else {
+                body();
+            }
+        }
     }
 
     /// Renders the select tree.
@@ -41,13 +56,34 @@ impl Element {
 
     /// Renders the element options.
     fn render_options(&mut self, ui: &Ui) {
-        ui.text_disabled(format!("{} Options", self.kind.as_ref()));
-        ui.separator();
-        ui.spacing();
+        if let Some(_token) = ui.tab_bar(self.common.id_string()) {
+            if let Some(_token) = ui.tab_item(&self.kind) {
+                self.common.render_options(ui);
+                self.kind.render_options(ui);
+            }
 
-        self.common.render_options(ui);
+            if let Some(_token) = ui.tab_item("Trigger") {
+                self.trigger.render_options(ui);
+            }
 
-        self.kind.render_options(ui);
+            if let Some(_token) = ui.tab_item("Animation") {
+                if self.animation.is_some() {
+                    if ui.checkbox("Enabled", &mut true) {
+                        self.animation = None;
+                    }
+                } else if ui.checkbox("Enabled", &mut false) {
+                    self.animation = Some(Animation::default());
+                }
+
+                if let Some(animation) = &mut self.animation {
+                    animation.render_options(ui);
+                }
+            }
+
+            if let Some(_token) = ui.tab_item("?") {
+                self.common.render_debug(ui);
+            }
+        }
     }
 }
 

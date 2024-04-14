@@ -8,8 +8,7 @@ use crate::{
 use nexus::imgui::{CollapsingHeader, ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
 
-// TODO: wrapping options
-// TODO: sorting options
+// TODO: wrapping, sorting options
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
