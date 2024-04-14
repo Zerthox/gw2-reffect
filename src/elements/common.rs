@@ -32,7 +32,8 @@ impl Common {
         state: &RenderState,
         children: impl FnOnce(&RenderState),
     ) {
-        let state = state.with_offset(self.pos);
+        let mut state = state.with_offset(self.pos);
+        state.name = &self.name;
         children(&state);
 
         if ctx.edit.is_active(self.id) {

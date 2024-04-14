@@ -4,20 +4,26 @@ use crate::component_wise::ComponentWise;
 ///
 /// This is used as immutable structure to avoid accidentally keeping child state changes.
 #[derive(Debug, Clone)]
-pub struct RenderState {
+pub struct RenderState<'a> {
     pub edit: bool,
     pub pos: [f32; 2],
+    pub name: &'a str,
 }
 
-impl RenderState {
+impl RenderState<'_> {
     pub const fn new(edit: bool, pos: [f32; 2]) -> Self {
-        Self { edit, pos }
+        Self {
+            edit,
+            pos,
+            name: "Unnamed",
+        }
     }
 
     pub fn with_offset(&self, offset: [f32; 2]) -> Self {
         Self {
             edit: self.edit,
             pos: self.pos.add(offset),
+            name: self.name,
         }
     }
 
@@ -27,6 +33,7 @@ impl RenderState {
         Self {
             edit: self.edit || edit,
             pos: self.pos,
+            name: self.name,
         }
     }
 }

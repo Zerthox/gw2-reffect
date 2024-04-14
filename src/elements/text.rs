@@ -21,14 +21,17 @@ pub struct Text {
 }
 
 mod replace {
-    pub const STACKS: &str = "%stacks";
+    pub const NAME: &str = "%n";
+
+    pub const STACKS: &str = "%s";
 }
 
 impl Text {
     pub fn process_text(&self, ctx: &RenderContext, state: &RenderState) -> Option<String> {
+        let text = self.text.replace(replace::NAME, state.name);
         self.buff
             .get_stacks_or_edit(ctx, state)
-            .map(|stacks| self.text.replace(replace::STACKS, &stacks.to_string()))
+            .map(|stacks| text.replace(replace::STACKS, &stacks.to_string()))
     }
 }
 
@@ -58,6 +61,10 @@ impl RenderOptions for Text {
         self.buff.render_options(ui);
 
         ui.input_text("Text", &mut self.text).build();
+        if ui.is_item_hovered() {
+            ui.tooltip_text("%n replaced by name");
+            ui.tooltip_text("%s replaced by buff stacks");
+        }
 
         input_float_with_format(
             "Size",
