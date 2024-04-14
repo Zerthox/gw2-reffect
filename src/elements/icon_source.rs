@@ -1,6 +1,6 @@
 use crate::{
+    render_util::{enum_combo, impl_static_variants},
     texture_manager::TextureManager,
-    util::{enum_combo, impl_static_variants},
 };
 use nexus::imgui::{ComboBoxFlags, TextureId, Ui};
 use serde::{Deserialize, Serialize};

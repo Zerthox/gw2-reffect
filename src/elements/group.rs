@@ -1,6 +1,7 @@
-use super::{Animation, Element, HasOptions, Node, Render, RenderState};
+use super::{Animation, Element, RenderState};
 use crate::{
     context::RenderContext,
+    traits::{Node, Render, RenderOptions},
     trigger::{MetaTrigger, Trigger},
 };
 use nexus::imgui::{CollapsingHeader, Ui};
@@ -40,7 +41,7 @@ impl Render for Group {
     }
 }
 
-impl HasOptions for Group {
+impl RenderOptions for Group {
     fn render_options(&mut self, ui: &Ui) {
         if CollapsingHeader::new("Condition").build(ui) {
             self.condition.render_options(ui);

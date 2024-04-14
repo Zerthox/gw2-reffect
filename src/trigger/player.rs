@@ -1,8 +1,8 @@
 use super::{CombatTrigger, Trigger};
 use crate::{
     context::{Mount, Profession, RenderContext, Specialization},
-    elements::HasOptions,
-    util::enum_combo,
+    render_util::enum_combo_checkbox,
+    traits::{Leaf, RenderOptions},
 };
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
@@ -19,68 +19,51 @@ pub struct PlayerTrigger {
 impl Trigger for PlayerTrigger {
     fn is_active(&self, ctx: &RenderContext) -> bool {
         self.combat.is_active(ctx)
-            && empty_or_contains(&self.profs, &ctx.player.prof)
-            && empty_or_contains(&self.specs, &ctx.player.spec)
+            && empty_or_contains_optional(&self.profs, ctx.player.prof.as_ref().ok())
+            && empty_or_contains_optional(&self.specs, ctx.player.spec.as_ref().ok())
             && empty_or_contains(&self.mounts, &ctx.player.mount)
     }
 }
 
-impl HasOptions for PlayerTrigger {
+impl Leaf for PlayerTrigger {
+    fn load(&mut self) {
+        self.profs.sort();
+        self.specs.sort();
+        self.mounts.sort();
+    }
+}
+
+impl RenderOptions for PlayerTrigger {
     fn render_options(&mut self, ui: &Ui) {
         self.combat.render_options(ui);
 
-        ui.spacing();
-        ui.group(|| {
-            for (i, prof) in self.profs.iter_mut().enumerate() {
-                enum_combo(ui, format!("Prof {}", i + 1), prof, ComboBoxFlags::empty());
-            }
-            if ui.button("Add Prof") {
-                self.profs.push(Profession::default());
-            }
-            ui.same_line();
-            if ui.button("Remove Prof") {
-                self.profs.pop();
-            }
-        });
+        enum_combo_checkbox(
+            ui,
+            "Profession",
+            &mut self.profs,
+            ComboBoxFlags::HEIGHT_LARGE,
+        );
 
-        ui.spacing();
-        ui.group(|| {
-            for (i, spec) in self.specs.iter_mut().enumerate() {
-                enum_combo(ui, format!("Spec {}", i + 1), spec, ComboBoxFlags::empty());
-            }
-            if ui.button("Add Spec") {
-                self.specs.push(Specialization::default());
-            }
-            ui.same_line();
-            if ui.button("Remove Spec") {
-                self.specs.pop();
-            }
-        });
-
-        ui.spacing();
-        ui.group(|| {
-            for (i, mount) in self.mounts.iter_mut().enumerate() {
-                enum_combo(
-                    ui,
-                    format!("Mount {}", i + 1),
-                    mount,
-                    ComboBoxFlags::empty(),
-                );
-            }
-            if ui.button("Add Mount") {
-                self.mounts.push(Mount::default());
-            }
-            ui.same_line();
-            if ui.button("Remove Mount") {
-                self.mounts.pop();
-            }
-        });
+        enum_combo_checkbox(
+            ui,
+            "Specialization",
+            &mut self.specs,
+            ComboBoxFlags::HEIGHT_LARGE,
+        );
+        enum_combo_checkbox(ui, "Mount", &mut self.mounts, ComboBoxFlags::HEIGHT_LARGE);
     }
 }
 
 fn empty_or_contains<T>(slice: &[T], el: &T) -> bool
 where
-    T: PartialEq,
+    T: Ord,
 {
-    slice.is_empty() || slice.contains(el)
+    slice.is_empty() || slice.binary_search(el).is_ok()
+}
+
+fn empty_or_contains_optional<T>(slice: &[T], el: Option<&T>) -> bool
+where
+    T: Ord,
+{
+    el.map(|el| empty_or_contains(slice, el)).unwrap_or(true)
 }

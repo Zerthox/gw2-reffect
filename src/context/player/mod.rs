@@ -9,8 +9,8 @@ use nexus::data_link::mumble::MumblePtr;
 
 #[derive(Debug, Clone)]
 pub struct PlayerContext {
-    pub prof: Profession,
-    pub spec: Specialization,
+    pub prof: Result<Profession, u8>,
+    pub spec: Result<Specialization, u32>,
     pub race: Race,
     pub mount: Mount,
 }
@@ -18,8 +18,8 @@ pub struct PlayerContext {
 impl PlayerContext {
     pub const fn empty() -> Self {
         Self {
-            prof: Profession::Unknown,
-            spec: Specialization::Unknown,
+            prof: Err(0),
+            spec: Err(0),
             race: Race::Unknown,
             mount: Mount::None,
         }
@@ -34,8 +34,11 @@ impl PlayerContext {
         if mumble.read_ui_tick() > 0 {
             match mumble.parse_identity() {
                 Ok(identity) => {
-                    self.prof = (identity.profession as u8).into();
-                    self.spec = identity.spec.into();
+                    self.prof =
+                        Profession::try_from(identity.profession as u8).map_err(|err| err.number);
+
+                    self.spec = Specialization::try_from(identity.spec).map_err(|err| err.number);
+
                     self.race = (identity.race as u8).into();
                 }
                 Err(err) => log::error!("Failed to parse mumble identity: {err}"),

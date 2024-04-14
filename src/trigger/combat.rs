@@ -1,5 +1,5 @@
 use super::Trigger;
-use crate::{context::RenderContext, elements::HasOptions};
+use crate::{context::RenderContext, traits::RenderOptions};
 use nexus::imgui::{Selectable, Ui};
 use serde::{Deserialize, Serialize};
 
@@ -24,7 +24,7 @@ impl Trigger for CombatTrigger {
     }
 }
 
-impl HasOptions for CombatTrigger {
+impl RenderOptions for CombatTrigger {
     fn render_options(&mut self, ui: &Ui) {
         if let Some(_token) = ui.begin_combo("Combat", Self::label(self.0)) {
             const VALUES: &[Option<bool>] = &[None, Some(true), Some(false)];

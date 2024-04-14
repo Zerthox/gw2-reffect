@@ -1,4 +1,4 @@
-use crate::{component_wise::ComponentWise, util::impl_static_variants};
+use crate::{component_wise::ComponentWise, render_util::impl_static_variants};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter};

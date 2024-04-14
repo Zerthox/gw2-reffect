@@ -1,5 +1,10 @@
-use super::{HasOptions, IconSource, Node, RenderState, TextAlign, TextDecoration};
-use crate::{component_wise::ComponentWise, context::RenderContext, trigger::BuffTrigger};
+use super::{IconSource, RenderState, TextAlign, TextDecoration};
+use crate::{
+    component_wise::ComponentWise,
+    context::RenderContext,
+    traits::{Leaf, RenderOptions},
+    trigger::BuffTrigger,
+};
 use nexus::imgui::{ColorEdit, ColorPreview, Ui};
 use serde::{Deserialize, Serialize};
 
@@ -56,17 +61,13 @@ impl Icon {
     }
 }
 
-impl Node for Icon {
+impl Leaf for Icon {
     fn load(&mut self) {
         self.icon.load();
     }
-
-    fn children(&mut self) -> &mut [super::Element] {
-        &mut []
-    }
 }
 
-impl HasOptions for Icon {
+impl RenderOptions for Icon {
     fn render_options(&mut self, ui: &Ui) {
         self.buff.render_options(ui);
 

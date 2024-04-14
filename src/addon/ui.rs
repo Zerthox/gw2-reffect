@@ -49,6 +49,9 @@ impl Addon {
             .size([250.0, 0.0])
             .build(ui, || {
                 ui.text_disabled("Elements");
+                ui.separator();
+                ui.spacing();
+
                 for pack in &mut self.packs {
                     pack.render_select_tree(ui, &mut self.context.edit);
                 }
@@ -85,8 +88,20 @@ impl Addon {
                 }
 
                 ui.text(format!("Combat: {}", ctx.ui.combat));
-                ui.text(format!("Profession: {}", ctx.player.prof));
-                ui.text(format!("Specialization: {}", ctx.player.spec));
+                ui.text(format!(
+                    "Profession: {}",
+                    match ctx.player.prof {
+                        Ok(prof) => prof.to_string(),
+                        Err(id) => format!("Unknown {id}"),
+                    }
+                ));
+                ui.text(format!(
+                    "Specialization: {}",
+                    match ctx.player.spec {
+                        Ok(spec) => spec.to_string(),
+                        Err(id) => format!("Unknown {id}"),
+                    }
+                ));
                 ui.text(format!("Race: {}", ctx.player.race));
                 ui.text(format!("Mount: {}", ctx.player.mount));
                 ui.text(format!("Map id: {}", ctx.map.id));

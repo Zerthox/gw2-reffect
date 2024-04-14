@@ -1,5 +1,6 @@
 use nexus::data_link::mumble::{map_type, MumblePtr};
 use serde::{Deserialize, Serialize};
+use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
 
 #[derive(Debug, Clone)]
 pub struct MapContext {
@@ -35,9 +36,13 @@ impl MapContext {
     PartialOrd,
     Ord,
     Hash,
+    AsRefStr,
+    IntoStaticStr,
+    Display,
+    EnumIter,
+    VariantArray,
     Serialize,
     Deserialize,
-    strum::Display,
 )]
 pub enum MapCategory {
     #[default]

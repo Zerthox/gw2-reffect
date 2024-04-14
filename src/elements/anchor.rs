@@ -2,7 +2,7 @@ use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter};
 
-use crate::util::impl_static_variants;
+use crate::render_util::impl_static_variants;
 
 /// Screen anchor point.
 #[derive(

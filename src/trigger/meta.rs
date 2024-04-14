@@ -1,5 +1,8 @@
 use super::{MapTrigger, PlayerTrigger, Trigger};
-use crate::{context::RenderContext, elements::HasOptions};
+use crate::{
+    context::RenderContext,
+    traits::{Leaf, RenderOptions},
+};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
@@ -16,8 +19,15 @@ impl Trigger for MetaTrigger {
     }
 }
 
-impl MetaTrigger {
-    pub fn render_options(&mut self, ui: &Ui) {
+impl Leaf for MetaTrigger {
+    fn load(&mut self) {
+        self.player.load();
+        self.map.load();
+    }
+}
+
+impl RenderOptions for MetaTrigger {
+    fn render_options(&mut self, ui: &Ui) {
         self.player.render_options(ui);
 
         self.map.render_options(ui);

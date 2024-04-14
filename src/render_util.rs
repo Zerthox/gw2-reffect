@@ -1,4 +1,6 @@
-use nexus::imgui::{sys, InputTextFlags, Selectable, StyleVar, TreeNode, Ui};
+use nexus::imgui::{
+    sys, ComboBoxFlags, InputTextFlags, Selectable, StyleColor, StyleVar, TreeNode, Ui,
+};
 use std::{ffi::CString, mem};
 use strum::VariantArray;
 
@@ -51,7 +53,7 @@ where
 /// Helper to implement [`EnumStaticVariants`] for enums already implementing [`IntoEnumIterator`].
 macro_rules! impl_static_variants {
     ($ty:ty) => {
-        impl $crate::util::EnumStaticVariants for $ty {
+        impl $crate::render_util::EnumStaticVariants for $ty {
             fn static_variants() -> &'static [Self] {
                 use ::std::sync::OnceLock;
                 use ::strum::IntoEnumIterator;
@@ -65,21 +67,18 @@ macro_rules! impl_static_variants {
 
 pub(crate) use impl_static_variants;
 
-pub fn enum_combo<T>(
-    ui: &Ui,
-    label: impl AsRef<str>,
-    current: &mut T,
-    flags: nexus::imgui::ComboBoxFlags,
-) -> bool
+use crate::traits::Colored;
+
+pub fn enum_combo<T>(ui: &Ui, label: impl AsRef<str>, current: &mut T, flags: ComboBoxFlags) -> bool
 where
     T: Clone + AsRef<str> + EnumStaticVariants + 'static,
 {
     let mut changed = false;
-    if let Some(_token) = ui.begin_combo_with_flags(label, current.as_ref(), flags) {
+    if let Some(_token) = ui.begin_combo_with_flags(label, &current, flags) {
         for entry in T::static_variants() {
             // distinguish only discriminants
             let selected = mem::discriminant(entry) == mem::discriminant(current);
-            if Selectable::new(entry.as_ref()).selected(selected).build(ui) {
+            if Selectable::new(entry).selected(selected).build(ui) {
                 changed = true;
                 *current = entry.clone();
             }
@@ -87,6 +86,58 @@ where
             // handle focus
             if selected {
                 ui.set_item_default_focus();
+            }
+        }
+    }
+    changed
+}
+
+pub fn enum_combo_checkbox<T>(
+    ui: &Ui,
+    label: impl AsRef<str>,
+    current: &mut Vec<T>,
+    flags: ComboBoxFlags,
+) -> bool
+where
+    T: Clone + PartialEq + Ord + AsRef<str> + VariantArray + Colored,
+{
+    let mut changed = false;
+
+    const ITEMS: usize = 4;
+    const CHARS: usize = 4;
+
+    let mut preview = current
+        .first()
+        .map(|el| &el.as_ref()[..CHARS])
+        .unwrap_or("Any")
+        .to_string();
+    for el in current.iter().skip(1).take(ITEMS - 1) {
+        preview += ", ";
+        preview += &el.as_ref()[..CHARS];
+    }
+    if current.len() > ITEMS {
+        preview += "...";
+    }
+
+    if let Some(_token) = ui.begin_combo_with_flags(&label, &preview, flags) {
+        let _style = ui.push_style_var(StyleVar::FramePadding([0.0, 0.0]));
+
+        for entry in T::VARIANTS {
+            // we assume the vec is sorted
+            let found = current.binary_search(entry);
+            let mut selected = found.is_ok();
+            let _color = entry
+                .colored()
+                .map(|color| ui.push_style_color(StyleColor::Text, color));
+
+            if ui.checkbox(entry, &mut selected) {
+                changed = true;
+                match found {
+                    Ok(index) => {
+                        current.remove(index);
+                    }
+                    Err(index) => current.insert(index, entry.clone()),
+                }
             }
         }
     }

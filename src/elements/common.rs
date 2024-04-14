@@ -1,14 +1,14 @@
+use super::{Element, ElementType, RenderState};
+use crate::{
+    component_wise::ComponentWise,
+    context::{EditState, RenderContext},
+    render_util::{input_float_with_format, item_context_menu, tree_select},
+    traits::RenderOptions,
+};
 use nexus::imgui::{InputTextFlags, MenuItem, Ui};
 use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 use uuid::Uuid;
-
-use super::{Element, ElementType, HasOptions, RenderState};
-use crate::{
-    component_wise::ComponentWise,
-    context::{EditState, RenderContext},
-    util::{input_float_with_format, item_context_menu, tree_select},
-};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
@@ -108,7 +108,7 @@ impl Common {
     }
 }
 
-impl HasOptions for Common {
+impl RenderOptions for Common {
     fn render_options(&mut self, ui: &Ui) {
         ui.input_text("Name", &mut self.name).build();
 

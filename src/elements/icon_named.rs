@@ -1,5 +1,8 @@
-use super::{HasOptions, Icon, Node, RenderState};
-use crate::context::RenderContext;
+use super::{Icon, RenderState};
+use crate::{
+    context::RenderContext,
+    traits::{Node, RenderOptions},
+};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
@@ -31,7 +34,7 @@ impl Node for IconNamed {
     }
 }
 
-impl HasOptions for IconNamed {
+impl RenderOptions for IconNamed {
     fn render_options(&mut self, ui: &Ui) {
         ui.input_text("Name", &mut self.name).build();
 

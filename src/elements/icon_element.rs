@@ -1,5 +1,9 @@
-use super::{Element, HasOptions, Icon, Node, Render, RenderState};
-use crate::{context::RenderContext, trigger::Trigger};
+use super::{Icon, RenderState};
+use crate::{
+    context::RenderContext,
+    traits::{Leaf, Render, RenderOptions},
+    trigger::Trigger,
+};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
@@ -10,13 +14,9 @@ pub struct IconElement {
     pub size: [f32; 2],
 }
 
-impl Node for IconElement {
+impl Leaf for IconElement {
     fn load(&mut self) {
         self.icon.load();
-    }
-
-    fn children(&mut self) -> &mut [Element] {
-        &mut []
     }
 }
 
@@ -28,7 +28,7 @@ impl Render for IconElement {
     }
 }
 
-impl HasOptions for IconElement {
+impl RenderOptions for IconElement {
     fn render_options(&mut self, ui: &Ui) {
         ui.text("Icon");
         ui.same_line();

@@ -1,8 +1,9 @@
-use super::{Direction, Element, HasOptions, IconNamed, Node, Render, RenderState};
+use super::{Direction, IconNamed, RenderState};
 use crate::{
     context::RenderContext,
+    render_util::{enum_combo, input_float_with_format},
+    traits::{Leaf, Node, Render, RenderOptions},
     trigger::Trigger,
-    util::{enum_combo, input_float_with_format},
 };
 use nexus::imgui::{CollapsingHeader, ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
@@ -19,15 +20,11 @@ pub struct IconGrid {
     pub icons: Vec<IconNamed>,
 }
 
-impl Node for IconGrid {
+impl Leaf for IconGrid {
     fn load(&mut self) {
         for icon in &mut self.icons {
             icon.load();
         }
-    }
-
-    fn children(&mut self) -> &mut [Element] {
-        &mut []
     }
 }
 
@@ -49,7 +46,7 @@ impl Render for IconGrid {
     }
 }
 
-impl HasOptions for IconGrid {
+impl RenderOptions for IconGrid {
     fn render_options(&mut self, ui: &Ui) {
         enum_combo(ui, "Direction", &mut self.direction, ComboBoxFlags::empty());
 

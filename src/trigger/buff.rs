@@ -1,8 +1,9 @@
 use super::Trigger;
 use crate::{
     context::RenderContext,
-    elements::{HasOptions, RenderState},
-    util::{enum_combo, impl_static_variants, input_u32},
+    elements::RenderState,
+    render_util::{enum_combo, impl_static_variants, input_u32},
+    traits::RenderOptions,
 };
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
@@ -69,7 +70,7 @@ impl BuffTrigger {
     }
 }
 
-impl HasOptions for BuffTrigger {
+impl RenderOptions for BuffTrigger {
     fn render_options(&mut self, ui: &Ui) {
         ui.group(|| {
             // TODO: propagate ids when selecting another trigger?

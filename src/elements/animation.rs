@@ -1,10 +1,10 @@
+use crate::{
+    render_util::{enum_combo, input_u32},
+    traits::RenderOptions,
+};
 use nexus::imgui::{ComboBoxFlags, StyleVar, Ui};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, VariantArray};
-
-use crate::util::{enum_combo, input_u32};
-
-use super::HasOptions;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
@@ -25,7 +25,7 @@ impl Animation {
     }
 }
 
-impl HasOptions for Animation {
+impl RenderOptions for Animation {
     fn render_options(&mut self, ui: &Ui) {
         enum_combo(ui, "Animation", &mut self.kind, unsafe {
             ComboBoxFlags::from_bits_unchecked(1 >> 7)

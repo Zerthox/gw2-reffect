@@ -1,5 +1,8 @@
-use super::{Element, Group, HasOptions, IconElement, IconGrid, Node, Render, RenderState, Text};
-use crate::context::RenderContext;
+use super::{Element, Group, IconElement, IconGrid, RenderState, Text};
+use crate::{
+    context::RenderContext,
+    traits::{Node, Render, RenderOptions},
+};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, IntoStaticStr};
@@ -48,7 +51,7 @@ impl Render for ElementType {
     }
 }
 
-impl HasOptions for ElementType {
+impl RenderOptions for ElementType {
     fn render_options(&mut self, ui: &Ui) {
         match self {
             Self::Group(group) => group.render_options(ui),

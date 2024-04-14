@@ -1,9 +1,10 @@
-use super::{Element, HasOptions, Node, Render, RenderState, TextAlign, TextDecoration};
+use super::{RenderState, TextAlign, TextDecoration};
 use crate::{
     component_wise::ComponentWise,
     context::RenderContext,
+    render_util::{enum_combo, input_float_with_format},
+    traits::{Leaf, Render, RenderOptions},
     trigger::BuffTrigger,
-    util::{enum_combo, input_float_with_format},
 };
 use nexus::imgui::{ColorEdit, ColorPreview, ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
@@ -31,10 +32,8 @@ impl Text {
     }
 }
 
-impl Node for Text {
-    fn children(&mut self) -> &mut [Element] {
-        &mut []
-    }
+impl Leaf for Text {
+    fn load(&mut self) {}
 }
 
 impl Render for Text {
@@ -54,7 +53,7 @@ impl Render for Text {
     }
 }
 
-impl HasOptions for Text {
+impl RenderOptions for Text {
     fn render_options(&mut self, ui: &Ui) {
         self.buff.render_options(ui);
 

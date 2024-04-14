@@ -1,8 +1,8 @@
 use super::Trigger;
 use crate::{
     context::{MapCategory, RenderContext},
-    elements::HasOptions,
-    util::{enum_combo, impl_static_variants},
+    render_util::{enum_combo, impl_static_variants, input_u32},
+    traits::{Leaf, RenderOptions},
 };
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
@@ -28,8 +28,32 @@ impl Trigger for MapTrigger {
     }
 }
 
-impl HasOptions for MapTrigger {
+impl Leaf for MapTrigger {
+    fn load(&mut self) {}
+}
+
+impl RenderOptions for MapTrigger {
     fn render_options(&mut self, ui: &Ui) {
         enum_combo(ui, "Map", self, ComboBoxFlags::empty());
+
+        match self {
+            Self::Any => {}
+            Self::Category(category) => {
+                enum_combo(ui, "Category", category, ComboBoxFlags::empty());
+            }
+            Self::Ids(ids) => {
+                // TODO: as single text input?
+                for (i, id) in ids.iter_mut().enumerate() {
+                    input_u32(ui, format!("Id {}", i + 1), id);
+                }
+                if ui.button("+") {
+                    ids.push(0);
+                }
+                ui.same_line();
+                if ui.button("-") {
+                    ids.pop();
+                }
+            }
+        }
     }
 }

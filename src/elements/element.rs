@@ -1,5 +1,8 @@
-use super::{render_or_children, Common, ElementType, HasOptions, Node, Render, RenderState};
-use crate::context::{EditState, RenderContext};
+use super::{render_or_children, Common, ElementType, RenderState};
+use crate::{
+    context::{EditState, RenderContext},
+    traits::{Node, Render, RenderOptions},
+};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
@@ -39,6 +42,7 @@ impl Element {
     /// Renders the element options.
     fn render_options(&mut self, ui: &Ui) {
         ui.text_disabled(format!("{} Options", self.kind.as_ref()));
+        ui.separator();
         ui.spacing();
 
         self.common.render_options(ui);

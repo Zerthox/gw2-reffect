@@ -1,7 +1,8 @@
-use super::{render_or_children, Anchor, Common, Element, HasOptions, Node, RenderState};
+use super::{render_or_children, Anchor, Common, Element, RenderState};
 use crate::{
     context::{EditState, RenderContext},
-    util::enum_combo,
+    render_util::enum_combo,
+    traits::{Node, RenderOptions},
 };
 use nexus::imgui::{ComboBoxFlags, StyleVar, Ui};
 use serde::{Deserialize, Serialize};
@@ -87,6 +88,7 @@ impl Pack {
             ui.same_line();
             ui.text_disabled(format!("({file})"));
         }
+        ui.separator();
         ui.spacing();
 
         ui.checkbox("Enabled", &mut self.enabled);
