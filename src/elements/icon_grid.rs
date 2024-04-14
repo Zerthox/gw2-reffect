@@ -5,7 +5,9 @@ use crate::{
     traits::{Leaf, Node, Render, RenderOptions},
     trigger::Trigger,
 };
-use nexus::imgui::{CollapsingHeader, ComboBoxFlags, InputTextFlags, Ui};
+use nexus::imgui::{
+    CollapsingHeader, ComboBoxFlags, InputTextFlags, Slider, SliderFlags, StyleVar, Ui,
+};
 use serde::{Deserialize, Serialize};
 
 // TODO: wrapping, sorting options
@@ -16,6 +18,7 @@ pub struct IconGrid {
     pub direction: Direction,
     pub size: [f32; 2],
     pub pad: f32,
+    pub opacity: f32,
     pub icons: Vec<IconNamed>,
 }
 
@@ -29,6 +32,9 @@ impl Leaf for IconGrid {
 
 impl Render for IconGrid {
     fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &RenderState) {
+        let alpha = ui.clone_style().alpha;
+        let _style = ui.push_style_var(StyleVar::Alpha(alpha * self.opacity));
+
         let icons = self
             .icons
             .iter_mut()
@@ -54,6 +60,15 @@ impl RenderOptions for IconGrid {
         input_float_with_format("Size y", y, 1.0, 10.0, "%.2f", InputTextFlags::empty());
 
         input_float_with_format("Padding", y, 1.0, 10.0, "%.2f", InputTextFlags::empty());
+
+        let mut opacity = 100.0 * self.opacity;
+        if Slider::new("Opacity", 0.0, 100.0)
+            .flags(SliderFlags::ALWAYS_CLAMP)
+            .display_format("%.2f")
+            .build(ui, &mut opacity)
+        {
+            self.opacity = opacity / 100.0;
+        }
 
         ui.spacing();
         ui.text_disabled("Icons");
@@ -86,8 +101,9 @@ impl Default for IconGrid {
     fn default() -> Self {
         Self {
             direction: Direction::Right,
-            pad: 3.0,
             size: [32.0, 32.0],
+            pad: 3.0,
+            opacity: 1.0,
             icons: Vec::new(),
         }
     }
