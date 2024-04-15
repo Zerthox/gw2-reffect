@@ -11,17 +11,15 @@ use std::{
     collections::HashMap,
     path::Path,
     sync::{mpsc, Mutex, MutexGuard, OnceLock},
-    thread,
+    thread::{self, JoinHandle},
 };
 use url::Url;
 
 static TEXTURE_MANAGER: OnceLock<Mutex<TextureManager>> = OnceLock::new();
 
-type Message = IconSource;
-
 #[derive(Debug)]
 pub struct TextureManager {
-    sender: Option<mpsc::Sender<Message>>,
+    loader: Option<TextureLoader>,
     pending: HashMap<String, IconSource>,
     loaded: HashMap<IconSource, TextureId>,
     default: Option<TextureId>,
@@ -30,47 +28,31 @@ pub struct TextureManager {
 impl TextureManager {
     fn new() -> Self {
         Self {
-            sender: None,
+            loader: TextureLoader::spawn(Self::loader_thread),
             pending: HashMap::new(),
             loaded: HashMap::new(),
             default: None,
         }
-        .init_thread()
     }
 
-    fn init_thread(mut self) -> Self {
-        let (sender, receiver) = mpsc::channel();
-
-        thread::Builder::new()
-            .name("reffect-texture-loader".into())
-            .spawn(move || {
-                log::debug!("Texture thread spawn");
-                while let Ok(source) = receiver.recv() {
-                    let mut textures = Self::lock();
-                    if !textures.loaded.contains_key(&source) {
-                        match &source {
-                            IconSource::Empty => {}
-                            IconSource::File(path) => {
-                                let id = textures.add_pending(source.clone());
-                                drop(textures); // drop to avoid recursive locking
-                                Self::load_from_file(&id, path);
-                            }
-                            IconSource::Url(url) => {
-                                let id = textures.add_pending(source.clone());
-                                drop(textures); // drop to avoid recursive locking
-                                Self::load_from_url(&id, url).unwrap_or_else(|| {
-                                    log::warn!("Failed to parse icon url \"{url}\"")
-                                });
-                            }
-                        }
-                    }
+    fn loader_thread(source: IconSource) {
+        let mut textures = Self::lock();
+        if !textures.loaded.contains_key(&source) {
+            match &source {
+                IconSource::Empty => {}
+                IconSource::File(path) => {
+                    let id = textures.add_pending(source.clone());
+                    drop(textures); // drop to avoid recursive locking
+                    Self::load_from_file(&id, path);
                 }
-                log::debug!("Texture thread exit");
-            })
-            .expect("failed to spawn texture loading thread");
-
-        self.sender = Some(sender);
-        self
+                IconSource::Url(url) => {
+                    let id = textures.add_pending(source.clone());
+                    drop(textures); // drop to avoid recursive locking
+                    Self::load_from_url(&id, url)
+                        .unwrap_or_else(|| log::warn!("Failed to parse icon url \"{url}\""));
+                }
+            }
+        }
     }
 
     fn with_default(mut self) -> Self {
@@ -96,7 +78,9 @@ impl TextureManager {
     }
 
     pub fn unload() {
-        Self::lock().sender = None;
+        if let Some(loader) = Self::lock().loader.take() {
+            loader.exit_and_wait();
+        }
     }
 
     pub fn get_texture(source: &IconSource) -> Option<TextureId> {
@@ -107,13 +91,12 @@ impl TextureManager {
     pub fn add_source(source: &IconSource) {
         if source.needs_load() {
             // send to loader thread
-            let textures = Self::lock();
-            if let Some(sender) = &textures.sender {
-                if sender.send(source.clone()).is_err() {
-                    log::error!("Texture loading thread receiver disconnected");
+            if let Some(loader) = &Self::lock().loader {
+                if loader.sender.send(source.clone()).is_err() {
+                    log::error!("Texture loader receiver disconnected");
                 }
             } else {
-                log::error!("Texture loading thread sender disconnected");
+                log::error!("Texture loader sender disconnected");
             }
         }
     }
@@ -166,6 +149,44 @@ impl TextureManager {
             }
         } else {
             log::warn!("Failed to load icon source {}", source.pretty_print());
+        }
+    }
+}
+
+#[derive(Debug)]
+struct TextureLoader {
+    sender: mpsc::Sender<IconSource>,
+    handle: JoinHandle<()>,
+}
+
+impl TextureLoader {
+    fn spawn(callback: impl Fn(IconSource) + Send + 'static) -> Option<Self> {
+        let (sender, receiver) = mpsc::channel();
+
+        let result = thread::Builder::new()
+            .name("reffect-texture-loader".into())
+            .spawn(move || {
+                log::debug!("Texture loader spawn");
+                while let Ok(source) = receiver.recv() {
+                    callback(source);
+                }
+                log::debug!("Texture loader exit");
+            });
+
+        match result {
+            Ok(handle) => Some(Self { sender, handle }),
+            Err(err) => {
+                log::error!("Failed to spawn texture loader: {err}");
+                None
+            }
+        }
+    }
+
+    fn exit_and_wait(self) {
+        let Self { sender, handle } = self;
+        drop(sender);
+        if handle.join().is_err() {
+            log::error!("Failed to join texture loader");
         }
     }
 }
