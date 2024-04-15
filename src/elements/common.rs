@@ -1,18 +1,16 @@
 use super::{Element, ElementType, RenderState};
 use crate::{
-    action::{Action, ChildAction},
+    action::ChildAction,
     component_wise::ComponentWise,
     context::{EditState, RenderContext},
-    render_util::{
-        input_float_with_format, item_context_menu, tree_select_custom, EnumStaticVariants,
-    },
+    render_util::{input_float_with_format, EnumStaticVariants},
     traits::RenderOptions,
 };
 use nexus::imgui::{InputTextFlags, MenuItem, Ui};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Common {
     #[serde(skip)]
@@ -23,6 +21,10 @@ pub struct Common {
 }
 
 impl Common {
+    pub fn fresh_id() -> Uuid {
+        Uuid::new_v4()
+    }
+
     pub fn id_string(&self) -> String {
         self.id.simple().to_string()
     }
@@ -60,92 +62,50 @@ impl Common {
         ui.text_colored(COLOR, &self.name);
     }
 
-    /// Renders the select tree.
-    /// Returns `true` if a child is selected.
-    pub fn render_select_tree(
-        &self,
-        ui: &Ui,
-        state: &mut EditState,
-        kind: &str,
-        mut children: Option<&mut Vec<Element>>,
-    ) -> Action {
-        let id = self.id_string();
-        let active = state.is_active(self.id);
-        let leaf = children
-            .as_ref()
-            .map(|children| children.is_empty())
-            .unwrap_or(true);
-        let changed = tree_select_custom(
-            ui,
-            &id,
-            active,
-            leaf,
-            || {
-                ui.same_line();
-                ui.text_disabled(kind);
-                ui.same_line();
-                ui.text(&self.name);
-            },
-            || {
-                if let Some(children) = children.as_mut() {
-                    let mut action = ChildAction::new();
-                    for (i, child) in children.iter_mut().enumerate() {
-                        action.or(i, child.render_select_tree(ui, state));
-                    }
-                    action.perform(state, children);
-                }
-            },
-        );
-        if changed {
-            state.select(self.id);
-        }
-
-        let mut action = Action::None;
-        item_context_menu(&id, || {
-            action = self.render_context_menu(ui, state, children);
-        });
-        action
+    pub fn render_tree_label(&self, ui: &Ui, kind: &str) {
+        ui.same_line();
+        ui.text_disabled(kind);
+        ui.same_line();
+        ui.text(&self.name);
     }
 
-    fn render_context_menu(
+    pub fn render_tree_children(
         &self,
         ui: &Ui,
         state: &mut EditState,
-        mut children: Option<&mut Vec<Element>>,
-    ) -> Action {
-        let mut action = Action::None;
-        let has_children = children.is_some();
+        children: &mut Vec<Element>,
+    ) {
+        let mut action = ChildAction::new();
+        for (i, child) in children.iter_mut().enumerate() {
+            action.or(i, child.render_select_tree(ui, state));
+        }
+        action.perform(state, children);
+    }
 
-        ui.menu_with_enabled("Create", has_children, || {
-            for kind in ElementType::static_variants() {
-                let name = kind.as_ref();
-                if MenuItem::new(name).build(ui) {
-                    children
-                        .as_mut()
-                        .expect("create with no children")
-                        .push(Element::of_type(kind.clone()));
+    /// Renders common context menu options.
+    pub fn render_context_menu(
+        &mut self,
+        ui: &Ui,
+        state: &mut EditState,
+        children: Option<&mut Vec<Element>>,
+    ) {
+        if let Some(children) = children {
+            ui.menu("Create", || {
+                for kind in ElementType::static_variants() {
+                    let name = kind.as_ref();
+                    if MenuItem::new(name).build(ui) {
+                        let new = Element::of_type(kind.clone());
+                        children.push(new);
+                    }
                 }
+            });
+            if MenuItem::new("Paste")
+                .enabled(state.has_clipboard())
+                .build(ui)
+            {
+                children.push(state.take_clipboard().expect("paste without clipboard"))
             }
-        });
-        if MenuItem::new("Cut").build(ui) {
-            action = Action::Cut;
         }
-        if MenuItem::new("Copy").build(ui) {
-            action = Action::Copy;
-        }
-        if MenuItem::new("Paste")
-            .enabled(has_children && state.has_clipboard())
-            .build(ui)
-        {
-            children
-                .expect("paste with no children")
-                .push(state.take_clipboard().expect("paste without clipboard"))
-        }
-        if MenuItem::new("Delete").build(ui) {
-            action = Action::Delete;
-        }
-
-        action
     }
 
     pub fn render_debug(&mut self, ui: &Ui) {
@@ -168,9 +128,19 @@ impl RenderOptions for Common {
 impl Default for Common {
     fn default() -> Self {
         Self {
-            id: Uuid::new_v4(),
+            id: Self::fresh_id(),
             name: "Unnamed".into(),
             pos: [0.0, 0.0],
+        }
+    }
+}
+
+impl Clone for Common {
+    fn clone(&self) -> Self {
+        Self {
+            id: Self::fresh_id(), // we want a fresh id for the clone
+            name: self.name.clone(),
+            pos: self.pos,
         }
     }
 }

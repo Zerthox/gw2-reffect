@@ -42,9 +42,15 @@ impl Addon {
             }
         }
         ui.same_line();
+        if ui.button("New pack") {
+            // TODO: create new packk
+        }
+
+        ui.same_line();
         ui.checkbox("Debug window", &mut self.debug);
 
         ui.spacing();
+
         ChildWindow::new("element-select")
             .size([250.0, 0.0])
             .build(ui, || {
@@ -53,9 +59,17 @@ impl Addon {
                 ui.separator();
                 ui.spacing();
 
-                for pack in &mut self.packs {
+                let _style = ui.push_style_var(StyleVar::IndentSpacing(10.0));
+                let mut remove = None;
+                for (i, pack) in self.packs.iter_mut().enumerate() {
                     pack.edit = false;
-                    pack.render_select_tree(ui, &mut self.context.edit);
+                    let deleted = pack.render_select_tree(ui, &mut self.context.edit);
+                    if deleted {
+                        remove = Some(i);
+                    }
+                }
+                if let Some(index) = remove {
+                    self.packs.remove(index);
                 }
             });
 
@@ -114,6 +128,9 @@ impl Addon {
                 ui.text(format!("Map category: {}", ctx.map.category));
 
                 ui.spacing();
+                ui.separator();
+                ui.spacing();
+
                 self.context.edit.debug(ui);
                 ui.text("Edited Packs:");
                 ui.indent();

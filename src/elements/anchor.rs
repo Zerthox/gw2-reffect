@@ -7,6 +7,7 @@ use crate::render_util::impl_static_variants;
 /// Screen anchor point.
 #[derive(
     Debug,
+    Default,
     Clone,
     Copy,
     PartialEq,
@@ -20,6 +21,7 @@ use crate::render_util::impl_static_variants;
     Deserialize,
 )]
 pub enum Anchor {
+    #[default]
     #[strum(serialize = "Top Left")]
     TopLeft,
 

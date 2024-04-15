@@ -1,11 +1,10 @@
 use super::{render_or_children, Anchor, Common, Element, RenderState};
 use crate::{
-    action::Action,
     context::{EditState, RenderContext},
-    render_util::enum_combo,
+    render_util::{confirm_modal, enum_combo, item_context_menu, tree_select_empty},
     traits::{Node, RenderOptions},
 };
-use nexus::imgui::{ComboBoxFlags, StyleVar, Ui};
+use nexus::imgui::{ComboBoxFlags, MenuItem, StyleVar, Ui};
 use serde::{Deserialize, Serialize};
 use std::{
     fs::File,
@@ -13,7 +12,7 @@ use std::{
     path::PathBuf,
 };
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Pack {
     pub enabled: bool, // TODO: store enabled separately in addon settings?
@@ -70,9 +69,33 @@ impl Pack {
     }
 
     /// Renders the select tree.
-    pub fn render_select_tree(&mut self, ui: &Ui, state: &mut EditState) -> Action {
-        self.common
-            .render_select_tree(ui, state, "Pack", Some(&mut self.elements))
+    /// Returns `true` if the pack should be deleted.
+    #[must_use]
+    pub fn render_select_tree(&mut self, ui: &Ui, state: &mut EditState) -> bool {
+        let id = self.common.id_string();
+        let active = state.is_active(self.common.id);
+        let children = &mut self.elements;
+        let (token, clicked) = tree_select_empty(ui, &id, active, false);
+        if clicked {
+            state.select(self.common.id);
+        }
+
+        let mut open = false;
+        item_context_menu(&id, || {
+            self.common.render_context_menu(ui, state, Some(children));
+            open = MenuItem::new("Delete").build(ui);
+        });
+        let title = format!("Delete Pack?##{id}");
+        if open {
+            ui.open_popup(&title);
+        }
+
+        self.common.render_tree_label(ui, "Pack");
+        if token.is_some() {
+            self.common.render_tree_children(ui, state, children);
+        }
+
+        confirm_modal(ui, &title)
     }
 
     /// Attempts to render options if selected.
@@ -84,7 +107,7 @@ impl Pack {
 
     /// Renders the pack options.
     fn render_options(&mut self, ui: &Ui) {
-        if let Some(_token) = ui.tab_bar("pack-options") {
+        if let Some(_token) = ui.tab_bar(self.common.id_string()) {
             if let Some(_token) = ui.tab_item("Pack") {
                 ui.checkbox("Enabled", &mut self.enabled);
 
@@ -118,19 +141,5 @@ impl Pack {
 impl Node for Pack {
     fn children(&mut self) -> Option<&mut Vec<Element>> {
         Some(&mut self.elements)
-    }
-}
-
-impl Default for Pack {
-    fn default() -> Self {
-        Self {
-            enabled: false,
-            common: Common::default(),
-            layer: 0,
-            anchor: Anchor::TopLeft,
-            elements: Vec::new(),
-            file: PathBuf::new(),
-            edit: false,
-        }
     }
 }

@@ -2,10 +2,11 @@ use super::{render_or_children, Animation, Common, ElementType, RenderState};
 use crate::{
     action::Action,
     context::{EditState, RenderContext},
+    render_util::{confirm_modal, item_context_menu, tree_select_empty},
     traits::{Node, Render, RenderOptions},
     trigger::{MetaTrigger, Trigger},
 };
-use nexus::imgui::Ui;
+use nexus::imgui::{MenuItem, Ui};
 use serde::{Deserialize, Serialize};
 
 // TODO: conditions, e.g. lower opacity out of combat, color change based on stack threshold
@@ -22,6 +23,9 @@ pub struct Element {
 
     #[serde(flatten)]
     pub kind: ElementType,
+
+    #[serde(skip)]
+    confirm_delete: bool,
 }
 
 impl Element {
@@ -52,8 +56,49 @@ impl Element {
     /// Returns `true` if a child is selected.
     pub fn render_select_tree(&mut self, ui: &Ui, state: &mut EditState) -> Action {
         let kind = (&self.kind).into(); // borrow here to keep ownership
-        self.common
-            .render_select_tree(ui, state, kind, self.kind.children())
+        let id = self.common.id_string();
+        let active = state.is_active(self.common.id);
+        let leaf = self
+            .kind
+            .children()
+            .as_ref()
+            .map(|children| children.is_empty())
+            .unwrap_or(true);
+        let (token, clicked) = tree_select_empty(ui, &id, active, leaf);
+        if clicked {
+            state.select(self.common.id);
+        }
+
+        let mut action = Action::None;
+        let mut open = false;
+        item_context_menu(&id, || {
+            self.common
+                .render_context_menu(ui, state, self.kind.children());
+
+            if MenuItem::new("Cut").build(ui) {
+                action = Action::Cut;
+            }
+            if MenuItem::new("Copy").build(ui) {
+                action = Action::Copy;
+            }
+            open = MenuItem::new("Delete").build(ui);
+        });
+        let title = format!("Delete {kind}?##{id}");
+        if open {
+            ui.open_popup(&title)
+        }
+        if confirm_modal(ui, &title) {
+            action = Action::Delete;
+        }
+
+        self.common.render_tree_label(ui, kind);
+        if token.is_some() {
+            if let Some(children) = self.kind.children() {
+                self.common.render_tree_children(ui, state, children);
+            }
+        }
+
+        action
     }
 
     /// Attempts to render options if selected.

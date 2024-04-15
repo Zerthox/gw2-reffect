@@ -1,6 +1,7 @@
 use crate::{context::EditState, elements::Element};
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[must_use]
 pub enum Action {
     #[default]
     None,
@@ -23,10 +24,19 @@ impl Action {
     pub fn perform(self, edit: &mut EditState, children: &mut Vec<Element>, index: usize) {
         match self {
             Action::None => {}
-            Action::Cut => edit.set_clipboard(children.remove(index)),
-            Action::Copy => edit.set_clipboard(children[index].clone()),
+            Action::Cut => {
+                let child = children.remove(index);
+                log::debug!("Cut child {index} {}", child.kind.as_ref());
+                edit.set_clipboard(child);
+            }
+            Action::Copy => {
+                let child = children[index].clone();
+                log::debug!("Copy child {index} {}", child.kind.as_ref());
+                edit.set_clipboard(child);
+            }
             Action::Delete => {
-                children.remove(index);
+                let child = children.remove(index);
+                log::debug!("Delete child {index} {}", child.kind.as_ref());
             }
         }
     }

@@ -1,6 +1,7 @@
+use crate::traits::Colored;
 use nexus::imgui::{
     sys, ComboBoxFlags, InputTextFlags, Selectable, StyleColor, StyleVar, TreeNode, TreeNodeFlags,
-    Ui,
+    TreeNodeToken, Ui,
 };
 use std::{ffi::CString, mem};
 use strum::VariantArray;
@@ -68,8 +69,6 @@ macro_rules! impl_static_variants {
 
 pub(crate) use impl_static_variants;
 
-use crate::traits::Colored;
-
 pub fn enum_combo<T>(ui: &Ui, label: impl AsRef<str>, current: &mut T, flags: ComboBoxFlags) -> bool
 where
     T: Clone + AsRef<str> + EnumStaticVariants + 'static,
@@ -93,7 +92,7 @@ where
     changed
 }
 
-pub fn enum_combo_checkbox<T>(
+pub fn enum_combo_check<T>(
     ui: &Ui,
     label: impl AsRef<str>,
     current: &mut Vec<T>,
@@ -122,6 +121,7 @@ where
 
     if let Some(_token) = ui.begin_combo_with_flags(&label, &preview, flags) {
         let _style = ui.push_style_var(StyleVar::FramePadding([0.0, 0.0]));
+        let mut focus = false;
 
         for entry in T::VARIANTS {
             // we assume the vec is sorted
@@ -140,20 +140,21 @@ where
                     Err(index) => current.insert(index, entry.clone()),
                 }
             }
+            if !focus && selected {
+                ui.set_item_default_focus();
+                focus = true;
+            }
         }
     }
     changed
 }
 
-pub fn tree_select_custom(
-    ui: &Ui,
+pub fn tree_select_empty<'ui>(
+    ui: &'ui Ui,
     id: impl AsRef<str>,
     selected: bool,
     leaf: bool,
-    label: impl FnOnce(),
-    children: impl FnOnce(),
-) -> bool {
-    let _style = ui.push_style_var(StyleVar::IndentSpacing(10.0));
+) -> (Option<TreeNodeToken<'ui>>, bool) {
     let token = TreeNode::new(id)
         .label::<&str, _>("") // FIXME: unused type param in imgui-rs
         .flags(TreeNodeFlags::SPAN_AVAIL_WIDTH)
@@ -162,16 +163,7 @@ pub fn tree_select_custom(
         .leaf(leaf)
         .tree_push_on_open(!leaf)
         .push(ui);
-    let clicked = ui.is_item_clicked() && !ui.is_item_toggled_open();
-
-    ui.same_line();
-    label();
-
-    if token.is_some() {
-        children();
-    }
-
-    clicked
+    (token, ui.is_item_clicked() && !ui.is_item_toggled_open())
 }
 
 pub fn item_context_menu(str_id: impl Into<String>, contents: impl FnOnce()) {
@@ -186,4 +178,22 @@ pub fn item_context_menu(str_id: impl Into<String>, contents: impl FnOnce()) {
             unsafe { sys::igEndPopup() };
         }
     }
+}
+
+pub fn confirm_modal(ui: &Ui, title: impl AsRef<str>) -> bool {
+    let mut confirm = false;
+    ui.popup_modal(title)
+        .always_auto_resize(true)
+        .build(ui, || {
+            if ui.button("Confirm") {
+                confirm = true;
+                ui.close_current_popup();
+            }
+            ui.set_item_default_focus();
+            ui.same_line();
+            if ui.button("Cancel") {
+                ui.close_current_popup();
+            }
+        });
+    confirm
 }

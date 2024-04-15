@@ -1,7 +1,7 @@
 use super::{CombatTrigger, Trigger};
 use crate::{
     context::{Mount, Profession, RenderContext, Specialization},
-    render_util::enum_combo_checkbox,
+    render_util::enum_combo_check,
     traits::{Leaf, RenderOptions},
 };
 use nexus::imgui::{ComboBoxFlags, Ui};
@@ -37,20 +37,20 @@ impl RenderOptions for PlayerTrigger {
     fn render_options(&mut self, ui: &Ui) {
         self.combat.render_options(ui);
 
-        enum_combo_checkbox(
+        enum_combo_check(
             ui,
             "Profession",
             &mut self.profs,
             ComboBoxFlags::HEIGHT_LARGE,
         );
 
-        enum_combo_checkbox(
+        enum_combo_check(
             ui,
             "Specialization",
             &mut self.specs,
             ComboBoxFlags::HEIGHT_LARGE,
         );
-        enum_combo_checkbox(ui, "Mount", &mut self.mounts, ComboBoxFlags::HEIGHT_LARGE);
+        enum_combo_check(ui, "Mount", &mut self.mounts, ComboBoxFlags::HEIGHT_LARGE);
     }
 }
 
