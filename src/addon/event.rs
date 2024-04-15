@@ -36,22 +36,25 @@ impl Addon {
         let dir = Self::addon_dir();
         log::info!("Loading packs from \"{}\"", dir.display());
 
-        let files = fs::read_dir(&dir)
-            .expect("failed to read addon directory")
-            .filter_map(|entry| entry.ok())
-            .filter(|entry| {
-                matches!(
-                    entry.path().extension().and_then(|ext| ext.to_str()),
-                    Some("json" | "yml" | "yaml")
-                )
-            });
+        match fs::read_dir(&dir) {
+            Ok(iter) => {
+                let files = iter.filter_map(|entry| entry.ok()).filter(|entry| {
+                    matches!(
+                        entry.path().extension().and_then(|ext| ext.to_str()),
+                        Some("json" | "yml" | "yaml")
+                    )
+                });
 
-        for file in files {
-            if let Some(pack) = Pack::load_from_file(&file.path()) {
-                self.add_pack(pack);
+                for file in files {
+                    if let Some(pack) = Pack::load_from_file(&file.path()) {
+                        self.add_pack(pack);
+                    }
+                }
+                log::info!("Loaded {} packs", self.packs.len());
             }
+
+            Err(err) => log::error!("Failed to read pack directory: {err}"),
         }
-        log::info!("Loaded {} packs", self.packs.len());
     }
 
     pub fn add_pack(&mut self, new: Pack) {
