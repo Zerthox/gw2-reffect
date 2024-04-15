@@ -1,5 +1,6 @@
 use super::{render_or_children, Anchor, Common, Element, RenderState};
 use crate::{
+    action::Action,
     context::{EditState, RenderContext},
     render_util::enum_combo,
     traits::{Node, RenderOptions},
@@ -69,9 +70,9 @@ impl Pack {
     }
 
     /// Renders the select tree.
-    pub fn render_select_tree(&mut self, ui: &Ui, state: &mut EditState) {
+    pub fn render_select_tree(&mut self, ui: &Ui, state: &mut EditState) -> Action {
         self.common
-            .render_select_tree(ui, state, "Pack", &mut self.elements);
+            .render_select_tree(ui, state, "Pack", Some(&mut self.elements))
     }
 
     /// Attempts to render options if selected.
@@ -115,8 +116,8 @@ impl Pack {
 }
 
 impl Node for Pack {
-    fn children(&mut self) -> &mut [Element] {
-        &mut self.elements
+    fn children(&mut self) -> Option<&mut Vec<Element>> {
+        Some(&mut self.elements)
     }
 }
 

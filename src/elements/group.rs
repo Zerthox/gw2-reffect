@@ -13,8 +13,8 @@ pub struct Group {
 }
 
 impl Node for Group {
-    fn children(&mut self) -> &mut [Element] {
-        &mut self.members
+    fn children(&mut self) -> Option<&mut Vec<Element>> {
+        Some(&mut self.members)
     }
 }
 

@@ -1,6 +1,7 @@
 use super::{Element, Group, IconElement, IconGrid, RenderState, Text};
 use crate::{
     context::RenderContext,
+    render_util::impl_static_variants,
     traits::{Node, Render, RenderOptions},
 };
 use nexus::imgui::Ui;
@@ -20,6 +21,8 @@ pub enum ElementType {
     Text(Text),
 }
 
+impl_static_variants!(ElementType);
+
 impl Node for ElementType {
     fn load(&mut self) {
         match self {
@@ -30,7 +33,7 @@ impl Node for ElementType {
         }
     }
 
-    fn children(&mut self) -> &mut [Element] {
+    fn children(&mut self) -> Option<&mut Vec<Element>> {
         match self {
             Self::Group(group) => group.children(),
             Self::IconGrid(grid) => grid.children(),

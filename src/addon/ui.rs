@@ -114,10 +114,7 @@ impl Addon {
                 ui.text(format!("Map category: {}", ctx.map.category));
 
                 ui.spacing();
-                ui.text(format!(
-                    "Selected Element: {}",
-                    self.context.edit.active.simple()
-                ));
+                self.context.edit.debug(ui);
                 ui.text("Edited Packs:");
                 ui.indent();
                 for pack in &mut self.packs {

@@ -1,4 +1,4 @@
-use super::{Icon, RenderState};
+use super::{Element, Icon, RenderState};
 use crate::{
     context::RenderContext,
     traits::{Node, RenderOptions},
@@ -29,7 +29,7 @@ impl Node for IconNamed {
         self.inner.load();
     }
 
-    fn children(&mut self) -> &mut [super::Element] {
+    fn children(&mut self) -> Option<&mut Vec<Element>> {
         self.inner.children()
     }
 }

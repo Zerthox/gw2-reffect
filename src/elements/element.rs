@@ -1,5 +1,6 @@
 use super::{render_or_children, Animation, Common, ElementType, RenderState};
 use crate::{
+    action::Action,
     context::{EditState, RenderContext},
     traits::{Node, Render, RenderOptions},
     trigger::{MetaTrigger, Trigger},
@@ -24,6 +25,13 @@ pub struct Element {
 }
 
 impl Element {
+    pub fn of_type(kind: ElementType) -> Self {
+        Self {
+            kind,
+            ..Self::default()
+        }
+    }
+
     /// Renders the element.
     pub fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &RenderState) {
         if self.trigger.is_active_or_edit(ctx, state) {
@@ -42,7 +50,7 @@ impl Element {
 
     /// Renders the select tree.
     /// Returns `true` if a child is selected.
-    pub fn render_select_tree(&mut self, ui: &Ui, state: &mut EditState) {
+    pub fn render_select_tree(&mut self, ui: &Ui, state: &mut EditState) -> Action {
         let kind = (&self.kind).into(); // borrow here to keep ownership
         self.common
             .render_select_tree(ui, state, kind, self.kind.children())
@@ -92,7 +100,7 @@ impl Node for Element {
         self.kind.load();
     }
 
-    fn children(&mut self) -> &mut [Element] {
+    fn children(&mut self) -> Option<&mut Vec<Element>> {
         self.kind.children()
     }
 }

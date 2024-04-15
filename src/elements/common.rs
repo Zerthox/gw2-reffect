@@ -1,13 +1,15 @@
 use super::{Element, ElementType, RenderState};
 use crate::{
+    action::{Action, ChildAction},
     component_wise::ComponentWise,
     context::{EditState, RenderContext},
-    render_util::{input_float_with_format, item_context_menu, tree_select_custom},
+    render_util::{
+        input_float_with_format, item_context_menu, tree_select_custom, EnumStaticVariants,
+    },
     traits::RenderOptions,
 };
 use nexus::imgui::{InputTextFlags, MenuItem, Ui};
 use serde::{Deserialize, Serialize};
-use strum::IntoEnumIterator;
 use uuid::Uuid;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -65,15 +67,19 @@ impl Common {
         ui: &Ui,
         state: &mut EditState,
         kind: &str,
-        children: &mut [Element],
-    ) {
+        mut children: Option<&mut Vec<Element>>,
+    ) -> Action {
         let id = self.id_string();
         let active = state.is_active(self.id);
+        let leaf = children
+            .as_ref()
+            .map(|children| children.is_empty())
+            .unwrap_or(true);
         let changed = tree_select_custom(
             ui,
             &id,
             active,
-            children.is_empty(),
+            leaf,
             || {
                 ui.same_line();
                 ui.text_disabled(kind);
@@ -81,8 +87,12 @@ impl Common {
                 ui.text(&self.name);
             },
             || {
-                for child in children {
-                    child.render_select_tree(ui, state);
+                if let Some(children) = children.as_mut() {
+                    let mut action = ChildAction::new();
+                    for (i, child) in children.iter_mut().enumerate() {
+                        action.or(i, child.render_select_tree(ui, state));
+                    }
+                    action.perform(state, children);
                 }
             },
         );
@@ -90,33 +100,52 @@ impl Common {
             state.select(self.id);
         }
 
+        let mut action = Action::None;
         item_context_menu(&id, || {
-            ui.menu("Create", || {
-                for element in ElementType::iter() {
-                    let name = element.as_ref();
-                    if MenuItem::new(name).build(ui) {
-                        log::debug!("Creating new {name}");
-                        // TODO: push element
-                    }
+            action = self.render_context_menu(ui, state, children);
+        });
+        action
+    }
+
+    fn render_context_menu(
+        &self,
+        ui: &Ui,
+        state: &mut EditState,
+        mut children: Option<&mut Vec<Element>>,
+    ) -> Action {
+        let mut action = Action::None;
+        let has_children = children.is_some();
+
+        ui.menu_with_enabled("Create", has_children, || {
+            for kind in ElementType::static_variants() {
+                let name = kind.as_ref();
+                if MenuItem::new(name).build(ui) {
+                    children
+                        .as_mut()
+                        .expect("create with no children")
+                        .push(Element::of_type(kind.clone()));
                 }
-            });
-            if MenuItem::new("Cut").build(ui) {
-                log::debug!("Cutting {kind}");
-                // TODO: remove from parent (indicate via return) & save in clipboard
-            }
-            if MenuItem::new("Copy").build(ui) {
-                log::debug!("Copying {kind}");
-                // TODO: create copy & save in clipboard
-            }
-            if MenuItem::new("Paste").build(ui) {
-                log::debug!("Pasting unknown");
-                // TODO: append element from clipboard
-            }
-            if MenuItem::new("Delete").build(ui) {
-                log::debug!("Deleting {kind}");
-                // TODO: remove from parent (indicate via return)
             }
         });
+        if MenuItem::new("Cut").build(ui) {
+            action = Action::Cut;
+        }
+        if MenuItem::new("Copy").build(ui) {
+            action = Action::Copy;
+        }
+        if MenuItem::new("Paste")
+            .enabled(has_children && state.has_clipboard())
+            .build(ui)
+        {
+            children
+                .expect("paste with no children")
+                .push(state.take_clipboard().expect("paste without clipboard"))
+        }
+        if MenuItem::new("Delete").build(ui) {
+            action = Action::Delete;
+        }
+
+        action
     }
 
     pub fn render_debug(&mut self, ui: &Ui) {
@@ -152,11 +181,12 @@ macro_rules! render_or_children {
         if $state.is_active($self.common.id) {
             $self.render_options($ui);
             true
-        } else {
-            $self
-                .children()
+        } else if let Some(children) = $self.children() {
+            children
                 .iter_mut()
                 .any(|child| child.try_render_options($ui, $state))
+        } else {
+            false
         }
     };
 }

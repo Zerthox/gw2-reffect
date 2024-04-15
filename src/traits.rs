@@ -9,13 +9,15 @@ use nexus::imgui::Ui;
 pub trait Node {
     /// Performs necessary loads.
     fn load(&mut self) {
-        for child in self.children() {
-            child.load();
+        if let Some(children) = self.children() {
+            for child in children {
+                child.load();
+            }
         }
     }
 
     /// Returns the child [`Elements`].
-    fn children(&mut self) -> &mut [Element];
+    fn children(&mut self) -> Option<&mut Vec<Element>>;
 }
 
 /// [`Element`] tree node that is a leaf.
@@ -32,8 +34,8 @@ where
         Leaf::load(self)
     }
 
-    fn children(&mut self) -> &mut [Element] {
-        &mut []
+    fn children(&mut self) -> Option<&mut Vec<Element>> {
+        None
     }
 }
 
