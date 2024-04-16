@@ -2,7 +2,7 @@ use super::{render_or_children, Animation, Common, ElementType, RenderState};
 use crate::{
     action::Action,
     context::{EditState, RenderContext},
-    render_util::{confirm_modal, item_context_menu, tree_select_empty},
+    render_util::{delete_confirm_modal, item_context_menu, tree_select_empty},
     traits::{Node, Render, RenderOptions},
     trigger::{MetaTrigger, Trigger},
 };
@@ -87,7 +87,7 @@ impl Element {
         if open {
             ui.open_popup(&title)
         }
-        if confirm_modal(ui, &title) {
+        if delete_confirm_modal(ui, &title) {
             action = Action::Delete;
         }
 

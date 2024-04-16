@@ -1,7 +1,7 @@
 use super::{render_or_children, Anchor, Common, Element, RenderState};
 use crate::{
     context::{EditState, RenderContext},
-    render_util::{confirm_modal, enum_combo, item_context_menu, tree_select_empty},
+    render_util::{delete_confirm_modal, enum_combo, item_context_menu, tree_select_empty},
     traits::{Node, RenderOptions},
 };
 use nexus::imgui::{ComboBoxFlags, MenuItem, StyleVar, Ui};
@@ -95,7 +95,7 @@ impl Pack {
             self.common.render_tree_children(ui, state, children);
         }
 
-        confirm_modal(ui, &title)
+        delete_confirm_modal(ui, &title)
     }
 
     /// Attempts to render options if selected.

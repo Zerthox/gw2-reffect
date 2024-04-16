@@ -180,16 +180,23 @@ pub fn item_context_menu(str_id: impl Into<String>, contents: impl FnOnce()) {
     }
 }
 
-pub fn confirm_modal(ui: &Ui, title: impl AsRef<str>) -> bool {
+pub fn delete_confirm_modal(ui: &Ui, title: impl AsRef<str>) -> bool {
     let mut confirm = false;
     ui.popup_modal(title)
         .always_auto_resize(true)
         .build(ui, || {
-            if ui.button("Confirm") {
-                confirm = true;
-                ui.close_current_popup();
+            {
+                let _style = ui.push_style_color(StyleColor::Button, [0.80, 0.20, 0.20, 1.0]);
+                let _style =
+                    ui.push_style_color(StyleColor::ButtonHovered, [0.85, 0.15, 0.15, 1.0]);
+                let _style = ui.push_style_color(StyleColor::ButtonActive, [0.90, 0.10, 0.10, 1.0]);
+                if ui.button("Delete") {
+                    confirm = true;
+                    ui.close_current_popup();
+                }
+                ui.set_item_default_focus();
             }
-            ui.set_item_default_focus();
+
             ui.same_line();
             if ui.button("Cancel") {
                 ui.close_current_popup();
