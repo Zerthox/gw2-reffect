@@ -3,9 +3,10 @@ mod links;
 mod map;
 mod player;
 mod render;
+mod settings;
 mod ui;
 
-pub use self::{edit_state::*, links::*, map::*, player::*, render::*, ui::*};
+pub use self::{edit_state::*, links::*, map::*, player::*, render::*, settings::*, ui::*};
 
 use crate::{
     get_buffs::{get_buffs, GetBuffsError, StackedBuff},
@@ -13,9 +14,12 @@ use crate::{
 };
 
 // TODO: optional no edit in combat
-// TODO: customizable update intervals? hidden behind advanced
 
-#[derive(Debug)]
+const BUFFS_INTERVAL: f64 = 0.040;
+
+const PLAYER_INTERVAL: f64 = 1.000;
+
+#[derive(Debug, Clone)]
 pub struct Context {
     pub edit: EditState,
     pub ui: UiContext,
@@ -24,23 +28,10 @@ pub struct Context {
     pub buffs: Result<Vec<StackedBuff>, GetBuffsError>,
     links: Links,
     buffs_update: Interval,
-    slow_update: Interval,
+    player_update: Interval,
 }
 
 impl Context {
-    pub fn new() -> Self {
-        Self {
-            edit: EditState::default(),
-            ui: UiContext::empty(),
-            player: PlayerContext::empty(),
-            map: MapContext::empty(),
-            buffs: Err(GetBuffsError::Null),
-            links: Links::load(),
-            buffs_update: Interval::new(0.040),
-            slow_update: Interval::new(1.000),
-        }
-    }
-
     pub fn as_render(&self) -> RenderContext {
         RenderContext {
             edit: &self.edit,
@@ -65,10 +56,41 @@ impl Context {
         if let Some(mumble) = self.links.mumble() {
             self.player.update_fast(mumble);
 
-            if self.slow_update.triggered(time) {
+            if self.player_update.triggered(time) {
                 self.player.update_slow(mumble);
                 self.map.update(mumble);
             }
+        }
+    }
+
+    pub fn get_buffs_interval(&self) -> f64 {
+        self.buffs_update.frequency
+    }
+
+    pub fn get_player_interval(&self) -> f64 {
+        self.player_update.frequency
+    }
+
+    pub fn replace_buffs_interval(&mut self, interval: f64) {
+        self.buffs_update = Interval::new(interval);
+    }
+
+    pub fn replace_player_intervals(&mut self, interval: f64) {
+        self.player_update = Interval::new(interval);
+    }
+}
+
+impl Default for Context {
+    fn default() -> Self {
+        Self {
+            edit: EditState::default(),
+            ui: UiContext::empty(),
+            player: PlayerContext::empty(),
+            map: MapContext::empty(),
+            buffs: Err(GetBuffsError::Null),
+            links: Links::load(),
+            buffs_update: Interval::new(BUFFS_INTERVAL),
+            player_update: Interval::new(PLAYER_INTERVAL),
         }
     }
 }

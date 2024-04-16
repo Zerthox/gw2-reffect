@@ -3,16 +3,35 @@ use nexus::imgui::{
     sys, ComboBoxFlags, InputTextFlags, Selectable, StyleColor, StyleVar, TreeNode, TreeNodeFlags,
     TreeNodeToken, Ui,
 };
-use std::{ffi::CString, mem};
+use std::{ffi::CString, mem, ptr};
 use strum::VariantArray;
 
-pub fn input_u32(ui: &Ui, label: impl AsRef<str>, value: &mut u32) {
+pub fn next_window_size_constraints(size_min: [f32; 2], size_max: [f32; 2]) {
+    unsafe {
+        sys::igSetNextWindowSizeConstraints(size_min.into(), size_max.into(), None, ptr::null_mut())
+    }
+}
+
+pub fn input_u32(
+    ui: &Ui,
+    label: impl AsRef<str>,
+    value: &mut u32,
+    step: u32,
+    step_fast: u32,
+) -> bool {
     let mut int = *value as _;
-    if ui.input_int(label, &mut int).step(0).step_fast(0).build() {
+    if ui
+        .input_int(label, &mut int)
+        .step(step as _)
+        .step_fast(step_fast as _)
+        .build()
+    {
         if let Ok(new) = u32::try_from(int) {
             *value = new;
+            return true;
         }
     }
+    false
 }
 
 pub fn input_float_with_format(

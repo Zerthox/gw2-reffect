@@ -87,7 +87,7 @@ impl RenderOptions for BuffTrigger {
                 BuffTrigger::Any(ids) | BuffTrigger::All(ids) => {
                     // TODO: as single text input?
                     for (i, id) in ids.iter_mut().enumerate() {
-                        input_u32(ui, format!("Id {}", i + 1), id);
+                        input_u32(ui, format!("Id {}", i + 1), id, 0, 0);
                     }
                     if ui.button("+") {
                         ids.push(0);
@@ -98,7 +98,7 @@ impl RenderOptions for BuffTrigger {
                     }
                 }
                 BuffTrigger::Not(id) | BuffTrigger::Has(id) => {
-                    input_u32(ui, "Id", id);
+                    input_u32(ui, "Id", id, 0, 0);
                 }
             }
         })

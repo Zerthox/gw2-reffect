@@ -1,6 +1,6 @@
 use nexus::data_link::{get_mumble_link, get_nexus_link, mumble::MumblePtr, NexusLink};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Links {
     mumble: Option<MumblePtr>,
     nexus: *const NexusLink,

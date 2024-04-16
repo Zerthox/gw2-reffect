@@ -1,5 +1,5 @@
 use super::Addon;
-use crate::{elements::Pack, texture_manager::TextureManager, util::file_name};
+use crate::{addon::Settings, elements::Pack, texture_manager::TextureManager, util::file_name};
 use nexus::gui::{register_render, RenderType};
 use std::fs;
 
@@ -22,18 +22,33 @@ impl Addon {
         )
         .revert_on_unload();
 
-        let _ = fs::create_dir(Self::addon_dir());
-        Self::lock().load_packs();
+        let _ = fs::create_dir_all(Self::packs_dir());
+
+        let mut plugin = Self::lock();
+
+        if let Some(settings) = Settings::try_load() {
+            plugin.context.load(settings.context);
+        }
+
+        plugin.load_packs();
     }
 
     pub fn unload() {
         log::info!("Reffect v{VERSION} unload");
-        Self::lock().save_packs();
+        let plugin = Self::lock();
+
+        Settings {
+            context: plugin.context.settings(),
+        }
+        .save();
+
+        plugin.save_packs();
+
         TextureManager::unload();
     }
 
     pub fn load_packs(&mut self) {
-        let dir = Self::addon_dir();
+        let dir = Self::packs_dir();
         log::info!("Loading packs from \"{}\"", dir.display());
 
         match fs::read_dir(&dir) {

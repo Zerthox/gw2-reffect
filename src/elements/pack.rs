@@ -13,6 +13,8 @@ use std::{
     path::PathBuf,
 };
 
+// TODO: tag pack with version before serializing
+
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Pack {
@@ -39,7 +41,7 @@ impl Pack {
             file,
             ..Self::default()
         };
-        pack.save_to_file().map(|_| pack)
+        pack.save_to_file().then_some(pack)
     }
 
     pub fn load_from_file(path: impl Into<PathBuf>) -> Option<Self> {
@@ -62,26 +64,22 @@ impl Pack {
             })
     }
 
-    pub fn save_to_file(&self) -> Option<()> {
-        let file = File::create(&self.file)
-            .inspect_err(|err| {
+    pub fn save_to_file(&self) -> bool {
+        match File::create(&self.file) {
+            Ok(file) => {
+                let writer = BufWriter::new(file);
+                serde_json::to_writer_pretty(writer, self).expect("failed to serialize pack");
+                true
+            }
+            Err(err) => {
                 log::error!(
                     "Failed to save pack \"{}\" to \"{}\": {err}",
                     self.common.name,
                     file_name(&self.file)
-                )
-            })
-            .ok()?;
-        let writer = BufWriter::new(file);
-        serde_json::to_writer_pretty(writer, self)
-            .inspect_err(|err| {
-                log::error!(
-                    "Failed to serialize pack \"{}\" to \"{}\": {err}",
-                    self.common.name,
-                    file_name(&self.file)
-                )
-            })
-            .ok()
+                );
+                false
+            }
+        }
     }
 
     /// Renders the pack.

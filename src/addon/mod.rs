@@ -1,5 +1,8 @@
 mod event;
+mod settings;
 mod ui;
+
+pub use self::settings::*;
 
 use crate::{context::Context, elements::Pack};
 use nexus::paths::get_addon_dir;
@@ -22,7 +25,7 @@ impl Addon {
         Self {
             debug: false,
             packs: Vec::new(),
-            context: Context::new(),
+            context: Context::default(),
         }
     }
 
@@ -35,5 +38,9 @@ impl Addon {
 
     pub fn addon_dir() -> PathBuf {
         get_addon_dir("reffect").expect("invalid addon directory")
+    }
+
+    pub fn packs_dir() -> PathBuf {
+        Self::addon_dir().join("packs")
     }
 }

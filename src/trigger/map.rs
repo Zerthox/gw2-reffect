@@ -44,7 +44,7 @@ impl RenderOptions for MapTrigger {
             Self::Ids(ids) => {
                 // TODO: as single text input?
                 for (i, id) in ids.iter_mut().enumerate() {
-                    input_u32(ui, format!("Id {}", i + 1), id);
+                    input_u32(ui, format!("Id {}", i + 1), id, 0, 0);
                 }
                 if ui.button("+") {
                     ids.push(0);

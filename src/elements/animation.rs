@@ -29,7 +29,7 @@ impl RenderOptions for Animation {
     fn render_options(&mut self, ui: &Ui) {
         enum_combo(ui, "Animation", &mut self.kind, ComboBoxFlags::empty());
 
-        input_u32(ui, "Period", &mut self.period);
+        input_u32(ui, "Period", &mut self.period, 100, 1000);
     }
 }
 
