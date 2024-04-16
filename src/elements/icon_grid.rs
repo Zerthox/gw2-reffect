@@ -1,7 +1,7 @@
 use super::{Direction, IconNamed, RenderState};
 use crate::{
     context::RenderContext,
-    render_util::{enum_combo, input_float_with_format},
+    render_util::{enum_combo, input_float_with_format, input_size},
     traits::{Leaf, Node, Render, RenderOptions},
     trigger::Trigger,
 };
@@ -56,8 +56,7 @@ impl RenderOptions for IconGrid {
         enum_combo(ui, "Direction", &mut self.direction, ComboBoxFlags::empty());
 
         let [x, y] = &mut self.size;
-        input_float_with_format("Size x", x, 1.0, 10.0, "%.2f", InputTextFlags::empty());
-        input_float_with_format("Size y", y, 1.0, 10.0, "%.2f", InputTextFlags::empty());
+        input_size(x, y);
 
         input_float_with_format("Padding", y, 1.0, 10.0, "%.2f", InputTextFlags::empty());
 

@@ -39,6 +39,11 @@ pub fn input_float_with_format(
     }
 }
 
+pub fn input_size(x: &mut f32, y: &mut f32) {
+    input_float_with_format("Size x", x, 1.0, 10.0, "%.2f", InputTextFlags::empty());
+    input_float_with_format("Size y", y, 1.0, 10.0, "%.2f", InputTextFlags::empty());
+}
+
 pub trait EnumStaticVariants: Sized {
     fn static_variants() -> &'static [Self];
 }

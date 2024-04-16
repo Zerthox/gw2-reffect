@@ -1,6 +1,7 @@
 use super::{Icon, RenderState};
 use crate::{
     context::RenderContext,
+    render_util::input_size,
     traits::{Leaf, Render, RenderOptions},
     trigger::Trigger,
 };
@@ -30,8 +31,9 @@ impl Render for IconElement {
 
 impl RenderOptions for IconElement {
     fn render_options(&mut self, ui: &Ui) {
-        ui.text("Icon");
-        ui.same_line();
+        let [x, y] = &mut self.size;
+        input_size(x, y);
+
         self.icon.render_options(ui);
     }
 }

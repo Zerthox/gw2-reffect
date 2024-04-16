@@ -104,7 +104,7 @@ impl Pack {
         let id = self.common.id_string();
         let active = state.is_active(self.common.id);
         let children = &mut self.elements;
-        let (token, clicked) = tree_select_empty(ui, &id, active, false);
+        let (token, clicked) = tree_select_empty(ui, &id, active, children.is_empty());
         if clicked {
             state.select(self.common.id);
         }
