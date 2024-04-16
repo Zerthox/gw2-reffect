@@ -21,7 +21,6 @@ use crate::render_util::impl_static_variants;
     Deserialize,
 )]
 pub enum Anchor {
-    #[default]
     #[strum(serialize = "Top Left")]
     TopLeft,
 
@@ -34,6 +33,7 @@ pub enum Anchor {
     #[strum(serialize = "Left Center")]
     LeftCenter,
 
+    #[default]
     Center,
 
     #[strum(serialize = "Right Center")]
