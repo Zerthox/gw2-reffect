@@ -186,10 +186,10 @@ pub fn delete_confirm_modal(ui: &Ui, title: impl AsRef<str>) -> bool {
         .always_auto_resize(true)
         .build(ui, || {
             {
-                let _style = ui.push_style_color(StyleColor::Button, [0.80, 0.20, 0.20, 1.0]);
+                let _style = ui.push_style_color(StyleColor::Button, [0.60, 0.24, 0.24, 1.0]);
                 let _style =
-                    ui.push_style_color(StyleColor::ButtonHovered, [0.85, 0.15, 0.15, 1.0]);
-                let _style = ui.push_style_color(StyleColor::ButtonActive, [0.90, 0.10, 0.10, 1.0]);
+                    ui.push_style_color(StyleColor::ButtonHovered, [0.70, 0.21, 0.21, 1.0]);
+                let _style = ui.push_style_color(StyleColor::ButtonActive, [0.80, 0.16, 0.16, 1.0]);
                 if ui.button("Delete") {
                     confirm = true;
                     ui.close_current_popup();
