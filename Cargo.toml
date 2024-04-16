@@ -19,8 +19,15 @@ strum = { version = "0.26.1", features = ["derive"] }
 url = "2.5.0"
 uuid = { version = "1.8.0", features = ["v4"] }
 
+[build-dependencies]
+winresource = "0.1.17"
+
 [lib]
 crate-type = ["cdylib"]
+
+[package.metadata.winresource]
+ProductName = "Reffect"
+OriginalFilename = "reffect.dll"
 
 [profile.release]
 lto = "thin"
