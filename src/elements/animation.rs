@@ -27,9 +27,7 @@ impl Animation {
 
 impl RenderOptions for Animation {
     fn render_options(&mut self, ui: &Ui) {
-        enum_combo(ui, "Animation", &mut self.kind, unsafe {
-            ComboBoxFlags::from_bits_unchecked(1 >> 7)
-        });
+        enum_combo(ui, "Animation", &mut self.kind, ComboBoxFlags::empty());
 
         input_u32(ui, "Period", &mut self.period);
     }
