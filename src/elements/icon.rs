@@ -44,7 +44,7 @@ impl Icon {
                     ui.set_window_font_scale(font_scale);
                     let text = stacks.to_string();
                     let [x_offset, _] = TextAlign::Right.calc_pos(ui, &text);
-                    let pad = [1.0, 1.0]; // TODO: customizable offset!
+                    let pad = [1.0, 1.0];
                     let line_height = ui.text_line_height();
                     let text_pos = end.add([x_offset, -line_height]).sub(pad);
 
@@ -73,11 +73,12 @@ impl RenderOptions for Icon {
 
         self.icon.render_select(ui);
 
-        ui.checkbox("Stacks", &mut self.stacks);
-
         ColorEdit::new("Color", &mut self.color)
             .preview(ColorPreview::Alpha)
             .build(ui);
+
+        ui.checkbox("Stacks", &mut self.stacks);
+        // TODO: customizable stacks text offset
     }
 }
 

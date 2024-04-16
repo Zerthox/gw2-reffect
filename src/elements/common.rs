@@ -120,8 +120,22 @@ impl RenderOptions for Common {
         ui.input_text("Name", &mut self.name).build();
 
         let [x, y] = &mut self.pos;
-        input_float_with_format("Position x", x, 1.0, 10.0, "%.2f", InputTextFlags::empty());
-        input_float_with_format("Position y", y, 1.0, 10.0, "%.2f", InputTextFlags::empty());
+        input_float_with_format(
+            "Position x",
+            x,
+            10.0,
+            100.0,
+            "%.2f",
+            InputTextFlags::empty(),
+        );
+        input_float_with_format(
+            "Position y",
+            y,
+            10.0,
+            100.0,
+            "%.2f",
+            InputTextFlags::empty(),
+        );
     }
 }
 

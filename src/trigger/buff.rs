@@ -9,6 +9,8 @@ use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, IntoStaticStr};
 
+// TODO: allow displaying with 0 stacks?
+
 #[derive(Debug, Default, Clone, AsRefStr, IntoStaticStr, EnumIter, Serialize, Deserialize)]
 pub enum BuffTrigger {
     #[default]

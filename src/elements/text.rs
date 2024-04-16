@@ -66,14 +66,17 @@ impl RenderOptions for Text {
             ui.tooltip_text("%s replaced by buff stacks");
         }
 
-        input_float_with_format(
+        let mut size = 100.0 * self.size;
+        if input_float_with_format(
             "Size",
-            &mut self.size,
-            0.1,
-            1.0,
+            &mut size,
+            10.0,
+            100.0,
             "%.2f",
             InputTextFlags::empty(),
-        );
+        ) {
+            self.size = size / 100.0;
+        }
 
         self.align.render_combo(ui);
 
