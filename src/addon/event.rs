@@ -62,6 +62,13 @@ impl Addon {
         self.packs.insert(index, new);
     }
 
+    pub fn delete_pack(&mut self, index: usize) {
+        let Pack { file, .. } = self.packs.remove(index);
+        if let Err(err) = fs::remove_file(&file) {
+            log::error!("Failed to delete pack file \"{}\": {err}", file.display());
+        }
+    }
+
     pub fn save_packs(&self) {
         log::info!("Saving packs");
         for pack in &self.packs {

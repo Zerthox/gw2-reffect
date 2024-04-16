@@ -43,7 +43,7 @@ impl Addon {
         }
         ui.same_line();
         if ui.button("New pack") {
-            // TODO: create new packk
+            // TODO: create new pack
         }
 
         ui.same_line();
@@ -69,7 +69,7 @@ impl Addon {
                     }
                 }
                 if let Some(index) = remove {
-                    self.packs.remove(index);
+                    self.delete_pack(index);
                 }
             });
 
