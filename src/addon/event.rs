@@ -1,5 +1,5 @@
 use super::Addon;
-use crate::{elements::Pack, texture_manager::TextureManager};
+use crate::{elements::Pack, texture_manager::TextureManager, util::file_name};
 use nexus::gui::{register_render, RenderType};
 use std::fs;
 
@@ -57,15 +57,34 @@ impl Addon {
         }
     }
 
-    pub fn add_pack(&mut self, new: Pack) {
-        let index = self.packs.partition_point(|entry| entry.layer <= new.layer);
-        self.packs.insert(index, new);
+    pub fn add_pack(&mut self, pack: Pack) {
+        log::info!(
+            "Added pack \"{}\" from \"{}\"",
+            pack.common.name,
+            file_name(&pack.file)
+        );
+        let index = self
+            .packs
+            .partition_point(|entry| entry.layer <= pack.layer);
+        self.packs.insert(index, pack);
     }
 
     pub fn delete_pack(&mut self, index: usize) {
-        let Pack { file, .. } = self.packs.remove(index);
-        if let Err(err) = fs::remove_file(&file) {
-            log::error!("Failed to delete pack file \"{}\": {err}", file.display());
+        let pack = &self.packs[index];
+        match fs::remove_file(&pack.file) {
+            Ok(_) => {
+                let pack = self.packs.remove(index);
+                log::info!(
+                    "Deleted pack \"{}\" file \"{}\"",
+                    pack.common.name,
+                    file_name(&pack.file)
+                );
+            }
+            Err(err) => log::error!(
+                "Failed to delete pack \"{}\" file \"{}\": {err}",
+                pack.common.name,
+                file_name(&pack.file)
+            ),
         }
     }
 

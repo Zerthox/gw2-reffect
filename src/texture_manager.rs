@@ -173,13 +173,10 @@ impl TextureLoader {
                 log::debug!("Texture loader exit");
             });
 
-        match result {
-            Ok(handle) => Some(Self { sender, handle }),
-            Err(err) => {
-                log::error!("Failed to spawn texture loader: {err}");
-                None
-            }
-        }
+        result
+            .inspect_err(|err| log::error!("Failed to spawn texture loader: {err}"))
+            .ok()
+            .map(|handle| Self { sender, handle })
     }
 
     fn exit_and_wait(self) {

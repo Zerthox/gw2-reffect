@@ -83,11 +83,13 @@ impl Element {
             }
             open = MenuItem::new("Delete").build(ui);
         });
-        let title = format!("Delete {kind}?##{id}");
+        let title = format!("Confirm Delete##{id}");
         if open {
             ui.open_popup(&title)
         }
-        if delete_confirm_modal(ui, &title) {
+        if delete_confirm_modal(ui, &title, || {
+            ui.text(format!("Delete {kind} {}?", self.common.name))
+        }) {
             action = Action::Delete;
         }
 

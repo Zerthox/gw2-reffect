@@ -11,6 +11,7 @@ mod render_util;
 mod texture_manager;
 mod traits;
 mod trigger;
+mod util;
 
 use addon::Addon;
 

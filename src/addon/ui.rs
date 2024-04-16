@@ -1,5 +1,8 @@
 use super::Addon;
+use crate::elements::Pack;
 use nexus::imgui::{ChildWindow, Condition, StyleVar, Ui, Window};
+use rfd::FileDialog;
+use std::thread;
 
 impl Addon {
     pub fn render(&mut self, ui: &Ui) {
@@ -43,7 +46,19 @@ impl Addon {
         }
         ui.same_line();
         if ui.button("New pack") {
-            // TODO: create new pack
+            // just spawn a thread to not have to deal with futures
+            thread::spawn(move || {
+                if let Some(file) = FileDialog::new()
+                    .set_title("Save Pack")
+                    .set_directory(Self::addon_dir())
+                    .add_filter("JSON", &["json"])
+                    .save_file()
+                {
+                    if let Some(pack) = Pack::create(file) {
+                        Self::lock().add_pack(pack);
+                    }
+                }
+            });
         }
 
         ui.same_line();

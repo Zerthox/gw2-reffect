@@ -3,6 +3,7 @@ use crate::{
     context::{EditState, RenderContext},
     render_util::{delete_confirm_modal, enum_combo, item_context_menu, tree_select_empty},
     traits::{Node, RenderOptions},
+    util::file_name,
 };
 use nexus::imgui::{ComboBoxFlags, MenuItem, StyleVar, Ui};
 use serde::{Deserialize, Serialize};
@@ -32,27 +33,55 @@ pub struct Pack {
 }
 
 impl Pack {
+    pub fn create(file: PathBuf) -> Option<Self> {
+        let pack = Self {
+            enabled: true,
+            file,
+            ..Self::default()
+        };
+        pack.save_to_file().map(|_| pack)
+    }
+
     pub fn load_from_file(path: impl Into<PathBuf>) -> Option<Self> {
         let path = path.into();
-        let file = File::open(&path).ok()?;
+        let file = File::open(&path)
+            .inspect_err(|err| {
+                log::error!("Failed to open pack file \"{}\": {err}", file_name(&path))
+            })
+            .ok()?;
         let reader = BufReader::new(file);
-        match serde_json::from_reader::<_, Self>(reader) {
-            Ok(mut pack) => {
+        serde_json::from_reader::<_, Self>(reader)
+            .inspect_err(|err| {
+                log::error!("Failed to parse pack file \"{}\": {err}", file_name(&path))
+            })
+            .ok()
+            .map(|mut pack| {
                 pack.file = path;
                 pack.load();
-                Some(pack)
-            }
-            Err(err) => {
-                log::warn!("Failed to parse pack \"{}\": {}", path.display(), err);
-                None
-            }
-        }
+                pack
+            })
     }
 
     pub fn save_to_file(&self) -> Option<()> {
-        let file = File::create(&self.file).ok()?;
+        let file = File::create(&self.file)
+            .inspect_err(|err| {
+                log::error!(
+                    "Failed to save pack \"{}\" to \"{}\": {err}",
+                    self.common.name,
+                    file_name(&self.file)
+                )
+            })
+            .ok()?;
         let writer = BufWriter::new(file);
-        serde_json::to_writer_pretty(writer, self).ok()
+        serde_json::to_writer_pretty(writer, self)
+            .inspect_err(|err| {
+                log::error!(
+                    "Failed to serialize pack \"{}\" to \"{}\": {err}",
+                    self.common.name,
+                    file_name(&self.file)
+                )
+            })
+            .ok()
     }
 
     /// Renders the pack.
@@ -85,7 +114,7 @@ impl Pack {
             self.common.render_context_menu(ui, state, Some(children));
             open = MenuItem::new("Delete").build(ui);
         });
-        let title = format!("Delete Pack?##{id}");
+        let title = format!("Confirm Delete##{id}");
         if open {
             ui.open_popup(&title);
         }
@@ -95,7 +124,9 @@ impl Pack {
             self.common.render_tree_children(ui, state, children);
         }
 
-        delete_confirm_modal(ui, &title)
+        delete_confirm_modal(ui, &title, || {
+            ui.text(format!("Delete Pack {}?", self.common.name))
+        })
     }
 
     /// Attempts to render options if selected.
