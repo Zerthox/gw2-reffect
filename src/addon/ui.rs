@@ -11,21 +11,24 @@ impl Addon {
     pub fn render(&mut self, ui: &Ui) {
         self.context.update(ui.time());
 
-        let screen_size = ui.io().display_size;
-        Window::new("##reffect-displays")
-            .position([0.0, 0.0], Condition::Always)
-            .content_size(screen_size)
-            .draw_background(false)
-            .no_decoration()
-            .no_inputs()
-            .movable(false)
-            .focus_on_appearing(false)
-            .build(ui, || {
-                let ctx = self.context.as_render();
-                for pack in &mut self.packs {
-                    pack.render(ui, &ctx);
-                }
-            });
+        {
+            let screen_size = ui.io().display_size;
+            let _style = ui.push_style_var(StyleVar::WindowPadding([0.0, 0.0]));
+            Window::new("##reffect-displays")
+                .position([0.0, 0.0], Condition::Always)
+                .size(screen_size, Condition::Always)
+                .draw_background(false)
+                .no_decoration()
+                .no_inputs()
+                .movable(false)
+                .focus_on_appearing(false)
+                .build(ui, || {
+                    let ctx = self.context.as_render();
+                    for pack in &mut self.packs {
+                        pack.render(ui, &ctx);
+                    }
+                });
+        }
 
         if self.debug {
             self.render_debug(ui);
