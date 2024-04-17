@@ -1,4 +1,5 @@
 use crate::traits::Colored;
+use enumflags2::{BitFlag, BitFlags};
 use nexus::imgui::{
     sys, ComboBoxFlags, InputTextFlags, Selectable, StyleColor, StyleVar, TreeNode, TreeNodeFlags,
     TreeNodeToken, Ui,
@@ -116,52 +117,40 @@ where
     changed
 }
 
-pub fn enum_combo_check<T>(
+pub fn enum_combo_bitflags<T>(
     ui: &Ui,
     label: impl AsRef<str>,
-    current: &mut Vec<T>,
+    current: &mut BitFlags<T>,
     flags: ComboBoxFlags,
 ) -> bool
 where
-    T: Clone + PartialEq + Ord + AsRef<str> + VariantArray + Colored,
+    T: Copy + PartialEq + Ord + AsRef<str> + BitFlag + VariantArray + Colored,
+    &'static str: From<T>,
 {
     let mut changed = false;
 
-    const ITEMS: usize = 4;
-    const CHARS: usize = 4;
-
-    let mut preview = current
-        .first()
-        .map(|el| &el.as_ref()[..CHARS])
-        .unwrap_or("Any")
-        .to_string();
-    for el in current.iter().skip(1).take(ITEMS - 1) {
-        preview += ", ";
-        preview += &el.as_ref()[..CHARS];
-    }
-    if current.len() > ITEMS {
-        preview += "...";
-    }
+    let preview = current
+        .iter()
+        .take(5)
+        .map(|el| &<&'static str>::from(el)[..4])
+        .fold(String::new(), |acc, el| acc + el + " ");
 
     if let Some(_token) = ui.begin_combo_with_flags(&label, &preview, flags) {
         let _style = ui.push_style_var(StyleVar::FramePadding([0.0, 0.0]));
         let mut focus = false;
 
-        for entry in T::VARIANTS {
-            // we assume the vec is sorted
-            let found = current.binary_search(entry);
-            let mut selected = found.is_ok();
+        for entry in T::VARIANTS.iter().copied() {
+            let mut selected = current.contains(entry);
             let _color = entry
                 .colored()
                 .map(|color| ui.push_style_color(StyleColor::Text, color));
 
             if ui.checkbox(entry, &mut selected) {
                 changed = true;
-                match found {
-                    Ok(index) => {
-                        current.remove(index);
-                    }
-                    Err(index) => current.insert(index, entry.clone()),
+                if selected {
+                    current.remove(entry);
+                } else {
+                    current.insert(entry);
                 }
             }
             if !focus && selected {

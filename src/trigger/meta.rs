@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 #[serde(default)]
 pub struct MetaTrigger {
     pub player: PlayerTrigger,
-    pub map: MapTrigger,
+    pub map: MapTrigger, // TODO: cache trigger between renders
 }
 
 impl Trigger for MetaTrigger {

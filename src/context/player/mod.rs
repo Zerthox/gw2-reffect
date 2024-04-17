@@ -11,8 +11,8 @@ use nexus::data_link::mumble::MumblePtr;
 pub struct PlayerContext {
     pub prof: Result<Profession, u8>,
     pub spec: Result<Specialization, u32>,
-    pub race: Race,
-    pub mount: Mount,
+    pub race: Result<Race, u8>,
+    pub mount: Result<Mount, u8>,
 }
 
 impl PlayerContext {
@@ -20,13 +20,13 @@ impl PlayerContext {
         Self {
             prof: Err(0),
             spec: Err(0),
-            race: Race::Unknown,
-            mount: Mount::None,
+            race: Err(0),
+            mount: Err(0),
         }
     }
 
     pub fn update_fast(&mut self, mumble: MumblePtr) {
-        self.mount = (mumble.read_mount_index() as u8).into();
+        self.mount = (mumble.read_mount_index() as u8).try_into();
     }
 
     pub fn update_slow(&mut self, mumble: MumblePtr) {
@@ -34,12 +34,9 @@ impl PlayerContext {
         if mumble.read_ui_tick() > 0 {
             match mumble.parse_identity() {
                 Ok(identity) => {
-                    self.prof =
-                        Profession::try_from(identity.profession as u8).map_err(|err| err.number);
-
-                    self.spec = Specialization::try_from(identity.spec).map_err(|err| err.number);
-
-                    self.race = (identity.race as u8).into();
+                    self.prof = Profession::try_from(identity.profession as u8);
+                    self.spec = Specialization::try_from(identity.spec);
+                    self.race = (identity.race as u8).try_into();
                 }
                 Err(err) => log::error!("Failed to parse mumble identity: {err}"),
             }

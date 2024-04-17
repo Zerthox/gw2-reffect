@@ -1,10 +1,9 @@
-use num_enum::{FromPrimitive, IntoPrimitive};
+use enumflags2::bitflags;
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
 
 #[derive(
     Debug,
-    Default,
     Clone,
     Copy,
     PartialEq,
@@ -17,19 +16,30 @@ use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
     Display,
     EnumIter,
     VariantArray,
-    FromPrimitive,
-    IntoPrimitive,
     Serialize,
     Deserialize,
 )]
+#[bitflags]
 #[repr(u8)]
 pub enum Race {
-    Asura = 0,
-    Charr = 1,
-    Human = 2,
-    Norn = 3,
-    Sylvari = 4,
+    Asura = 1 << 1,
+    Charr = 1 << 2,
+    Human = 1 << 3,
+    Norn = 1 << 4,
+    Sylvari = 1 << 5,
+}
 
-    #[default]
-    Unknown = u8::MAX,
+impl TryFrom<u8> for Race {
+    type Error = u8;
+
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Self::Asura),
+            1 => Ok(Self::Charr),
+            2 => Ok(Self::Human),
+            3 => Ok(Self::Norn),
+            4 => Ok(Self::Sylvari),
+            _ => Err(value),
+        }
+    }
 }

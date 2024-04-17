@@ -5,7 +5,7 @@ use crate::{
 };
 use nexus::imgui::{ChildWindow, CollapsingHeader, Condition, StyleVar, TreeNodeFlags, Ui, Window};
 use rfd::FileDialog;
-use std::thread;
+use std::{fmt, thread};
 
 impl Addon {
     pub fn render(&mut self, ui: &Ui) {
@@ -164,20 +164,14 @@ impl Addon {
                 ui.text(format!("Combat: {}", ctx.ui.combat));
                 ui.text(format!(
                     "Profession: {}",
-                    match ctx.player.prof {
-                        Ok(prof) => prof.to_string(),
-                        Err(id) => format!("Unknown {id}"),
-                    }
+                    name_or_unknown_id(ctx.player.prof)
                 ));
                 ui.text(format!(
                     "Specialization: {}",
-                    match ctx.player.spec {
-                        Ok(spec) => spec.to_string(),
-                        Err(id) => format!("Unknown {id}"),
-                    }
+                    name_or_unknown_id(ctx.player.spec)
                 ));
-                ui.text(format!("Race: {}", ctx.player.race));
-                ui.text(format!("Mount: {}", ctx.player.mount));
+                ui.text(format!("Race: {}", name_or_unknown_id(ctx.player.race)));
+                ui.text(format!("Mount: {}", name_or_unknown_id(ctx.player.mount)));
                 ui.text(format!("Map id: {}", ctx.map.id));
                 ui.text(format!("Map category: {}", ctx.map.category));
 
@@ -199,5 +193,16 @@ impl Addon {
                 }
                 ui.unindent();
             });
+    }
+}
+
+fn name_or_unknown_id<T, N>(value: Result<T, N>) -> String
+where
+    T: fmt::Display,
+    N: fmt::Display,
+{
+    match value {
+        Ok(value) => value.to_string(),
+        Err(id) => format!("Unknown {id}"),
     }
 }

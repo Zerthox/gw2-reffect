@@ -1,6 +1,6 @@
 use super::Profession;
 use crate::{colors::Color, traits::Colored};
-use num_enum::{IntoPrimitive, TryFromPrimitive};
+use enumflags2::bitflags;
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
 
@@ -18,57 +18,93 @@ use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
     Display,
     EnumIter,
     VariantArray,
-    TryFromPrimitive,
-    IntoPrimitive,
     Serialize,
     Deserialize,
 )]
+#[bitflags]
 #[repr(u32)]
 pub enum Specialization {
     // guardian
-    Dragonhunter = 27,
-    Firebrand = 62,
-    Willbender = 65,
+    Dragonhunter = 1 << 1,
+    Firebrand = 1 << 2,
+    Willbender = 1 << 3,
 
     // warrior
-    Berserker = 18,
-    Spellbreaker = 61,
-    Bladesworn = 68,
+    Berserker = 1 << 4,
+    Spellbreaker = 1 << 5,
+    Bladesworn = 1 << 6,
 
     // revenant
-    Herald = 52,
-    Renegade = 63,
-    Vindicator = 69,
+    Herald = 1 << 7,
+    Renegade = 1 << 8,
+    Vindicator = 1 << 9,
 
     // engineer
-    Scrapper = 43,
-    Holosmith = 57,
-    Mechanist = 70,
+    Scrapper = 1 << 10,
+    Holosmith = 1 << 11,
+    Mechanist = 1 << 12,
 
     // ranger
-    Druid = 5,
-    Soulbeast = 55,
-    Untamed = 72,
+    Druid = 1 << 13,
+    Soulbeast = 1 << 14,
+    Untamed = 1 << 15,
 
     // thief
-    Daredevil = 7,
-    Deadeye = 58,
-    Specter = 71,
+    Daredevil = 1 << 16,
+    Deadeye = 1 << 17,
+    Specter = 1 << 18,
 
     // elementalist
-    Tempest = 48,
-    Weaver = 56,
-    Catalyst = 67,
+    Tempest = 1 << 19,
+    Weaver = 1 << 20,
+    Catalyst = 1 << 21,
 
     // mesmer
-    Chronomancer = 40,
-    Mirage = 59,
-    Virtuoso = 66,
+    Chronomancer = 1 << 22,
+    Mirage = 1 << 23,
+    Virtuoso = 1 << 24,
 
     // necromancer
-    Reaper = 34,
-    Scourge = 60,
-    Harbinger = 64,
+    Reaper = 1 << 25,
+    Scourge = 1 << 26,
+    Harbinger = 1 << 27,
+}
+
+impl TryFrom<u32> for Specialization {
+    type Error = u32;
+
+    fn try_from(value: u32) -> Result<Self, Self::Error> {
+        match value {
+            5 => Ok(Self::Druid),
+            7 => Ok(Self::Daredevil),
+            18 => Ok(Self::Berserker),
+            27 => Ok(Self::Dragonhunter),
+            34 => Ok(Self::Reaper),
+            40 => Ok(Self::Chronomancer),
+            43 => Ok(Self::Scrapper),
+            48 => Ok(Self::Tempest),
+            52 => Ok(Self::Herald),
+            55 => Ok(Self::Soulbeast),
+            56 => Ok(Self::Weaver),
+            57 => Ok(Self::Holosmith),
+            58 => Ok(Self::Deadeye),
+            59 => Ok(Self::Mirage),
+            60 => Ok(Self::Scourge),
+            61 => Ok(Self::Spellbreaker),
+            62 => Ok(Self::Firebrand),
+            63 => Ok(Self::Renegade),
+            64 => Ok(Self::Harbinger),
+            65 => Ok(Self::Willbender),
+            66 => Ok(Self::Virtuoso),
+            67 => Ok(Self::Catalyst),
+            68 => Ok(Self::Bladesworn),
+            69 => Ok(Self::Vindicator),
+            70 => Ok(Self::Mechanist),
+            71 => Ok(Self::Specter),
+            72 => Ok(Self::Untamed),
+            _ => Err(value),
+        }
+    }
 }
 
 impl Specialization {

@@ -1,9 +1,11 @@
 use super::{CombatTrigger, Trigger};
 use crate::{
     context::{Mount, Profession, RenderContext, Specialization},
-    render_util::enum_combo_check,
+    render_util::enum_combo_bitflags,
+    serde_bitflags,
     traits::{Leaf, RenderOptions},
 };
+use enumflags2::{BitFlag, BitFlags};
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 
@@ -11,59 +13,63 @@ use serde::{Deserialize, Serialize};
 #[serde(default)]
 pub struct PlayerTrigger {
     pub combat: CombatTrigger,
-    pub profs: Vec<Profession>,
-    pub specs: Vec<Specialization>,
-    pub mounts: Vec<Mount>, // TODO: mount example?
+
+    #[serde(with = "serde_bitflags")]
+    pub profs: BitFlags<Profession>,
+
+    #[serde(with = "serde_bitflags")]
+    pub specs: BitFlags<Specialization>,
+
+    #[serde(with = "serde_bitflags")]
+    pub mounts: BitFlags<Mount>,
 }
 
 impl Trigger for PlayerTrigger {
     fn is_active(&self, ctx: &RenderContext) -> bool {
         self.combat.is_active(ctx)
-            && empty_or_contains_optional(&self.profs, ctx.player.prof.as_ref().ok())
-            && empty_or_contains_optional(&self.specs, ctx.player.spec.as_ref().ok())
-            && empty_or_contains(&self.mounts, &ctx.player.mount)
+            && check_bitflags_optional(self.profs, ctx.player.prof.ok())
+            && check_bitflags_optional(self.specs, ctx.player.spec.ok())
+            && check_bitflags_optional(self.mounts, ctx.player.mount.ok())
     }
 }
 
 impl Leaf for PlayerTrigger {
-    fn load(&mut self) {
-        self.profs.sort();
-        self.specs.sort();
-        self.mounts.sort();
-    }
+    fn load(&mut self) {}
 }
 
 impl RenderOptions for PlayerTrigger {
     fn render_options(&mut self, ui: &Ui) {
         self.combat.render_options(ui);
 
-        enum_combo_check(
+        enum_combo_bitflags(
             ui,
             "Profession",
             &mut self.profs,
             ComboBoxFlags::HEIGHT_LARGE,
         );
 
-        enum_combo_check(
+        enum_combo_bitflags(
             ui,
             "Specialization",
             &mut self.specs,
             ComboBoxFlags::HEIGHT_LARGE,
         );
-        enum_combo_check(ui, "Mount", &mut self.mounts, ComboBoxFlags::HEIGHT_LARGE);
+        enum_combo_bitflags(ui, "Mount", &mut self.mounts, ComboBoxFlags::HEIGHT_LARGE);
     }
 }
 
-fn empty_or_contains<T>(slice: &[T], el: &T) -> bool
+fn check_bitflags<T>(flags: BitFlags<T>, value: T) -> bool
 where
-    T: Ord,
+    T: Copy + BitFlag,
 {
-    slice.is_empty() || slice.binary_search(el).is_ok()
+    flags.is_empty() || flags.contains(value)
 }
 
-fn empty_or_contains_optional<T>(slice: &[T], el: Option<&T>) -> bool
+fn check_bitflags_optional<T>(flags: BitFlags<T>, value: Option<T>) -> bool
 where
-    T: Ord,
+    T: Copy + BitFlag,
 {
-    el.map(|el| empty_or_contains(slice, el)).unwrap_or(true)
+    value
+        .map(|value| check_bitflags(flags, value))
+        .unwrap_or(true)
 }

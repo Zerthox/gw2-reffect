@@ -1,15 +1,13 @@
-use num_enum::{FromPrimitive, IntoPrimitive};
-use serde::{Deserialize, Serialize};
-use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
-
 use crate::{
     colors::{self, Color},
     traits::Colored,
 };
+use enumflags2::bitflags;
+use serde::{Deserialize, Serialize};
+use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
 
 #[derive(
     Debug,
-    Default,
     Clone,
     Copy,
     PartialEq,
@@ -22,37 +20,56 @@ use crate::{
     Display,
     EnumIter,
     VariantArray,
-    FromPrimitive,
-    IntoPrimitive,
     Serialize,
     Deserialize,
 )]
-#[repr(u8)]
+#[bitflags]
+#[repr(u32)]
 pub enum Mount {
-    #[default]
-    None = 0,
+    None = 1 << 1,
 
-    Raptor = 5,
+    Raptor = 1 << 2,
 
-    Springer = 3,
+    Springer = 1 << 3,
 
-    Skimmer = 4,
+    Skimmer = 1 << 4,
 
-    Jackal = 1,
+    Jackal = 1 << 5,
 
-    Griffon = 2,
+    Griffon = 1 << 6,
 
     #[strum(serialize = "Roller Beetle")]
-    RollerBeetle = 6,
+    RollerBeetle = 1 << 7,
 
-    Warclaw = 7,
+    Warclaw = 1 << 8,
 
-    Skyscale = 8,
+    Skyscale = 1 << 9,
 
     #[strum(serialize = "Siege Turtle")]
-    SiegeTurtle = 10,
+    SiegeTurtle = 1 << 10,
 
-    Skiff = 9,
+    Skiff = 1 << 11,
+}
+
+impl TryFrom<u8> for Mount {
+    type Error = u8;
+
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Self::None),
+            1 => Ok(Self::Jackal),
+            2 => Ok(Self::Griffon),
+            3 => Ok(Self::Springer),
+            4 => Ok(Self::Skimmer),
+            5 => Ok(Self::Raptor),
+            6 => Ok(Self::RollerBeetle),
+            7 => Ok(Self::Warclaw),
+            8 => Ok(Self::Skyscale),
+            9 => Ok(Self::Skiff),
+            10 => Ok(Self::SiegeTurtle),
+            _ => Err(value),
+        }
+    }
 }
 
 impl Colored for Mount {
