@@ -3,30 +3,26 @@ use crate::{
     action::ChildAction,
     component_wise::ComponentWise,
     context::{EditState, RenderContext},
+    id::{Id, IdGen},
     render_util::{input_float_with_format, EnumStaticVariants},
     traits::RenderOptions,
 };
 use nexus::imgui::{InputTextFlags, MenuItem, Ui};
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Common {
     #[serde(skip)]
-    pub id: Uuid,
+    pub id: Id,
 
     pub name: String,
     pub pos: [f32; 2],
 }
 
 impl Common {
-    pub fn fresh_id() -> Uuid {
-        Uuid::new_v4()
-    }
-
     pub fn id_string(&self) -> String {
-        self.id.simple().to_string()
+        IdGen::display(self.id).to_string()
     }
 
     pub fn render(
@@ -142,7 +138,7 @@ impl RenderOptions for Common {
 impl Default for Common {
     fn default() -> Self {
         Self {
-            id: Self::fresh_id(),
+            id: IdGen::generate(),
             name: "Unnamed".into(),
             pos: [0.0, 0.0],
         }
@@ -152,7 +148,7 @@ impl Default for Common {
 impl Clone for Common {
     fn clone(&self) -> Self {
         Self {
-            id: Self::fresh_id(), // we want a fresh id for the clone
+            id: IdGen::generate(), // we want a fresh id for the clone
             name: self.name.clone(),
             pos: self.pos,
         }

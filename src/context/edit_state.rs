@@ -1,23 +1,25 @@
-use crate::elements::Element;
+use crate::{
+    elements::Element,
+    id::{Id, IdGen},
+};
 use nexus::imgui::Ui;
-use uuid::Uuid;
 
 // TODO: store parent chain and only display those during edit?
 
 #[derive(Debug, Default, Clone)]
 pub struct EditState {
     clipboard: Option<Element>,
-    active: Uuid,
+    active: Id,
 }
 
 impl EditState {
-    pub fn is_active(&self, id: Uuid) -> bool {
+    pub fn is_active(&self, id: Id) -> bool {
         self.active == id
     }
 
-    pub fn select(&mut self, id: Uuid) {
+    pub fn select(&mut self, id: Id) {
         if self.active == id {
-            self.active = Uuid::nil();
+            self.active = IdGen::nil();
         } else {
             self.active = id;
         }
@@ -36,10 +38,14 @@ impl EditState {
     }
 
     pub fn debug(&self, ui: &Ui) {
+        ui.text("Clipboard:");
+        ui.same_line();
         match &self.clipboard {
-            Some(element) => ui.text(format!("Clipboard: {}", element.kind.as_ref())),
-            None => ui.text("Clipboard: empty"),
+            Some(element) => ui.text(&element.kind),
+            None => ui.text_disabled("empty"),
         }
-        ui.text(format!("Selected Element: {}", self.active.simple()));
+        ui.text("Selected Element:");
+        ui.same_line();
+        ui.text(IdGen::display(self.active).to_string());
     }
 }

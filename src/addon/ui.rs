@@ -186,11 +186,9 @@ impl Addon {
                 ui.indent();
                 for pack in &mut self.packs {
                     if pack.edit {
-                        ui.text(format!(
-                            "{} ({})",
-                            pack.common.name,
-                            pack.common.id_string()
-                        ))
+                        ui.text(&pack.common.name);
+                        ui.same_line();
+                        ui.text_disabled(pack.common.id_string());
                     }
                 }
                 ui.unindent();

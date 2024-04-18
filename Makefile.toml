@@ -14,6 +14,14 @@ end
 """
 ]
 
+[tasks.build]
+command = "cargo"
+args = ["build"]
+
+[tasks.build-release]
+command = "cargo"
+args = ["build", "--release"]
+
 [tasks.copy-release]
 script = "cp \"${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/release/${CARGO_MAKE_CRATE_NAME}.dll\" \"${GW2_PATH}/addons\""
 script_runner = "@shell"
