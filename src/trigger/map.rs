@@ -2,7 +2,7 @@ use super::Trigger;
 use crate::{
     context::{MapCategory, RenderContext},
     render_util::{enum_combo, impl_static_variants, input_u32},
-    traits::{Leaf, RenderOptions},
+    traits::RenderOptions,
 };
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
@@ -19,17 +19,13 @@ pub enum MapTrigger {
 impl_static_variants!(MapTrigger);
 
 impl Trigger for MapTrigger {
-    fn is_active(&self, ctx: &RenderContext) -> bool {
+    fn is_active(&mut self, ctx: &RenderContext) -> bool {
         match self {
             Self::Any => true,
             Self::Category(category) => ctx.map.category == *category,
             Self::Ids(ids) => ids.iter().copied().any(|id| ctx.map.is_on_map(id)),
         }
     }
-}
-
-impl Leaf for MapTrigger {
-    fn load(&mut self) {}
 }
 
 impl RenderOptions for MapTrigger {

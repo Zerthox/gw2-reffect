@@ -3,7 +3,6 @@ use crate::{
     context::RenderContext,
     render_util::{enum_combo, input_float_with_format, input_size},
     traits::{Leaf, Node, Render, RenderOptions},
-    trigger::Trigger,
 };
 use nexus::imgui::{
     CollapsingHeader, ComboBoxFlags, InputTextFlags, Slider, SliderFlags, StyleVar, Ui,
@@ -28,6 +27,8 @@ impl Leaf for IconGrid {
             icon.load();
         }
     }
+
+    fn context_update(&mut self, _ctx: &RenderContext) {}
 }
 
 impl Render for IconGrid {
@@ -35,11 +36,12 @@ impl Render for IconGrid {
         let alpha = ui.clone_style().alpha;
         let _style = ui.push_style_var(StyleVar::Alpha(alpha * self.opacity));
 
-        let icons = self
-            .icons
-            .iter_mut()
-            .filter(|icon| icon.inner.buff.is_active_or_edit(ctx, state))
-            .collect::<Vec<_>>();
+        let mut icons = Vec::new();
+        for icon in &mut self.icons {
+            if icon.is_visible(ctx, state) {
+                icons.push(icon);
+            }
+        }
         let icon_count = icons.len();
 
         for (i, icon) in icons.into_iter().enumerate() {

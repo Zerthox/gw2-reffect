@@ -32,7 +32,7 @@ pub enum BuffTrigger {
 impl_static_variants!(BuffTrigger);
 
 impl Trigger for BuffTrigger {
-    fn is_active(&self, ctx: &RenderContext) -> bool {
+    fn is_active(&mut self, ctx: &RenderContext) -> bool {
         match self {
             Self::Always => true,
             Self::Any(ids) => ids.iter().any(|id| ctx.has_buff(*id)),

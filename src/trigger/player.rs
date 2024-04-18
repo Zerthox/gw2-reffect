@@ -3,7 +3,7 @@ use crate::{
     context::{Mount, Profession, RenderContext, Specialization},
     render_util::enum_combo_bitflags,
     serde_bitflags,
-    traits::{Leaf, RenderOptions},
+    traits::RenderOptions,
 };
 use enumflags2::{BitFlag, BitFlags};
 use nexus::imgui::{ComboBoxFlags, Ui};
@@ -25,16 +25,12 @@ pub struct PlayerTrigger {
 }
 
 impl Trigger for PlayerTrigger {
-    fn is_active(&self, ctx: &RenderContext) -> bool {
+    fn is_active(&mut self, ctx: &RenderContext) -> bool {
         self.combat.is_active(ctx)
             && check_bitflags_optional(self.profs, ctx.player.prof.ok())
             && check_bitflags_optional(self.specs, ctx.player.spec.ok())
             && check_bitflags_optional(self.mounts, ctx.player.mount.ok())
     }
-}
-
-impl Leaf for PlayerTrigger {
-    fn load(&mut self) {}
 }
 
 impl RenderOptions for PlayerTrigger {

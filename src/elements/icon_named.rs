@@ -19,6 +19,10 @@ pub struct IconNamed {
 }
 
 impl IconNamed {
+    pub fn is_visible(&mut self, ctx: &RenderContext, state: &RenderState) -> bool {
+        self.inner.is_visible(ctx, state)
+    }
+
     pub fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &RenderState, size: [f32; 2]) {
         self.inner.render(ui, ctx, state, size)
     }

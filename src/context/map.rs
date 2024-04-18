@@ -16,9 +16,14 @@ impl MapContext {
         }
     }
 
-    pub fn update(&mut self, mumble: MumblePtr) {
-        self.id = mumble.read_map_id();
+    pub fn update(&mut self, mumble: MumblePtr) -> bool {
+        let id = mumble.read_map_id();
+        let new = self.id != id;
+
+        self.id = id;
         self.category = mumble.read_map_type().into();
+
+        new
     }
 
     pub fn is_on_map(&self, id: u32) -> bool {

@@ -46,7 +46,11 @@ impl Context {
         }
     }
 
-    pub fn update(&mut self, time: f64) {
+    /// Updates the context.
+    /// Returns `true` if a slow update needs to be propagated.
+    pub fn update(&mut self, time: f64) -> bool {
+        let mut changed = false;
+
         self.ui.update(&self.links);
 
         if self.buffs_update.triggered(time) {
@@ -58,9 +62,11 @@ impl Context {
 
             if self.player_update.triggered(time) {
                 self.player.update_slow(mumble);
-                self.map.update(mumble);
+                changed |= self.map.update(mumble);
             }
         }
+
+        changed
     }
 
     pub fn get_buffs_interval(&self) -> f64 {

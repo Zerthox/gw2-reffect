@@ -3,7 +3,6 @@ use crate::{
     context::RenderContext,
     render_util::input_size,
     traits::{Leaf, Render, RenderOptions},
-    trigger::Trigger,
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
@@ -19,11 +18,13 @@ impl Leaf for IconElement {
     fn load(&mut self) {
         self.icon.load();
     }
+
+    fn context_update(&mut self, _ctx: &RenderContext) {}
 }
 
 impl Render for IconElement {
     fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &RenderState) {
-        if self.icon.buff.is_active_or_edit(ctx, state) {
+        if self.icon.is_visible(ctx, state) {
             self.icon.render(ui, ctx, state, self.size)
         }
     }

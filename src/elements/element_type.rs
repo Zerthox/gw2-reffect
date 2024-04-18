@@ -33,6 +33,15 @@ impl Node for ElementType {
         }
     }
 
+    fn slow_update(&mut self, ctx: &RenderContext) {
+        match self {
+            Self::Group(group) => group.slow_update(ctx),
+            Self::IconGrid(grid) => grid.slow_update(ctx),
+            Self::Icon(icon) => icon.slow_update(ctx),
+            Self::Text(text) => text.slow_update(ctx),
+        }
+    }
+
     fn children(&mut self) -> Option<&mut Vec<Element>> {
         match self {
             Self::Group(group) => group.children(),

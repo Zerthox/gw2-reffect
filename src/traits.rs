@@ -7,11 +7,20 @@ use nexus::imgui::Ui;
 
 /// [`Element`] tree node.
 pub trait Node {
-    /// Performs necessary loads.
+    /// Performs necessary initial loads.
     fn load(&mut self) {
         if let Some(children) = self.children() {
             for child in children {
                 child.load();
+            }
+        }
+    }
+
+    /// Performs slow updates from the [`RenderContext`].
+    fn slow_update(&mut self, ctx: &RenderContext) {
+        if let Some(children) = self.children() {
+            for child in children {
+                child.slow_update(ctx);
             }
         }
     }
@@ -24,6 +33,9 @@ pub trait Node {
 pub trait Leaf {
     /// Performs necessary loads.
     fn load(&mut self);
+
+    /// Performs slow updates from the [`RenderContext`].
+    fn context_update(&mut self, ctx: &RenderContext);
 }
 
 impl<T> Node for T
@@ -32,6 +44,10 @@ where
 {
     fn load(&mut self) {
         Leaf::load(self)
+    }
+
+    fn slow_update(&mut self, ctx: &RenderContext) {
+        Leaf::context_update(self, ctx)
     }
 
     fn children(&mut self) -> Option<&mut Vec<Element>> {

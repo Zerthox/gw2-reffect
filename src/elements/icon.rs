@@ -3,7 +3,7 @@ use crate::{
     component_wise::ComponentWise,
     context::RenderContext,
     traits::{Leaf, RenderOptions},
-    trigger::BuffTrigger,
+    trigger::{BuffTrigger, Trigger},
 };
 use nexus::imgui::{ColorEdit, ColorPreview, Ui};
 use serde::{Deserialize, Serialize};
@@ -22,6 +22,10 @@ impl Icon {
         let [r, g, b, a] = self.color;
         let global_alpha = ui.clone_style().alpha;
         [r, g, b, a * global_alpha]
+    }
+
+    pub fn is_visible(&mut self, ctx: &RenderContext, state: &RenderState) -> bool {
+        self.buff.is_active_or_edit(ctx, state)
     }
 
     pub fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &RenderState, size: [f32; 2]) {
@@ -65,6 +69,8 @@ impl Leaf for Icon {
     fn load(&mut self) {
         self.icon.load();
     }
+
+    fn context_update(&mut self, _ctx: &RenderContext) {}
 }
 
 impl RenderOptions for Icon {

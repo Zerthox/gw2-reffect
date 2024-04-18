@@ -1,4 +1,4 @@
-use super::{MapTrigger, PlayerTrigger, Trigger};
+use super::{memo::Memo, MapTrigger, PlayerTrigger, Trigger};
 use crate::{
     context::RenderContext,
     traits::{Leaf, RenderOptions},
@@ -9,20 +9,21 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct MetaTrigger {
-    pub player: PlayerTrigger,
-    pub map: MapTrigger, // TODO: cache trigger between renders
+    pub player: PlayerTrigger, // player not memoized due to combat & mount
+    pub map: Memo<MapTrigger>, // memoize map
 }
 
 impl Trigger for MetaTrigger {
-    fn is_active(&self, ctx: &RenderContext) -> bool {
+    fn is_active(&mut self, ctx: &RenderContext) -> bool {
         self.player.is_active(ctx) && self.map.is_active(ctx)
     }
 }
 
 impl Leaf for MetaTrigger {
-    fn load(&mut self) {
-        self.player.load();
-        self.map.load();
+    fn load(&mut self) {}
+
+    fn context_update(&mut self, ctx: &RenderContext) {
+        self.map.update(ctx);
     }
 }
 

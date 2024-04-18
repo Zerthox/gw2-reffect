@@ -149,6 +149,11 @@ impl Node for Element {
         self.kind.load();
     }
 
+    fn slow_update(&mut self, ctx: &RenderContext) {
+        self.trigger.slow_update(ctx);
+        self.kind.slow_update(ctx);
+    }
+
     fn children(&mut self) -> Option<&mut Vec<Element>> {
         self.kind.children()
     }

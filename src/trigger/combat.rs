@@ -19,7 +19,7 @@ impl CombatTrigger {
 }
 
 impl Trigger for CombatTrigger {
-    fn is_active(&self, ctx: &RenderContext) -> bool {
+    fn is_active(&mut self, ctx: &RenderContext) -> bool {
         self.0.map(|combat| combat == ctx.ui.combat).unwrap_or(true)
     }
 }
