@@ -1,12 +1,10 @@
 use super::{Direction, IconNamed, RenderState};
 use crate::{
     context::RenderContext,
-    render_util::{enum_combo, input_float_with_format, input_size},
+    render_util::{enum_combo, input_float_with_format, input_size, push_alpha_change},
     traits::{Leaf, Node, Render, RenderOptions},
 };
-use nexus::imgui::{
-    CollapsingHeader, ComboBoxFlags, InputTextFlags, Slider, SliderFlags, StyleVar, Ui,
-};
+use nexus::imgui::{CollapsingHeader, ComboBoxFlags, InputTextFlags, Slider, SliderFlags, Ui};
 use serde::{Deserialize, Serialize};
 
 // TODO: wrapping, sorting options
@@ -33,8 +31,7 @@ impl Leaf for IconGrid {
 
 impl Render for IconGrid {
     fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &RenderState) {
-        let alpha = ui.clone_style().alpha;
-        let _style = ui.push_style_var(StyleVar::Alpha(alpha * self.opacity));
+        let _style = push_alpha_change(ui, self.opacity);
 
         let mut icons = Vec::new();
         for icon in &mut self.icons {

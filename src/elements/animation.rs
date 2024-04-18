@@ -1,8 +1,8 @@
 use crate::{
-    render_util::{enum_combo, input_u32},
+    render_util::{enum_combo, input_u32, push_alpha_change},
     traits::RenderOptions,
 };
-use nexus::imgui::{ComboBoxFlags, StyleVar, Ui};
+use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, VariantArray};
 
@@ -66,13 +66,12 @@ impl AnimationKind {
     pub fn animate(&mut self, ui: &Ui, progress: f32, body: impl FnOnce()) {
         match self {
             Self::Pulse => {
-                let prev = ui.clone_style().alpha;
                 let factor = if progress < 0.5 {
                     1.0 - 2.0 * progress
                 } else {
                     2.0 * progress - 1.0
                 };
-                let _token = ui.push_style_var(StyleVar::Alpha(factor * prev));
+                let _style = push_alpha_change(ui, factor);
                 body();
             }
         }

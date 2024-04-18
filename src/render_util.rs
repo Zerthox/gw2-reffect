@@ -1,8 +1,8 @@
 use crate::traits::Colored;
 use enumflags2::{BitFlag, BitFlags};
 use nexus::imgui::{
-    sys, ComboBoxFlags, InputTextFlags, Selectable, StyleColor, StyleVar, TreeNode, TreeNodeFlags,
-    TreeNodeToken, Ui,
+    sys, ComboBoxFlags, InputTextFlags, Selectable, Style, StyleColor, StyleStackToken, StyleVar,
+    TreeNode, TreeNodeFlags, TreeNodeToken, Ui,
 };
 use std::{ffi::CString, mem, ptr};
 use strum::VariantArray;
@@ -11,6 +11,11 @@ pub fn next_window_size_constraints(size_min: [f32; 2], size_max: [f32; 2]) {
     unsafe {
         sys::igSetNextWindowSizeConstraints(size_min.into(), size_max.into(), None, ptr::null_mut())
     }
+}
+
+pub fn push_alpha_change<'ui>(ui: &'ui Ui, change: f32) -> StyleStackToken<'ui> {
+    let Style { alpha, .. } = ui.clone_style();
+    ui.push_style_var(StyleVar::Alpha(alpha * change))
 }
 
 pub fn input_u32(
