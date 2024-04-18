@@ -36,11 +36,12 @@ pub struct Pack {
 
 impl Pack {
     pub fn create(file: PathBuf) -> Option<Self> {
-        let pack = Self {
+        let mut pack = Self {
             enabled: true,
             file,
             ..Self::default()
         };
+        pack.load();
         pack.save_to_file().then_some(pack)
     }
 

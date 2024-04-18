@@ -30,10 +30,12 @@ pub struct Element {
 
 impl Element {
     pub fn of_type(kind: ElementType) -> Self {
-        Self {
+        let mut element = Self {
             kind,
             ..Self::default()
-        }
+        };
+        element.load();
+        element
     }
 
     /// Renders the element.
