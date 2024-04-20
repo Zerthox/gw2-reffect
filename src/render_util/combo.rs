@@ -1,4 +1,4 @@
-use crate::traits::Colored;
+use crate::traits::{Colored, ShortName};
 use enumflags2::{BitFlag, BitFlags};
 use nexus::imgui::{ComboBoxFlags, Selectable, StyleColor, StyleVar, Ui};
 use std::mem;
@@ -64,16 +64,26 @@ pub fn enum_combo_bitflags<T>(
     flags: ComboBoxFlags,
 ) -> bool
 where
-    T: Copy + PartialEq + Ord + AsRef<str> + BitFlag + VariantArray + Colored,
+    T: Copy + PartialEq + Ord + AsRef<str> + BitFlag + VariantArray + ShortName + Colored,
     &'static str: From<T>,
 {
     let mut changed = false;
 
-    let preview = current
-        .iter()
-        .take(5)
-        .map(|el| &<&'static str>::from(el)[..4])
-        .fold(String::new(), |acc, el| acc + el + " ");
+    let mut iter = current.iter();
+    let preview = if let Some(first) = iter.next() {
+        let string = iter
+            .clone()
+            .take(4)
+            .map(|el| el.short_name())
+            .fold(first.short_name().to_string(), |acc, el| acc + "," + el);
+        if iter.nth(4).is_some() {
+            string + ",..."
+        } else {
+            string
+        }
+    } else {
+        "Any".into()
+    };
 
     if let Some(_token) = ui.begin_combo_with_flags(&label, &preview, flags) {
         let _style = ui.push_style_var(StyleVar::FramePadding([0.0, 0.0]));

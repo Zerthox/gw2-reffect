@@ -1,5 +1,8 @@
 use super::Profession;
-use crate::{colors::Color, traits::Colored};
+use crate::{
+    colors::Color,
+    traits::{Colored, ShortName},
+};
 use enumflags2::bitflags;
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
@@ -119,6 +122,40 @@ impl Specialization {
             Self::Tempest | Self::Weaver | Self::Catalyst => Profession::Elementalist,
             Self::Chronomancer | Self::Mirage | Self::Virtuoso => Profession::Mesmer,
             Self::Reaper | Self::Scourge | Self::Harbinger => Profession::Necromancer,
+        }
+    }
+}
+
+impl ShortName for Specialization {
+    fn short_name(&self) -> &'static str {
+        match self {
+            Self::Dragonhunter => "Dgh",
+            Self::Firebrand => "Fbd",
+            Self::Willbender => "Wbd",
+            Self::Berserker => "Brs",
+            Self::Spellbreaker => "Spb",
+            Self::Bladesworn => "Bls",
+            Self::Herald => "Her",
+            Self::Renegade => "Ren",
+            Self::Vindicator => "Vin",
+            Self::Scrapper => "Scr",
+            Self::Holosmith => "Hls",
+            Self::Mechanist => "Mec",
+            Self::Druid => "Dru",
+            Self::Soulbeast => "Slb",
+            Self::Untamed => "Unt",
+            Self::Daredevil => "Dar",
+            Self::Deadeye => "Ded",
+            Self::Specter => "Spe",
+            Self::Tempest => "Tmp",
+            Self::Weaver => "Wea",
+            Self::Catalyst => "Cat",
+            Self::Chronomancer => "Chr",
+            Self::Mirage => "Mir",
+            Self::Virtuoso => "Vir",
+            Self::Reaper => "Rea",
+            Self::Scourge => "Scg",
+            Self::Harbinger => "Har",
         }
     }
 }

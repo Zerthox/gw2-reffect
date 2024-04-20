@@ -1,6 +1,6 @@
 use crate::{
     colors::{self, Color},
-    traits::Colored,
+    traits::{Colored, ShortName},
 };
 use enumflags2::bitflags;
 use serde::{Deserialize, Serialize};
@@ -52,6 +52,22 @@ impl TryFrom<u8> for Profession {
             8 => Ok(Self::Necromancer),
             9 => Ok(Self::Revenant),
             _ => Err(value),
+        }
+    }
+}
+
+impl ShortName for Profession {
+    fn short_name(&self) -> &'static str {
+        match self {
+            Self::Guardian => "Gdn",
+            Self::Warrior => "War",
+            Self::Revenant => "Rev",
+            Self::Engineer => "Eng",
+            Self::Ranger => "Rgr",
+            Self::Thief => "Thf",
+            Self::Elementalist => "Ele",
+            Self::Mesmer => "Mes",
+            Self::Necromancer => "Nec",
         }
     }
 }

@@ -72,3 +72,9 @@ pub trait Colored {
     /// Returns the color.
     fn colored(&self) -> Option<Color>;
 }
+
+/// Associated short name.
+pub trait ShortName {
+    /// Returns the short name.
+    fn short_name(&self) -> &'static str;
+}

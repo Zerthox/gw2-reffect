@@ -1,6 +1,6 @@
 use crate::{
     colors::{self, Color},
-    traits::Colored,
+    traits::{Colored, ShortName},
 };
 use enumflags2::bitflags;
 use serde::{Deserialize, Serialize};
@@ -68,6 +68,24 @@ impl TryFrom<u8> for Mount {
             9 => Ok(Self::Skiff),
             10 => Ok(Self::SiegeTurtle),
             _ => Err(value),
+        }
+    }
+}
+
+impl ShortName for Mount {
+    fn short_name(&self) -> &'static str {
+        match self {
+            Self::None => "No",
+            Self::Jackal => "Jkl",
+            Self::Griffon => "Grf",
+            Self::Springer => "Spr",
+            Self::Skimmer => "Skm",
+            Self::Raptor => "Rpt",
+            Self::RollerBeetle => "Btl",
+            Self::Warclaw => "Wcl",
+            Self::Skyscale => "Sky",
+            Self::SiegeTurtle => "Ttl",
+            Self::Skiff => "Skf",
         }
     }
 }
