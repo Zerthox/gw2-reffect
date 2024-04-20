@@ -88,9 +88,9 @@ where
             if ui.checkbox(entry, &mut selected) {
                 changed = true;
                 if selected {
-                    current.remove(entry);
-                } else {
                     current.insert(entry);
+                } else {
+                    current.remove(entry);
                 }
             }
             if !focus && selected {
