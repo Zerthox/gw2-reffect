@@ -1,35 +1,48 @@
-use core::fmt;
-
 #[cfg_attr(feature = "guid", path = "guid.rs")]
 mod simple;
 
-pub trait GenerateId {
-    type Id;
-
-    fn nil() -> Self::Id;
-
-    fn generate() -> Self::Id;
-
-    fn display(id: Self::Id) -> impl fmt::Display;
-}
+use core::fmt;
+use std::hash::Hash;
 
 /// Helper to generate ids.
 ///
 /// The backing id implementation is selected using features.
 pub struct IdGen;
 
-pub type Id = <IdGen as GenerateId>::Id;
-
 impl IdGen {
     pub fn nil() -> Id {
-        <Self as GenerateId>::nil()
+        Id(<Self as GenerateId>::nil())
     }
 
     pub fn generate() -> Id {
-        <Self as GenerateId>::generate()
+        Id(<Self as GenerateId>::generate())
     }
+}
 
-    pub fn display(id: Id) -> impl fmt::Display {
-        <Self as GenerateId>::display(id)
+/// Opaque wrapper around an id type.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[repr(transparent)]
+pub struct Id(<IdGen as GenerateId>::Id);
+
+impl Default for Id {
+    fn default() -> Self {
+        IdGen::nil()
     }
+}
+
+impl fmt::Display for Id {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        IdGen::display(self.0).fmt(formatter)
+    }
+}
+
+/// Helper interface for implementing id generation.
+trait GenerateId {
+    type Id: fmt::Debug + Clone + Copy + PartialEq + Eq + PartialOrd + Ord + Hash;
+
+    fn nil() -> Self::Id;
+
+    fn generate() -> Self::Id;
+
+    fn display(id: Self::Id) -> impl fmt::Display;
 }

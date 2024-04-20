@@ -1,7 +1,4 @@
-use crate::{
-    elements::Element,
-    id::{Id, IdGen},
-};
+use crate::{elements::Element, id::Id};
 use nexus::imgui::Ui;
 
 // TODO: store parent chain and only display those during edit?
@@ -19,7 +16,7 @@ impl EditState {
 
     pub fn select(&mut self, id: Id) {
         if self.active == id {
-            self.active = IdGen::nil();
+            self.active = Id::default();
         } else {
             self.active = id;
         }
@@ -46,6 +43,6 @@ impl EditState {
         }
         ui.text("Selected Element:");
         ui.same_line();
-        ui.text(IdGen::display(self.active).to_string());
+        ui.text(self.active.to_string());
     }
 }

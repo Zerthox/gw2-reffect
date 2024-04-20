@@ -22,7 +22,7 @@ pub struct Common {
 
 impl Common {
     pub fn id_string(&self) -> String {
-        IdGen::display(self.id).to_string()
+        self.id.to_string()
     }
 
     pub fn render(
