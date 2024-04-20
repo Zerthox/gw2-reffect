@@ -57,7 +57,14 @@ impl RenderOptions for IconGrid {
         let [x, y] = &mut self.size;
         input_size(x, y);
 
-        input_float_with_format("Padding", y, 1.0, 10.0, "%.2f", InputTextFlags::empty());
+        input_float_with_format(
+            "Padding",
+            &mut self.pad,
+            1.0,
+            10.0,
+            "%.2f",
+            InputTextFlags::empty(),
+        );
 
         let mut opacity = 100.0 * self.opacity;
         if Slider::new("Opacity", 0.0, 100.0)
