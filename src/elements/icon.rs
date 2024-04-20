@@ -3,6 +3,7 @@ use crate::{
     colors::{self, with_alpha},
     component_wise::ComponentWise,
     context::RenderContext,
+    render_util::spinner,
     traits::{Leaf, RenderOptions},
     trigger::{BuffTrigger, Trigger},
 };
@@ -65,6 +66,10 @@ impl Icon {
                     ui.set_window_font_scale(1.0);
                 }
             }
+        } else {
+            ui.set_cursor_screen_pos(state.pos);
+            let [x, _] = size;
+            spinner(ui, 0.4 * x, colors::WHITE, with_alpha(colors::WHITE, 0.3))
         }
     }
 }
@@ -96,7 +101,7 @@ impl Default for Icon {
     fn default() -> Self {
         Self {
             buff: BuffTrigger::default(),
-            icon: IconSource::Empty,
+            icon: IconSource::Unknown,
             stacks: false,
             color: [1.0, 1.0, 1.0, 1.0],
         }

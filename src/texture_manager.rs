@@ -22,7 +22,6 @@ pub struct TextureManager {
     loader: Option<TextureLoader>,
     pending: HashMap<String, IconSource>,
     loaded: HashMap<IconSource, TextureId>,
-    default: Option<TextureId>,
 }
 
 impl TextureManager {
@@ -31,7 +30,6 @@ impl TextureManager {
             loader: TextureLoader::spawn(Self::loader_thread),
             pending: HashMap::new(),
             loaded: HashMap::new(),
-            default: None,
         }
     }
 
@@ -39,7 +37,7 @@ impl TextureManager {
         let mut textures = Self::lock();
         if !textures.loaded.contains_key(&source) {
             match &source {
-                IconSource::Empty => {}
+                IconSource::Unknown => {}
                 IconSource::File(path) => {
                     let id = textures.add_pending(source.clone());
                     drop(textures); // drop to avoid recursive locking
@@ -55,14 +53,13 @@ impl TextureManager {
         }
     }
 
-    fn with_default(mut self) -> Self {
+    fn with_defaults(mut self) -> Self {
         // check for the texture ourselves to avoid recursive locking
-        let id = IconSource::DEFAULT_ID;
+        let id = IconSource::UNKNOWN_ID;
         if let Some(texture) = get_texture(id) {
-            let texture_id = texture.id();
-            self.default = Some(texture_id);
+            self.loaded.insert(IconSource::Unknown, texture.id());
         } else {
-            self.pending.insert(id.into(), IconSource::Empty);
+            self.pending.insert(id.into(), IconSource::Unknown);
             load_texture_from_memory(id, MONSTER_ICON, Some(Self::RECEIVE_TEXTURE));
         };
 
@@ -70,7 +67,7 @@ impl TextureManager {
     }
 
     pub fn load() -> &'static Mutex<TextureManager> {
-        TEXTURE_MANAGER.get_or_init(|| Mutex::new(Self::new().with_default()))
+        TEXTURE_MANAGER.get_or_init(|| Mutex::new(Self::new().with_defaults()))
     }
 
     fn lock() -> MutexGuard<'static, TextureManager> {
@@ -84,8 +81,9 @@ impl TextureManager {
     }
 
     pub fn get_texture(source: &IconSource) -> Option<TextureId> {
+        // TODO: error state?
         let textures = Self::lock();
-        textures.loaded.get(source).copied().or(textures.default)
+        textures.loaded.get(source).copied()
     }
 
     pub fn add_source(source: &IconSource) {
@@ -142,11 +140,7 @@ impl TextureManager {
             .expect("received load for non-pending texture");
 
         if let Some(texture_id) = texture_id {
-            if let IconSource::Empty = source {
-                self.default = Some(texture_id);
-            } else {
-                self.loaded.insert(source, texture_id);
-            }
+            self.loaded.insert(source, texture_id);
         } else {
             log::warn!("Failed to load icon source {}", source.pretty_print());
         }

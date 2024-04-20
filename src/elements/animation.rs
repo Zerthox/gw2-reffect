@@ -1,5 +1,5 @@
 use crate::{
-    render_util::{enum_combo, input_u32, push_alpha_change},
+    render_util::{cycle_progress, enum_combo, input_u32, push_alpha_change},
     traits::RenderOptions,
 };
 use nexus::imgui::{ComboBoxFlags, Ui};
@@ -18,9 +18,7 @@ pub struct Animation {
 
 impl Animation {
     pub fn render(&mut self, ui: &Ui, body: impl FnOnce()) {
-        let time = (1000.0 * ui.time()) as u32;
-        let passed = time % self.period;
-        let progress = passed as f32 / self.period as f32;
+        let progress = cycle_progress(ui, self.period);
         self.kind.animate(ui, progress, body);
     }
 }

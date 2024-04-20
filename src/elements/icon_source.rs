@@ -22,7 +22,7 @@ use strum::{AsRefStr, EnumIter, IntoStaticStr};
 )]
 pub enum IconSource {
     #[default]
-    Empty,
+    Unknown,
     File(PathBuf),
     Url(String),
 }
@@ -30,10 +30,10 @@ pub enum IconSource {
 impl_static_variants!(IconSource);
 
 impl IconSource {
-    pub const DEFAULT_ID: &'static str = "REFFECT_ICON_DEFAULT";
+    pub const UNKNOWN_ID: &'static str = "REFFECT_ICON_UNKNOWN";
 
     pub fn needs_load(&self) -> bool {
-        !matches!(self, Self::Empty)
+        !matches!(self, Self::Unknown)
     }
 
     pub fn load(&self) {
@@ -46,7 +46,7 @@ impl IconSource {
 
     pub fn generate_id(&self) -> String {
         match self {
-            Self::Empty => Self::DEFAULT_ID.into(),
+            Self::Unknown => Self::UNKNOWN_ID.into(),
             Self::File(path) => format!("REFFECT_ICON_FILE_\"{}\"", path.display()),
             Self::Url(url) => format!("REFFECT_ICON_URL_\"{url}\""),
         }
@@ -54,7 +54,7 @@ impl IconSource {
 
     pub fn pretty_print(&self) -> String {
         match self {
-            Self::Empty => "empty".into(),
+            Self::Unknown => "unknown".into(),
             Self::File(path) => format!("file \"{}\"", path.display()),
             Self::Url(url) => format!("url \"{url}\""),
         }
@@ -64,7 +64,7 @@ impl IconSource {
         enum_combo(ui, "Icon", self, ComboBoxFlags::empty());
 
         match self {
-            Self::Empty => {}
+            Self::Unknown => return,
             Self::File(path) => {
                 let mut string = path.to_str().expect("invalid path string").into();
                 if ui.input_text("##path", &mut string).build() {
@@ -75,8 +75,9 @@ impl IconSource {
                 ui.input_text("##url", url).build();
             }
         }
+
         ui.same_line();
-        if ui.button("Apply") {
+        if ui.button("Load") {
             self.load();
         }
     }
