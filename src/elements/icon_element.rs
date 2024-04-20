@@ -19,7 +19,7 @@ impl Leaf for IconElement {
         self.icon.load();
     }
 
-    fn context_update(&mut self, _ctx: &RenderContext) {}
+    fn slow_update(&mut self, _ctx: &RenderContext) {}
 }
 
 impl Render for IconElement {

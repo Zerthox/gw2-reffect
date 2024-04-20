@@ -79,7 +79,7 @@ impl Leaf for Icon {
         self.icon.load();
     }
 
-    fn context_update(&mut self, _ctx: &RenderContext) {}
+    fn slow_update(&mut self, _ctx: &RenderContext) {}
 }
 
 impl RenderOptions for Icon {

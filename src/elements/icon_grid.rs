@@ -26,7 +26,7 @@ impl Leaf for IconGrid {
         }
     }
 
-    fn context_update(&mut self, _ctx: &RenderContext) {}
+    fn slow_update(&mut self, _ctx: &RenderContext) {}
 }
 
 impl Render for IconGrid {

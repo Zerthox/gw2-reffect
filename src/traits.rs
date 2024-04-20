@@ -35,7 +35,7 @@ pub trait Leaf {
     fn load(&mut self);
 
     /// Performs slow updates from the [`RenderContext`].
-    fn context_update(&mut self, ctx: &RenderContext);
+    fn slow_update(&mut self, ctx: &RenderContext);
 }
 
 impl<T> Node for T
@@ -47,7 +47,7 @@ where
     }
 
     fn slow_update(&mut self, ctx: &RenderContext) {
-        Leaf::context_update(self, ctx)
+        Leaf::slow_update(self, ctx)
     }
 
     fn children(&mut self) -> Option<&mut Vec<Element>> {

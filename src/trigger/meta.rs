@@ -22,7 +22,7 @@ impl Trigger for MetaTrigger {
 impl Leaf for MetaTrigger {
     fn load(&mut self) {}
 
-    fn context_update(&mut self, ctx: &RenderContext) {
+    fn slow_update(&mut self, ctx: &RenderContext) {
         self.map.update(ctx);
     }
 }

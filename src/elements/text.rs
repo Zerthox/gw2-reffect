@@ -38,7 +38,7 @@ impl Text {
 impl Leaf for Text {
     fn load(&mut self) {}
 
-    fn context_update(&mut self, _ctx: &RenderContext) {}
+    fn slow_update(&mut self, _ctx: &RenderContext) {}
 }
 
 impl Render for Text {
