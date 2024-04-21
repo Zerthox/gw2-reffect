@@ -1,6 +1,7 @@
 use super::Addon;
 use crate::{
     elements::Pack,
+    id::IdGen,
     render_util::{input_u32, next_window_size_constraints},
 };
 use nexus::imgui::{ChildWindow, CollapsingHeader, Condition, StyleVar, TreeNodeFlags, Ui, Window};
@@ -66,6 +67,8 @@ impl Addon {
     pub fn render_element_options(&mut self, ui: &Ui) {
         if ui.button("Reload packs") {
             self.packs.clear();
+            self.context.edit = Default::default();
+            IdGen::reset();
             self.load_packs();
         }
         ui.same_line();

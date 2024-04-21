@@ -17,6 +17,10 @@ impl IdGen {
     pub fn generate() -> Id {
         Id(<Self as GenerateId>::generate())
     }
+
+    pub fn reset() {
+        <Self as GenerateId>::reset()
+    }
 }
 
 /// Opaque wrapper around an id type.
@@ -43,6 +47,8 @@ trait GenerateId {
     fn nil() -> Self::Id;
 
     fn generate() -> Self::Id;
+
+    fn reset();
 
     fn display(id: Self::Id) -> impl fmt::Display;
 }

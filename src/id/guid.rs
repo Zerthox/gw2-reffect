@@ -13,6 +13,8 @@ impl GenerateId for IdGen {
         Uuid::new_v4()
     }
 
+    fn reset() {}
+
     fn display(id: Self::Id) -> impl fmt::Display {
         id.simple()
     }
