@@ -1,7 +1,7 @@
-use crate::{component_wise::ComponentWise, render_util::impl_static_variants};
+use crate::component_wise::ComponentWise;
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
-use strum::{AsRefStr, EnumIter};
+use strum::{AsRefStr, EnumIter, VariantArray};
 
 #[derive(
     Debug,
@@ -14,6 +14,7 @@ use strum::{AsRefStr, EnumIter};
     Hash,
     AsRefStr,
     EnumIter,
+    VariantArray,
     Serialize,
     Deserialize,
 )]
@@ -22,8 +23,6 @@ pub enum TextDecoration {
     Shadow,
     Outline,
 }
-
-impl_static_variants!(TextDecoration);
 
 impl TextDecoration {
     fn render_at(ui: &Ui, pos: [f32; 2], text: &str, color: [f32; 4]) {

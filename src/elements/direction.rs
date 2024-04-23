@@ -1,7 +1,5 @@
 use serde::{Deserialize, Serialize};
-use strum::{AsRefStr, EnumIter};
-
-use crate::render_util::impl_static_variants;
+use strum::{AsRefStr, EnumIter, VariantArray};
 
 #[derive(
     Debug,
@@ -14,6 +12,7 @@ use crate::render_util::impl_static_variants;
     Hash,
     AsRefStr,
     EnumIter,
+    VariantArray,
     Serialize,
     Deserialize,
 )]
@@ -25,8 +24,6 @@ pub enum Direction {
     Horizontal,
     Vertical,
 }
-
-impl_static_variants!(Direction);
 
 impl Direction {
     pub fn offset_for(&self, size: [f32; 2], pad: f32, element: usize, total: usize) -> [f32; 2] {
