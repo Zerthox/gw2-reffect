@@ -4,7 +4,6 @@ use crate::{
 };
 use nexus::imgui::{ComboBoxFlags, TextureId, Ui};
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
 use strum::{AsRefStr, EnumIter, IntoStaticStr};
 
 #[derive(
@@ -24,7 +23,7 @@ pub enum IconSource {
     #[default]
     Unknown,
     Url(String),
-    File(PathBuf),
+    File(String),
 }
 
 impl_static_variants!(IconSource);
@@ -47,7 +46,7 @@ impl IconSource {
     pub fn generate_id(&self) -> String {
         match self {
             Self::Unknown => Self::UNKNOWN_ID.into(),
-            Self::File(path) => format!("REFFECT_ICON_FILE_\"{}\"", path.display()),
+            Self::File(path) => format!("REFFECT_ICON_FILE_\"{}\"", path),
             Self::Url(url) => format!("REFFECT_ICON_URL_\"{url}\""),
         }
     }
@@ -55,21 +54,28 @@ impl IconSource {
     pub fn pretty_print(&self) -> String {
         match self {
             Self::Unknown => "unknown".into(),
-            Self::File(path) => format!("file \"{}\"", path.display()),
+            Self::File(path) => format!("file \"{}\"", path),
             Self::Url(url) => format!("url \"{url}\""),
         }
     }
 
-    pub fn render_select(&mut self, ui: &Ui) {
-        enum_combo(ui, "Icon", self, ComboBoxFlags::empty());
+    pub fn render_select(mut self: &mut Self, ui: &Ui) {
+        if let Some(prev) = enum_combo(ui, "Icon", self, ComboBoxFlags::empty()) {
+            match (prev, &mut self) {
+                (Self::Url(url), Self::File(new)) => {
+                    *new = url;
+                }
+                (Self::File(path), Self::Url(new)) => {
+                    *new = path;
+                }
+                _ => {}
+            }
+        }
 
         match self {
             Self::Unknown => return,
             Self::File(path) => {
-                let mut string = path.to_str().expect("invalid path string").into();
-                if ui.input_text("##path", &mut string).build() {
-                    *path = string.into();
-                }
+                ui.input_text("##path", path).build();
             }
             Self::Url(url) => {
                 ui.input_text("##url", url).build();

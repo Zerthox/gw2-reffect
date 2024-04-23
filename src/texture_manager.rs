@@ -99,7 +99,7 @@ impl TextureManager {
         }
     }
 
-    fn load_from_file(id: &str, path: &Path) {
+    fn load_from_file(id: &str, path: impl AsRef<Path>) {
         load_texture_from_file(id, path, Some(Self::RECEIVE_TEXTURE));
     }
 
