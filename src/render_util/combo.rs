@@ -34,18 +34,22 @@ macro_rules! impl_static_variants {
 
 pub(crate) use impl_static_variants;
 
-pub fn enum_combo<T>(ui: &Ui, label: impl AsRef<str>, current: &mut T, flags: ComboBoxFlags) -> bool
+pub fn enum_combo<T>(
+    ui: &Ui,
+    label: impl AsRef<str>,
+    current: &mut T,
+    flags: ComboBoxFlags,
+) -> Option<T>
 where
     T: Clone + AsRef<str> + EnumStaticVariants + 'static,
 {
-    let mut changed = false;
+    let mut replaced = None;
     if let Some(_token) = ui.begin_combo_with_flags(label, &current, flags) {
         for entry in T::static_variants() {
             // distinguish only discriminants
             let selected = mem::discriminant(entry) == mem::discriminant(current);
             if Selectable::new(entry).selected(selected).build(ui) {
-                changed = true;
-                *current = entry.clone();
+                replaced = Some(mem::replace(current, entry.clone()));
             }
 
             // handle focus
@@ -54,7 +58,7 @@ where
             }
         }
     }
-    changed
+    replaced
 }
 
 pub fn enum_combo_bitflags<T>(

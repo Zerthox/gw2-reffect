@@ -74,13 +74,30 @@ impl BuffTrigger {
             self.get_stacks(ctx)
         }
     }
+
+    pub fn into_ids(self) -> Vec<u32> {
+        match self {
+            Self::Always => Vec::new(),
+            Self::Has(id) | Self::Not(id) => vec![id],
+            Self::Any(ids) | Self::All(ids) => ids,
+        }
+    }
 }
 
 impl RenderOptions for BuffTrigger {
-    fn render_options(&mut self, ui: &Ui) {
+    fn render_options(mut self: &mut Self, ui: &Ui) {
         ui.group(|| {
-            // TODO: propagate ids when selecting another trigger?
-            enum_combo(ui, "Buff", self, ComboBoxFlags::empty());
+            if let Some(prev) = enum_combo(ui, "Buff", self, ComboBoxFlags::empty()) {
+                match &mut self {
+                    Self::Always => {}
+                    Self::Has(id) | Self::Not(id) => {
+                        if let Some(first) = prev.into_ids().first() {
+                            *id = *first;
+                        }
+                    }
+                    Self::Any(ids) | Self::All(ids) => *ids = prev.into_ids(),
+                }
+            }
 
             match self {
                 BuffTrigger::Always => {}

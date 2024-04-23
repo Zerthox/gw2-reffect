@@ -23,8 +23,8 @@ use strum::{AsRefStr, EnumIter, IntoStaticStr};
 pub enum IconSource {
     #[default]
     Unknown,
-    File(PathBuf),
     Url(String),
+    File(PathBuf),
 }
 
 impl_static_variants!(IconSource);
