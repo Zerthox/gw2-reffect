@@ -14,5 +14,6 @@ pub fn tree_select_empty<'ui>(
         .leaf(leaf)
         .tree_push_on_open(!leaf)
         .push(ui);
-    (token, ui.is_item_clicked() && !ui.is_item_toggled_open())
+    let open = ui.is_item_clicked() && !ui.is_item_toggled_open();
+    (token, open)
 }

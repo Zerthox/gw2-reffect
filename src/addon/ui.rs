@@ -60,6 +60,8 @@ impl Addon {
                             .replace_player_intervals((player / 1000) as f64);
                     }
                 }
+
+                ui.checkbox("Debug window", &mut self.debug);
             }
         }
     }
@@ -99,9 +101,6 @@ impl Addon {
             });
         }
 
-        ui.same_line();
-        ui.checkbox("Debug window", &mut self.debug);
-
         ui.spacing();
 
         ChildWindow::new("editor")
@@ -138,7 +137,6 @@ impl Addon {
                         let rendered = pack.try_render_options(ui, &self.context.edit);
                         if rendered {
                             // end after we find the element that has to render
-                            pack.edit = true;
                             break;
                         }
                     }

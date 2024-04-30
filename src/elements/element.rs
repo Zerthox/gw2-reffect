@@ -60,9 +60,8 @@ impl Element {
         let kind = (&self.kind).into(); // borrow here to keep ownership
         let id = self.common.id_string();
         let active = state.is_active(self.common.id);
-        let leaf = self
-            .kind
-            .children()
+        let children = self.kind.children();
+        let leaf = children
             .as_ref()
             .map(|children| children.is_empty())
             .unwrap_or(true);
@@ -72,10 +71,10 @@ impl Element {
         }
 
         let mut action = Action::None;
+
         let mut open = false;
         item_context_menu(&id, || {
-            self.common
-                .render_context_menu(ui, state, self.kind.children());
+            self.common.render_context_menu(ui, state, children);
 
             if MenuItem::new("Cut").build(ui) {
                 action = Action::Cut;

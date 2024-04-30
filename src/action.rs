@@ -1,4 +1,8 @@
-use crate::{context::EditState, elements::Element};
+use crate::{
+    context::EditState,
+    elements::{Dnd, Element},
+};
+use std::ops;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[must_use]
@@ -8,6 +12,7 @@ pub enum Action {
     Cut,
     Copy,
     Delete,
+    Drag,
 }
 
 impl Action {
@@ -38,7 +43,18 @@ impl Action {
                 let child = children.remove(index);
                 log::debug!("Delete child {index} {}", child.kind.as_ref());
             }
+            Action::Drag => {
+                let child = children.remove(index); // TODO: remove at end of drag?
+                log::debug!("Drag child {index} {}", child.kind.as_ref());
+                Dnd::set_dragging(child);
+            }
         }
+    }
+}
+
+impl ops::BitOrAssign for Action {
+    fn bitor_assign(&mut self, rhs: Self) {
+        self.or(rhs)
     }
 }
 
@@ -65,5 +81,11 @@ impl ChildAction {
 
     pub fn perform(self, edit: &mut EditState, children: &mut Vec<Element>) {
         self.kind.perform(edit, children, self.index)
+    }
+}
+
+impl ops::BitOrAssign for ChildAction {
+    fn bitor_assign(&mut self, rhs: Self) {
+        self.or(rhs.index, rhs.kind)
     }
 }
