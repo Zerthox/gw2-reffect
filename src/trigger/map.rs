@@ -12,7 +12,7 @@ use strum::{AsRefStr, EnumIter};
 pub enum MapTrigger {
     #[default]
     Any,
-    Category(MapCategory),
+    Category(MapCategory), // TODO: multi category trigger?
     Ids(Vec<u32>),
 }
 

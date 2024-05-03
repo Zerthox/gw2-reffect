@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, IntoStaticStr};
 
 // TODO: allow displaying with 0 stacks?
+// TODO: speed up buff checking, memoize? binary search? what is order from getbuffs?
 
 #[derive(Debug, Default, Clone, AsRefStr, IntoStaticStr, EnumIter, Serialize, Deserialize)]
 pub enum BuffTrigger {

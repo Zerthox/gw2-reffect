@@ -6,7 +6,11 @@ use crate::{
 };
 use nexus::imgui::{ChildWindow, CollapsingHeader, Condition, StyleVar, TreeNodeFlags, Ui, Window};
 use rfd::FileDialog;
-use std::{fmt, thread};
+use std::{
+    fmt,
+    sync::atomic::{AtomicBool, Ordering},
+    thread,
+};
 
 impl Addon {
     pub fn render(&mut self, ui: &Ui) {
@@ -83,23 +87,48 @@ impl Addon {
                 log::error!("Failed to open packs folder: {err}");
             }
         }
+
+        const POPUP_TITLE: &str = "Pack Creation Error";
+        static ERROR: AtomicBool = AtomicBool::new(false);
+
         ui.same_line();
         if ui.button("New pack") {
             // just spawn a thread to not have to deal with futures
             thread::spawn(move || {
+                let packs = Self::packs_dir();
                 if let Some(file) = FileDialog::new()
                     .set_title("Save Pack")
-                    .set_directory(Self::packs_dir())
+                    .set_directory(&packs)
                     .add_filter("JSON", &["json"])
                     .save_file()
                 {
-                    // TODO: verify file is in packs folder?
-                    if let Some(pack) = Pack::create(file) {
-                        Self::lock().add_pack(pack);
+                    log::debug!("request to create {}", file.display());
+                    if let Some(dir) = file.parent() {
+                        if dir == packs {
+                            if let Some(pack) = Pack::create(file) {
+                                Self::lock().add_pack(pack);
+                            }
+                        } else {
+                            ERROR.store(true, Ordering::Relaxed);
+                            log::warn!("Unable to create pack in {}", dir.display());
+                        }
                     }
                 }
             });
         }
+
+        if ERROR.swap(false, Ordering::Relaxed) {
+            ui.open_popup(POPUP_TITLE)
+        }
+        ui.popup_modal(POPUP_TITLE)
+            .always_auto_resize(true)
+            .build(ui, || {
+                ui.text("Can not create outside of packs folder");
+                if ui.button("Ok") {
+                    ui.close_current_popup();
+                }
+                ui.set_item_default_focus();
+            });
 
         ui.spacing();
 

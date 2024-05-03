@@ -23,7 +23,7 @@ pub enum IconSource {
     #[default]
     Unknown,
     Url(String),
-    File(String),
+    File(String), // TODO: relative to addon dir?
 }
 
 impl_static_variants!(IconSource);
