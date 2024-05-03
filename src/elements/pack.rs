@@ -131,8 +131,9 @@ impl Pack {
     /// Attempts to render options if selected.
     /// Returns `true` if the pack or a child rendered.
     pub fn try_render_options(&mut self, ui: &Ui, state: &EditState) -> bool {
-        self.edit = render_or_children!(self, ui, state);
-        self.edit
+        let found = render_or_children!(self, ui, state);
+        self.edit = state.is_allowed() && found;
+        found
     }
 
     /// Renders the pack options.

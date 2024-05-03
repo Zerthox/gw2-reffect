@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 use std::{
     borrow::Borrow,
     ops::{Add, Div, Mul, Sub},

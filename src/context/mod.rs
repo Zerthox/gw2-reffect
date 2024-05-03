@@ -13,8 +13,6 @@ use crate::{
     interval::Interval,
 };
 
-// TODO: optional no edit in combat
-
 const BUFFS_INTERVAL: f64 = 0.040;
 
 const PLAYER_INTERVAL: f64 = 1.000;
@@ -52,6 +50,7 @@ impl Context {
         let mut changed = false;
 
         self.ui.update(&self.links);
+        self.edit.update_allowed(&self.ui);
 
         if self.buffs_update.triggered(time) {
             self.buffs = unsafe { get_buffs() }.map(|buffs| buffs.into());

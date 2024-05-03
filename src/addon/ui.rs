@@ -49,6 +49,8 @@ impl Addon {
             }
 
             if let Some(_token) = ui.tab_item("Settings") {
+                ui.checkbox("Allow edit in combat", &mut self.context.edit.during_combat);
+
                 if CollapsingHeader::new("Advanced")
                     .flags(TreeNodeFlags::SPAN_AVAIL_WIDTH)
                     .build(ui)
@@ -63,9 +65,9 @@ impl Addon {
                         self.context
                             .replace_player_intervals((player / 1000) as f64);
                     }
-                }
 
-                ui.checkbox("Debug window", &mut self.debug);
+                    ui.checkbox("Debug window", &mut self.debug);
+                }
             }
         }
     }
@@ -110,7 +112,7 @@ impl Addon {
                             }
                         } else {
                             ERROR.store(true, Ordering::Relaxed);
-                            log::warn!("Unable to create pack in {}", dir.display());
+                            log::warn!("Unable to create pack in \"{}\"", dir.display());
                         }
                     }
                 }

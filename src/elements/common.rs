@@ -36,7 +36,7 @@ impl Common {
         state.name = &self.name;
         children(&state);
 
-        if ctx.edit.is_active(self.id) {
+        if ctx.edit.is_edited(self.id) {
             self.render_edit_indicator(ui, &state);
         }
     }

@@ -1,17 +1,35 @@
+use super::UiContext;
 use crate::{elements::Element, id::Id};
 use nexus::imgui::Ui;
 
 // TODO: store parent chain and only display those during edit?
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 pub struct EditState {
-    clipboard: Option<Element>,
+    /// Whether edit mode is allowed in combat.
+    pub during_combat: bool,
+
+    /// Whether edit mode is currently allowed.
+    allowed: bool,
+
+    /// Selected element id.
     active: Id,
+
+    /// Current clipboard contents.
+    clipboard: Option<Element>,
 }
 
 impl EditState {
     pub fn is_active(&self, id: Id) -> bool {
         self.active == id
+    }
+
+    pub fn is_allowed(&self) -> bool {
+        self.allowed
+    }
+
+    pub fn is_edited(&self, id: Id) -> bool {
+        self.is_allowed() && self.is_active(id)
     }
 
     pub fn select(&mut self, id: Id) {
@@ -20,6 +38,10 @@ impl EditState {
         } else {
             self.active = id;
         }
+    }
+
+    pub fn update_allowed(&mut self, ui: &UiContext) {
+        self.allowed = self.during_combat || !ui.combat;
     }
 
     pub fn has_clipboard(&mut self) -> bool {
@@ -44,5 +66,16 @@ impl EditState {
         ui.text("Selected Element:");
         ui.same_line();
         ui.text(self.active.to_string());
+    }
+}
+
+impl Default for EditState {
+    fn default() -> Self {
+        Self {
+            during_combat: false,
+            allowed: true,
+            clipboard: None,
+            active: Id::default(),
+        }
     }
 }
