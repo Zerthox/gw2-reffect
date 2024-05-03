@@ -1,15 +1,15 @@
 use super::{GenerateId, IdGen};
 use std::{
     fmt,
-    sync::atomic::{AtomicUsize, Ordering},
+    sync::atomic::{AtomicU32, Ordering},
 };
 
-const INITIAL: usize = 1;
+const INITIAL: u32 = 1;
 
-static ID: AtomicUsize = AtomicUsize::new(INITIAL);
+static ID: AtomicU32 = AtomicU32::new(INITIAL);
 
 impl GenerateId for IdGen {
-    type Id = usize;
+    type Id = u32;
 
     fn nil() -> Self::Id {
         0
