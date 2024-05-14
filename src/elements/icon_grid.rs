@@ -107,7 +107,7 @@ impl Default for IconGrid {
         Self {
             direction: Direction::Right,
             size: [32.0, 32.0],
-            pad: 3.0,
+            pad: 2.0,
             opacity: 1.0,
             icons: Vec::new(),
         }
