@@ -1,10 +1,11 @@
+mod button;
 mod combo;
 mod input;
 mod popup;
 mod spinner;
 mod tree;
 
-pub use self::{combo::*, input::*, popup::*, spinner::*, tree::*};
+pub use self::{button::*, combo::*, input::*, popup::*, spinner::*, tree::*};
 
 use nexus::imgui::{sys, Style, StyleStackToken, StyleVar, Ui};
 use std::ptr;

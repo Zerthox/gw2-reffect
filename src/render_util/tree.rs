@@ -17,3 +17,11 @@ pub fn tree_select_empty<'ui>(
     let open = ui.is_item_clicked() && !ui.is_item_toggled_open();
     (token, open)
 }
+
+pub fn collapsing_header_same_line_end(ui: &Ui, size_x: f32) {
+    let [_, min_y] = ui.item_rect_min();
+    let [max_x, _] = ui.item_rect_max();
+    let pos_x = max_x - size_x;
+    let pos_y = min_y;
+    ui.set_cursor_screen_pos([pos_x, pos_y]);
+}

@@ -1,10 +1,17 @@
 use super::{Direction, IconNamed, RenderState};
 use crate::{
+    colors,
     context::RenderContext,
-    render_util::{enum_combo, input_float_with_format, input_size, push_alpha_change},
+    render_util::{
+        button_disabled, collapsing_header_same_line_end, enum_combo, input_float_with_format,
+        input_size, push_alpha_change,
+    },
     traits::{Leaf, Node, Render, RenderOptions},
 };
-use nexus::imgui::{CollapsingHeader, ComboBoxFlags, InputTextFlags, Slider, SliderFlags, Ui};
+use nexus::imgui::{
+    self as ig, CollapsingHeader, ComboBoxFlags, InputTextFlags, Slider, SliderFlags, StyleColor,
+    TreeNodeFlags, Ui,
+};
 use serde::{Deserialize, Serialize};
 
 // TODO: wrapping, sorting options
@@ -78,16 +85,44 @@ impl RenderOptions for IconGrid {
         ui.spacing();
         ui.text_disabled("Icons");
 
+        let len = self.icons.len();
+        let mut move_down = None;
         let mut remove = None;
         for (i, icon) in self.icons.iter_mut().enumerate() {
             let _id = ui.push_id(i as i32);
             let mut remains = true;
-            if CollapsingHeader::new(format!("{}###icon{i}", icon.name))
-                .build_with_close_button(ui, &mut remains)
-            {
+
+            let open = CollapsingHeader::new(format!("{}###icon{i}", icon.name))
+                .flags(TreeNodeFlags::ALLOW_ITEM_OVERLAP)
+                .begin_with_close_button(ui, &mut remains);
+
+            let size_x = ui.frame_height();
+            let [spacing_x, _] = ui.clone_style().item_spacing;
+            let style = ui.push_style_color(StyleColor::Button, colors::TRANSPARENT);
+            collapsing_header_same_line_end(ui, 3.0 * size_x + 2.0 * spacing_x);
+
+            let enabled = i > 0;
+            let disabled = button_disabled(ui, enabled);
+            if ui.arrow_button("btnup", ig::Direction::Up) && enabled {
+                move_down = Some(i - 1);
+            }
+            drop(disabled);
+
+            ui.same_line();
+            let enabled = i < len - 1;
+            let disabled = button_disabled(ui, enabled);
+            if ui.arrow_button("btndown", ig::Direction::Down) && enabled {
+                move_down = Some(i);
+            }
+            drop(disabled);
+
+            style.end();
+
+            if open {
                 icon.render_options(ui);
                 ui.spacing();
             }
+
             if !remains {
                 remove = Some(i);
             }
@@ -96,6 +131,9 @@ impl RenderOptions for IconGrid {
             self.icons.push(IconNamed::default());
         }
 
+        if let Some(index) = move_down {
+            self.icons.swap(index, index + 1);
+        }
         if let Some(index) = remove {
             self.icons.remove(index);
         }
