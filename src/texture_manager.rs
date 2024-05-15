@@ -35,7 +35,7 @@ impl TextureManager {
 
     fn loader_thread(source: IconSource) {
         let mut textures = Self::lock();
-        if !textures.loaded.contains_key(&source) {
+        if !textures.exists(&source) {
             match &source {
                 IconSource::Unknown => {}
                 IconSource::File(path) => {
@@ -53,8 +53,12 @@ impl TextureManager {
         }
     }
 
+    fn exists(&self, source: &IconSource) -> bool {
+        self.loaded.contains_key(source) || self.pending.contains_key(&source.generate_id())
+    }
+
     fn with_defaults(mut self) -> Self {
-        // check for the texture ourselves to avoid recursive locking
+        // check for the texture ourself to avoid recursive locking
         let id = IconSource::UNKNOWN_ID;
         if let Some(texture) = get_texture(id) {
             self.loaded.insert(IconSource::Unknown, texture.id());
@@ -134,15 +138,14 @@ impl TextureManager {
     }
 
     fn add_loaded(&mut self, pending_id: &str, texture_id: Option<TextureId>) {
-        let source = self
-            .pending
-            .remove(pending_id)
-            .expect("received load for non-pending texture");
-
-        if let Some(texture_id) = texture_id {
-            self.loaded.insert(source, texture_id);
+        if let Some(source) = self.pending.remove(pending_id) {
+            if let Some(texture_id) = texture_id {
+                self.loaded.insert(source, texture_id);
+            } else {
+                log::warn!("Failed to load icon source {}", source.pretty_print());
+            }
         } else {
-            log::warn!("Failed to load icon source {}", source.pretty_print());
+            log::warn!("Received load for non-pending texture \"{}\"", pending_id);
         }
     }
 }
