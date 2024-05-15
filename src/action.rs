@@ -11,6 +11,8 @@ pub enum Action {
     None,
     Cut,
     Copy,
+    Up,
+    Down,
     Delete,
     Drag,
 }
@@ -28,22 +30,34 @@ impl Action {
 
     pub fn perform(self, edit: &mut EditState, children: &mut Vec<Element>, index: usize) {
         match self {
-            Action::None => {}
-            Action::Cut => {
+            Self::None => {}
+            Self::Cut => {
                 let child = children.remove(index);
                 log::debug!("Cut child {index} {}", child.kind.as_ref());
                 edit.set_clipboard(child);
             }
-            Action::Copy => {
+            Self::Copy => {
                 let child = children[index].clone();
                 log::debug!("Copy child {index} {}", child.kind.as_ref());
                 edit.set_clipboard(child);
             }
-            Action::Delete => {
+            Self::Up => {
+                log::debug!("Move child up {index} {}", children[index].kind.as_ref());
+                if index > 0 {
+                    children.swap(index, index - 1);
+                }
+            }
+            Self::Down => {
+                log::debug!("Move child down {index} {}", children[index].kind.as_ref());
+                if index < children.len() - 1 {
+                    children.swap(index, index + 1);
+                }
+            }
+            Self::Delete => {
                 let child = children.remove(index);
                 log::debug!("Delete child {index} {}", child.kind.as_ref());
             }
-            Action::Drag => {
+            Self::Drag => {
                 let child = children.remove(index); // TODO: remove at end of drag?
                 log::debug!("Drag child {index} {}", child.kind.as_ref());
                 Dnd::set_dragging(child);

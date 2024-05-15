@@ -82,6 +82,12 @@ impl Element {
             if MenuItem::new("Copy").build(ui) {
                 action = Action::Copy;
             }
+            if MenuItem::new("Move Up").build(ui) {
+                action = Action::Up;
+            }
+            if MenuItem::new("Move Down").build(ui) {
+                action = Action::Down;
+            }
             open = MenuItem::new("Delete").build(ui);
         });
         let title = format!("Confirm Delete##{id}");
