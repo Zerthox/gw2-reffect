@@ -3,6 +3,8 @@ use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, VariantArray};
 
+// TODO: avoid rendering same text multiple times, prerender characters as atlas?
+
 #[derive(
     Debug,
     Clone,

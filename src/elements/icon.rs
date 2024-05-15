@@ -7,7 +7,7 @@ use crate::{
     traits::{Leaf, RenderOptions},
     trigger::{BuffTrigger, Trigger},
 };
-use nexus::imgui::{ColorEdit, ColorPreview, Style, Ui};
+use nexus::imgui::{ColorEdit, ColorPreview, Style, StyleVar, Ui};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -45,20 +45,22 @@ impl Icon {
             // render stack count
             if self.stacks {
                 if let Some(stacks) = self.buff.get_stacks_or_edit(ctx, state) {
-                    ui.set_window_font_scale(1.0);
+                    // override alpha
+                    let _style = ui.push_style_var(StyleVar::Alpha(0.8));
+
+                    let text = stacks.to_string();
 
                     let [_, height] = size;
+                    ui.set_window_font_scale(1.0);
                     let font_scale = 0.5 * height / ui.current_font_size();
                     ui.set_window_font_scale(font_scale);
-                    let text = stacks.to_string();
                     let [x_offset, _] = TextAlign::Right.calc_pos(ui, &text);
                     let pad = [1.0, 1.0];
                     let line_height = ui.text_line_height();
                     let text_pos = end.add([x_offset, -line_height]).sub(pad);
 
-                    let [_, _, _, alpha] = self.color;
-                    let color = with_alpha(colors::WHITE, alpha);
-                    let shadow_color = with_alpha(colors::BLACK, alpha);
+                    let color = colors::WHITE;
+                    let shadow_color = colors::BLACK;
                     ui.set_cursor_screen_pos(text_pos);
                     TextDecoration::Shadow.render(ui, &text, shadow_color);
                     ui.text_colored(color, &text);
