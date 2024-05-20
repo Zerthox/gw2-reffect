@@ -1,5 +1,5 @@
-use crate::component_wise::ComponentWise;
-use nexus::imgui::Ui;
+use crate::{component_wise::ComponentWise, render_util::enum_combo};
+use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, VariantArray};
 
@@ -7,6 +7,7 @@ use strum::{AsRefStr, EnumIter, VariantArray};
 
 #[derive(
     Debug,
+    Default,
     Clone,
     Copy,
     PartialEq,
@@ -21,6 +22,7 @@ use strum::{AsRefStr, EnumIter, VariantArray};
     Deserialize,
 )]
 pub enum TextDecoration {
+    #[default]
     None,
     Shadow,
     Outline,
@@ -50,5 +52,12 @@ impl TextDecoration {
             }
         }
         ui.set_cursor_pos(cursor);
+    }
+
+    pub fn render_select(&mut self, ui: &Ui) {
+        enum_combo(ui, "Decoration", self, ComboBoxFlags::empty());
+        if ui.is_item_hovered() {
+            ui.tooltip_text("Beware: many text decorations may negatively impact performance");
+        }
     }
 }

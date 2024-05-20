@@ -14,7 +14,7 @@ use std::{
 
 impl Addon {
     pub fn render(&mut self, ui: &Ui) {
-        self.perform_updates(ui.time());
+        self.perform_updates(ui.time()); // TODO: perform update in separate thread?
 
         self.render_displays(ui);
 

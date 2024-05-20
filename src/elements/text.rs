@@ -86,12 +86,7 @@ impl RenderOptions for Text {
             .preview(ColorPreview::Alpha)
             .build(ui);
 
-        enum_combo(
-            ui,
-            "Decoration",
-            &mut self.decoration,
-            ComboBoxFlags::empty(),
-        );
+        self.decoration.render_select(ui);
     }
 }
 
@@ -103,7 +98,7 @@ impl Default for Text {
             align: TextAlign::Center,
             size: 1.0,
             color: [1.0, 1.0, 1.0, 1.0],
-            decoration: TextDecoration::Shadow,
+            decoration: TextDecoration::default(),
         }
     }
 }
