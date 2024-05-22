@@ -2,11 +2,11 @@ use super::{RenderState, TextAlign, TextDecoration};
 use crate::{
     component_wise::ComponentWise,
     context::RenderContext,
-    render_util::{enum_combo, input_float_with_format},
+    render_util::input_float_with_format,
     traits::{Leaf, Render, RenderOptions},
     trigger::BuffTrigger,
 };
-use nexus::imgui::{ColorEdit, ColorPreview, ComboBoxFlags, InputTextFlags, Ui};
+use nexus::imgui::{ColorEdit, ColorPreview, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

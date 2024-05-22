@@ -24,8 +24,16 @@ use strum::{AsRefStr, EnumIter, VariantArray};
 pub enum TextDecoration {
     #[default]
     None,
+
     Shadow,
+
+    #[strum(serialize = "Shadow (thick)")]
+    ShadowDouble,
+
     Outline,
+
+    #[strum(serialize = "Outline (thick)")]
+    OutlineDouble,
 }
 
 impl TextDecoration {
@@ -39,13 +47,19 @@ impl TextDecoration {
         let text = text.as_ref();
         let cursor = ui.cursor_pos();
         match self {
-            TextDecoration::None => {}
-            TextDecoration::Shadow => {
+            Self::None => {}
+            Self::Shadow => Self::render_at(ui, cursor.add([1.0, 1.0]), text, color),
+            Self::ShadowDouble => {
                 for offset in [[0.0, 1.0], [1.0, 0.0]] {
                     Self::render_at(ui, cursor.add(offset), text, color)
                 }
             }
-            TextDecoration::Outline => {
+            Self::Outline => {
+                for offset in [[-1.0, -1.0], [1.0, 1.0]] {
+                    Self::render_at(ui, cursor.add(offset), text, color)
+                }
+            }
+            Self::OutlineDouble => {
                 for offset in [[-1.0, -1.0], [-1.0, 1.0], [1.0, -1.0], [1.0, 1.0]] {
                     Self::render_at(ui, cursor.add(offset), text, color)
                 }
@@ -57,7 +71,7 @@ impl TextDecoration {
     pub fn render_select(&mut self, ui: &Ui) {
         enum_combo(ui, "Decoration", self, ComboBoxFlags::empty());
         if ui.is_item_hovered() {
-            ui.tooltip_text("Beware: many text decorations may negatively impact performance");
+            ui.tooltip_text("Warning: many text decorations may negatively impact performance");
         }
     }
 }
