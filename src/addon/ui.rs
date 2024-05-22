@@ -190,8 +190,17 @@ impl Addon {
 
                 ui.text("Buffs status:");
                 ui.same_line();
-                match ctx.buffs {
-                    Ok(_) => ui.text_colored(GREEN, "ok"),
+                match &ctx.buffs {
+                    Ok(buffs) => {
+                        ui.text_colored(GREEN, "ok");
+                        if ui.is_item_hovered() {
+                            ui.tooltip(|| {
+                                for buff in buffs {
+                                    ui.text(format!("{}x {}", buff.count, buff.id));
+                                }
+                            });
+                        }
+                    }
                     Err(err) => ui.text_colored(RED, err.to_string()),
                 }
 
