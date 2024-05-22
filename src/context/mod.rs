@@ -19,11 +19,21 @@ const PLAYER_INTERVAL: f64 = 1.000;
 
 #[derive(Debug, Clone)]
 pub struct Context {
+    /// Edit mode state.
     pub edit: EditState,
+
+    /// Information about game UI.
     pub ui: UiContext,
+
+    /// Information about current map.
     pub map: MapContext,
+
+    /// Information about player character.
     pub player: PlayerContext,
+
+    /// Current buffs sorted by id.
     pub buffs: Result<Vec<StackedBuff>, GetBuffsError>,
+
     links: Links,
     buffs_update: Interval,
     player_update: Interval,
@@ -53,7 +63,12 @@ impl Context {
         self.edit.update_allowed(&self.ui);
 
         if self.buffs_update.triggered(time) {
-            self.buffs = unsafe { get_buffs() }.map(|buffs| buffs.into());
+            self.buffs = unsafe { get_buffs() }.map(|buffs| {
+                // keep the buffs sorted, unstable sort is fine
+                let mut vec = buffs.to_vec();
+                vec.sort_unstable_by_key(|buff| buff.id);
+                vec
+            });
         }
 
         if let Some(mumble) = self.links.mumble() {

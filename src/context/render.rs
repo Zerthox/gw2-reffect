@@ -12,11 +12,16 @@ pub struct RenderContext<'a> {
 
 impl<'a> RenderContext<'a> {
     pub fn buff(&self, id: u32) -> Option<&StackedBuff> {
-        self.buffs.iter().find(|entry| entry.id == id)
+        self.buffs
+            .binary_search_by_key(&id, |entry| entry.id)
+            .ok()
+            .map(|index| unsafe { self.buffs.get_unchecked(index) })
     }
 
     pub fn has_buff(&self, id: u32) -> bool {
-        self.buffs.iter().any(|entry| entry.id == id)
+        self.buffs
+            .binary_search_by_key(&id, |entry| entry.id)
+            .is_ok()
     }
 
     pub fn stacks_of(&self, id: u32) -> Option<i32> {
