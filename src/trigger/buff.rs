@@ -1,124 +1,40 @@
-use super::Trigger;
-use crate::{
-    context::RenderContext,
-    elements::RenderState,
-    render_util::{enum_combo, impl_static_variants, input_u32},
-    traits::RenderOptions,
-};
-use nexus::imgui::{ComboBoxFlags, Ui};
+use super::{BuffThreshold, BuffTriggerId, Trigger};
+use crate::{context::RenderContext, elements::RenderState, traits::RenderOptions};
+use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
-use strum::{AsRefStr, EnumIter, IntoStaticStr};
 
-// TODO: allow displaying icon even with 0 stacks? like always but tied to ids
-// TODO: speed up buff checking, memoize? binary search? what is order from getbuffs?
+// TODO: we are still checking threshold for always/none
 
-#[derive(Debug, Default, Clone, AsRefStr, IntoStaticStr, EnumIter, Serialize, Deserialize)]
-pub enum BuffTrigger {
-    #[default]
-    Always,
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[serde(default)]
+pub struct BuffTrigger {
+    pub id: BuffTriggerId,
 
-    #[strum(serialize = "Has")]
-    Has(u32),
-
-    #[strum(serialize = "Missing")]
-    Not(u32),
-
-    #[strum(serialize = "Any of")]
-    Any(Vec<u32>),
-
-    #[strum(serialize = "All of")]
-    All(Vec<u32>),
+    #[serde(rename = "stacks")]
+    #[serde(alias = "threshold")]
+    pub threshold: BuffThreshold,
 }
-
-impl_static_variants!(BuffTrigger);
 
 impl Trigger for BuffTrigger {
     fn is_active(&mut self, ctx: &RenderContext) -> bool {
-        match self {
-            Self::Always => true,
-            Self::Any(ids) => ids.iter().any(|id| ctx.has_buff(*id)),
-            Self::All(ids) => ids.iter().any(|id| ctx.has_buff(*id)),
-            Self::Not(id) => !ctx.has_buff(*id),
-            Self::Has(id) => ctx.has_buff(*id),
-        }
+        self.threshold.is_met(self.id.count_stacks(ctx))
     }
 }
 
 impl BuffTrigger {
-    fn get_stacks(&self, ctx: &RenderContext) -> Option<i32> {
-        match self {
-            Self::Always => Some(0),
-            Self::Any(ids) => {
-                let mut iter = ids.iter().filter_map(|id| ctx.stacks_of(*id));
-                iter.next().map(|first| first + iter.sum::<i32>())
-            }
-            Self::All(ids) => {
-                let mut sum = 0;
-                for id in ids {
-                    if let Some(stacks) = ctx.stacks_of(*id) {
-                        sum += stacks;
-                    } else {
-                        return None;
-                    }
-                }
-                Some(sum)
-            }
-            Self::Not(id) => (!ctx.has_buff(*id)).then_some(0),
-            Self::Has(id) => ctx.stacks_of(*id),
-        }
-    }
-
-    pub fn get_stacks_or_edit(&self, ctx: &RenderContext, state: &RenderState) -> Option<i32> {
+    pub fn active_stacks_or_edit(&self, ctx: &RenderContext, state: &RenderState) -> Option<i32> {
         if state.edit {
             Some(1)
         } else {
-            self.get_stacks(ctx)
-        }
-    }
-
-    pub fn into_ids(self) -> Vec<u32> {
-        match self {
-            Self::Always => Vec::new(),
-            Self::Has(id) | Self::Not(id) => vec![id],
-            Self::Any(ids) | Self::All(ids) => ids,
+            let stacks = self.id.count_stacks(ctx);
+            self.threshold.is_met(stacks).then_some(stacks)
         }
     }
 }
 
 impl RenderOptions for BuffTrigger {
-    fn render_options(mut self: &mut Self, ui: &Ui) {
-        ui.group(|| {
-            if let Some(prev) = enum_combo(ui, "Buff", self, ComboBoxFlags::empty()) {
-                match &mut self {
-                    Self::Always => {}
-                    Self::Has(id) | Self::Not(id) => {
-                        if let Some(first) = prev.into_ids().first() {
-                            *id = *first;
-                        }
-                    }
-                    Self::Any(ids) | Self::All(ids) => *ids = prev.into_ids(),
-                }
-            }
-
-            match self {
-                BuffTrigger::Always => {}
-                BuffTrigger::Any(ids) | BuffTrigger::All(ids) => {
-                    // TODO: as single text input?
-                    for (i, id) in ids.iter_mut().enumerate() {
-                        input_u32(ui, format!("Id {}", i + 1), id, 0, 0);
-                    }
-                    if ui.button("+") {
-                        ids.push(0);
-                    }
-                    ui.same_line();
-                    if ui.button("-") {
-                        ids.pop();
-                    }
-                }
-                BuffTrigger::Not(id) | BuffTrigger::Has(id) => {
-                    input_u32(ui, "Id", id, 0, 0);
-                }
-            }
-        })
+    fn render_options(&mut self, ui: &Ui) {
+        self.id.render_options(ui);
+        self.threshold.render_options(ui);
     }
 }

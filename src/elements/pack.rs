@@ -55,7 +55,7 @@ impl Pack {
         let reader = BufReader::new(file);
         serde_json::from_reader::<_, Self>(reader)
             .inspect_err(|err| {
-                log::error!("Failed to parse pack file \"{}\": {err}", file_name(&path))
+                log::warn!("Failed to parse pack file \"{}\": {err}", file_name(&path))
             })
             .ok()
             .map(|mut pack| {
@@ -69,7 +69,13 @@ impl Pack {
         match File::create(&self.file) {
             Ok(file) => {
                 let writer = BufWriter::new(file);
-                serde_json::to_writer_pretty(writer, self).expect("failed to serialize pack");
+                if let Err(err) = serde_json::to_writer_pretty(writer, self) {
+                    log::error!(
+                        "Failed to serialize pack \"{}\" to \"{}\": {err}",
+                        self.common.name,
+                        file_name(&self.file)
+                    );
+                }
                 true
             }
             Err(err) => {

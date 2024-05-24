@@ -1,7 +1,7 @@
 use super::Trigger;
 use crate::context::RenderContext;
 use serde::{Deserialize, Serialize};
-use std::{any::type_name, ops};
+use std::ops;
 
 /// Memoization for a [`Trigger`].
 #[derive(Debug, Default, Clone)]
@@ -32,7 +32,6 @@ where
         if let Some(active) = self.cache {
             active
         } else {
-            log::debug!("Initializing memo for {}", type_name::<T>());
             self.update(ctx)
         }
     }

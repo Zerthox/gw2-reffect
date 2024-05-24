@@ -30,7 +30,7 @@ impl Text {
     pub fn process_text(&self, ctx: &RenderContext, state: &RenderState) -> Option<String> {
         let text = self.text.replace(replace::NAME, state.name);
         self.buff
-            .get_stacks_or_edit(ctx, state)
+            .active_stacks_or_edit(ctx, state)
             .map(|stacks| text.replace(replace::STACKS, &stacks.to_string()))
     }
 }

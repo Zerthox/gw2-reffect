@@ -15,7 +15,7 @@ impl<'a> RenderContext<'a> {
         self.buffs
             .binary_search_by_key(&id, |entry| entry.id)
             .ok()
-            .map(|index| unsafe { self.buffs.get_unchecked(index) })
+            .map(|index| unsafe { self.buffs.get_unchecked(index) }) // index is from binary search, avoid bounds check here
     }
 
     pub fn has_buff(&self, id: u32) -> bool {

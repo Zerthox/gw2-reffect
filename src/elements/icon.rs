@@ -44,7 +44,7 @@ impl Icon {
 
             // render stack count
             if self.stacks {
-                if let Some(stacks) = self.buff.get_stacks_or_edit(ctx, state) {
+                if let Some(stacks) = self.buff.active_stacks_or_edit(ctx, state) {
                     // override alpha
                     let _style = ui.push_style_var(StyleVar::Alpha(0.8));
 

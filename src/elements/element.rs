@@ -17,7 +17,7 @@ pub struct Element {
     #[serde(flatten)]
     pub common: Common,
 
-    pub trigger: MetaTrigger,
+    pub trigger: MetaTrigger, // TODO: condition? restriction? filter? requirement?
 
     pub animation: Option<Animation>,
 
