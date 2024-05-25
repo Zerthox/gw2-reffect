@@ -6,6 +6,7 @@ use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, IntoStaticStr};
 
+// TODO: none variant more intuitive than max 0?
 // TODO: between allowing range of stacks?
 
 #[derive(Debug, Clone, AsRefStr, IntoStaticStr, EnumIter, Serialize, Deserialize)]

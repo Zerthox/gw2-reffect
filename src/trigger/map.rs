@@ -38,7 +38,7 @@ impl RenderOptions for MapTrigger {
                 enum_combo(ui, "Category", category, ComboBoxFlags::empty());
             }
             Self::Ids(ids) => {
-                // TODO: as single text input?
+                // TODO: as single text input? or at least delete per id
                 for (i, id) in ids.iter_mut().enumerate() {
                     input_u32(ui, format!("Id {}", i + 1), id, 0, 0);
                 }

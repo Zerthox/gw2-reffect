@@ -11,6 +11,7 @@ pub use self::{buff::*, buff_id::*, buff_threshold::*, combat::*, map::*, meta::
 
 use crate::{context::RenderContext, elements::RenderState};
 
+// TODO: parametric return type?
 pub trait Trigger {
     fn is_active_or_edit(&mut self, ctx: &RenderContext, state: &RenderState) -> bool {
         state.edit || self.is_active(ctx)

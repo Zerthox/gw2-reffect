@@ -8,6 +8,8 @@ use super::Addon;
 use crate::context::ContextSettings;
 use serde::{Deserialize, Serialize};
 
+// TODO: setting for icon stacks text
+
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Settings {

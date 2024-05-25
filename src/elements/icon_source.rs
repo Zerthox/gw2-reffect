@@ -75,6 +75,7 @@ impl IconSource {
         match self {
             Self::Unknown => return,
             Self::File(path) => {
+                // TODO: file dialog for select
                 ui.input_text("##path", path).build();
             }
             Self::Url(url) => {

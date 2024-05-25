@@ -82,7 +82,7 @@ impl RenderOptions for BuffTriggerId {
                     input_u32(ui, "Id", id, 0, 0);
                 }
                 Self::Any(ids) | Self::All(ids) => {
-                    // TODO: as single text input?
+                    // TODO: as single text input? or at least delete per id
                     for (i, id) in ids.iter_mut().enumerate() {
                         input_u32(ui, format!("Id {}", i + 1), id, 0, 0);
                     }

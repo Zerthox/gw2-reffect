@@ -4,6 +4,7 @@ use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
 // TODO: we are still checking threshold for always/none
+// TODO: update examples!
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(default)]
