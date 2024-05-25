@@ -13,7 +13,7 @@ use std::{
     path::PathBuf,
 };
 
-// TODO: tag pack with version before serializing
+// TODO: tag pack with version before serializing. maybe versioned with helper trait? struct with field? internally tagged enum?
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(default)]
@@ -38,9 +38,12 @@ impl Pack {
     pub fn create(file: PathBuf) -> Option<Self> {
         let mut pack = Self {
             enabled: true,
-            file,
             ..Self::default()
         };
+        if let Some(name) = file.file_name() {
+            pack.common.name = name.to_string_lossy().into_owned();
+        }
+        pack.file = file;
         pack.load();
         pack.save_to_file().then_some(pack)
     }
