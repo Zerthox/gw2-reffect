@@ -1,9 +1,15 @@
 use crate::{
     render_util::{enum_combo, impl_static_variants},
     texture_manager::TextureManager,
+    util::file_name,
 };
-use nexus::imgui::{ComboBoxFlags, TextureId, Ui};
+use nexus::{
+    imgui::{ComboBoxFlags, TextureId, Ui},
+    paths::get_game_dir,
+};
+use rfd::FileDialog;
 use serde::{Deserialize, Serialize};
+use std::{path::PathBuf, sync::Mutex, thread};
 use strum::{AsRefStr, EnumIter, IntoStaticStr};
 
 #[derive(
@@ -23,7 +29,7 @@ pub enum IconSource {
     #[default]
     Unknown,
     Url(String),
-    File(String), // TODO: relative to addon dir?
+    File(PathBuf),
 }
 
 impl_static_variants!(IconSource);
@@ -46,7 +52,7 @@ impl IconSource {
     pub fn generate_id(&self) -> String {
         match self {
             Self::Unknown => Self::UNKNOWN_ID.into(),
-            Self::File(path) => format!("REFFECT_ICON_FILE_\"{}\"", path),
+            Self::File(path) => format!("REFFECT_ICON_FILE_\"{}\"", path.display()),
             Self::Url(url) => format!("REFFECT_ICON_URL_\"{url}\""),
         }
     }
@@ -54,7 +60,7 @@ impl IconSource {
     pub fn pretty_print(&self) -> String {
         match self {
             Self::Unknown => "unknown".into(),
-            Self::File(path) => format!("file \"{}\"", path),
+            Self::File(path) => format!("file \"{}\"", path.display()),
             Self::Url(url) => format!("url \"{url}\""),
         }
     }
@@ -63,10 +69,10 @@ impl IconSource {
         if let Some(prev) = enum_combo(ui, "Icon", self, ComboBoxFlags::empty()) {
             match (prev, &mut self) {
                 (Self::Url(url), Self::File(new)) => {
-                    *new = url;
+                    *new = url.into();
                 }
                 (Self::File(path), Self::Url(new)) => {
-                    *new = path;
+                    *new = path.to_string_lossy().into_owned();
                 }
                 _ => {}
             }
@@ -75,8 +81,39 @@ impl IconSource {
         match self {
             Self::Unknown => return,
             Self::File(path) => {
-                // TODO: file dialog for select
-                ui.input_text("##path", path).build();
+                ui.text(file_name(path));
+
+                ui.same_line();
+                static FILE: Mutex<Option<PathBuf>> = Mutex::new(None);
+                match FILE.lock().unwrap().take() {
+                    Some(file) => {
+                        *path = file;
+                        ui.text("Selecting");
+                    }
+                    None => {
+                        if ui.button("Select") {
+                            thread::spawn(|| {
+                                let game_dir = get_game_dir().expect("no game directory");
+                                if let Some(file) = FileDialog::new()
+                                    .set_title("Select Icon")
+                                    .set_directory(&game_dir)
+                                    .add_filter("Image", &["png", "jpg", "jpeg"])
+                                    .pick_file()
+                                {
+                                    // try to get the relative path from game directory
+                                    let file = match file.strip_prefix(game_dir) {
+                                        Ok(relative) => relative.to_path_buf(),
+                                        Err(_) => {
+                                            log::warn!("Absolute icon path \"{}\"", file.display());
+                                            file
+                                        }
+                                    };
+                                    *FILE.lock().unwrap() = Some(file);
+                                }
+                            });
+                        }
+                    }
+                }
             }
             Self::Url(url) => {
                 ui.input_text("##url", url).build();
