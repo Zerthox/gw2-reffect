@@ -1,5 +1,5 @@
 use super::Element;
-use crate::action::Action;
+use crate::action::ElementAction;
 use nexus::imgui::{DragDropFlags, DragDropSource, DragDropTarget, Ui};
 
 // imgui is single threaded
@@ -16,7 +16,7 @@ impl Dnd {
         unsafe { DRAGGED = Some(element.clone()) }
     }
 
-    pub fn render_drag(ui: &Ui, label: impl FnOnce()) -> Action {
+    pub fn render_drag(ui: &Ui, label: impl FnOnce()) -> ElementAction {
         if let Some(_tooltip) = DragDropSource::new(Self::ID)
             .flags(DragDropFlags::SOURCE_NO_DISABLE_HOVER)
             .begin(ui)
@@ -24,11 +24,11 @@ impl Dnd {
             label();
             unsafe {
                 if DRAGGED.is_none() {
-                    return Action::Drag;
+                    return ElementAction::Drag;
                 }
             }
         }
-        Action::None
+        ElementAction::None
     }
 
     pub fn render_drop(ui: &Ui) -> Option<Element> {

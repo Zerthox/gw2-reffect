@@ -6,7 +6,7 @@ use std::ops;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[must_use]
-pub enum Action {
+pub enum ElementAction {
     #[default]
     None,
     Cut,
@@ -17,7 +17,7 @@ pub enum Action {
     Drag,
 }
 
-impl Action {
+impl ElementAction {
     pub fn is_none(&self) -> bool {
         matches!(self, Self::None)
     }
@@ -66,27 +66,27 @@ impl Action {
     }
 }
 
-impl ops::BitOrAssign for Action {
+impl ops::BitOrAssign for ElementAction {
     fn bitor_assign(&mut self, rhs: Self) {
         self.or(rhs)
     }
 }
 
 #[derive(Debug, Default, Clone)]
-pub struct ChildAction {
+pub struct ChildElementAction {
     pub index: usize,
-    pub kind: Action,
+    pub kind: ElementAction,
 }
 
-impl ChildAction {
+impl ChildElementAction {
     pub const fn new() -> Self {
         Self {
             index: 0,
-            kind: Action::None,
+            kind: ElementAction::None,
         }
     }
 
-    pub fn or(&mut self, index: usize, other: Action) {
+    pub fn or(&mut self, index: usize, other: ElementAction) {
         if self.kind.is_none() {
             self.kind = other;
             self.index = index;
@@ -98,7 +98,7 @@ impl ChildAction {
     }
 }
 
-impl ops::BitOrAssign for ChildAction {
+impl ops::BitOrAssign for ChildElementAction {
     fn bitor_assign(&mut self, rhs: Self) {
         self.or(rhs.index, rhs.kind)
     }

@@ -18,10 +18,11 @@ impl MapContext {
 
     pub fn update(&mut self, mumble: MumblePtr) -> bool {
         let id = mumble.read_map_id();
+        let map_type = mumble.read_map_type();
         let new = self.id != id;
 
         self.id = id;
-        self.category = mumble.read_map_type().into();
+        self.category = MapCategory::new(id, map_type);
 
         new
     }
@@ -30,6 +31,8 @@ impl MapContext {
         self.id == id
     }
 }
+
+// TODO: custom category for raids, fractals, strikes based on map id?
 
 #[derive(
     Debug,
@@ -58,9 +61,9 @@ pub enum MapCategory {
     Unknown,
 }
 
-impl From<u32> for MapCategory {
-    fn from(value: u32) -> Self {
-        match value {
+impl MapCategory {
+    pub fn new(_id: u32, category: u32) -> Self {
+        match category {
             map_type::PVE | map_type::PVE_MINI => Self::Pve,
 
             map_type::PVP | map_type::USER_TOURNAMENT | map_type::BIG_BATTLE => Self::Pvp,

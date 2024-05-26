@@ -1,6 +1,6 @@
 use super::{Element, ElementType, RenderState};
 use crate::{
-    action::ChildAction,
+    action::ChildElementAction,
     component_wise::ComponentWise,
     context::{EditState, RenderContext},
     id::{Id, IdGen},
@@ -71,7 +71,7 @@ impl Common {
         state: &mut EditState,
         children: &mut Vec<Element>,
     ) {
-        let mut action = ChildAction::new();
+        let mut action = ChildElementAction::new();
         for (i, child) in children.iter_mut().enumerate() {
             action.or(i, child.render_select_tree(ui, state));
         }

@@ -1,5 +1,6 @@
 use super::Trigger;
 use crate::{
+    action::Action,
     context::{MapCategory, RenderContext},
     render_util::{enum_combo, impl_static_variants, input_u32},
     traits::RenderOptions,
@@ -38,17 +39,23 @@ impl RenderOptions for MapTrigger {
                 enum_combo(ui, "Category", category, ComboBoxFlags::empty());
             }
             Self::Ids(ids) => {
-                // TODO: as single text input? or at least delete per id
+                // TODO: as single text input?
+                let mut action = Action::new();
                 for (i, id) in ids.iter_mut().enumerate() {
-                    input_u32(ui, format!("Id {}", i + 1), id, 0, 0);
+                    let _id = ui.push_id(i as i32);
+                    input_u32(ui, "##id", id, 0, 0);
+
+                    ui.same_line();
+                    action.render_buttons(ui, i);
+
+                    ui.same_line();
+                    ui.text(format!("Id {}", i + 1));
                 }
-                if ui.button("+") {
+                if ui.button("Add") {
                     ids.push(0);
                 }
-                ui.same_line();
-                if ui.button("-") {
-                    ids.pop();
-                }
+
+                action.perform(ids);
             }
         }
     }

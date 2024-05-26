@@ -1,6 +1,6 @@
 use super::{render_or_children, Animation, Common, ElementType, RenderState};
 use crate::{
-    action::Action,
+    action::ElementAction,
     context::{EditState, RenderContext},
     render_util::{delete_confirm_modal, item_context_menu, tree_select_empty},
     traits::{Node, Render, RenderOptions},
@@ -56,7 +56,7 @@ impl Element {
 
     /// Renders the select tree.
     /// Returns `true` if a child is selected.
-    pub fn render_select_tree(&mut self, ui: &Ui, state: &mut EditState) -> Action {
+    pub fn render_select_tree(&mut self, ui: &Ui, state: &mut EditState) -> ElementAction {
         let kind = (&self.kind).into(); // borrow here to keep ownership
         let id = self.common.id_string();
         let active = state.is_active(self.common.id);
@@ -70,23 +70,23 @@ impl Element {
             state.select(self.common.id);
         }
 
-        let mut action = Action::None;
+        let mut action = ElementAction::None;
 
         let mut open = false;
         item_context_menu(&id, || {
             self.common.render_context_menu(ui, state, children);
 
             if MenuItem::new("Cut").build(ui) {
-                action = Action::Cut;
+                action = ElementAction::Cut;
             }
             if MenuItem::new("Copy").build(ui) {
-                action = Action::Copy;
+                action = ElementAction::Copy;
             }
             if MenuItem::new("Move Up").build(ui) {
-                action = Action::Up;
+                action = ElementAction::Up;
             }
             if MenuItem::new("Move Down").build(ui) {
-                action = Action::Down;
+                action = ElementAction::Down;
             }
             open = MenuItem::new("Delete").build(ui);
         });
@@ -97,7 +97,7 @@ impl Element {
         if delete_confirm_modal(ui, &title, || {
             ui.text(format!("Delete {kind} {}?", self.common.name))
         }) {
-            action = Action::Delete;
+            action = ElementAction::Delete;
         }
 
         self.common.render_tree_label(ui, kind);

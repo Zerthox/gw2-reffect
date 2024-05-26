@@ -162,6 +162,7 @@ impl Pack {
                     ui.input_int("Layer", &mut layer)
                         .step(0)
                         .step_fast(0)
+                        .read_only(true)
                         .build();
                 }
             }
