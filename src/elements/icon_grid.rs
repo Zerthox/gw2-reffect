@@ -6,7 +6,7 @@ use crate::{
         button_disabled, collapsing_header_same_line_end, enum_combo, input_float_with_format,
         input_size, push_alpha_change,
     },
-    traits::{TreeLeaf, Render, RenderOptions},
+    traits::{Render, RenderOptions, TreeLeaf},
 };
 use nexus::imgui::{
     self as ig, CollapsingHeader, ComboBoxFlags, InputTextFlags, Slider, SliderFlags, StyleColor,
@@ -57,7 +57,7 @@ impl RenderOptions for IconGrid {
         input_size(x, y);
 
         input_float_with_format(
-            "Padding",
+            "Spacing",
             &mut self.pad,
             1.0,
             10.0,
@@ -95,7 +95,7 @@ impl RenderOptions for IconGrid {
 
             let enabled = i > 0;
             let disabled = button_disabled(ui, enabled);
-            if ui.arrow_button("btnup", ig::Direction::Up) && enabled {
+            if ui.arrow_button("up", ig::Direction::Up) && enabled {
                 move_down = Some(i - 1);
             }
             drop(disabled);
@@ -103,7 +103,7 @@ impl RenderOptions for IconGrid {
             ui.same_line();
             let enabled = i < len - 1;
             let disabled = button_disabled(ui, enabled);
-            if ui.arrow_button("btndown", ig::Direction::Down) && enabled {
+            if ui.arrow_button("down", ig::Direction::Down) && enabled {
                 move_down = Some(i);
             }
             drop(disabled);
@@ -111,6 +111,7 @@ impl RenderOptions for IconGrid {
             style.end();
 
             if open {
+                // TODO: apply option to all context menu option
                 icon.render_options(ui);
                 ui.spacing();
             }

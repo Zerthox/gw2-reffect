@@ -13,12 +13,15 @@ pub enum BuffThreshold {
     Missing,
 
     // Minimum amount of stacks.
+    #[strum(serialize = "Min stacks")]
     Min(i32),
 
     // Maximum amount of stacks.
+    #[strum(serialize = "Max stacks")]
     Max(i32),
 
-    // Lower & upper bound of stacks.
+    // Range of stacks.
+    #[strum(serialize = "Range of stacks")]
     Between(i32, i32),
 }
 

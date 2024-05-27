@@ -31,12 +31,12 @@ impl Action {
     }
 
     pub fn render_buttons(&mut self, ui: &Ui, index: usize) {
-        if ui.arrow_button("##up", Direction::Up) {
+        if ui.arrow_button("up", Direction::Up) {
             *self = Action::Up(index);
         }
 
         ui.same_line();
-        if ui.arrow_button("##down", Direction::Down) {
+        if ui.arrow_button("down", Direction::Down) {
             *self = Action::Down(index);
         }
 
