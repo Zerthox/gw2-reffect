@@ -94,7 +94,7 @@ impl RenderOptions for Icon {
             .preview(ColorPreview::Alpha)
             .build(ui);
 
-        ui.checkbox("Stacks", &mut self.stacks);
+        ui.checkbox("Show stacks", &mut self.stacks);
         // TODO: customizable stacks text offset
     }
 }

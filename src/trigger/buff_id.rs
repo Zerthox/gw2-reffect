@@ -34,6 +34,10 @@ pub enum BuffTriggerId {
 impl_static_variants!(BuffTriggerId);
 
 impl BuffTriggerId {
+    pub fn always(&self) -> bool {
+        matches!(self, Self::None)
+    }
+
     pub fn count_stacks(&self, ctx: &Context) -> i32 {
         match self {
             Self::None => 1, // return 1 stack

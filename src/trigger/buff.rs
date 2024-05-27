@@ -3,7 +3,6 @@ use crate::{context::Context, elements::RenderState, traits::RenderOptions};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
-// TODO: we are still checking threshold for always/none
 // TODO: update examples!
 // TODO: memoize?
 
@@ -12,14 +11,13 @@ use serde::{Deserialize, Serialize};
 pub struct BuffTrigger {
     pub id: BuffTriggerId,
 
-    #[serde(rename = "stacks")]
-    #[serde(alias = "threshold")]
+    #[serde(alias = "stacks")]
     pub threshold: BuffThreshold,
 }
 
 impl Trigger for BuffTrigger {
     fn is_active(&mut self, ctx: &Context) -> bool {
-        self.threshold.is_met(self.id.count_stacks(ctx))
+        self.id.always() || self.threshold.is_met(self.id.count_stacks(ctx))
     }
 }
 
@@ -29,7 +27,7 @@ impl BuffTrigger {
             Some(1)
         } else {
             let stacks = self.id.count_stacks(ctx);
-            self.threshold.is_met(stacks).then_some(stacks)
+            (self.id.always() || self.threshold.is_met(stacks)).then_some(stacks)
         }
     }
 }
@@ -37,6 +35,8 @@ impl BuffTrigger {
 impl RenderOptions for BuffTrigger {
     fn render_options(&mut self, ui: &Ui) {
         self.id.render_options(ui);
-        self.threshold.render_options(ui);
+        if !self.id.always() {
+            self.threshold.render_options(ui);
+        }
     }
 }
