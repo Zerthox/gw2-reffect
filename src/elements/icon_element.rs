@@ -1,8 +1,8 @@
 use super::{Icon, RenderState};
 use crate::{
-    context::RenderContext,
+    context::Context,
     render_util::input_size,
-    traits::{Leaf, Render, RenderOptions},
+    traits::{Render, RenderOptions, TreeLeaf},
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
@@ -14,16 +14,10 @@ pub struct IconElement {
     pub size: [f32; 2],
 }
 
-impl Leaf for IconElement {
-    fn load(&mut self) {
-        self.icon.load();
-    }
-
-    fn slow_update(&mut self, _ctx: &RenderContext) {}
-}
+impl TreeLeaf for IconElement {}
 
 impl Render for IconElement {
-    fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &RenderState) {
+    fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
         if self.icon.is_visible(ctx, state) {
             self.icon.render(ui, ctx, state, self.size)
         }

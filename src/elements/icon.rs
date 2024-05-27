@@ -2,9 +2,9 @@ use super::{IconSource, RenderState, TextAlign, TextDecoration};
 use crate::{
     colors::{self, with_alpha},
     component_wise::ComponentWise,
-    context::RenderContext,
+    context::Context,
     render_util::spinner,
-    traits::{Leaf, RenderOptions},
+    traits::RenderOptions,
     trigger::{BuffTrigger, Trigger},
 };
 use nexus::imgui::{ColorEdit, ColorPreview, Style, StyleVar, Ui};
@@ -14,24 +14,32 @@ use serde::{Deserialize, Serialize};
 #[serde(default)]
 pub struct Icon {
     pub buff: BuffTrigger,
-    pub icon: IconSource,
+
+    #[serde(rename = "icon")]
+    pub source: IconSource,
+
     pub stacks: bool,
+
     pub color: [f32; 4],
 }
 
 impl Icon {
+    pub fn load(&mut self) {
+        self.source.load();
+    }
+
     fn texture_color(&self, ui: &Ui) -> [f32; 4] {
         let Style { alpha, .. } = ui.clone_style();
         let [r, g, b, a] = self.color;
         [r, g, b, a * alpha]
     }
 
-    pub fn is_visible(&mut self, ctx: &RenderContext, state: &RenderState) -> bool {
+    pub fn is_visible(&mut self, ctx: &Context, state: &RenderState) -> bool {
         self.buff.is_active_or_edit(ctx, state)
     }
 
-    pub fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &RenderState, size: [f32; 2]) {
-        if let Some(texture) = self.icon.get_texture() {
+    pub fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState, size: [f32; 2]) {
+        if let Some(texture) = self.source.get_texture() {
             // render icon
             let half_size = size.mul_scalar(0.5);
             let start = state.pos.sub(half_size);
@@ -76,19 +84,11 @@ impl Icon {
     }
 }
 
-impl Leaf for Icon {
-    fn load(&mut self) {
-        self.icon.load();
-    }
-
-    fn slow_update(&mut self, _ctx: &RenderContext) {}
-}
-
 impl RenderOptions for Icon {
     fn render_options(&mut self, ui: &Ui) {
         self.buff.render_options(ui);
 
-        self.icon.render_select(ui);
+        self.source.render_select(ui);
 
         ColorEdit::new("Color", &mut self.color)
             .preview(ColorPreview::Alpha)
@@ -103,7 +103,7 @@ impl Default for Icon {
     fn default() -> Self {
         Self {
             buff: BuffTrigger::default(),
-            icon: IconSource::Unknown,
+            source: IconSource::Unknown,
             stacks: false,
             color: [1.0, 1.0, 1.0, 1.0],
         }

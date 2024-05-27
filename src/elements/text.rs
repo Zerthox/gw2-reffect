@@ -1,9 +1,9 @@
 use super::{RenderState, TextAlign, TextDecoration};
 use crate::{
     component_wise::ComponentWise,
-    context::RenderContext,
+    context::Context,
     render_util::input_float_with_format,
-    traits::{Leaf, Render, RenderOptions},
+    traits::{Render, RenderOptions, TreeLeaf},
     trigger::BuffTrigger,
 };
 use nexus::imgui::{ColorEdit, ColorPreview, InputTextFlags, Ui};
@@ -27,7 +27,7 @@ mod replace {
 }
 
 impl Text {
-    pub fn process_text(&self, ctx: &RenderContext, state: &RenderState) -> Option<String> {
+    pub fn process_text(&self, ctx: &Context, state: &RenderState) -> Option<String> {
         let text = self.text.replace(replace::NAME, state.name);
         self.buff
             .active_stacks_or_edit(ctx, state)
@@ -35,14 +35,10 @@ impl Text {
     }
 }
 
-impl Leaf for Text {
-    fn load(&mut self) {}
-
-    fn slow_update(&mut self, _ctx: &RenderContext) {}
-}
+impl TreeLeaf for Text {}
 
 impl Render for Text {
-    fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &RenderState) {
+    fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
         if let Some(text) = self.process_text(ctx, state) {
             ui.set_window_font_scale(self.size);
 
@@ -65,7 +61,7 @@ impl RenderOptions for Text {
         ui.input_text("Text", &mut self.text).build();
         if ui.is_item_hovered() {
             ui.tooltip_text("%n replaced by name");
-            ui.tooltip_text("%s replaced by buff stacks");
+            ui.tooltip_text("%s replaced by effect stacks");
         }
 
         let mut size = 100.0 * self.size;

@@ -1,7 +1,5 @@
 use super::Addon;
-use crate::{
-    addon::Settings, elements::Pack, texture_manager::TextureManager, traits::Node, util::file_name,
-};
+use crate::{addon::Settings, elements::Pack, texture_manager::TextureManager, util::file_name};
 use nexus::gui::{register_render, RenderType};
 use std::fs;
 
@@ -47,16 +45,6 @@ impl Addon {
         plugin.save_packs();
 
         TextureManager::unload();
-    }
-
-    pub fn perform_updates(&mut self, time: f64) {
-        let slow_update = self.context.update(time);
-        if slow_update {
-            log::debug!("Updating slow triggers");
-            for pack in &mut self.packs {
-                pack.slow_update(&self.context.as_render());
-            }
-        }
     }
 
     pub fn load_packs(&mut self) {

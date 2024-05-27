@@ -1,9 +1,10 @@
 use super::{render_or_children, Anchor, Common, Element, RenderState};
 use crate::{
-    context::{EditState, RenderContext},
+    context::{Context, EditState},
     render_util::{delete_confirm_modal, enum_combo, item_context_menu, tree_select_empty},
-    traits::{Node, RenderOptions},
+    traits::{RenderOptions, TreeNode},
     util::file_name,
+    visit::{Loader, VisitMut},
 };
 use nexus::imgui::{ComboBoxFlags, MenuItem, StyleVar, Ui};
 use serde::{Deserialize, Serialize};
@@ -46,6 +47,10 @@ impl Pack {
         pack.file = file;
         pack.load();
         pack.save_to_file().then_some(pack)
+    }
+
+    pub fn load(&mut self) {
+        Loader.visit_elements(&mut self.elements);
     }
 
     pub fn load_from_file(path: impl Into<PathBuf>) -> Option<Self> {
@@ -93,7 +98,7 @@ impl Pack {
     }
 
     /// Renders the pack.
-    pub fn render(&mut self, ui: &Ui, ctx: &RenderContext) {
+    pub fn render(&mut self, ui: &Ui, ctx: &Context) {
         if self.edit || (self.enabled && ctx.ui.should_show()) {
             let pos = self.anchor.calc_pos(ui);
             let state = RenderState::new(self.edit, pos);
@@ -179,7 +184,7 @@ impl Pack {
     }
 }
 
-impl Node for Pack {
+impl TreeNode for Pack {
     fn children(&mut self) -> Option<&mut Vec<Element>> {
         Some(&mut self.elements)
     }

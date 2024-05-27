@@ -1,10 +1,11 @@
 use super::{BuffThreshold, BuffTriggerId, Trigger};
-use crate::{context::RenderContext, elements::RenderState, traits::RenderOptions};
+use crate::{context::Context, elements::RenderState, traits::RenderOptions};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
 // TODO: we are still checking threshold for always/none
 // TODO: update examples!
+// TODO: memoize?
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(default)]
@@ -17,13 +18,13 @@ pub struct BuffTrigger {
 }
 
 impl Trigger for BuffTrigger {
-    fn is_active(&mut self, ctx: &RenderContext) -> bool {
+    fn is_active(&mut self, ctx: &Context) -> bool {
         self.threshold.is_met(self.id.count_stacks(ctx))
     }
 }
 
 impl BuffTrigger {
-    pub fn active_stacks_or_edit(&self, ctx: &RenderContext, state: &RenderState) -> Option<i32> {
+    pub fn active_stacks_or_edit(&self, ctx: &Context, state: &RenderState) -> Option<i32> {
         if state.edit {
             Some(1)
         } else {

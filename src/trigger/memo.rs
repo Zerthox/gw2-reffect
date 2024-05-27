@@ -1,5 +1,5 @@
 use super::Trigger;
-use crate::context::RenderContext;
+use crate::context::Context;
 use serde::{Deserialize, Serialize};
 use std::ops;
 
@@ -24,11 +24,11 @@ where
         }
     }
 
-    pub fn update(&mut self, ctx: &RenderContext) -> bool {
+    pub fn update(&mut self, ctx: &Context) -> bool {
         *self.cache.insert(self.trigger.is_active(ctx))
     }
 
-    pub fn get_or_update(&mut self, ctx: &RenderContext) -> bool {
+    pub fn get_or_update(&mut self, ctx: &Context) -> bool {
         if let Some(active) = self.cache {
             active
         } else {
@@ -61,7 +61,7 @@ impl<T> Trigger for Memo<T>
 where
     T: Trigger,
 {
-    fn is_active(&mut self, ctx: &RenderContext) -> bool {
+    fn is_active(&mut self, ctx: &Context) -> bool {
         self.get_or_update(ctx)
     }
 }

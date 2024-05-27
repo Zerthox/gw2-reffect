@@ -1,6 +1,6 @@
 use super::{CombatTrigger, Trigger};
 use crate::{
-    context::{Mount, Profession, RenderContext, Specialization},
+    context::{Context, Mount, Profession, Specialization},
     render_util::enum_combo_bitflags,
     serde_bitflags,
     traits::RenderOptions,
@@ -25,7 +25,7 @@ pub struct PlayerTrigger {
 }
 
 impl Trigger for PlayerTrigger {
-    fn is_active(&mut self, ctx: &RenderContext) -> bool {
+    fn is_active(&mut self, ctx: &Context) -> bool {
         self.combat.is_active(ctx)
             && check_bitflags_optional(self.profs, ctx.player.prof.ok())
             && check_bitflags_optional(self.specs, ctx.player.spec.ok())

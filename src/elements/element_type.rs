@@ -1,8 +1,8 @@
 use super::{Element, Group, IconElement, IconGrid, RenderState, Text};
 use crate::{
-    context::RenderContext,
+    context::Context,
     render_util::impl_static_variants,
-    traits::{Node, Render, RenderOptions},
+    traits::{TreeNode, Render, RenderOptions},
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
@@ -23,25 +23,7 @@ pub enum ElementType {
 
 impl_static_variants!(ElementType);
 
-impl Node for ElementType {
-    fn load(&mut self) {
-        match self {
-            Self::Group(group) => group.load(),
-            Self::IconGrid(grid) => grid.load(),
-            Self::Icon(icon) => icon.load(),
-            Self::Text(text) => text.load(),
-        }
-    }
-
-    fn slow_update(&mut self, ctx: &RenderContext) {
-        match self {
-            Self::Group(group) => group.slow_update(ctx),
-            Self::IconGrid(grid) => grid.slow_update(ctx),
-            Self::Icon(icon) => icon.slow_update(ctx),
-            Self::Text(text) => text.slow_update(ctx),
-        }
-    }
-
+impl TreeNode for ElementType {
     fn children(&mut self) -> Option<&mut Vec<Element>> {
         match self {
             Self::Group(group) => group.children(),
@@ -53,7 +35,7 @@ impl Node for ElementType {
 }
 
 impl Render for ElementType {
-    fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &RenderState) {
+    fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
         match self {
             Self::Group(group) => group.render(ui, ctx, state),
             Self::IconGrid(grid) => grid.render(ui, ctx, state),

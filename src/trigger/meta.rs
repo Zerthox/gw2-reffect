@@ -1,7 +1,7 @@
 use super::{memo::Memo, MapTrigger, PlayerTrigger, Trigger};
 use crate::{
-    context::RenderContext,
-    traits::{Leaf, RenderOptions},
+    context::{Context, Update},
+    traits::RenderOptions,
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
@@ -14,16 +14,12 @@ pub struct MetaTrigger {
 }
 
 impl Trigger for MetaTrigger {
-    fn is_active(&mut self, ctx: &RenderContext) -> bool {
+    fn is_active(&mut self, ctx: &Context) -> bool {
+        if ctx.updates.contains(Update::Map) {
+            self.map.update(ctx);
+        }
+
         self.player.is_active(ctx) && self.map.is_active(ctx)
-    }
-}
-
-impl Leaf for MetaTrigger {
-    fn load(&mut self) {}
-
-    fn slow_update(&mut self, ctx: &RenderContext) {
-        self.map.update(ctx);
     }
 }
 

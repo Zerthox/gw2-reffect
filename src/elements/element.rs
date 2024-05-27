@@ -1,10 +1,11 @@
 use super::{render_or_children, Animation, Common, ElementType, RenderState};
 use crate::{
     action::ElementAction,
-    context::{EditState, RenderContext},
+    context::{Context, EditState},
     render_util::{delete_confirm_modal, item_context_menu, tree_select_empty},
-    traits::{Node, Render, RenderOptions},
+    traits::{Render, RenderOptions, TreeNode},
     trigger::{MetaTrigger, Trigger},
+    visit::{Loader, VisitMut},
 };
 use nexus::imgui::{MenuItem, Ui};
 use serde::{Deserialize, Serialize};
@@ -38,8 +39,12 @@ impl Element {
         element
     }
 
+    pub fn load(&mut self) {
+        Loader.visit_element(self);
+    }
+
     /// Renders the element.
-    pub fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &RenderState) {
+    pub fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
         if self.trigger.is_active_or_edit(ctx, state) {
             let mut body = || {
                 self.common
@@ -149,16 +154,7 @@ impl Element {
     }
 }
 
-impl Node for Element {
-    fn load(&mut self) {
-        self.kind.load();
-    }
-
-    fn slow_update(&mut self, ctx: &RenderContext) {
-        self.trigger.slow_update(ctx);
-        self.kind.slow_update(ctx);
-    }
-
+impl TreeNode for Element {
     fn children(&mut self) -> Option<&mut Vec<Element>> {
         self.kind.children()
     }

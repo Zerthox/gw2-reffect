@@ -1,7 +1,7 @@
 use super::Trigger;
 use crate::{
     action::Action,
-    context::{MapCategory, RenderContext},
+    context::{Context, MapCategory},
     render_util::{enum_combo, impl_static_variants, input_u32},
     traits::RenderOptions,
 };
@@ -20,7 +20,7 @@ pub enum MapTrigger {
 impl_static_variants!(MapTrigger);
 
 impl Trigger for MapTrigger {
-    fn is_active(&mut self, ctx: &RenderContext) -> bool {
+    fn is_active(&mut self, ctx: &Context) -> bool {
         match self {
             Self::Any => true,
             Self::Category(category) => ctx.map.category == *category,

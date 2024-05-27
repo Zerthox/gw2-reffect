@@ -1,5 +1,5 @@
 use super::Trigger;
-use crate::{context::RenderContext, traits::RenderOptions};
+use crate::{context::Context, traits::RenderOptions};
 use nexus::imgui::{Selectable, Ui};
 use serde::{Deserialize, Serialize};
 
@@ -19,7 +19,7 @@ impl CombatTrigger {
 }
 
 impl Trigger for CombatTrigger {
-    fn is_active(&mut self, ctx: &RenderContext) -> bool {
+    fn is_active(&mut self, ctx: &Context) -> bool {
         self.0.map(|combat| combat == ctx.ui.combat).unwrap_or(true)
     }
 }

@@ -23,8 +23,8 @@ impl Context {
     pub fn settings(&self) -> ContextSettings {
         ContextSettings {
             edit_during_combat: self.edit.during_combat,
-            buffs_interval: self.buffs_update.frequency,
-            player_interval: self.player_update.frequency,
+            buffs_interval: self.buffs_interval.frequency,
+            player_interval: self.player_interval.frequency,
         }
     }
 

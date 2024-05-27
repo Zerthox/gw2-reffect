@@ -14,7 +14,7 @@ use std::{
 
 impl Addon {
     pub fn render(&mut self, ui: &Ui) {
-        self.perform_updates(ui.time()); // TODO: perform update in separate thread?
+        self.context.update(ui.time()); // TODO: perform update in separate thread?
 
         self.render_displays(ui);
 
@@ -35,9 +35,8 @@ impl Addon {
             .movable(false)
             .focus_on_appearing(false)
             .build(ui, || {
-                let ctx = self.context.as_render();
                 for pack in &mut self.packs {
-                    pack.render(ui, &ctx);
+                    pack.render(ui, &self.context);
                 }
             });
     }
@@ -56,7 +55,7 @@ impl Addon {
                     .build(ui)
                 {
                     let mut buffs = (1000.0 * self.context.get_buffs_interval()) as u32;
-                    if input_u32(ui, "Buffs update interval", &mut buffs, 10, 100) {
+                    if input_u32(ui, "Effect update interval", &mut buffs, 10, 100) {
                         self.context.replace_buffs_interval((buffs / 1000) as f64);
                     }
 
@@ -190,18 +189,23 @@ impl Addon {
 
                 ui.text("Buffs status:");
                 ui.same_line();
-                match &ctx.buffs {
-                    Ok(buffs) => {
+                match &ctx.buffs_state {
+                    Ok(()) => {
                         ui.text_colored(GREEN, "ok");
                         if ui.is_item_hovered() {
                             ui.tooltip(|| {
-                                for buff in buffs {
+                                for buff in &ctx.buffs {
                                     ui.text(format!("{}x {}", buff.count, buff.id));
                                 }
                             });
                         }
                     }
-                    Err(err) => ui.text_colored(RED, err.to_string()),
+                    Err(err) => {
+                        ui.text_colored(RED, "error");
+                        if ui.is_item_hovered() {
+                            ui.tooltip_text(err.to_string());
+                        }
+                    }
                 }
 
                 ui.text(format!("Combat: {}", ctx.ui.combat));

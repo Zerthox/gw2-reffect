@@ -1,7 +1,7 @@
 use super::{Element, RenderState};
 use crate::{
-    context::RenderContext,
-    traits::{Node, Render, RenderOptions},
+    context::Context,
+    traits::{TreeNode, Render, RenderOptions},
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
@@ -12,14 +12,14 @@ pub struct Group {
     pub members: Vec<Element>,
 }
 
-impl Node for Group {
+impl TreeNode for Group {
     fn children(&mut self) -> Option<&mut Vec<Element>> {
         Some(&mut self.members)
     }
 }
 
 impl Render for Group {
-    fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &RenderState) {
+    fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
         for member in &mut self.members {
             member.render(ui, ctx, state);
         }

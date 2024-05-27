@@ -1,3 +1,5 @@
+#![allow(unused)] // TODO: remove after done
+
 use super::Element;
 use crate::action::ElementAction;
 use nexus::imgui::{DragDropFlags, DragDropSource, DragDropTarget, Ui};

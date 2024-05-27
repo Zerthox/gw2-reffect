@@ -1,5 +1,8 @@
 use crate::component_wise::ComponentWise;
 
+// TODO: as visitor?
+// TODO: avoid duplicating edit & name?
+
 /// Current render state.
 ///
 /// This is used as immutable structure to avoid accidentally keeping child state changes.
@@ -10,7 +13,7 @@ pub struct RenderState<'a> {
     pub name: &'a str,
 }
 
-impl RenderState<'_> {
+impl<'a> RenderState<'a> {
     pub const fn new(edit: bool, pos: [f32; 2]) -> Self {
         Self {
             edit,
@@ -24,6 +27,14 @@ impl RenderState<'_> {
             edit: self.edit,
             pos: self.pos.add(offset),
             name: self.name,
+        }
+    }
+
+    pub fn with_name(self, name: &'a str) -> Self {
+        Self {
+            edit: self.edit,
+            pos: self.pos,
+            name,
         }
     }
 

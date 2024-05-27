@@ -1,55 +1,23 @@
 use crate::{
     colors::Color,
-    context::RenderContext,
+    context::Context,
     elements::{Element, RenderState},
 };
 use nexus::imgui::Ui;
 
 /// [`Element`] tree node.
-pub trait Node {
-    /// Performs necessary initial loads.
-    fn load(&mut self) {
-        if let Some(children) = self.children() {
-            for child in children {
-                child.load();
-            }
-        }
-    }
-
-    /// Performs slow updates from the [`RenderContext`].
-    fn slow_update(&mut self, ctx: &RenderContext) {
-        if let Some(children) = self.children() {
-            for child in children {
-                child.slow_update(ctx);
-            }
-        }
-    }
-
+pub trait TreeNode {
     /// Returns the child [`Elements`].
     fn children(&mut self) -> Option<&mut Vec<Element>>;
 }
 
 /// [`Element`] tree node that is a leaf.
-pub trait Leaf {
-    /// Performs necessary loads.
-    fn load(&mut self);
+pub trait TreeLeaf {}
 
-    /// Performs slow updates from the [`RenderContext`].
-    fn slow_update(&mut self, ctx: &RenderContext);
-}
-
-impl<T> Node for T
+impl<T> TreeNode for T
 where
-    T: Leaf,
+    T: TreeLeaf,
 {
-    fn load(&mut self) {
-        Leaf::load(self)
-    }
-
-    fn slow_update(&mut self, ctx: &RenderContext) {
-        Leaf::slow_update(self, ctx)
-    }
-
     fn children(&mut self) -> Option<&mut Vec<Element>> {
         None
     }
@@ -58,7 +26,7 @@ where
 /// Render UI element.
 pub trait Render: RenderOptions {
     /// Renders the UI element.
-    fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &RenderState);
+    fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState);
 }
 
 /// Render options UI.

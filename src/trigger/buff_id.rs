@@ -1,6 +1,6 @@
 use crate::{
     action::Action,
-    context::RenderContext,
+    context::Context,
     render_util::{enum_combo, impl_static_variants, input_u32},
     traits::RenderOptions,
 };
@@ -34,7 +34,7 @@ pub enum BuffTriggerId {
 impl_static_variants!(BuffTriggerId);
 
 impl BuffTriggerId {
-    pub fn count_stacks(&self, ctx: &RenderContext) -> i32 {
+    pub fn count_stacks(&self, ctx: &Context) -> i32 {
         match self {
             Self::None => 1, // return 1 stack
             Self::Single(id) => ctx.stacks_of(*id).unwrap_or(0),
@@ -45,7 +45,7 @@ impl BuffTriggerId {
                     if let Some(stacks) = ctx.stacks_of(*id) {
                         sum += stacks;
                     } else {
-                        return 0; // missing one of the buffs equals no stacks
+                        return 0; // missing one of the buffs means no stacks
                     }
                 }
                 sum
@@ -65,7 +65,7 @@ impl BuffTriggerId {
 impl RenderOptions for BuffTriggerId {
     fn render_options(&mut self, ui: &Ui) {
         ui.group(|| {
-            if let Some(prev) = enum_combo(ui, "Buff", self, ComboBoxFlags::empty()) {
+            if let Some(prev) = enum_combo(ui, "Effect", self, ComboBoxFlags::empty()) {
                 match self {
                     Self::None => {}
                     Self::Single(id) => {

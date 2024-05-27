@@ -1,12 +1,12 @@
 use super::{Direction, IconNamed, RenderState};
 use crate::{
     colors,
-    context::RenderContext,
+    context::Context,
     render_util::{
         button_disabled, collapsing_header_same_line_end, enum_combo, input_float_with_format,
         input_size, push_alpha_change,
     },
-    traits::{Leaf, Node, Render, RenderOptions},
+    traits::{TreeLeaf, Render, RenderOptions},
 };
 use nexus::imgui::{
     self as ig, CollapsingHeader, ComboBoxFlags, InputTextFlags, Slider, SliderFlags, StyleColor,
@@ -26,18 +26,10 @@ pub struct IconGrid {
     pub icons: Vec<IconNamed>,
 }
 
-impl Leaf for IconGrid {
-    fn load(&mut self) {
-        for icon in &mut self.icons {
-            icon.load();
-        }
-    }
-
-    fn slow_update(&mut self, _ctx: &RenderContext) {}
-}
+impl TreeLeaf for IconGrid {}
 
 impl Render for IconGrid {
-    fn render(&mut self, ui: &Ui, ctx: &RenderContext, state: &RenderState) {
+    fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
         let _style = push_alpha_change(ui, self.opacity);
 
         let mut icons = Vec::new();

@@ -14,6 +14,7 @@ mod texture_manager;
 mod traits;
 mod trigger;
 mod util;
+mod visit;
 
 use addon::Addon;
 

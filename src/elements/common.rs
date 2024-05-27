@@ -2,7 +2,7 @@ use super::{Element, ElementType, RenderState};
 use crate::{
     action::ChildElementAction,
     component_wise::ComponentWise,
-    context::{EditState, RenderContext},
+    context::{Context, EditState},
     id::{Id, IdGen},
     render_util::{input_float_with_format, EnumStaticVariants},
     traits::RenderOptions,
@@ -28,12 +28,11 @@ impl Common {
     pub fn render(
         &self,
         ui: &Ui,
-        ctx: &RenderContext,
+        ctx: &Context,
         state: &RenderState,
         children: impl FnOnce(&RenderState),
     ) {
-        let mut state = state.with_offset(self.pos);
-        state.name = &self.name;
+        let state = state.with_offset(self.pos).with_name(&self.name);
         children(&state);
 
         if ctx.edit.is_edited(self.id) {
