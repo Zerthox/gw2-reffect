@@ -1,7 +1,7 @@
 use super::{Element, RenderState};
 use crate::{
     context::Context,
-    traits::{TreeNode, Render, RenderOptions},
+    traits::{Render, RenderOptions, TreeNode},
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};

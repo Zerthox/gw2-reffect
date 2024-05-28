@@ -103,8 +103,14 @@ impl Context {
     }
 
     /// Changes the interval for player updates.
-    pub fn replace_player_intervals(&mut self, interval: f64) {
+    pub fn replace_player_interval(&mut self, interval: f64) {
         self.player_interval = Interval::new(interval);
+    }
+
+    /// Resets the intervals for all updates.
+    pub fn reset_intervals(&mut self) {
+        self.replace_buffs_interval(BUFFS_INTERVAL);
+        self.replace_player_interval(PLAYER_INTERVAL);
     }
 
     /// Checks whether a given buff id is present.

@@ -1,10 +1,15 @@
 use super::Addon;
 use crate::{
-    elements::Pack,
+    elements::{Pack, TextDecoration},
     id::IdGen,
-    render_util::{input_u32, next_window_size_constraints},
+    render_util::{
+        enum_combo, input_float_with_format, input_u32, next_window_size_constraints,
+        style_disabled,
+    },
 };
-use nexus::imgui::{ChildWindow, CollapsingHeader, Condition, StyleVar, TreeNodeFlags, Ui, Window};
+use nexus::imgui::{
+    ChildWindow, ComboBoxFlags, Condition, InputTextFlags, StyleVar, TreeNodeFlags, Ui, Window,
+};
 use rfd::FileDialog;
 use std::{
     fmt,
@@ -49,20 +54,59 @@ impl Addon {
 
             if let Some(_token) = ui.tab_item("Settings") {
                 ui.checkbox("Allow edit in combat", &mut self.context.edit.during_combat);
+                if ui.collapsing_header(
+                    "Stacks Display (coming soon...)",
+                    TreeNodeFlags::SPAN_AVAIL_WIDTH | TreeNodeFlags::DEFAULT_OPEN,
+                ) {
+                    // TODO: stacks settings
+                    let _style = style_disabled(ui);
+                    enum_combo(
+                        ui,
+                        "Decoration",
+                        &mut TextDecoration::Shadow,
+                        ComboBoxFlags::empty(),
+                    );
 
-                if CollapsingHeader::new("Advanced")
-                    .flags(TreeNodeFlags::SPAN_AVAIL_WIDTH)
-                    .build(ui)
-                {
+                    input_float_with_format(
+                        "Size",
+                        &mut 100.0,
+                        1.0,
+                        10.0,
+                        "%.2f",
+                        InputTextFlags::READ_ONLY,
+                    );
+
+                    input_float_with_format(
+                        "Position x",
+                        &mut 0.0,
+                        10.0,
+                        100.0,
+                        "%.2f",
+                        InputTextFlags::READ_ONLY,
+                    );
+                    input_float_with_format(
+                        "Position y",
+                        &mut 0.0,
+                        10.0,
+                        100.0,
+                        "%.2f",
+                        InputTextFlags::READ_ONLY,
+                    );
+                }
+
+                if ui.collapsing_header("Advanced", TreeNodeFlags::SPAN_AVAIL_WIDTH) {
                     let mut buffs = (1000.0 * self.context.get_buffs_interval()) as u32;
                     if input_u32(ui, "Effect update interval", &mut buffs, 10, 100) {
-                        self.context.replace_buffs_interval((buffs / 1000) as f64);
+                        self.context.replace_buffs_interval(buffs as f64 / 1000.0);
                     }
 
                     let mut player = (1000.0 * self.context.get_player_interval()) as u32;
                     if input_u32(ui, "Player update interval", &mut player, 10, 100) {
-                        self.context
-                            .replace_player_intervals((player / 1000) as f64);
+                        self.context.replace_player_interval(player as f64 / 1000.0);
+                    }
+
+                    if ui.button("Reset update intervals") {
+                        self.context.reset_intervals();
                     }
 
                     ui.checkbox("Debug window", &mut self.debug);

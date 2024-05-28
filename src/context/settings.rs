@@ -31,6 +31,6 @@ impl Context {
     pub fn load(&mut self, settings: ContextSettings) {
         self.edit.during_combat = settings.edit_during_combat;
         self.replace_buffs_interval(settings.buffs_interval);
-        self.replace_player_intervals(settings.player_interval);
+        self.replace_player_interval(settings.player_interval);
     }
 }

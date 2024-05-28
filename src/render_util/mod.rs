@@ -16,6 +16,10 @@ pub fn next_window_size_constraints(size_min: [f32; 2], size_max: [f32; 2]) {
     }
 }
 
+pub fn style_disabled<'ui>(ui: &'ui Ui) -> StyleStackToken<'ui> {
+    ui.push_style_var(StyleVar::Alpha(0.5))
+}
+
 pub fn push_alpha_change<'ui>(ui: &'ui Ui, change: f32) -> StyleStackToken<'ui> {
     let Style { alpha, .. } = ui.clone_style();
     ui.push_style_var(StyleVar::Alpha(alpha * change))

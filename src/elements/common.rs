@@ -10,6 +10,8 @@ use crate::{
 use nexus::imgui::{InputTextFlags, MenuItem, Ui};
 use serde::{Deserialize, Serialize};
 
+// FIXME: common default is called twice when deserializing element/pack, generating unused ids
+
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Common {
@@ -17,6 +19,7 @@ pub struct Common {
     pub id: Id,
 
     pub name: String,
+
     pub pos: [f32; 2],
 }
 

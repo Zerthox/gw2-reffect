@@ -1,12 +1,14 @@
 use super::{render_or_children, Anchor, Common, Element, RenderState};
 use crate::{
     context::{Context, EditState},
-    render_util::{delete_confirm_modal, enum_combo, item_context_menu, tree_select_empty},
+    render_util::{
+        delete_confirm_modal, enum_combo, item_context_menu, style_disabled, tree_select_empty,
+    },
     traits::{RenderOptions, TreeNode},
     util::file_name,
     visit::{Loader, VisitMut},
 };
-use nexus::imgui::{ComboBoxFlags, MenuItem, StyleVar, Ui};
+use nexus::imgui::{ComboBoxFlags, MenuItem, Ui};
 use serde::{Deserialize, Serialize};
 use std::{
     fs::File,
@@ -162,7 +164,7 @@ impl Pack {
 
                 {
                     // TODO: layer input
-                    let _style = ui.push_style_var(StyleVar::Alpha(0.5));
+                    let _style = style_disabled(ui);
                     let mut layer = self.layer;
                     ui.input_int("Layer", &mut layer)
                         .step(0)

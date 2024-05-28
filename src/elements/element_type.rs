@@ -2,7 +2,7 @@ use super::{Element, Group, IconElement, IconGrid, RenderState, Text};
 use crate::{
     context::Context,
     render_util::impl_static_variants,
-    traits::{TreeNode, Render, RenderOptions},
+    traits::{Render, RenderOptions, TreeNode},
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};

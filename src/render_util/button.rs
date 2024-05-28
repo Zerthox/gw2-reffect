@@ -1,5 +1,6 @@
+use super::style_disabled;
 use crate::{colors::TRANSPARENT, component_wise::ComponentWise};
-use nexus::imgui::{ColorStackToken, StyleColor, StyleStackToken, StyleVar, Ui};
+use nexus::imgui::{ColorStackToken, StyleColor, StyleStackToken, Ui};
 
 pub struct ButtonDisabledToken<'ui> {
     _alpha: StyleStackToken<'ui>,
@@ -10,7 +11,7 @@ pub struct ButtonDisabledToken<'ui> {
 
 pub fn button_disabled<'ui>(ui: &'ui Ui, enabled: bool) -> Option<ButtonDisabledToken<'ui>> {
     (!enabled).then(|| ButtonDisabledToken {
-        _alpha: ui.push_style_var(StyleVar::Alpha(0.5)),
+        _alpha: style_disabled(ui),
         _color: ui.push_style_color(StyleColor::Button, TRANSPARENT),
         _hover_color: ui.push_style_color(StyleColor::ButtonHovered, TRANSPARENT),
         _active_color: ui.push_style_color(StyleColor::ButtonActive, TRANSPARENT),
