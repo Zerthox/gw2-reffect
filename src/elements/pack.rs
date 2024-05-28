@@ -43,7 +43,7 @@ impl Pack {
             enabled: true,
             ..Self::default()
         };
-        if let Some(name) = file.file_name() {
+        if let Some(name) = file.file_stem() {
             pack.common.name = name.to_string_lossy().into_owned();
         }
         pack.file = file;

@@ -18,10 +18,9 @@ pub struct Element {
     #[serde(flatten)]
     pub common: Common,
 
-    // TODO: move to common? allow on pack?
+    // TODO: move trigger, animation to common to allow on pack? need to figure out pack render conditions, debug tab
     pub trigger: MetaTrigger,
 
-    // TODO: move to common? allow on pack?
     pub animation: Option<Animation>,
 
     #[serde(flatten)]
