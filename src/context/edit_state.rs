@@ -20,16 +20,23 @@ pub struct EditState {
 }
 
 impl EditState {
-    pub fn is_active(&self, id: Id) -> bool {
+    /// Whether the id is selected for editing.
+    pub fn is_selected(&self, id: Id) -> bool {
         self.active == id
     }
 
+    /// Whether edit mode is currently allowed.
     pub fn is_allowed(&self) -> bool {
         self.allowed
     }
 
+    /// Whether the id currently edited.
     pub fn is_edited(&self, id: Id) -> bool {
-        self.is_allowed() && self.is_active(id)
+        self.is_allowed() && self.is_selected(id)
+    }
+
+    pub fn is_editing(&self) -> bool {
+        self.is_allowed() && self.active != Id::default()
     }
 
     pub fn select(&mut self, id: Id) {

@@ -24,15 +24,15 @@ where
 }
 
 /// Render UI element.
-pub trait Render: RenderOptions {
+pub trait Render<T = ()> {
     /// Renders the UI element.
-    fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState);
+    fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) -> T;
 }
 
 /// Render options UI.
-pub trait RenderOptions {
+pub trait RenderOptions<T = ()> {
     /// Renders options for the type.
-    fn render_options(&mut self, ui: &Ui);
+    fn render_options(&mut self, ui: &Ui) -> T;
 }
 
 /// Associated color.

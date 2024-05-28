@@ -18,7 +18,8 @@ pub struct Element {
     #[serde(flatten)]
     pub common: Common,
 
-    pub trigger: MetaTrigger, // TODO: rename to condition? restriction? filter? requirement?
+    // TODO: move to common? allow on pack?
+    pub trigger: MetaTrigger,
 
     pub animation: Option<Animation>,
 
@@ -64,13 +65,13 @@ impl Element {
     pub fn render_select_tree(&mut self, ui: &Ui, state: &mut EditState) -> ElementAction {
         let kind = (&self.kind).into(); // borrow here to keep ownership
         let id = self.common.id_string();
-        let active = state.is_active(self.common.id);
+        let selected = state.is_selected(self.common.id);
         let children = self.kind.children();
         let leaf = children
             .as_ref()
             .map(|children| children.is_empty())
             .unwrap_or(true);
-        let (token, clicked) = tree_select_empty(ui, &id, active, leaf);
+        let (token, clicked) = tree_select_empty(ui, &id, selected, leaf);
         if clicked {
             state.select(self.common.id);
         }
@@ -129,7 +130,7 @@ impl Element {
                 self.kind.render_options(ui);
             }
 
-            if let Some(_token) = ui.tab_item("Trigger") {
+            if let Some(_token) = ui.tab_item("Filter") {
                 self.trigger.render_options(ui);
             }
 

@@ -115,9 +115,9 @@ impl Pack {
     #[must_use]
     pub fn render_select_tree(&mut self, ui: &Ui, state: &mut EditState) -> bool {
         let id = self.common.id_string();
-        let active = state.is_active(self.common.id);
+        let selected = state.is_selected(self.common.id);
         let children = &mut self.elements;
-        let (token, clicked) = tree_select_empty(ui, &id, active, children.is_empty());
+        let (token, clicked) = tree_select_empty(ui, &id, selected, children.is_empty());
         if clicked {
             state.select(self.common.id);
         }

@@ -157,7 +157,7 @@ impl Clone for Common {
 /// Helper to generate options render.
 macro_rules! render_or_children {
     ( $self:ident, $ui:expr, $state:expr ) => {
-        if $state.is_active($self.common.id) {
+        if $state.is_selected($self.common.id) {
             $self.render_options($ui);
             true
         } else if let Some(children) = $self.children() {

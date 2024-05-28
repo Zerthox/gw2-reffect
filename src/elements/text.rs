@@ -1,7 +1,7 @@
 use super::{RenderState, TextAlign, TextDecoration};
 use crate::{
     component_wise::ComponentWise,
-    context::Context,
+    context::{Context, ContextUpdate},
     render_util::input_float_with_format,
     traits::{Render, RenderOptions, TreeLeaf},
     trigger::BuffTrigger,
@@ -18,6 +18,9 @@ pub struct Text {
     pub align: TextAlign,
     pub color: [f32; 4],
     pub decoration: TextDecoration,
+
+    #[serde(skip)]
+    text_memo: Option<String>,
 }
 
 mod replace {
@@ -27,11 +30,14 @@ mod replace {
 }
 
 impl Text {
-    pub fn process_text(&self, ctx: &Context, state: &RenderState) -> Option<String> {
-        let text = self.text.replace(replace::NAME, state.name);
-        self.buff
-            .active_stacks_or_edit(ctx, state)
-            .map(|stacks| text.replace(replace::STACKS, &stacks.to_string()))
+    pub fn update_text(&mut self, ctx: &Context, state: &RenderState) {
+        if ctx.has_update_or_edit(ContextUpdate::Buffs) {
+            self.text_memo = self.buff.active_stacks_or_edit(ctx, state).map(|stacks| {
+                self.text
+                    .replace(replace::NAME, state.name)
+                    .replace(replace::STACKS, &stacks.to_string())
+            });
+        }
     }
 }
 
@@ -39,15 +45,17 @@ impl TreeLeaf for Text {}
 
 impl Render for Text {
     fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
-        if let Some(text) = self.process_text(ctx, state) {
+        self.update_text(ctx, state);
+
+        if let Some(text) = &self.text_memo {
             ui.set_window_font_scale(self.size);
 
-            let align = self.align.calc_pos(ui, &text);
+            let align = self.align.calc_pos(ui, text);
             let pos = state.pos.add(align);
             ui.set_cursor_screen_pos(pos);
             let color @ [_, _, _, alpha] = self.color;
-            self.decoration.render(ui, &text, [0.0, 0.0, 0.0, alpha]);
-            ui.text_colored(color, &text);
+            self.decoration.render(ui, text, [0.0, 0.0, 0.0, alpha]);
+            ui.text_colored(color, text);
 
             ui.set_window_font_scale(1.0);
         }
@@ -95,6 +103,7 @@ impl Default for Text {
             size: 1.0,
             color: [1.0, 1.0, 1.0, 1.0],
             decoration: TextDecoration::default(),
+            text_memo: None,
         }
     }
 }

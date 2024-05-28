@@ -1,6 +1,6 @@
 use super::{memo::Memo, MapTrigger, PlayerTrigger, Trigger};
 use crate::{
-    context::{Context, Update},
+    context::{Context, ContextUpdate},
     traits::RenderOptions,
 };
 use nexus::imgui::Ui;
@@ -15,7 +15,7 @@ pub struct MetaTrigger {
 
 impl Trigger for MetaTrigger {
     fn is_active(&mut self, ctx: &Context) -> bool {
-        if ctx.updates.contains(Update::Map) {
+        if ctx.has_update(ContextUpdate::Map) {
             self.map.update(ctx);
         }
 
