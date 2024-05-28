@@ -229,7 +229,7 @@ impl Addon {
 
                 let ctx = &self.context;
 
-                ui.text(format!("Show Elements: {}", ctx.ui.should_show()));
+                ui.text(format!("Show elements: {}", ctx.ui.should_show()));
 
                 ui.text("Buffs status:");
                 ui.same_line();
@@ -271,7 +271,7 @@ impl Addon {
                 ui.spacing();
 
                 self.context.edit.debug(ui);
-                ui.text("Edited Packs:");
+                ui.text("Edited packs:");
                 ui.indent();
                 for pack in &mut self.packs {
                     if pack.edit {
@@ -292,6 +292,6 @@ where
 {
     match value {
         Ok(value) => value.to_string(),
-        Err(id) => format!("Unknown {id}"),
+        Err(id) => format!("Unknown ({id})"),
     }
 }

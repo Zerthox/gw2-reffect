@@ -12,6 +12,7 @@ use serde::{Deserialize, Serialize};
 
 // FIXME: common default is called twice when deserializing element/pack, generating unused ids
 
+/// Common behavior between elements and packs.
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Common {

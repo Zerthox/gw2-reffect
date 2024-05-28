@@ -21,6 +21,7 @@ pub struct Element {
     // TODO: move to common? allow on pack?
     pub trigger: MetaTrigger,
 
+    // TODO: move to common? allow on pack?
     pub animation: Option<Animation>,
 
     #[serde(flatten)]
