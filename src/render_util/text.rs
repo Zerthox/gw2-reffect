@@ -5,13 +5,12 @@ pub fn draw_text_bg(
     ui: &Ui,
     text: impl AsRef<str>,
     pos: [f32; 2],
-    font_scale: f32,
+    font_size: f32,
     color: impl Into<ImColor32>,
 ) {
     let text = text.as_ref();
     let text_bytes = text.as_bytes();
     let text_ptr = text_bytes.as_ptr().cast();
-    let font_size = font_scale * ui.current_font_size();
 
     let _bg = ui.get_background_draw_list();
     unsafe {

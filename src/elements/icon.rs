@@ -59,16 +59,17 @@ impl Icon {
                     let text = stacks.to_string();
 
                     let [_, height] = size;
-                    let font_scale = 0.5 * height / ui.current_font_size();
+                    let font_size = 0.5 * height;
+                    let font_scale = font_size / ui.current_font_size();
                     let [x_offset, _] = TextAlign::Right.calc_pos(ui, &text, font_scale);
                     let pad = [1.0, 1.0];
-                    let line_height = font_scale * ui.text_line_height();
+                    let line_height = font_size * ui.text_line_height();
                     let text_pos = end.add([x_offset, -line_height]).sub(pad);
                     let color = colors::WHITE;
                     let shadow_color = colors::BLACK;
 
-                    TextDecoration::Shadow.render(ui, &text, text_pos, font_scale, shadow_color);
-                    draw_text_bg(ui, &text, text_pos, font_scale, color);
+                    TextDecoration::Shadow.render(ui, &text, text_pos, font_size, shadow_color);
+                    draw_text_bg(ui, &text, text_pos, font_size, color);
                 }
             }
         } else {

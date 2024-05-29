@@ -48,13 +48,15 @@ impl Render for Text {
         self.update_text(ctx, state);
 
         if let Some(text) = &self.text_memo {
-            let align = self.align.calc_pos(ui, text, self.size);
+            let font_scale = self.size;
+            let font_size = font_scale * ui.current_font_size();
+            let align = self.align.calc_pos(ui, text, font_scale);
             let pos = state.pos.add(align);
             let color @ [_, _, _, alpha] = self.color;
 
             self.decoration
-                .render(ui, text, pos, self.size, [0.0, 0.0, 0.0, alpha]);
-            draw_text_bg(ui, text, pos, self.size, color);
+                .render(ui, text, pos, font_size, [0.0, 0.0, 0.0, alpha]);
+            draw_text_bg(ui, text, pos, font_size, color);
         }
     }
 }
