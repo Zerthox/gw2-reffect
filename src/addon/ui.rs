@@ -8,7 +8,7 @@ use crate::{
     },
 };
 use nexus::imgui::{
-    ChildWindow, ComboBoxFlags, Condition, InputTextFlags, StyleVar, TreeNodeFlags, Ui, Window,
+    ChildWindow, ComboBoxFlags, InputTextFlags, StyleVar, TreeNodeFlags, Ui, Window,
 };
 use rfd::FileDialog;
 use std::{
@@ -29,21 +29,9 @@ impl Addon {
     }
 
     pub fn render_displays(&mut self, ui: &Ui) {
-        let screen_size = ui.io().display_size;
-        let _style = ui.push_style_var(StyleVar::WindowPadding([0.0, 0.0]));
-        Window::new("##reffect-displays")
-            .position([0.0, 0.0], Condition::Always)
-            .size(screen_size, Condition::Always)
-            .draw_background(false)
-            .no_decoration()
-            .no_inputs()
-            .movable(false)
-            .focus_on_appearing(false)
-            .build(ui, || {
-                for pack in &mut self.packs {
-                    pack.render(ui, &self.context);
-                }
-            });
+        for pack in &mut self.packs {
+            pack.render(ui, &self.context);
+        }
     }
 
     pub fn render_options(&mut self, ui: &Ui) {
@@ -55,7 +43,7 @@ impl Addon {
             if let Some(_token) = ui.tab_item("Settings") {
                 ui.checkbox("Allow edit in combat", &mut self.context.edit.during_combat);
                 if ui.collapsing_header(
-                    "Stacks Display (coming soon...)",
+                    "Stacks Display (WIP)",
                     TreeNodeFlags::SPAN_AVAIL_WIDTH | TreeNodeFlags::DEFAULT_OPEN,
                 ) {
                     // TODO: stacks settings

@@ -3,7 +3,7 @@ use crate::{
     colors::{self, with_alpha},
     component_wise::ComponentWise,
     context::Context,
-    render_util::spinner,
+    render_util::{draw_text_bg, spinner_bg},
     traits::RenderOptions,
     trigger::{BuffTrigger, Trigger},
 };
@@ -45,7 +45,7 @@ impl Icon {
             let start = state.pos.sub(half_size);
             let end = state.pos.add(half_size);
             let color = self.texture_color(ui);
-            ui.get_window_draw_list()
+            ui.get_background_draw_list()
                 .add_image(texture, start, end)
                 .col(color)
                 .build();
@@ -59,27 +59,27 @@ impl Icon {
                     let text = stacks.to_string();
 
                     let [_, height] = size;
-                    ui.set_window_font_scale(1.0);
                     let font_scale = 0.5 * height / ui.current_font_size();
-                    ui.set_window_font_scale(font_scale);
-                    let [x_offset, _] = TextAlign::Right.calc_pos(ui, &text);
+                    let [x_offset, _] = TextAlign::Right.calc_pos(ui, &text, font_scale);
                     let pad = [1.0, 1.0];
-                    let line_height = ui.text_line_height();
+                    let line_height = font_scale * ui.text_line_height();
                     let text_pos = end.add([x_offset, -line_height]).sub(pad);
-
                     let color = colors::WHITE;
                     let shadow_color = colors::BLACK;
-                    ui.set_cursor_screen_pos(text_pos);
-                    TextDecoration::Shadow.render(ui, &text, shadow_color);
-                    ui.text_colored(color, &text);
 
-                    ui.set_window_font_scale(1.0);
+                    TextDecoration::Shadow.render(ui, &text, text_pos, font_scale, shadow_color);
+                    draw_text_bg(ui, &text, text_pos, font_scale, color);
                 }
             }
         } else {
-            ui.set_cursor_screen_pos(state.pos);
             let [x, _] = size;
-            spinner(ui, 0.4 * x, colors::WHITE, with_alpha(colors::WHITE, 0.3))
+            spinner_bg(
+                ui,
+                state.pos,
+                0.4 * x,
+                colors::WHITE,
+                with_alpha(colors::WHITE, 0.3),
+            )
         }
     }
 }

@@ -2,7 +2,7 @@ use super::{RenderState, TextAlign, TextDecoration};
 use crate::{
     component_wise::ComponentWise,
     context::{Context, ContextUpdate},
-    render_util::input_float_with_format,
+    render_util::{draw_text_bg, input_float_with_format},
     traits::{Render, RenderOptions, TreeLeaf},
     trigger::BuffTrigger,
 };
@@ -48,16 +48,13 @@ impl Render for Text {
         self.update_text(ctx, state);
 
         if let Some(text) = &self.text_memo {
-            ui.set_window_font_scale(self.size);
-
-            let align = self.align.calc_pos(ui, text);
+            let align = self.align.calc_pos(ui, text, self.size);
             let pos = state.pos.add(align);
-            ui.set_cursor_screen_pos(pos);
             let color @ [_, _, _, alpha] = self.color;
-            self.decoration.render(ui, text, [0.0, 0.0, 0.0, alpha]);
-            ui.text_colored(color, text);
 
-            ui.set_window_font_scale(1.0);
+            self.decoration
+                .render(ui, text, pos, self.size, [0.0, 0.0, 0.0, alpha]);
+            draw_text_bg(ui, text, pos, self.size, color);
         }
     }
 }

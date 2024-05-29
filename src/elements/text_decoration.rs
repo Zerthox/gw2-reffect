@@ -1,4 +1,7 @@
-use crate::{component_wise::ComponentWise, render_util::enum_combo};
+use crate::{
+    component_wise::ComponentWise,
+    render_util::{draw_text_bg, enum_combo},
+};
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, VariantArray};
@@ -37,35 +40,39 @@ pub enum TextDecoration {
 }
 
 impl TextDecoration {
-    fn render_at(ui: &Ui, pos: [f32; 2], text: &str, color: [f32; 4]) {
-        ui.set_cursor_pos(pos);
-        ui.text_colored(color, text);
+    fn render_at(ui: &Ui, pos: [f32; 2], text: &str, font_scale: f32, color: [f32; 4]) {
+        draw_text_bg(ui, text, pos, font_scale, color)
     }
 
-    pub fn render(&self, ui: &Ui, text: impl AsRef<str>, color: [f32; 4]) {
+    pub fn render(
+        &self,
+        ui: &Ui,
+        text: impl AsRef<str>,
+        pos: [f32; 2],
+        font_scale: f32,
+        color: [f32; 4],
+    ) {
         // FIXME: shadow renders behind transparent text
         let text = text.as_ref();
-        let cursor = ui.cursor_pos();
         match self {
             Self::None => {}
-            Self::Shadow => Self::render_at(ui, cursor.add([1.0, 1.0]), text, color),
+            Self::Shadow => Self::render_at(ui, pos.add([1.0, 1.0]), text, font_scale, color),
             Self::ShadowDouble => {
                 for offset in [[0.0, 1.0], [1.0, 0.0]] {
-                    Self::render_at(ui, cursor.add(offset), text, color)
+                    Self::render_at(ui, pos.add(offset), text, font_scale, color)
                 }
             }
             Self::Outline => {
                 for offset in [[-1.0, -1.0], [1.0, 1.0]] {
-                    Self::render_at(ui, cursor.add(offset), text, color)
+                    Self::render_at(ui, pos.add(offset), text, font_scale, color)
                 }
             }
             Self::OutlineDouble => {
                 for offset in [[-1.0, -1.0], [-1.0, 1.0], [1.0, -1.0], [1.0, 1.0]] {
-                    Self::render_at(ui, cursor.add(offset), text, color)
+                    Self::render_at(ui, pos.add(offset), text, font_scale, color)
                 }
             }
         }
-        ui.set_cursor_pos(cursor);
     }
 
     pub fn render_select(&mut self, ui: &Ui) {

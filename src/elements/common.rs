@@ -52,13 +52,14 @@ impl Common {
 
         let start = state.pos.sub(OFFSET);
         let end = state.pos.add(OFFSET);
-        ui.get_window_draw_list()
+        ui.get_background_draw_list()
             .add_rect(start, end, COLOR)
             .filled(true)
             .build();
 
-        ui.set_cursor_screen_pos(state.pos.add([HALF_SIZE + 1.0, 0.0]));
-        ui.text_colored(COLOR, &self.name);
+        let pos = state.pos.add([HALF_SIZE + 1.0, 0.0]);
+        ui.get_background_draw_list()
+            .add_text(pos, COLOR, &self.name);
     }
 
     pub fn render_tree_label(&self, ui: &Ui, kind: &str) {

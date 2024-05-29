@@ -25,14 +25,15 @@ pub enum TextAlign {
 }
 
 impl TextAlign {
-    pub fn calc_pos(&self, ui: &Ui, text: impl AsRef<str>) -> [f32; 2] {
+    pub fn calc_pos(&self, ui: &Ui, text: impl AsRef<str>, font_scale: f32) -> [f32; 2] {
         let [text_x, _] = ui.calc_text_size(text);
+        let width = font_scale * text_x;
         let line_height = ui.text_line_height();
-        let offset_y = -0.5 * line_height;
+        let offset_y = -0.5 * font_scale * line_height;
         match self {
             TextAlign::Left => [0.0, offset_y],
-            TextAlign::Center => [-0.5 * text_x, offset_y],
-            TextAlign::Right => [-text_x, offset_y],
+            TextAlign::Center => [-0.5 * width, offset_y],
+            TextAlign::Right => [-width, offset_y],
         }
     }
 
