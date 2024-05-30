@@ -49,9 +49,9 @@ impl RenderOptions for MapTrigger {
                     action.render_buttons(ui, i);
 
                     ui.same_line();
-                    ui.text(format!("Map id {}", i + 1));
+                    ui.text(format!("Map Id {}", i + 1));
                 }
-                if ui.button("Add") {
+                if ui.button("Add Map") {
                     ids.push(0);
                 }
 

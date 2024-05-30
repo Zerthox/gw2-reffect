@@ -86,16 +86,17 @@ impl Icon {
 
 impl RenderOptions for Icon {
     fn render_options(&mut self, ui: &Ui) {
-        // TODO: spacing
+        ui.spacing();
         self.buff.render_options(ui);
 
+        ui.spacing();
         self.source.render_select(ui);
 
         ColorEdit::new("Color", &mut self.color)
             .preview(ColorPreview::Alpha)
             .build(ui);
 
-        ui.checkbox("Show stacks", &mut self.stacks);
+        ui.checkbox("Show Stacks", &mut self.stacks);
         // TODO: customizable stacks text offset
     }
 }

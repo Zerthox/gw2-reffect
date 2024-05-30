@@ -63,8 +63,10 @@ impl Render for Text {
 
 impl RenderOptions for Text {
     fn render_options(&mut self, ui: &Ui) {
+        ui.spacing();
         self.buff.render_options(ui);
 
+        ui.spacing();
         ui.input_text("Text", &mut self.text).build();
         if ui.is_item_hovered() {
             ui.tooltip_text("%n replaced by name");

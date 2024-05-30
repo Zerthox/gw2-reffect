@@ -23,20 +23,20 @@ impl Action {
         match self {
             Self::None => {}
             Self::Up(index) => {
-                let other = if index > 0 {
-                    index - 1
+                if index == 0 {
+                    let first = children.remove(0);
+                    children.push(first);
                 } else {
-                    children.len() - 1
-                };
-                children.swap(index, other)
+                    children.swap(index, index - 1);
+                }
             }
             Self::Down(index) => {
-                let other = if index < children.len() - 1 {
-                    index + 1
+                if index == children.len() - 1 {
+                    let last = children.pop().expect("action down with empty vec");
+                    children.insert(0, last);
                 } else {
-                    0
+                    children.swap(index, index + 1);
                 };
-                children.swap(index, other)
             }
             Self::Delete(index) => {
                 children.remove(index);

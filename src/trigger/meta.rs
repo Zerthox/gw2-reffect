@@ -27,6 +27,7 @@ impl RenderOptions for MetaTrigger {
     fn render_options(&mut self, ui: &Ui) {
         self.player.render_options(ui);
 
+        ui.spacing();
         self.map.render_options(ui);
     }
 }

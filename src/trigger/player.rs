@@ -37,6 +37,7 @@ impl RenderOptions for PlayerTrigger {
     fn render_options(&mut self, ui: &Ui) {
         self.combat.render_options(ui);
 
+        ui.spacing();
         enum_combo_bitflags(
             ui,
             "Profession",
@@ -50,6 +51,7 @@ impl RenderOptions for PlayerTrigger {
             &mut self.specs,
             ComboBoxFlags::HEIGHT_LARGE,
         );
+
         enum_combo_bitflags(ui, "Mount", &mut self.mounts, ComboBoxFlags::HEIGHT_LARGE);
     }
 }

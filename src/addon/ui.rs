@@ -41,7 +41,10 @@ impl Addon {
             }
 
             if let Some(_token) = ui.tab_item("Settings") {
-                ui.checkbox("Allow edit in combat", &mut self.context.edit.during_combat);
+                ui.checkbox(
+                    "Allow edit mode in combat",
+                    &mut self.context.edit.during_combat,
+                );
                 if ui.collapsing_header(
                     "Stacks Display (WIP)",
                     TreeNodeFlags::SPAN_AVAIL_WIDTH | TreeNodeFlags::DEFAULT_OPEN,

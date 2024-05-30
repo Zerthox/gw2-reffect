@@ -97,9 +97,9 @@ impl RenderOptions for BuffTriggerId {
                         action.render_buttons(ui, i);
 
                         ui.same_line();
-                        ui.text(format!("Effect id {}", i + 1));
+                        ui.text(format!("Effect Id {}", i + 1));
                     }
-                    if ui.button("Add") {
+                    if ui.button("Add Effect") {
                         ids.push(0);
                     }
 

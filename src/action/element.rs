@@ -43,21 +43,21 @@ impl ElementAction {
             }
             Self::Up => {
                 log::debug!("Move child up {index} {}", children[index].kind.as_ref());
-                let other = if index > 0 {
-                    index - 1
+                if index == 0 {
+                    let first = children.remove(0);
+                    children.push(first);
                 } else {
-                    children.len() - 1
-                };
-                children.swap(index, other);
+                    children.swap(index, index - 1);
+                }
             }
             Self::Down => {
                 log::debug!("Move child down {index} {}", children[index].kind.as_ref());
-                let other = if index < children.len() - 1 {
-                    index + 1
+                if index == children.len() - 1 {
+                    let last = children.pop().expect("element action down with empty vec");
+                    children.insert(0, last);
                 } else {
-                    0
-                };
-                children.swap(index, other);
+                    children.swap(index, index + 1);
+                }
             }
             Self::Delete => {
                 let child = children.remove(index);
