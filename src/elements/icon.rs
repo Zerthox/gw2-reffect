@@ -3,11 +3,11 @@ use crate::{
     colors::{self, with_alpha},
     component_wise::ComponentWise,
     context::Context,
-    render_util::{draw_text_bg, spinner_bg},
+    render_util::{draw_spinner_bg, draw_text_bg},
     traits::RenderOptions,
     trigger::{BuffTrigger, Trigger},
 };
-use nexus::imgui::{ColorEdit, ColorPreview, Style, StyleVar, Ui};
+use nexus::imgui::{ColorEdit, ColorPreview, Style, Ui};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -53,9 +53,6 @@ impl Icon {
             // render stack count
             if self.stacks {
                 if let Some(stacks) = self.buff.active_stacks_or_edit(ctx, state) {
-                    // override alpha
-                    let _style = ui.push_style_var(StyleVar::Alpha(0.8));
-
                     let text = stacks.to_string();
 
                     let [_, height] = size;
@@ -63,10 +60,12 @@ impl Icon {
                     let font_scale = font_size / ui.current_font_size();
                     let [x_offset, _] = TextAlign::Right.calc_pos(ui, &text, font_scale);
                     let pad = [1.0, 1.0];
-                    let line_height = font_size * ui.text_line_height();
+                    let line_height = font_scale * ui.text_line_height();
                     let text_pos = end.add([x_offset, -line_height]).sub(pad);
-                    let color = colors::WHITE;
-                    let shadow_color = colors::BLACK;
+
+                    let alpha = 0.8; // FIXME: animation alpha ignored
+                    let color = with_alpha(colors::WHITE, alpha);
+                    let shadow_color = with_alpha(colors::BLACK, alpha);
 
                     TextDecoration::Shadow.render(ui, &text, text_pos, font_size, shadow_color);
                     draw_text_bg(ui, &text, text_pos, font_size, color);
@@ -74,7 +73,7 @@ impl Icon {
             }
         } else {
             let [x, _] = size;
-            spinner_bg(
+            draw_spinner_bg(
                 ui,
                 state.pos,
                 0.4 * x,
@@ -87,6 +86,7 @@ impl Icon {
 
 impl RenderOptions for Icon {
     fn render_options(&mut self, ui: &Ui) {
+        // TODO: spacing
         self.buff.render_options(ui);
 
         self.source.render_select(ui);

@@ -2,7 +2,7 @@ use super::cycle_progress;
 use nexus::imgui::{sys, ImColor32, Ui};
 use std::f32::consts::PI;
 
-pub fn spinner_bg(
+pub fn draw_spinner_bg(
     ui: &Ui,
     pos: [f32; 2],
     radius: f32,
