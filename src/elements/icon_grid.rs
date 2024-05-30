@@ -90,25 +90,25 @@ impl RenderOptions for IconGrid {
 
             let size_x = ui.frame_height();
             let [spacing_x, _] = ui.clone_style().item_spacing;
-            let style = ui.push_style_color(StyleColor::Button, colors::TRANSPARENT);
+            let button_color = ui.push_style_color(StyleColor::Button, colors::TRANSPARENT);
             collapsing_header_same_line_end(ui, 3.0 * size_x + 2.0 * spacing_x);
 
             let enabled = i > 0;
-            let disabled = button_disabled(ui, enabled);
-            if ui.arrow_button("up", ig::Direction::Up) && enabled {
-                move_down = Some(i - 1);
-            }
-            drop(disabled);
+            button_disabled(ui, enabled, || {
+                if ui.arrow_button("up", ig::Direction::Up) && enabled {
+                    move_down = Some(i - 1);
+                }
+            });
 
-            ui.same_line();
             let enabled = i < len - 1;
-            let disabled = button_disabled(ui, enabled);
-            if ui.arrow_button("down", ig::Direction::Down) && enabled {
-                move_down = Some(i);
-            }
-            drop(disabled);
+            button_disabled(ui, enabled, || {
+                ui.same_line();
+                if ui.arrow_button("down", ig::Direction::Down) && enabled {
+                    move_down = Some(i);
+                }
+            });
 
-            style.end();
+            button_color.end();
 
             if open {
                 // TODO: apply option to all context menu option

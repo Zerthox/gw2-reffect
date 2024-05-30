@@ -39,17 +39,18 @@ impl RenderOptions for MapTrigger {
                 enum_combo(ui, "Category", category, ComboBoxFlags::empty());
             }
             Self::Ids(ids) => {
-                // TODO: as single text input?
+                let len = ids.len();
                 let mut action = Action::new();
                 for (i, id) in ids.iter_mut().enumerate() {
                     let _id = ui.push_id(i as i32);
+                    action.set_next_input_size(ui);
                     input_u32(ui, "##id", id, 0, 0);
 
                     ui.same_line();
-                    action.render_buttons(ui, i);
+                    action.render_buttons(ui, i, len);
 
                     ui.same_line();
-                    ui.text(format!("Id {}", i + 1));
+                    ui.text(format!("Map id {}", i + 1));
                 }
                 if ui.button("Add") {
                     ids.push(0);
