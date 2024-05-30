@@ -63,6 +63,7 @@ pub enum AnimationKind {
 impl AnimationKind {
     pub fn animate(&mut self, ui: &Ui, progress: f32, body: impl FnOnce()) {
         match self {
+            // TODO: dont disappear completely
             Self::Pulse => {
                 let factor = if progress < 0.5 {
                     1.0 - 2.0 * progress

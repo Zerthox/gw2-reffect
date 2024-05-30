@@ -22,7 +22,7 @@ impl Action {
     pub fn perform<T>(self, children: &mut Vec<T>) {
         match self {
             Self::None => {}
-            Self::Up(index) => children.swap(index, index - 1),
+            Self::Up(index) => children.swap(index, index - 1), // TODO: index wrap around instead of disable?
             Self::Down(index) => children.swap(index, index + 1),
             Self::Delete(index) => {
                 children.remove(index);

@@ -13,7 +13,7 @@ use crate::{
 };
 use enumflags2::{bitflags, BitFlags};
 
-const BUFFS_INTERVAL: f64 = 0.020;
+const BUFFS_INTERVAL: f64 = 0.040;
 
 const PLAYER_INTERVAL: f64 = 1.000;
 
