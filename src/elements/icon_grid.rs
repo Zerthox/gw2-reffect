@@ -1,10 +1,11 @@
 use super::{Direction, IconNamed, RenderState};
 use crate::{
+    action::Action,
     colors,
     context::Context,
     render_util::{
-        button_disabled, collapsing_header_same_line_end, enum_combo, input_float_with_format,
-        input_size, push_alpha_change,
+        collapsing_header_same_line_end, enum_combo, input_float_with_format, input_size,
+        push_alpha_change,
     },
     traits::{Render, RenderOptions, TreeLeaf},
 };
@@ -77,36 +78,31 @@ impl RenderOptions for IconGrid {
         ui.spacing();
         ui.text_disabled("Icons");
 
-        let len = self.icons.len();
-        let mut move_down = None;
-        let mut remove = None;
+        let mut action = Action::new();
         for (i, icon) in self.icons.iter_mut().enumerate() {
             let _id = ui.push_id(i as i32);
-            let mut remains = true;
 
+            let mut remains = true;
             let open = CollapsingHeader::new(format!("{}###icon{i}", icon.name))
                 .flags(TreeNodeFlags::ALLOW_ITEM_OVERLAP)
                 .begin_with_close_button(ui, &mut remains);
+            if !remains {
+                action = Action::Delete(i);
+            }
 
             let size_x = ui.frame_height();
             let [spacing_x, _] = ui.clone_style().item_spacing;
             let button_color = ui.push_style_color(StyleColor::Button, colors::TRANSPARENT);
             collapsing_header_same_line_end(ui, 3.0 * size_x + 2.0 * spacing_x);
 
-            let enabled = i > 0;
-            button_disabled(ui, enabled, || {
-                if ui.arrow_button("up", ig::Direction::Up) && enabled {
-                    move_down = Some(i - 1);
-                }
-            });
+            if ui.arrow_button("up", ig::Direction::Up) {
+                action = Action::Up(i);
+            }
 
-            let enabled = i < len - 1;
-            button_disabled(ui, enabled, || {
-                ui.same_line();
-                if ui.arrow_button("down", ig::Direction::Down) && enabled {
-                    move_down = Some(i);
-                }
-            });
+            ui.same_line();
+            if ui.arrow_button("down", ig::Direction::Down) {
+                action = Action::Down(i);
+            }
 
             button_color.end();
 
@@ -115,21 +111,12 @@ impl RenderOptions for IconGrid {
                 icon.render_options(ui);
                 ui.spacing();
             }
-
-            if !remains {
-                remove = Some(i);
-            }
         }
         if ui.button("Add Icon") {
             self.icons.push(IconNamed::default());
         }
 
-        if let Some(index) = move_down {
-            self.icons.swap(index, index + 1);
-        }
-        if let Some(index) = remove {
-            self.icons.remove(index);
-        }
+        action.perform(&mut self.icons);
     }
 }
 

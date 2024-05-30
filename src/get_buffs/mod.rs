@@ -23,16 +23,16 @@ pub unsafe fn get_buffs<'a>() -> Result<&'a [StackedBuff], GetBuffsError> {
     if !buffs.is_null() {
         let first = &*buffs;
         match first.error() {
-            Some(err) => Result::Err(err.into()),
+            Some(err) => Err(err.into()),
             None => {
                 let mut count = 1;
                 while let Some(false) = buffs.add(count).as_ref().map(|buff| buff.is_end()) {
                     count += 1;
                 }
-                Result::Ok(slice::from_raw_parts(buffs, count))
+                Ok(slice::from_raw_parts(buffs, count))
             }
         }
     } else {
-        Result::Err(GetBuffsError::Null)
+        Err(GetBuffsError::Null)
     }
 }

@@ -43,15 +43,21 @@ impl ElementAction {
             }
             Self::Up => {
                 log::debug!("Move child up {index} {}", children[index].kind.as_ref());
-                if index > 0 {
-                    children.swap(index, index - 1);
-                }
+                let other = if index > 0 {
+                    index - 1
+                } else {
+                    children.len() - 1
+                };
+                children.swap(index, other);
             }
             Self::Down => {
                 log::debug!("Move child down {index} {}", children[index].kind.as_ref());
-                if index < children.len() - 1 {
-                    children.swap(index, index + 1);
-                }
+                let other = if index < children.len() - 1 {
+                    index + 1
+                } else {
+                    0
+                };
+                children.swap(index, other);
             }
             Self::Delete => {
                 let child = children.remove(index);

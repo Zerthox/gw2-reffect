@@ -87,7 +87,6 @@ impl RenderOptions for BuffTriggerId {
                     input_u32(ui, "Effect id", id, 0, 0);
                 }
                 Self::Any(ids) | Self::All(ids) => {
-                    let len = ids.len();
                     let mut action = Action::new();
                     for (i, id) in ids.iter_mut().enumerate() {
                         let _id = ui.push_id(i as i32);
@@ -95,7 +94,7 @@ impl RenderOptions for BuffTriggerId {
                         input_u32(ui, "##id", id, 0, 0);
 
                         ui.same_line();
-                        action.render_buttons(ui, i, len);
+                        action.render_buttons(ui, i);
 
                         ui.same_line();
                         ui.text(format!("Effect id {}", i + 1));
