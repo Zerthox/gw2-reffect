@@ -13,15 +13,15 @@ pub enum BuffThreshold {
     Missing,
 
     // Minimum amount of stacks.
-    #[strum(serialize = "Min stacks")]
+    #[strum(serialize = "Min Stacks")]
     Min(i32),
 
     // Maximum amount of stacks.
-    #[strum(serialize = "Max stacks")]
+    #[strum(serialize = "Max Stacks")]
     Max(i32),
 
     // Range of stacks.
-    #[strum(serialize = "Range of stacks")]
+    #[strum(serialize = "Range of Stacks")]
     Between(i32, i32),
 }
 
@@ -58,8 +58,8 @@ impl RenderOptions for BuffThreshold {
                     ui.input_int("Stacks", required).build();
                 }
                 Self::Between(min, max) => {
-                    ui.input_int("Min stacks", min).build();
-                    ui.input_int("Max stacks", max).build();
+                    ui.input_int("Min Stacks", min).build();
+                    ui.input_int("Max Stacks", max).build();
                 }
             }
         })

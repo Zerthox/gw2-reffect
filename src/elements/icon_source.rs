@@ -1,4 +1,5 @@
 use crate::{
+    lockbox::Lockbox,
     render_util::{enum_combo, impl_static_variants},
     texture_manager::TextureManager,
 };
@@ -8,7 +9,7 @@ use nexus::{
 };
 use rfd::FileDialog;
 use serde::{Deserialize, Serialize};
-use std::{path::PathBuf, sync::Mutex, thread};
+use std::{path::PathBuf, thread};
 use strum::{AsRefStr, EnumIter, IntoStaticStr};
 
 #[derive(
@@ -84,15 +85,14 @@ impl IconSource {
                     .read_only(true)
                     .build();
 
-                ui.same_line();
-                let clicked = ui.button("Select");
+                // we assume this stays in place, otherwise we consider the file dialog invalidated
+                let id = path.as_os_str().as_encoded_bytes().as_ptr() as usize;
 
-                static FILE: Mutex<Option<PathBuf>> = Mutex::new(None);
-                if let Some(file) = FILE.lock().unwrap().take() {
-                    *path = file;
-                    self.load();
-                } else if clicked {
-                    thread::spawn(|| {
+                static FILE: Lockbox<usize, PathBuf> = Lockbox::new();
+
+                ui.same_line();
+                if ui.button("Select") {
+                    thread::spawn(move || {
                         let game_dir = get_game_dir().expect("no game directory");
                         if let Some(file) = FileDialog::new()
                             .set_title("Select Icon")
@@ -108,9 +108,14 @@ impl IconSource {
                                     file
                                 }
                             };
-                            *FILE.lock().unwrap() = Some(file);
+                            FILE.write(id, file);
                         }
                     });
+                }
+
+                if let Some(file) = FILE.try_take(id) {
+                    *path = file;
+                    self.load();
                 }
             }
             Self::Url(url) => {

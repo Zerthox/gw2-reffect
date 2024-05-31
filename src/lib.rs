@@ -8,6 +8,7 @@ mod elements;
 mod get_buffs;
 mod id;
 mod interval;
+mod lockbox;
 mod render_util;
 mod serde_bitflags;
 mod texture_manager;

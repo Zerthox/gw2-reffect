@@ -8,9 +8,7 @@ pub fn draw_text_bg(
     font_size: f32,
     color: impl Into<ImColor32>,
 ) {
-    let text = text.as_ref();
-    let text_bytes = text.as_bytes();
-    let text_ptr = text_bytes.as_ptr().cast();
+    let range = text.as_ref().as_bytes().as_ptr_range();
 
     let _bg = ui.get_background_draw_list();
     unsafe {
@@ -23,8 +21,8 @@ pub fn draw_text_bg(
             font_size,
             pos.into(),
             color.into().into(),
-            text_ptr,
-            text_ptr.byte_add(text_bytes.len()),
+            range.start.cast(),
+            range.end.cast(),
             0.0,
             ptr::null_mut(),
         );
