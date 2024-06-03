@@ -6,6 +6,8 @@ use crate::{
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
+// TODO: opacity
+
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Group {

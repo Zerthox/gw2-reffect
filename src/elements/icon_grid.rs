@@ -5,13 +5,11 @@ use crate::{
     context::Context,
     render_util::{
         collapsing_header_same_line_end, enum_combo, input_float_with_format, input_size,
-        push_alpha_change,
     },
     traits::{Render, RenderOptions, TreeLeaf},
 };
 use nexus::imgui::{
-    self as ig, CollapsingHeader, ComboBoxFlags, InputTextFlags, Slider, SliderFlags, StyleColor,
-    TreeNodeFlags, Ui,
+    self as ig, CollapsingHeader, ComboBoxFlags, InputTextFlags, StyleColor, TreeNodeFlags, Ui,
 };
 use serde::{Deserialize, Serialize};
 
@@ -23,7 +21,7 @@ pub struct IconGrid {
     pub direction: Direction,
     pub size: [f32; 2],
     pub pad: f32,
-    pub opacity: f32,
+
     pub icons: Vec<IconNamed>,
 }
 
@@ -31,8 +29,6 @@ impl TreeLeaf for IconGrid {}
 
 impl Render for IconGrid {
     fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
-        let _style = push_alpha_change(ui, self.opacity);
-
         let mut icons = Vec::new();
         for icon in &mut self.icons {
             if icon.is_visible(ctx, state) {
@@ -65,15 +61,6 @@ impl RenderOptions for IconGrid {
             "%.2f",
             InputTextFlags::empty(),
         );
-
-        let mut opacity = 100.0 * self.opacity;
-        if Slider::new("Opacity", 0.0, 100.0)
-            .flags(SliderFlags::ALWAYS_CLAMP)
-            .display_format("%.2f")
-            .build(ui, &mut opacity)
-        {
-            self.opacity = opacity / 100.0;
-        }
 
         ui.spacing();
         ui.text_disabled("Icons");
@@ -126,7 +113,7 @@ impl Default for IconGrid {
             direction: Direction::Right,
             size: [32.0, 32.0],
             pad: 2.0,
-            opacity: 1.0,
+
             icons: Vec::new(),
         }
     }

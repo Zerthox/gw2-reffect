@@ -8,6 +8,8 @@ use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, IntoStaticStr};
 
+// TODO dynamic grid, fixed grid for all elements
+
 #[derive(Debug, Clone, EnumIter, AsRefStr, IntoStaticStr, Serialize, Deserialize)]
 #[serde(tag = "type")]
 pub enum ElementType {

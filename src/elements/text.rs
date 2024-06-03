@@ -67,10 +67,12 @@ impl RenderOptions for Text {
         self.buff.render_options(ui);
 
         ui.spacing();
-        ui.input_text("Text", &mut self.text).build();
+        ui.input_text("Text", &mut self.text).build(); // TODO: multiline?
         if ui.is_item_hovered() {
-            ui.tooltip_text("%n replaced by name");
-            ui.tooltip_text("%s replaced by effect stacks");
+            ui.tooltip(|| {
+                ui.text("%n replaced by name");
+                ui.text("%s replaced by effect stacks");
+            });
         }
 
         let mut size = 100.0 * self.size;

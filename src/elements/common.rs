@@ -4,10 +4,10 @@ use crate::{
     component_wise::ComponentWise,
     context::{Context, EditState},
     id::{Id, IdGen},
-    render_util::{input_float_with_format, EnumStaticVariants},
+    render_util::{input_float_with_format, push_alpha_change, EnumStaticVariants},
     traits::RenderOptions,
 };
-use nexus::imgui::{InputTextFlags, MenuItem, Ui};
+use nexus::imgui::{InputTextFlags, MenuItem, Slider, SliderFlags, Ui};
 use serde::{Deserialize, Serialize};
 
 // FIXME: common default is called twice when deserializing element/pack, generating unused ids
@@ -22,6 +22,8 @@ pub struct Common {
     pub name: String,
 
     pub pos: [f32; 2],
+
+    pub opacity: f32,
 }
 
 impl Common {
@@ -34,10 +36,13 @@ impl Common {
         ui: &Ui,
         ctx: &Context,
         state: &RenderState,
-        children: impl FnOnce(&RenderState),
+        contents: impl FnOnce(&RenderState),
     ) {
         let state = state.with_offset(self.pos).with_name(&self.name);
-        children(&state);
+        {
+            let _style = push_alpha_change(ui, self.opacity);
+            contents(&state);
+        }
 
         if ctx.edit.is_edited(self.id) {
             self.render_edit_indicator(ui, &state);
@@ -50,16 +55,14 @@ impl Common {
         const OFFSET: [f32; 2] = [HALF_SIZE, HALF_SIZE];
         const COLOR: [f32; 4] = [1.0, 0.0, 0.0, 0.8];
 
+        let draw_list = ui.get_foreground_draw_list();
+
         let start = state.pos.sub(OFFSET);
         let end = state.pos.add(OFFSET);
-        ui.get_background_draw_list()
-            .add_rect(start, end, COLOR)
-            .filled(true)
-            .build();
+        draw_list.add_rect(start, end, COLOR).filled(true).build();
 
         let pos = state.pos.add([HALF_SIZE + 1.0, 0.0]);
-        ui.get_background_draw_list()
-            .add_text(pos, COLOR, &self.name);
+        draw_list.add_text(pos, COLOR, &self.name);
     }
 
     pub fn render_tree_label(&self, ui: &Ui, kind: &str) {
@@ -120,22 +123,17 @@ impl RenderOptions for Common {
         ui.input_text("Name", &mut self.name).build();
 
         let [x, y] = &mut self.pos;
-        input_float_with_format(
-            "Position x",
-            x,
-            10.0,
-            100.0,
-            "%.2f",
-            InputTextFlags::empty(),
-        );
-        input_float_with_format(
-            "Position y",
-            y,
-            10.0,
-            100.0,
-            "%.2f",
-            InputTextFlags::empty(),
-        );
+        input_float_with_format("Position x", x, 1.0, 10.0, "%.2f", InputTextFlags::empty());
+        input_float_with_format("Position y", y, 1.0, 10.0, "%.2f", InputTextFlags::empty());
+
+        let mut opacity = 100.0 * self.opacity;
+        if Slider::new("Opacity", 0.0, 100.0)
+            .flags(SliderFlags::ALWAYS_CLAMP)
+            .display_format("%.2f")
+            .build(ui, &mut opacity)
+        {
+            self.opacity = opacity / 100.0;
+        }
     }
 }
 
@@ -145,6 +143,7 @@ impl Default for Common {
             id: IdGen::generate(),
             name: "Unnamed".into(),
             pos: [0.0, 0.0],
+            opacity: 1.0,
         }
     }
 }
@@ -155,6 +154,7 @@ impl Clone for Common {
             id: IdGen::generate(), // we want a fresh id for the clone
             name: self.name.clone(),
             pos: self.pos,
+            opacity: self.opacity,
         }
     }
 }

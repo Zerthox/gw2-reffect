@@ -7,7 +7,7 @@ use crate::{
     traits::RenderOptions,
     trigger::{BuffTrigger, Trigger},
 };
-use nexus::imgui::{ColorEdit, ColorPreview, Style, Ui};
+use nexus::imgui::{ColorEdit, Style, Ui};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -20,7 +20,8 @@ pub struct Icon {
 
     pub stacks: bool,
 
-    pub color: [f32; 4],
+    #[serde(alias = "color")]
+    pub tint: [f32; 3],
 }
 
 impl Icon {
@@ -30,8 +31,8 @@ impl Icon {
 
     fn texture_color(&self, ui: &Ui) -> [f32; 4] {
         let Style { alpha, .. } = ui.clone_style();
-        let [r, g, b, a] = self.color;
-        [r, g, b, a * alpha]
+        let [r, g, b] = self.tint;
+        [r, g, b, alpha]
     }
 
     pub fn is_visible(&mut self, ctx: &Context, state: &RenderState) -> bool {
@@ -92,9 +93,7 @@ impl RenderOptions for Icon {
         ui.spacing();
         self.source.render_select(ui);
 
-        ColorEdit::new("Color", &mut self.color)
-            .preview(ColorPreview::Alpha)
-            .build(ui);
+        ColorEdit::new("Tint", &mut self.tint).build(ui);
 
         ui.checkbox("Show Stacks", &mut self.stacks);
         // TODO: customizable stacks text offset
@@ -107,7 +106,7 @@ impl Default for Icon {
             buff: BuffTrigger::default(),
             source: IconSource::Unknown,
             stacks: false,
-            color: [1.0, 1.0, 1.0, 1.0],
+            tint: [1.0, 1.0, 1.0],
         }
     }
 }
