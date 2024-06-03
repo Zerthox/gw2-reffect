@@ -56,12 +56,12 @@ impl Context {
         self.edit.update_allowed(&self.ui);
 
         if self.buffs_interval.triggered(time) {
+            self.buffs.clear();
             self.buffs_state = unsafe { get_buffs() }.map(|buffs| {
-                // keep buffs sorted, unstable is fine
-                self.buffs = buffs.to_vec();
-                self.buffs.sort_unstable_by_key(|buff| buff.id);
-                self.updates.insert(ContextUpdate::Buffs);
+                self.buffs.extend(buffs.iter().cloned());
+                self.buffs.sort_unstable_by_key(|buff| buff.id); // keep buffs sorted, unstable is fine
             });
+            self.updates.insert(ContextUpdate::Buffs);
         }
 
         if let Some(mumble) = self.links.mumble() {

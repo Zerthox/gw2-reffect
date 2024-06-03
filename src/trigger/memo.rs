@@ -24,16 +24,23 @@ where
         }
     }
 
+    /// Updates the memoized state from the [`Context`].
     pub fn update(&mut self, ctx: &Context) -> bool {
         *self.cache.insert(self.trigger.is_active(ctx))
     }
 
+    /// Retrieves the memoized state or creates it from the [`Context`].
     pub fn get_or_update(&mut self, ctx: &Context) -> bool {
         if let Some(active) = self.cache {
             active
         } else {
             self.update(ctx)
         }
+    }
+
+    /// Clears the memoized state.
+    pub fn clear(&mut self) {
+        self.cache = None;
     }
 }
 

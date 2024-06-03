@@ -28,6 +28,10 @@ impl RenderOptions for MetaTrigger {
         self.player.render_options(ui);
 
         ui.spacing();
-        self.map.render_options(ui);
+        let changed = self.map.render_options(ui);
+        if changed {
+            // map trigger changed, ensure fresh state next access
+            self.map.clear();
+        }
     }
 }

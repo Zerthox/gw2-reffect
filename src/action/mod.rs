@@ -19,9 +19,9 @@ impl Action {
         Self::None
     }
 
-    pub fn perform<T>(self, children: &mut Vec<T>) {
+    pub fn perform<T>(self, children: &mut Vec<T>) -> bool {
         match self {
-            Self::None => {}
+            Self::None => false,
             Self::Up(index) => {
                 if index == 0 {
                     let first = children.remove(0);
@@ -29,6 +29,7 @@ impl Action {
                 } else {
                     children.swap(index, index - 1);
                 }
+                true
             }
             Self::Down(index) => {
                 if index == children.len() - 1 {
@@ -37,9 +38,11 @@ impl Action {
                 } else {
                     children.swap(index, index + 1);
                 };
+                true
             }
             Self::Delete(index) => {
                 children.remove(index);
+                true
             }
         }
     }
@@ -60,7 +63,15 @@ impl Action {
         }
     }
 
-    pub fn set_next_input_size(&self, ui: &Ui) {
+    pub fn input_with_buttons<T>(&mut self, ui: &Ui, index: usize, input: impl FnOnce() -> T) -> T {
+        Self::set_next_input_size(ui);
+        let result = input();
+        ui.same_line();
+        self.render_buttons(ui, index);
+        result
+    }
+
+    pub fn set_next_input_size(ui: &Ui) {
         let button_size = ui.frame_height();
         let [spacing, _] = ui.clone_style().item_inner_spacing;
         let width = ui.calc_item_width() - 3.0 * (button_size + spacing);

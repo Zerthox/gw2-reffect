@@ -29,34 +29,33 @@ impl Trigger for MapTrigger {
     }
 }
 
-impl RenderOptions for MapTrigger {
-    fn render_options(&mut self, ui: &Ui) {
-        enum_combo(ui, "Map", self, ComboBoxFlags::empty());
+impl RenderOptions<bool> for MapTrigger {
+    fn render_options(&mut self, ui: &Ui) -> bool {
+        let mut changed = enum_combo(ui, "Map", self, ComboBoxFlags::empty()).is_some();
 
         match self {
             Self::Any => {}
             Self::Category(category) => {
-                enum_combo(ui, "Category", category, ComboBoxFlags::empty());
+                changed |= enum_combo(ui, "Category", category, ComboBoxFlags::empty()).is_some();
             }
             Self::Ids(ids) => {
                 let mut action = Action::new();
                 for (i, id) in ids.iter_mut().enumerate() {
                     let _id = ui.push_id(i as i32);
-                    action.set_next_input_size(ui);
-                    input_u32(ui, "##id", id, 0, 0);
-
-                    ui.same_line();
-                    action.render_buttons(ui, i);
+                    changed |= action.input_with_buttons(ui, i, || input_u32(ui, "##id", id, 0, 0));
 
                     ui.same_line();
                     ui.text(format!("Map Id {}", i + 1));
                 }
                 if ui.button("Add Map") {
                     ids.push(0);
+                    changed = true;
                 }
 
-                action.perform(ids);
+                changed |= action.perform(ids);
             }
         }
+
+        changed
     }
 }

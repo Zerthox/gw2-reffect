@@ -63,6 +63,8 @@ impl Render for Text {
 
 impl RenderOptions for Text {
     fn render_options(&mut self, ui: &Ui) {
+        // TODO: we rely on buffs interval refreshing the text memo
+
         ui.spacing();
         self.buff.render_options(ui);
 

@@ -90,11 +90,7 @@ impl RenderOptions for BuffTriggerId {
                     let mut action = Action::new();
                     for (i, id) in ids.iter_mut().enumerate() {
                         let _id = ui.push_id(i as i32);
-                        action.set_next_input_size(ui);
-                        input_u32(ui, "##id", id, 0, 0);
-
-                        ui.same_line();
-                        action.render_buttons(ui, i);
+                        action.input_with_buttons(ui, i, || input_u32(ui, "##id", id, 0, 0));
 
                         ui.same_line();
                         ui.text(format!("Effect Id {}", i + 1));

@@ -57,6 +57,7 @@ impl RenderOptions for BuffTrigger {
         self.id.render_options(ui);
         if !self.id.always() {
             self.threshold.render_options(ui);
+            // TODO: we rely on buffs interval refreshing the memo
         }
     }
 }
