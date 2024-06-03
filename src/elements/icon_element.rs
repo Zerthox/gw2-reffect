@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct IconElement {
+    #[serde(flatten)]
     pub icon: Icon,
     pub size: [f32; 2],
 }
