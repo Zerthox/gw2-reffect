@@ -1,7 +1,7 @@
 #[derive(Debug, Clone)]
 pub struct Interval {
     pub frequency: f64,
-    pub last_update: f64,
+    pub last_update: f64, // TODO: next update instead for faster comparison?
 }
 
 impl Interval {

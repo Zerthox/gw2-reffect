@@ -53,7 +53,6 @@ impl Context {
         self.updates = BitFlags::empty();
 
         self.ui.update(&self.links);
-        self.edit.update_allowed(&self.ui);
 
         if self.buffs_interval.triggered(time) {
             self.buffs.clear();

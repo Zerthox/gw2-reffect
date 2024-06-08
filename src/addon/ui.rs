@@ -26,6 +26,8 @@ impl Addon {
         if self.debug {
             self.render_debug(ui);
         }
+
+        self.context.edit.reset_allowed();
     }
 
     pub fn render_displays(&mut self, ui: &Ui) {
@@ -35,6 +37,8 @@ impl Addon {
     }
 
     pub fn render_options(&mut self, ui: &Ui) {
+        self.context.edit.update_allowed(&self.context.ui);
+
         if let Some(_token) = ui.tab_bar("options") {
             if let Some(_token) = ui.tab_item("Elements") {
                 self.render_element_options(ui);
@@ -183,7 +187,6 @@ impl Addon {
                         let _style = ui.push_style_var(StyleVar::IndentSpacing(10.0));
                         let mut remove = None;
                         for (i, pack) in self.packs.iter_mut().enumerate() {
-                            pack.edit = false;
                             let deleted = pack.render_select_tree(ui, &mut self.context.edit);
                             if deleted {
                                 remove = Some(i);
@@ -262,16 +265,6 @@ impl Addon {
                 ui.spacing();
 
                 self.context.edit.debug(ui);
-                ui.text("Edited packs:");
-                ui.indent();
-                for pack in &mut self.packs {
-                    if pack.edit {
-                        ui.text(&pack.common.name);
-                        ui.same_line();
-                        ui.text_disabled(pack.common.id_string());
-                    }
-                }
-                ui.unindent();
             });
     }
 }

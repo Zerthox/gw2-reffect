@@ -27,6 +27,7 @@ pub enum Direction {
 
 impl Direction {
     pub fn offset_for(&self, size: [f32; 2], pad: f32, element: usize, total: usize) -> [f32; 2] {
+        // TODO: adjust center point of first element?
         let [width, height] = size;
         let i = element as f32;
         let offset_x = i * (width + pad);

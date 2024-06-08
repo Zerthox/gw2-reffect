@@ -1,4 +1,4 @@
-use super::{render_or_children, Anchor, Common, Element, RenderState};
+use super::{Anchor, Common, Element, RenderState};
 use crate::{
     context::{Context, EditState},
     render_util::{
@@ -32,9 +32,6 @@ pub struct Pack {
 
     #[serde(skip)]
     pub file: PathBuf,
-
-    #[serde(skip)]
-    pub edit: bool,
 }
 
 impl Pack {
@@ -101,9 +98,11 @@ impl Pack {
 
     /// Renders the pack.
     pub fn render(&mut self, ui: &Ui, ctx: &Context) {
-        if self.edit || (self.enabled && ctx.ui.should_show()) {
+        let show = self.enabled && ctx.ui.should_show();
+        let edit = ctx.edit.is_selected_or_parent(self.common.id);
+        if show || edit {
             let pos = self.anchor.calc_pos(ui);
-            let state = RenderState::new(self.edit, pos);
+            let state = RenderState::new(pos, &self.common);
             self.common.render(ui, ctx, &state, |state| {
                 for element in &mut self.elements {
                     element.render(ui, ctx, state);
@@ -113,14 +112,15 @@ impl Pack {
     }
 
     /// Renders the select tree.
+    ///
     /// Returns `true` if the pack should be deleted.
     #[must_use]
     pub fn render_select_tree(&mut self, ui: &Ui, state: &mut EditState) -> bool {
         let id = self.common.id_string();
         let selected = state.is_selected(self.common.id);
         let children = &mut self.elements;
-        let (token, clicked) = tree_select_empty(ui, &id, selected, children.is_empty());
-        if clicked {
+        let (token, selected) = tree_select_empty(ui, &id, selected, children.is_empty());
+        if selected {
             state.select(self.common.id);
         }
 
@@ -147,9 +147,18 @@ impl Pack {
     /// Attempts to render options if selected.
     /// Returns `true` if the pack or a child rendered.
     pub fn try_render_options(&mut self, ui: &Ui, state: &EditState) -> bool {
-        let found = render_or_children!(self, ui, state);
-        self.edit = state.is_allowed() && found;
-        found
+        let id = self.common.id;
+        if state.is_selected(id) {
+            self.render_options(ui);
+            return true;
+        } else if state.is_parent(id) {
+            for child in &mut self.elements {
+                if child.try_render_options(ui, state) {
+                    return true;
+                }
+            }
+        }
+        false
     }
 
     /// Renders the pack options.

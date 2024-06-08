@@ -65,23 +65,15 @@ impl IconSource {
         }
     }
 
-    pub fn render_select(mut self: &mut Self, ui: &Ui) {
-        if let Some(prev) = enum_combo(ui, "Icon", self, ComboBoxFlags::empty()) {
-            match (prev, &mut self) {
-                (Self::Url(url), Self::File(new)) => {
-                    *new = url.into();
-                }
-                (Self::File(path), Self::Url(new)) => {
-                    *new = path.to_string_lossy().into_owned();
-                }
-                _ => {}
-            }
-        }
+    pub fn render_select(&mut self, ui: &Ui) {
+        enum_combo(ui, "Icon", self, ComboBoxFlags::empty());
 
         match self {
             Self::Unknown => {}
             Self::File(path) => {
                 ui.input_text("##path", &mut path.display().to_string())
+                    .hint("No file")
+                    .auto_select_all(true)
                     .read_only(true)
                     .build();
 

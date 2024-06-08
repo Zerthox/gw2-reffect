@@ -84,7 +84,7 @@ impl RenderOptions for BuffTriggerId {
             match self {
                 Self::None => {}
                 Self::Single(id) => {
-                    input_u32(ui, "Effect id", id, 0, 0);
+                    input_u32(ui, "Effect Id", id, 0, 0);
                 }
                 Self::Any(ids) | Self::All(ids) => {
                     let mut action = Action::new();

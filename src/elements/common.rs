@@ -38,7 +38,7 @@ impl Common {
         state: &RenderState,
         contents: impl FnOnce(&RenderState),
     ) {
-        let state = state.with_offset(self.pos).with_name(&self.name);
+        let state = state.with_offset(self.pos).for_element(self, ctx);
         {
             let _style = push_alpha_change(ui, self.opacity);
             contents(&state);
@@ -72,17 +72,27 @@ impl Common {
         ui.text(&self.name);
     }
 
+    /// Renders the select tree children.
+    ///
+    /// Returns `true` if a child was selected.
     pub fn render_tree_children(
         &self,
         ui: &Ui,
         state: &mut EditState,
         children: &mut Vec<Element>,
-    ) {
+    ) -> bool {
+        let mut selected = false;
         let mut action = ChildElementAction::new();
         for (i, child) in children.iter_mut().enumerate() {
-            action.or(i, child.render_select_tree(ui, state));
+            let (child_selected, child_action) = child.render_select_tree(ui, state);
+            action.or(i, child_action);
+            if child_selected {
+                state.push_parent(self.id);
+                selected = true;
+            }
         }
         action.perform(state, children);
+        selected
     }
 
     /// Renders common context menu options.
@@ -158,21 +168,3 @@ impl Clone for Common {
         }
     }
 }
-
-/// Helper to generate options render.
-macro_rules! render_or_children {
-    ( $self:ident, $ui:expr, $state:expr ) => {
-        if $state.is_selected($self.common.id) {
-            $self.render_options($ui);
-            true
-        } else if let Some(children) = $self.children() {
-            children
-                .iter_mut()
-                .any(|child| child.try_render_options($ui, $state))
-        } else {
-            false
-        }
-    };
-}
-
-pub(crate) use render_or_children;

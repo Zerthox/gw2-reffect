@@ -44,7 +44,7 @@ impl BuffTrigger {
     }
 
     pub fn active_stacks_or_edit(&mut self, ctx: &Context, state: &RenderState) -> Option<i32> {
-        if state.edit {
+        if state.is_edit(ctx) {
             Some(1)
         } else {
             self.active_stacks(ctx)
@@ -57,7 +57,7 @@ impl RenderOptions for BuffTrigger {
         self.id.render_options(ui);
         if !self.id.always() {
             self.threshold.render_options(ui);
-            // TODO: we rely on buffs interval refreshing the memo
+            // TODO: we rely on buffs interval refreshing the memo, render options might want context for updates
         }
     }
 }

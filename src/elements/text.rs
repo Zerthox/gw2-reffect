@@ -34,7 +34,7 @@ impl Text {
         if ctx.has_update_or_edit(ContextUpdate::Buffs) {
             self.text_memo = self.buff.active_stacks_or_edit(ctx, state).map(|stacks| {
                 self.text
-                    .replace(replace::NAME, state.name)
+                    .replace(replace::NAME, &state.common.name)
                     .replace(replace::STACKS, &stacks.to_string())
             });
         }

@@ -1,4 +1,4 @@
-use super::{render_or_children, Animation, Common, ElementType, RenderState};
+use super::{Animation, Common, ElementType, RenderState};
 use crate::{
     action::ElementAction,
     context::{Context, EditState},
@@ -46,34 +46,33 @@ impl Element {
 
     /// Renders the element.
     pub fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
-        if self.trigger.is_active_or_edit(ctx, state) {
-            let mut body = || {
-                self.common
-                    .render(ui, ctx, state, |state| self.kind.render(ui, ctx, state))
-            };
-
-            if let Some(animation) = &mut self.animation {
-                animation.render(ui, body);
-            } else {
-                body();
+        self.common.render(ui, ctx, state, |state| {
+            if self.trigger.is_active_or_edit(ctx, state) {
+                let mut body = || self.kind.render(ui, ctx, state);
+                if let Some(animation) = &mut self.animation {
+                    animation.render(ui, body);
+                } else {
+                    body();
+                }
             }
-        }
+        });
     }
 
     /// Renders the select tree.
-    /// Returns `true` if a child is selected.
-    pub fn render_select_tree(&mut self, ui: &Ui, state: &mut EditState) -> ElementAction {
+    ///
+    /// Returns `true` if the element was selected.
+    pub fn render_select_tree(&mut self, ui: &Ui, state: &mut EditState) -> (bool, ElementAction) {
+        let mut selected = false;
         let kind = (&self.kind).into(); // borrow here to keep ownership
         let id = self.common.id_string();
-        let selected = state.is_selected(self.common.id);
         let children = self.kind.children();
         let leaf = children
             .as_ref()
             .map(|children| children.is_empty())
             .unwrap_or(true);
-        let (token, clicked) = tree_select_empty(ui, &id, selected, leaf);
+        let (token, clicked) = tree_select_empty(ui, &id, state.is_selected(self.common.id), leaf);
         if clicked {
-            state.select(self.common.id);
+            selected = state.select(self.common.id);
         }
 
         let mut action = ElementAction::None;
@@ -109,17 +108,28 @@ impl Element {
         self.common.render_tree_label(ui, kind);
         if token.is_some() {
             if let Some(children) = self.kind.children() {
-                self.common.render_tree_children(ui, state, children);
+                selected |= self.common.render_tree_children(ui, state, children);
             }
         }
 
-        action
+        (selected, action)
     }
 
     /// Attempts to render options if selected.
     /// Returns `true` if the element or a child rendered.
     pub fn try_render_options(&mut self, ui: &Ui, state: &EditState) -> bool {
-        render_or_children!(self, ui, state)
+        let id = self.common.id;
+        if state.is_selected(id) {
+            self.render_options(ui);
+            return true;
+        } else if let (true, Some(children)) = (state.is_parent(id), self.children()) {
+            for child in children {
+                if child.try_render_options(ui, state) {
+                    return true;
+                }
+            }
+        }
+        false
     }
 
     /// Renders the element options.
