@@ -1,24 +1,37 @@
 #[derive(Debug, Clone)]
 pub struct Interval {
     pub frequency: f64,
-    pub last_update: f64, // TODO: next update instead for faster comparison?
+    pub next_update: f64,
 }
 
 impl Interval {
     pub fn new(frequency: f64) -> Self {
         Self {
             frequency,
-            last_update: 0.0,
+            next_update: 0.0,
         }
     }
 
     pub fn triggered(&mut self, time: f64) -> bool {
-        let passed = time - self.last_update;
-        if passed >= self.frequency {
-            self.last_update = time;
+        if time >= self.next_update {
+            self.next_update = time + self.frequency;
             true
         } else {
             false
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn interval() {
+        let mut interval = Interval::new(1.0);
+
+        assert!(interval.triggered(2.0));
+        assert!(!interval.triggered(2.5));
+        assert!(interval.triggered(3.0));
     }
 }
