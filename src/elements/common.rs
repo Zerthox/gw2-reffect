@@ -45,6 +45,7 @@ impl Common {
         }
 
         if ctx.edit.is_edited(self.id) {
+            // TODO: change edited element draw list to foreground?
             self.render_edit_indicator(ui, &state);
         }
     }

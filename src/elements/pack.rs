@@ -99,7 +99,7 @@ impl Pack {
     /// Renders the pack.
     pub fn render(&mut self, ui: &Ui, ctx: &Context) {
         let show = self.enabled && ctx.ui.should_show();
-        let edit = ctx.edit.is_selected_or_parent(self.common.id);
+        let edit = ctx.edit.is_edited_or_parent(self.common.id);
         if show || edit {
             let pos = self.anchor.calc_pos(ui);
             let state = RenderState::new(ctx.edit.show_all && edit, pos, &self.common);
@@ -151,7 +151,7 @@ impl Pack {
         if state.is_selected(id) {
             self.render_options(ui);
             return true;
-        } else if state.is_parent(id) {
+        } else if state.is_selected_parent(id) {
             for child in &mut self.elements {
                 if child.try_render_options(ui, state) {
                     return true;

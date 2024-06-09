@@ -122,7 +122,7 @@ impl Element {
         if state.is_selected(id) {
             self.render_options(ui);
             return true;
-        } else if let (true, Some(children)) = (state.is_parent(id), self.children()) {
+        } else if let (true, Some(children)) = (state.is_selected_parent(id), self.children()) {
             for child in children {
                 if child.try_render_options(ui, state) {
                     return true;

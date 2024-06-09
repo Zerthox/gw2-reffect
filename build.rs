@@ -22,5 +22,5 @@ fn main() {
         if entry.metadata().unwrap().is_file() {
             fs::copy(entry.path(), target_path.join(entry.file_name())).unwrap();
         }
-    }
+    } // TODO: avoid unnecessary copy? remove? link?
 }

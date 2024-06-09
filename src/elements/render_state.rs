@@ -25,7 +25,7 @@ impl<'a> RenderState<'a> {
 
     pub fn for_element(self, common: &'a Common, ctx: &Context) -> Self {
         Self {
-            edit: self.edit || ctx.edit.is_selected(common.id),
+            edit: self.edit || ctx.edit.is_edited(common.id),
             pos: self.pos,
             common,
         }
@@ -40,6 +40,6 @@ impl<'a> RenderState<'a> {
     }
 
     pub fn is_edit(&self, ctx: &Context) -> bool {
-        self.edit || ctx.edit.is_parent(self.common.id)
+        self.edit || ctx.edit.is_edited_parent(self.common.id)
     }
 }

@@ -30,26 +30,37 @@ impl EditState {
         self.allowed
     }
 
-    /// Whether the id is selected for editing.
+    /// Whether the id is selected.
     pub fn is_selected(&self, id: Id) -> bool {
         self.selected == id
     }
 
-    /// Whether the id itself or a child of it is selected for editing.
+    /// Whether the id itself or a child of it is selected.
     pub fn is_selected_or_parent(&self, id: Id) -> bool {
-        self.is_selected(id) || self.is_parent(id)
+        self.is_selected(id) || self.is_selected_parent(id)
     }
 
-    /// Whether a child is selected for editing.
-    pub fn is_parent(&self, id: Id) -> bool {
+    /// Whether a child is selected.
+    pub fn is_selected_parent(&self, id: Id) -> bool {
         self.parents.contains(&id)
     }
 
-    /// Whether the id is the currently edited element.
+    /// Whether the id is currently edited.
     pub fn is_edited(&self, id: Id) -> bool {
         self.is_allowed() && self.is_selected(id)
     }
 
+    /// Whether a child is currently edited.
+    pub fn is_edited_parent(&self, id: Id) -> bool {
+        self.is_allowed() && self.is_selected_parent(id)
+    }
+
+    /// Whether the id itself or a child of it is currently edited.
+    pub fn is_edited_or_parent(&self, id: Id) -> bool {
+        self.is_allowed() && self.is_selected_or_parent(id)
+    }
+
+    /// Whether any element is edited.
     pub fn is_editing(&self) -> bool {
         self.is_allowed() && self.selected != Id::default()
     }
