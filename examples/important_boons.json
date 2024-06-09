@@ -1,63 +1,90 @@
 {
     "enabled": true,
     "name": "Important Boons",
-    "pos": [0.0, -250.0],
+    "pos": [0.0, -300.0],
+    "opacity": 1.0,
     "anchor": "BottomCenter",
     "layer": 0,
     "elements": [
         {
             "name": "Boon Icons",
             "pos": [0.0, 0.0],
+            "opacity": 0.8,
+            "trigger": {
+                "player": {
+                    "combat": null,
+                    "profs": [],
+                    "specs": [],
+                    "mounts": []
+                },
+                "map": "Any"
+            },
+            "animation": null,
             "type": "IconGrid",
+            "layout": "Dynamic",
             "direction": "Horizontal",
             "size": [32.0, 32.0],
             "pad": 2.0,
-            "opacity": 0.8,
             "icons": [
                 {
                     "name": "Aegis",
-                    "buff": { "Has": 743 },
+                    "buff": {
+                        "id": { "Single": 743 },
+                        "threshold": "Present"
+                    },
                     "icon": {
                         "Url": "https://wiki.guildwars2.com/images/e/e5/Aegis.png"
                     },
                     "stacks": false,
-                    "color": [1.0, 1.0, 1.0, 1.0]
+                    "tint": [1.0, 1.0, 1.0]
                 },
                 {
                     "name": "Might",
-                    "buff": { "Has": 740 },
+                    "buff": {
+                        "id": { "Single": 740 },
+                        "threshold": "Present"
+                    },
                     "icon": {
                         "Url": "https://wiki.guildwars2.com/images/7/7c/Might.png"
                     },
                     "stacks": true,
-                    "color": [1.0, 1.0, 1.0, 1.0]
+                    "tint": [1.0, 1.0, 1.0]
                 },
                 {
                     "name": "Quickness",
-                    "buff": { "Has": 1187 },
+                    "buff": {
+                        "id": { "Single": 1187 },
+                        "threshold": "Present"
+                    },
                     "icon": {
                         "Url": "https://wiki.guildwars2.com/images/b/b4/Quickness.png"
                     },
                     "stacks": false,
-                    "color": [1.0, 1.0, 1.0, 1.0]
+                    "tint": [1.0, 1.0, 1.0]
                 },
                 {
                     "name": "Alacrity",
-                    "buff": { "Has": 30328 },
+                    "buff": {
+                        "id": { "Single": 30328 },
+                        "threshold": "Present"
+                    },
                     "icon": {
                         "Url": "https://wiki.guildwars2.com/images/4/4c/Alacrity.png"
                     },
                     "stacks": false,
-                    "color": [1.0, 1.0, 1.0, 1.0]
+                    "tint": [1.0, 1.0, 1.0]
                 },
                 {
                     "name": "Stability",
-                    "buff": { "Has": 1122 },
+                    "buff": {
+                        "id": { "Single": 1122 },
+                        "threshold": "Present"
+                    },
                     "icon": {
                         "Url": "https://wiki.guildwars2.com/images/a/ae/Stability.png"
                     },
                     "stacks": true,
-                    "color": [1.0, 1.0, 1.0, 1.0]
+                    "tint": [1.0, 1.0, 1.0]
                 }
             ]
         }
