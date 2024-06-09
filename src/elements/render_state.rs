@@ -1,9 +1,7 @@
+use super::Common;
 use crate::{component_wise::ComponentWise, context::Context};
 
-use super::Common;
-
 // TODO: as visitor?
-// TODO: avoid duplicating name?
 
 /// Current render state.
 ///
@@ -21,17 +19,13 @@ pub struct RenderState<'a> {
 }
 
 impl<'a> RenderState<'a> {
-    pub const fn new(pos: [f32; 2], common: &'a Common) -> Self {
-        Self {
-            edit: false,
-            pos,
-            common,
-        }
+    pub const fn new(edit: bool, pos: [f32; 2], common: &'a Common) -> Self {
+        Self { edit, pos, common }
     }
 
     pub fn for_element(self, common: &'a Common, ctx: &Context) -> Self {
         Self {
-            edit: self.edit || ctx.edit.is_selected(common.id), // TODO: setting to show entire pack?
+            edit: self.edit || ctx.edit.is_selected(common.id),
             pos: self.pos,
             common,
         }

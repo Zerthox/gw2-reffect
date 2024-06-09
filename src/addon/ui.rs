@@ -49,6 +49,12 @@ impl Addon {
                     "Allow edit mode in combat",
                     &mut self.context.edit.during_combat,
                 );
+
+                ui.checkbox(
+                    "Show all pack elements during edit mode",
+                    &mut self.context.edit.show_all,
+                );
+
                 if ui.collapsing_header(
                     "Stacks Display (WIP)",
                     TreeNodeFlags::SPAN_AVAIL_WIDTH | TreeNodeFlags::DEFAULT_OPEN,

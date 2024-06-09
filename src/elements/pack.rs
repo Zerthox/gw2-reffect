@@ -102,7 +102,7 @@ impl Pack {
         let edit = ctx.edit.is_selected_or_parent(self.common.id);
         if show || edit {
             let pos = self.anchor.calc_pos(ui);
-            let state = RenderState::new(pos, &self.common);
+            let state = RenderState::new(ctx.edit.show_all && edit, pos, &self.common);
             self.common.render(ui, ctx, &state, |state| {
                 for element in &mut self.elements {
                     element.render(ui, ctx, state);

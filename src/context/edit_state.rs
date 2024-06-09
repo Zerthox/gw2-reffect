@@ -2,12 +2,13 @@ use super::UiContext;
 use crate::{elements::Element, id::Id};
 use nexus::imgui::Ui;
 
-// TODO: store parent chain and only display those during edit?
-
 #[derive(Debug, Clone)]
 pub struct EditState {
     /// Whether edit mode is allowed in combat.
     pub during_combat: bool,
+
+    /// Whether to show all elements of a pack in edit mode.
+    pub show_all: bool,
 
     /// Whether edit mode is currently allowed.
     allowed: bool,
@@ -119,6 +120,7 @@ impl Default for EditState {
     fn default() -> Self {
         Self {
             during_combat: false,
+            show_all: false,
             allowed: true,
             selected: Id::default(),
             parents: Vec::new(),
