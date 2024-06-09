@@ -22,20 +22,25 @@ impl Settings {
     }
 
     pub fn try_load() -> Option<Self> {
-        let file = File::open(Self::file())
+        let path = Self::file();
+        let file = File::open(&path)
             .inspect_err(|err| log::warn!("Failed to read settings file: {err}"))
             .ok()?;
         let reader = BufReader::new(file);
-        serde_json::from_reader(reader)
+        let settings = serde_json::from_reader(reader)
             .inspect_err(|err| log::warn!("Failed to parse settings file: {err}"))
-            .ok()
+            .ok()?;
+        log::info!("Loaded settings from \"{}\"", path.display());
+        Some(settings)
     }
 
     pub fn save(self) {
-        match File::create(Self::file()) {
+        let path = Self::file();
+        match File::create(&path) {
             Ok(file) => {
                 let writer = BufWriter::new(file);
                 serde_json::to_writer_pretty(writer, &self).expect("failed to serialize settings");
+                log::info!("Saved settings to \"{}\"", path.display())
             }
             Err(err) => log::error!("Failed to save settings: {err}"),
         }

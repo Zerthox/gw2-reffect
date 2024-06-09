@@ -3,6 +3,8 @@ use crate::{context::Context, traits::RenderOptions};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
+// TODO: individual opacity in grid?
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct IconNamed {

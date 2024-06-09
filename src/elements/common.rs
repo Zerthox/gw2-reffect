@@ -21,7 +21,7 @@ pub struct Common {
 
     pub name: String,
 
-    pub pos: [f32; 2],
+    pub pos: [f32; 2], // TODO: anchor parent vs screen
 
     pub opacity: f32,
 }

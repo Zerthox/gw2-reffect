@@ -119,11 +119,10 @@ impl EditState {
         ui.text(self.selected.to_string());
 
         ui.text("Selected parents:");
-        ui.indent();
         for id in &self.parents {
+            ui.same_line();
             ui.text(id.to_string());
         }
-        ui.unindent();
     }
 }
 
