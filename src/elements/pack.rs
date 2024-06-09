@@ -98,9 +98,13 @@ impl Pack {
 
     /// Renders the pack.
     pub fn render(&mut self, ui: &Ui, ctx: &Context) {
-        let show = self.enabled && ctx.ui.should_show();
         let edit = ctx.edit.is_edited_or_parent(self.common.id);
-        if show || edit {
+        let show = if ctx.edit.is_editing() {
+            edit
+        } else {
+            self.enabled && ctx.ui.should_show()
+        };
+        if show {
             let pos = self.anchor.calc_pos(ui);
             let state = RenderState::new(ctx.edit.show_all && edit, pos, &self.common);
             self.common.render(ui, ctx, &state, |state| {
