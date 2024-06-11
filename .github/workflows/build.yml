@@ -1,0 +1,20 @@
+name: Build
+
+on:
+  - workflow_dispatch
+  - workflow_call
+
+jobs:
+  build:
+    name: Build
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+      - run: cargo build --release
+      - uses: actions/upload-artifact@v3
+        with:
+          name: reffect
+          path: target/release/reffect.dll
