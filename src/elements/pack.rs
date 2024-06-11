@@ -4,19 +4,13 @@ use crate::{
     render_util::{
         delete_confirm_modal, enum_combo, item_context_menu, style_disabled, tree_select_empty,
     },
+    schema::Schema,
     traits::{RenderOptions, TreeNode},
-    util::file_name,
     visit::{Loader, VisitMut},
 };
 use nexus::imgui::{ComboBoxFlags, MenuItem, Ui};
 use serde::{Deserialize, Serialize};
-use std::{
-    fs::File,
-    io::{BufReader, BufWriter},
-    path::PathBuf,
-};
-
-// TODO: tag pack with version before serializing. maybe versioned with helper trait? struct with field? internally tagged enum?
+use std::path::PathBuf;
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(default)]
@@ -54,46 +48,16 @@ impl Pack {
 
     pub fn load_from_file(path: impl Into<PathBuf>) -> Option<Self> {
         let path = path.into();
-        let file = File::open(&path)
-            .inspect_err(|err| {
-                log::error!("Failed to open pack file \"{}\": {err}", file_name(&path))
-            })
-            .ok()?;
-        let reader = BufReader::new(file);
-        serde_json::from_reader::<_, Self>(reader)
-            .inspect_err(|err| {
-                log::warn!("Failed to parse pack file \"{}\": {err}", file_name(&path))
-            })
-            .ok()
-            .map(|mut pack| {
-                pack.file = path;
-                pack.load();
-                pack
-            })
+        Schema::load_from_file(&path).map(|schema| {
+            let mut pack = schema.into_pack();
+            pack.file = path;
+            pack.load();
+            pack
+        })
     }
 
     pub fn save_to_file(&self) -> bool {
-        match File::create(&self.file) {
-            Ok(file) => {
-                let writer = BufWriter::new(file);
-                if let Err(err) = serde_json::to_writer_pretty(writer, self) {
-                    log::error!(
-                        "Failed to serialize pack \"{}\" to \"{}\": {err}",
-                        self.common.name,
-                        file_name(&self.file)
-                    );
-                }
-                true
-            }
-            Err(err) => {
-                log::error!(
-                    "Failed to save pack \"{}\" to \"{}\": {err}",
-                    self.common.name,
-                    file_name(&self.file)
-                );
-                false
-            }
-        }
+        Schema::latest(self).save_to_file(&self.file)
     }
 
     /// Renders the pack.

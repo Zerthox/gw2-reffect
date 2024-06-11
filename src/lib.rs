@@ -10,6 +10,7 @@ mod id;
 mod interval;
 mod lockbox;
 mod render_util;
+mod schema;
 mod serde_bitflags;
 mod texture_manager;
 mod traits;

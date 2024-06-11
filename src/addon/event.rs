@@ -73,11 +73,6 @@ impl Addon {
     }
 
     pub fn add_pack(&mut self, pack: Pack) {
-        log::info!(
-            "Added pack \"{}\" from \"{}\"",
-            pack.common.name,
-            file_name(&pack.file)
-        );
         let index = self
             .packs
             .partition_point(|entry| entry.layer <= pack.layer);
