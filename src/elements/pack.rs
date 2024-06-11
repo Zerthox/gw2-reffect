@@ -142,10 +142,9 @@ impl Pack {
                 {
                     // TODO: layer input
                     let _style = style_disabled(ui);
-                    let mut layer = self.layer;
-                    ui.input_int("Layer", &mut layer)
-                        .step(0)
-                        .step_fast(0)
+                    ui.input_int("Layer", &mut self.layer)
+                        .step(1)
+                        .step_fast(10)
                         .read_only(true)
                         .build();
                 }
