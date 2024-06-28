@@ -7,7 +7,7 @@ use crate::{
     traits::RenderOptions,
     trigger::{BuffTrigger, Trigger},
 };
-use nexus::imgui::{ColorEdit, StyleColor, Ui};
+use nexus::imgui::{ColorEdit, Ui};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -72,20 +72,12 @@ impl Icon {
                         let x1 = start_x + PAD_X;
                         let x2 = end_x - PAD_X;
                         let x_mid = x1 + fill * (x2 - x1);
-                        let y1 = end_y;
-                        let y2 = end_y + HEIGHT;
+                        let y1 = end_y - HEIGHT;
+                        let y2 = end_y;
 
                         let draw_list = ui.get_background_draw_list();
                         draw_list
                             .add_rect([x1, y1], [x_mid, y2], [0.0, 1.0, 0.0, alpha])
-                            .filled(true)
-                            .build();
-                        draw_list
-                            .add_rect(
-                                [x_mid, y1],
-                                [x2, y2],
-                                with_alpha(ui.style_color(StyleColor::WindowBg), alpha),
-                            )
                             .filled(true)
                             .build();
                     }
