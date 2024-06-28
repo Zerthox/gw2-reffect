@@ -234,21 +234,18 @@ impl Addon {
                 ui.text("Buffs status:");
                 ui.same_line();
                 match &ctx.buffs_state {
-                    Ok(()) => {
+                    true => {
                         ui.text_colored(GREEN, "ok");
                         if ui.is_item_hovered() {
                             ui.tooltip(|| {
-                                for buff in &ctx.buffs {
-                                    ui.text(format!("{}x {}", buff.count, buff.id));
+                                for (id, buff) in &ctx.buffs {
+                                    ui.text(format!("{}x {id}", buff.stacks));
                                 }
                             });
                         }
                     }
-                    Err(err) => {
-                        ui.text_colored(RED, "error");
-                        if ui.is_item_hovered() {
-                            ui.tooltip_text(err.to_string());
-                        }
+                    false => {
+                        ui.text_colored(RED, "unavailable");
                     }
                 }
 

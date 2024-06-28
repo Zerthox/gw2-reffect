@@ -1,4 +1,7 @@
-use crate::{render_util::enum_combo, traits::RenderOptions};
+use crate::{
+    render_util::{enum_combo, input_u32},
+    traits::RenderOptions,
+};
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, IntoStaticStr, VariantArray};
@@ -14,15 +17,15 @@ pub enum BuffThreshold {
 
     // Minimum amount of stacks.
     #[strum(serialize = "Min Stacks")]
-    Min(i32),
+    Min(u32),
 
     // Maximum amount of stacks.
     #[strum(serialize = "Max Stacks")]
-    Max(i32),
+    Max(u32),
 
     // Range of stacks.
     #[strum(serialize = "Range of Stacks")]
-    Between(i32, i32),
+    Between(u32, u32),
 }
 
 impl VariantArray for BuffThreshold {
@@ -36,7 +39,7 @@ impl VariantArray for BuffThreshold {
 }
 
 impl BuffThreshold {
-    pub fn is_met(&self, stacks: i32) -> bool {
+    pub fn is_met(&self, stacks: u32) -> bool {
         match *self {
             Self::Present => stacks > 0,
             Self::Missing => stacks == 0,
@@ -55,11 +58,11 @@ impl RenderOptions for BuffThreshold {
             match self {
                 Self::Present | Self::Missing => {}
                 Self::Min(required) | Self::Max(required) => {
-                    ui.input_int("Stacks", required).build();
+                    input_u32(ui, "Stacks", required, 1, 10);
                 }
                 Self::Between(min, max) => {
-                    ui.input_int("Min Stacks", min).build();
-                    ui.input_int("Max Stacks", max).build();
+                    input_u32(ui, "Min Stacks", min, 1, 10);
+                    input_u32(ui, "Max Stacks", max, 1, 10);
                 }
             }
         })

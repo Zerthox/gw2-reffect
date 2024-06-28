@@ -36,3 +36,8 @@ OriginalFilename = "reffect.dll"
 
 [profile.release]
 lto = "thin"
+
+# [patch."https://github.com/zerthox/nexus-rs"]
+# nexus = { path = "../nexus-rs/nexus" }
+
+# icon idea: boon outline with rounded recycle symbol?

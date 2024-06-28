@@ -38,7 +38,7 @@ impl BuffTriggerId {
         matches!(self, Self::None)
     }
 
-    pub fn count_stacks(&self, ctx: &Context) -> i32 {
+    pub fn count_stacks(&self, ctx: &Context) -> u32 {
         match self {
             Self::None => 1, // return 1 stack
             Self::Single(id) => ctx.stacks_of(*id).unwrap_or(0),

@@ -21,7 +21,7 @@ pub struct BuffTrigger {
 
     /// Memoized active stacks.
     #[serde(skip)]
-    active_memo: Option<i32>,
+    active_memo: Option<u32>,
 }
 
 impl Trigger for BuffTrigger {
@@ -36,14 +36,14 @@ impl BuffTrigger {
         self.active_memo = (self.id.always() || self.threshold.is_met(stacks)).then_some(stacks);
     }
 
-    pub fn active_stacks(&mut self, ctx: &Context) -> Option<i32> {
+    pub fn active_stacks(&mut self, ctx: &Context) -> Option<u32> {
         if ctx.has_update_or_edit(ContextUpdate::Buffs) {
             self.force_update(ctx);
         }
         self.active_memo
     }
 
-    pub fn active_stacks_or_edit(&mut self, ctx: &Context, state: &RenderState) -> Option<i32> {
+    pub fn active_stacks_or_edit(&mut self, ctx: &Context, state: &RenderState) -> Option<u32> {
         if state.is_edit(ctx) {
             Some(1)
         } else {

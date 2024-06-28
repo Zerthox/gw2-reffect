@@ -5,10 +5,12 @@ mod player;
 mod settings;
 mod ui;
 
+use std::collections::BTreeMap;
+
 pub use self::{edit_state::*, links::*, map::*, player::*, settings::*, ui::*};
 
 use crate::{
-    get_buffs::{get_buffs, GetBuffsError, StackedBuff},
+    internal::{get_buffs, Buff},
     interval::Interval,
 };
 use enumflags2::{bitflags, BitFlags};
@@ -34,11 +36,11 @@ pub struct Context {
     /// Information about player character.
     pub player: PlayerContext,
 
-    /// Current buffs sorted by id.
-    pub buffs: Vec<StackedBuff>,
+    /// Current buffs by id.
+    pub buffs: BTreeMap<u32, Buff>,
 
     /// Current buffs state.
-    pub buffs_state: Result<(), GetBuffsError>,
+    pub buffs_state: bool, // TODO: error enum in internals
 
     links: Links,
 
@@ -56,10 +58,13 @@ impl Context {
 
         if self.buffs_interval.triggered(time) {
             self.buffs.clear();
-            self.buffs_state = unsafe { get_buffs() }.map(|buffs| {
-                self.buffs.extend(buffs.iter().cloned());
-                self.buffs.sort_unstable_by_key(|buff| buff.id); // keep buffs sorted, unstable is fine
-            });
+            if let Some(buffs) = unsafe { get_buffs() } {
+                self.buffs
+                    .extend(buffs.iter().map(|buff| (buff.id, buff.clone())));
+                self.buffs_state = true;
+            } else {
+                self.buffs_state = false;
+            }
             self.updates.insert(ContextUpdate::Buffs);
         }
 
@@ -115,22 +120,17 @@ impl Context {
 
     /// Checks whether a given buff id is present.
     pub fn has_buff(&self, id: u32) -> bool {
-        self.buffs
-            .binary_search_by_key(&id, |entry| entry.id)
-            .is_ok()
+        self.buffs.contains_key(&id)
     }
 
     /// Returns the [`StackedBuff`] for a given buff id, if present.
-    pub fn buff(&self, id: u32) -> Option<&StackedBuff> {
-        self.buffs
-            .binary_search_by_key(&id, |entry| entry.id)
-            .ok()
-            .map(|index| unsafe { self.buffs.get_unchecked(index) }) // index is from binary search, avoid bounds check here
+    pub fn buff(&self, id: u32) -> Option<&Buff> {
+        self.buffs.get(&id)
     }
 
     /// Returns the number of stacks for a given buff id, if present.
-    pub fn stacks_of(&self, id: u32) -> Option<i32> {
-        self.buff(id).map(|entry| entry.count)
+    pub fn stacks_of(&self, id: u32) -> Option<u32> {
+        self.buff(id).map(|entry| entry.stacks)
     }
 }
 
@@ -142,8 +142,8 @@ impl Default for Context {
             ui: UiContext::empty(),
             player: PlayerContext::empty(),
             map: MapContext::empty(),
-            buffs: Vec::new(),
-            buffs_state: Err(GetBuffsError::Null),
+            buffs: BTreeMap::new(),
+            buffs_state: false,
             links: Links::load(),
             buffs_interval: Interval::new(BUFFS_INTERVAL),
             player_interval: Interval::new(PLAYER_INTERVAL),

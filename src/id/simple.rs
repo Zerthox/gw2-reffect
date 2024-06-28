@@ -4,6 +4,8 @@ use std::{
     sync::atomic::{AtomicU32, Ordering},
 };
 
+// TODO: reclaim on drop if previous id?
+
 const INITIAL: u32 = 1;
 
 static ID: AtomicU32 = AtomicU32::new(INITIAL);

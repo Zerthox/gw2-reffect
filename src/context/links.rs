@@ -1,5 +1,7 @@
 use nexus::data_link::{get_mumble_link, get_nexus_link, mumble::MumblePtr, NexusLink};
 
+// TODO: update mumble identity information from nexus events!
+
 #[derive(Debug, Clone)]
 pub struct Links {
     mumble: Option<MumblePtr>,

@@ -12,6 +12,8 @@ use serde::{Deserialize, Serialize};
 use std::{path::PathBuf, thread};
 use strum::{AsRefStr, EnumIter, IntoStaticStr};
 
+// TODO: id gen for loaded icons? handle duplicates on load?
+
 #[derive(
     Debug,
     Default,
