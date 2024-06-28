@@ -9,6 +9,8 @@ use std::slice;
 // FIXME: required to be next to exe! manual load instead?
 #[link(name = "reffect_internal", kind = "raw-dylib")]
 extern "C" {
+    pub fn initialize();
+
     fn update_buffs() -> BuffsResult;
 }
 

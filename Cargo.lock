@@ -582,6 +582,7 @@ dependencies = [
  "strum",
  "url",
  "uuid",
+ "windows 0.57.0",
  "winresource",
 ]
 

@@ -14,13 +14,17 @@ use crate::{
     interval::Interval,
 };
 use enumflags2::{bitflags, BitFlags};
+use windows::Win32::Media::timeGetTime;
 
-const BUFFS_INTERVAL: f64 = 0.040;
+const BUFFS_INTERVAL: u32 = 100;
 
-const PLAYER_INTERVAL: f64 = 1.000;
+const PLAYER_INTERVAL: u32 = 1_000;
 
 #[derive(Debug, Clone)]
 pub struct Context {
+    /// Current system time.
+    pub now: u32,
+
     /// Flags for pending updates.
     updates: BitFlags<ContextUpdate>,
 
@@ -51,12 +55,14 @@ pub struct Context {
 
 impl Context {
     /// Updates the context.
-    pub fn update(&mut self, time: f64) {
+    pub fn update(&mut self) {
         self.updates = BitFlags::empty();
+
+        self.now = unsafe { timeGetTime() };
 
         self.ui.update(&self.links);
 
-        if self.buffs_interval.triggered(time) {
+        if self.buffs_interval.triggered(self.now) {
             self.buffs.clear();
             if let Some(buffs) = unsafe { get_buffs() } {
                 self.buffs
@@ -71,7 +77,7 @@ impl Context {
         if let Some(mumble) = self.links.mumble() {
             self.player.update_fast(mumble);
 
-            if self.player_interval.triggered(time) {
+            if self.player_interval.triggered(self.now) {
                 self.player.update_slow(mumble);
                 let map_changed = self.map.update(mumble);
                 if map_changed {
@@ -93,22 +99,22 @@ impl Context {
     }
 
     /// Returns the interval for buff updates.
-    pub fn get_buffs_interval(&self) -> f64 {
+    pub fn get_buffs_interval(&self) -> u32 {
         self.buffs_interval.frequency
     }
 
     /// Returns the interval for player updates.
-    pub fn get_player_interval(&self) -> f64 {
+    pub fn get_player_interval(&self) -> u32 {
         self.player_interval.frequency
     }
 
     /// Changes the interval for buff updates.
-    pub fn replace_buffs_interval(&mut self, interval: f64) {
+    pub fn replace_buffs_interval(&mut self, interval: u32) {
         self.buffs_interval = Interval::new(interval);
     }
 
     /// Changes the interval for player updates.
-    pub fn replace_player_interval(&mut self, interval: f64) {
+    pub fn replace_player_interval(&mut self, interval: u32) {
         self.player_interval = Interval::new(interval);
     }
 
@@ -120,23 +126,53 @@ impl Context {
 
     /// Checks whether a given buff id is present.
     pub fn has_buff(&self, id: u32) -> bool {
-        self.buffs.contains_key(&id)
+        self.buff(id).is_some()
     }
 
-    /// Returns the [`StackedBuff`] for a given buff id, if present.
+    /// Returns the [`Buff`] for a given buff id, if present.
     pub fn buff(&self, id: u32) -> Option<&Buff> {
-        self.buffs.get(&id)
+        self.buffs
+            .get(&id)
+            .filter(|buff| buff.runout_time > self.now)
     }
 
     /// Returns the number of stacks for a given buff id, if present.
     pub fn stacks_of(&self, id: u32) -> Option<u32> {
         self.buff(id).map(|entry| entry.stacks)
     }
+
+    /// Returns the initial duration for a given buff id, if present.
+    pub fn duration(&self, id: u32) -> Option<u32> {
+        self.buff(id).map(|entry| entry.duration)
+    }
+
+    /// Returns the runout time for a given buff id, if present.
+    pub fn runout_time(&self, id: u32) -> Option<u32> {
+        self.buff(id).map(|entry| entry.runout_time)
+    }
+
+    /// Returns the initial duration and runout time for a given buff id, if present.
+    pub fn times(&self, id: u32) -> Option<(u32, u32)> {
+        self.buff(id)
+            .map(|entry| (entry.duration, entry.runout_time))
+    }
+
+    /// Returns the remaining duration for a given buff id, if present.
+    pub fn remaining_for(&self, id: u32) -> Option<u32> {
+        self.runout_time(id)
+            .and_then(|time| self.remaining_time(time))
+    }
+
+    /// Returns the remaining duration for a given timestamp
+    pub fn remaining_time(&self, time: u32) -> Option<u32> {
+        (time != u32::MAX).then(|| time.saturating_sub(self.now))
+    }
 }
 
 impl Default for Context {
     fn default() -> Self {
         Self {
+            now: 0,
             updates: BitFlags::empty(),
             edit: EditState::default(),
             ui: UiContext::empty(),

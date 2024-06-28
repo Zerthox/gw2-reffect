@@ -7,7 +7,7 @@ use crate::{
     traits::RenderOptions,
     trigger::{BuffTrigger, Trigger},
 };
-use nexus::imgui::{ColorEdit, Style, Ui};
+use nexus::imgui::{ColorEdit, StyleColor, Ui};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -17,6 +17,8 @@ pub struct Icon {
 
     #[serde(rename = "icon")]
     pub source: IconSource,
+
+    pub duration: bool,
 
     pub stacks: bool,
 
@@ -29,10 +31,13 @@ impl Icon {
         self.source.load();
     }
 
+    fn alpha(&self, ui: &Ui) -> f32 {
+        ui.clone_style().alpha
+    }
+
     fn texture_color(&self, ui: &Ui) -> [f32; 4] {
-        let Style { alpha, .. } = ui.clone_style();
         let [r, g, b] = self.tint;
-        [r, g, b, alpha]
+        [r, g, b, self.alpha(ui)]
     }
 
     pub fn is_visible(&mut self, ctx: &Context, state: &RenderState) -> bool {
@@ -45,11 +50,47 @@ impl Icon {
             let half_size = size.mul_scalar(0.5);
             let start = state.pos.sub(half_size);
             let end = state.pos.add(half_size);
-            let color = self.texture_color(ui);
+            let color @ [_, _, _, alpha] = self.texture_color(ui);
             ui.get_background_draw_list()
                 .add_image(texture, start, end)
                 .col(color)
                 .build();
+
+            // render duration bar
+            if self.duration {
+                if let Some(info) = self.buff.active_or_edit(ctx, state) {
+                    // TODO: customization
+                    const HEIGHT: f32 = 2.0;
+                    const PAD_X: f32 = 0.0;
+
+                    if let Some(remain) = ctx.remaining_time(info.runout) {
+                        let fill = remain as f32 / info.duration as f32;
+
+                        let [start_x, _] = start;
+                        let [end_x, end_y] = end;
+
+                        let x1 = start_x + PAD_X;
+                        let x2 = end_x - PAD_X;
+                        let x_mid = x1 + fill * (x2 - x1);
+                        let y1 = end_y;
+                        let y2 = end_y + HEIGHT;
+
+                        let draw_list = ui.get_background_draw_list();
+                        draw_list
+                            .add_rect([x1, y1], [x_mid, y2], [0.0, 1.0, 0.0, alpha])
+                            .filled(true)
+                            .build();
+                        draw_list
+                            .add_rect(
+                                [x_mid, y1],
+                                [x2, y2],
+                                with_alpha(ui.style_color(StyleColor::WindowBg), alpha),
+                            )
+                            .filled(true)
+                            .build();
+                    }
+                }
+            }
 
             // render stack count
             if self.stacks {
@@ -95,8 +136,11 @@ impl RenderOptions for Icon {
 
         ColorEdit::new("Tint", &mut self.tint).build(ui);
 
+        // TODO: duration customizations
+        ui.checkbox("Show Duration", &mut self.duration);
+
+        // TODO: stacks customizations
         ui.checkbox("Show Stacks", &mut self.stacks);
-        // TODO: customizable stacks text offset
     }
 }
 
@@ -105,6 +149,7 @@ impl Default for Icon {
         Self {
             buff: BuffTrigger::default(),
             source: IconSource::Unknown,
+            duration: false,
             stacks: false,
             tint: [1.0, 1.0, 1.0],
         }

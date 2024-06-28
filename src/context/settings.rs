@@ -6,8 +6,8 @@ use serde::{Deserialize, Serialize};
 pub struct ContextSettings {
     pub edit_during_combat: bool,
     pub edit_show_all: bool,
-    pub buffs_interval: f64,
-    pub player_interval: f64,
+    pub buffs_interval: u32,
+    pub player_interval: u32,
 }
 
 impl Default for ContextSettings {

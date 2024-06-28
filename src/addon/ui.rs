@@ -19,7 +19,7 @@ use std::{
 
 impl Addon {
     pub fn render(&mut self, ui: &Ui) {
-        self.context.update(ui.time()); // TODO: perform update in separate thread?
+        self.context.update(); // TODO: perform update in separate thread?
 
         self.render_displays(ui);
 
@@ -40,8 +40,8 @@ impl Addon {
         self.context.edit.update_allowed(&self.context.ui);
 
         if let Some(_token) = ui.tab_bar("options") {
-            if let Some(_token) = ui.tab_item("Elements") {
-                self.render_element_options(ui);
+            if let Some(_token) = ui.tab_item("Editor") {
+                self.render_editor(ui);
             }
 
             if let Some(_token) = ui.tab_item("Settings") {
@@ -95,15 +95,17 @@ impl Addon {
                     );
                 }
 
+                // TODO: duration settings
+
                 if ui.collapsing_header("Advanced", TreeNodeFlags::SPAN_AVAIL_WIDTH) {
-                    let mut buffs = (1000.0 * self.context.get_buffs_interval()) as u32;
+                    let mut buffs = self.context.get_buffs_interval();
                     if input_u32(ui, "Effect update interval", &mut buffs, 10, 100) {
-                        self.context.replace_buffs_interval(buffs as f64 / 1000.0);
+                        self.context.replace_buffs_interval(buffs);
                     }
 
-                    let mut player = (1000.0 * self.context.get_player_interval()) as u32;
+                    let mut player = self.context.get_player_interval();
                     if input_u32(ui, "Player update interval", &mut player, 10, 100) {
-                        self.context.replace_player_interval(player as f64 / 1000.0);
+                        self.context.replace_player_interval(player);
                     }
 
                     if ui.button("Reset update intervals") {
@@ -116,7 +118,7 @@ impl Addon {
         }
     }
 
-    pub fn render_element_options(&mut self, ui: &Ui) {
+    pub fn render_editor(&mut self, ui: &Ui) {
         if ui.button("Reload packs") {
             self.packs.clear();
             self.context.edit = Default::default();
@@ -240,6 +242,14 @@ impl Addon {
                             ui.tooltip(|| {
                                 for (id, buff) in &ctx.buffs {
                                     ui.text(format!("{}x {id}", buff.stacks));
+                                    if let Some(remain) = ctx.remaining_for(buff.runout_time) {
+                                        ui.same_line();
+                                        ui.text(format!(
+                                            "for {:.1}/{:.1}s",
+                                            remain as f32 / 1000.0,
+                                            buff.duration as f32 / 1000.0
+                                        ));
+                                    }
                                 }
                             });
                         }

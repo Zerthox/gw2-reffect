@@ -1,5 +1,7 @@
 use super::Addon;
-use crate::{addon::Settings, elements::Pack, texture_manager::TextureManager, util::file_name};
+use crate::{
+    addon::Settings, elements::Pack, internal, texture_manager::TextureManager, util::file_name,
+};
 use nexus::gui::{register_render, RenderType};
 use std::fs;
 
@@ -9,6 +11,8 @@ impl Addon {
     pub fn load() {
         log::info!("Reffect v{VERSION} load");
         TextureManager::load();
+
+        unsafe { internal::initialize() };
 
         register_render(
             RenderType::Render,
