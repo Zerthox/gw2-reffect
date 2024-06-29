@@ -2,7 +2,8 @@ use super::{Anchor, Common, Element, RenderState};
 use crate::{
     context::{Context, EditState},
     render_util::{
-        delete_confirm_modal, enum_combo, item_context_menu, style_disabled, tree_select_empty,
+        delete_confirm_modal, enum_combo, item_context_menu, push_alpha_change, style_disabled,
+        style_disabled_if, tree_select_empty,
     },
     schema::Schema,
     traits::{RenderOptions, TreeNode},
@@ -87,7 +88,10 @@ impl Pack {
         let id = self.common.id_string();
         let selected = state.is_selected(self.common.id);
         let children = &mut self.elements;
+
+        let style = style_disabled_if(ui, !self.enabled);
         let (token, selected) = tree_select_empty(ui, &id, selected, children.is_empty());
+        drop(style);
         if selected {
             state.select(self.common.id);
         }
@@ -102,7 +106,9 @@ impl Pack {
             ui.open_popup(&title);
         }
 
+        let style = style_disabled_if(ui, !self.enabled);
         self.common.render_tree_label(ui, "Pack");
+        drop(style);
         if token.is_some() {
             self.common.render_tree_children(ui, state, children);
         }
