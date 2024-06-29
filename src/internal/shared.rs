@@ -10,7 +10,7 @@ pub struct BuffsResult {
     pub error: bool, // TODO: error enum
 
     /// Pointer to the buffs array.
-    pub buffs: *mut Buff,
+    pub buffs: *const Buff,
 
     /// Length of the buffs array.
     pub len: usize,
@@ -30,6 +30,9 @@ pub struct Buff {
     /// Category of the buff.
     pub category: Category,
 
+    /// Whether the buff stacks in duration.
+    pub duration_stacking: bool,
+
     /// Number of stacks or `1` if not intensity-stacking.
     pub stacks: u32,
 
@@ -43,8 +46,8 @@ pub struct Buff {
 /// Category of the buff.
 ///
 /// Any category except for Boon and Condition is mapped to [`Category::Generic`].
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[repr(u8)]
 pub enum Category {
     /// Buff is a Boon.
     Boon = 0,
