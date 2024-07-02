@@ -40,11 +40,14 @@ impl BuffTriggerId {
         }
     }
 
-    pub fn times(&self, ctx: &Context) -> (u32, u32) {
+    pub fn time_range(&self, ctx: &Context) -> (u32, u32) {
         match self {
             Self::None => (u32::MAX, u32::MAX),
-            Self::Single(id) => ctx.times(*id).unwrap_or((0, 0)),
-            Self::Any(ids) => ids.iter().find_map(|id| ctx.times(*id)).unwrap_or((0, 0)), // times of first match
+            Self::Single(id) => ctx.time_range(*id).unwrap_or((0, 0)),
+            Self::Any(ids) => ids
+                .iter()
+                .find_map(|id| ctx.time_range(*id))
+                .unwrap_or((0, 0)), // times of first match
         }
     }
 

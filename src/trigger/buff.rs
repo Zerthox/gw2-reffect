@@ -34,10 +34,10 @@ impl BuffTrigger {
     fn force_update(&mut self, ctx: &Context) {
         let stacks = self.id.count_stacks(ctx);
         self.active_memo = (self.id.always() || self.threshold.is_met(stacks)).then(|| {
-            let (duration, runout) = self.id.times(ctx);
+            let (apply, runout) = self.id.time_range(ctx);
             ActiveBuff {
                 stacks,
-                duration,
+                apply,
                 runout,
             }
         });
@@ -52,10 +52,11 @@ impl BuffTrigger {
 
     pub fn active_or_edit(&mut self, ctx: &Context, state: &RenderState) -> Option<ActiveBuff> {
         if state.is_edit(ctx) {
+            let apply = ctx.now - (ctx.now % 5000);
             Some(ActiveBuff {
                 stacks: 1,
-                runout: ctx.now + 5000 - (ctx.now % 5000),
-                duration: 5000,
+                runout: apply + 5000,
+                apply,
             })
         } else {
             self.active(ctx)
@@ -84,6 +85,6 @@ impl RenderOptions for BuffTrigger {
 #[derive(Debug, Clone)]
 pub struct ActiveBuff {
     pub stacks: u32,
-    pub duration: u32,
+    pub apply: u32,
     pub runout: u32,
 }

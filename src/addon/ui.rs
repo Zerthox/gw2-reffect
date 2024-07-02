@@ -242,12 +242,15 @@ impl Addon {
                             ui.tooltip(|| {
                                 for (id, buff) in &ctx.buffs {
                                     ui.text(format!("{}x {id}", buff.stacks));
-                                    if let Some(remain) = ctx.remaining_time(buff.runout_time) {
+                                    if let Some(remain) = ctx.time_until(buff.runout_time) {
+                                        let full = buff.runout_time - buff.apply_time;
+                                        let progress = remain as f32 / full as f32;
                                         ui.same_line();
                                         ui.text(format!(
-                                            "for {:.1}/{:.1}s",
+                                            "for {:.1}/{:.1}s {:.1}%",
                                             remain as f32 / 1000.0,
-                                            buff.duration as f32 / 1000.0
+                                            full as f32 / 1000.0,
+                                            progress * 100.0,
                                         ));
                                     }
                                 }

@@ -58,25 +58,22 @@ impl Icon {
 
             // render duration bar
             if self.duration {
-                if let Some(info) = self.buff.active_or_edit(ctx, state) {
-                    // TODO: customization
-                    const HEIGHT: f32 = 2.0;
-                    const PAD_X: f32 = 0.0;
-
-                    if let Some(remain) = ctx.remaining_time(info.runout) {
-                        let fill = remain as f32 / info.duration as f32;
+                if let Some(active) = self.buff.active_or_edit(ctx, state) {
+                    if let Some(progress) = ctx.progress_remaining(active.apply, active.runout) {
+                        // TODO: customization
+                        const HEIGHT: f32 = 2.0;
+                        const PAD_X: f32 = 0.0;
 
                         let [start_x, _] = start;
                         let [end_x, end_y] = end;
 
                         let x1 = start_x + PAD_X;
                         let x2 = end_x - PAD_X;
-                        let x_mid = x1 + fill * (x2 - x1);
+                        let x_mid = x1 + progress * (x2 - x1);
                         let y1 = end_y - HEIGHT;
                         let y2 = end_y;
 
-                        let draw_list = ui.get_background_draw_list();
-                        draw_list
+                        ui.get_background_draw_list()
                             .add_rect([x1, y1], [x_mid, y2], [0.0, 1.0, 0.0, alpha])
                             .filled(true)
                             .build();

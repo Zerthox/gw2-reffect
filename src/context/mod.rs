@@ -141,31 +141,28 @@ impl Context {
         self.buff(id).map(|entry| entry.stacks)
     }
 
-    /// Returns the initial duration for a given buff id, if present.
-    pub fn duration(&self, id: u32) -> Option<u32> {
-        self.buff(id).map(|entry| entry.duration)
-    }
-
-    /// Returns the runout time for a given buff id, if present.
-    pub fn runout_time(&self, id: u32) -> Option<u32> {
-        self.buff(id).map(|entry| entry.runout_time)
-    }
-
-    /// Returns the initial duration and runout time for a given buff id, if present.
-    pub fn times(&self, id: u32) -> Option<(u32, u32)> {
+    /// Returns the apply and runout time for a given buff id, if present.
+    pub fn time_range(&self, id: u32) -> Option<(u32, u32)> {
         self.buff(id)
-            .map(|entry| (entry.duration, entry.runout_time))
+            .map(|entry| (entry.apply_time, entry.runout_time))
     }
 
-    /// Returns the remaining duration for a given buff id, if present.
-    pub fn remaining_for(&self, id: u32) -> Option<u32> {
-        self.runout_time(id)
-            .and_then(|time| self.remaining_time(time))
+    /// Returns the duration passed since a given timestamp.
+    pub fn time_since(&self, time: u32) -> Option<u32> {
+        (time != u32::MAX).then(|| self.now.saturating_sub(time))
     }
 
-    /// Returns the remaining duration for a given timestamp
-    pub fn remaining_time(&self, time: u32) -> Option<u32> {
+    /// Returns the remaining duration until a given timestamp.
+    pub fn time_until(&self, time: u32) -> Option<u32> {
         (time != u32::MAX).then(|| time.saturating_sub(self.now))
+    }
+
+    /// Returns the remaining progress between two timestamps.
+    pub fn progress_remaining(&self, start: u32, end: u32) -> Option<f32> {
+        self.time_until(end).map(|remain| {
+            let full = end - start;
+            remain as f32 / full as f32
+        })
     }
 }
 

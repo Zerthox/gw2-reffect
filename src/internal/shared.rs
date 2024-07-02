@@ -36,8 +36,8 @@ pub struct Buff {
     /// Number of stacks or `1` if not intensity-stacking.
     pub stacks: u32,
 
-    /// Initially applied duration of the buff or [`u32::MAX`] if time not visible.
-    pub duration: u32,
+    /// Most recent application timestamp or [`u32::MAX`] if time not visible.
+    pub apply_time: u32,
 
     /// Predicted runout timestamp or [`u32::MAX`] if time not visible.
     pub runout_time: u32,
