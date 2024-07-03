@@ -4,7 +4,8 @@ use crate::{
     colors,
     context::Context,
     render_util::{
-        collapsing_header_same_line_end, enum_combo, input_float_with_format, input_size,
+        collapsing_header_same_line_end, delete_confirm_modal, enum_combo, input_float_with_format,
+        input_size,
     },
     traits::{Render, RenderOptions, TreeLeaf},
 };
@@ -90,7 +91,14 @@ impl RenderOptions for IconGrid {
             let open = CollapsingHeader::new(format!("{}###icon{i}", icon.name))
                 .flags(TreeNodeFlags::ALLOW_ITEM_OVERLAP)
                 .begin_with_close_button(ui, &mut remains);
+
+            let title = format!("Confirm Delete##gridicon{i}");
             if !remains {
+                ui.open_popup(&title);
+            }
+            if delete_confirm_modal(ui, &title, || {
+                ui.text(format!("Delete Icon {}?", icon.name))
+            }) {
                 action = Action::Delete(i);
             }
 
