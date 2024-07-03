@@ -113,7 +113,9 @@ impl IconSource {
                 }
             }
             Self::Url(url) => {
-                ui.input_text("##url", url).build();
+                ui.input_text("##url", url)
+                    .hint("https://wiki.guildwars2.com/...")
+                    .build();
                 ui.same_line();
                 if ui.button("Load") {
                     self.load();
