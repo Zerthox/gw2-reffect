@@ -2,8 +2,8 @@ use super::{Anchor, Common, Element, RenderState};
 use crate::{
     context::{Context, EditState},
     render_util::{
-        delete_confirm_modal, enum_combo, item_context_menu, push_alpha_change, style_disabled,
-        style_disabled_if, tree_select_empty,
+        delete_confirm_modal, enum_combo, item_context_menu, style_disabled, style_disabled_if,
+        tree_select_empty,
     },
     schema::Schema,
     traits::{RenderOptions, TreeNode},

@@ -3,7 +3,7 @@ name = "reffect"
 version = "0.1.0"
 authors = ["Zerthox"]
 edition = "2021"
-description = "Customizable character effect displays"
+description = "Customizable effect displays"
 rust-version = "1.76.0"
 
 [dependencies]
@@ -39,8 +39,3 @@ OriginalFilename = "reffect.dll"
 
 [profile.release]
 lto = "thin"
-
-# [patch."https://github.com/zerthox/nexus-rs"]
-# nexus = { path = "../nexus-rs/nexus" }
-
-# icon idea: boon outline with rounded recycle symbol?
