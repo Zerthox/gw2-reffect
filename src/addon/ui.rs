@@ -6,9 +6,10 @@ use crate::{
         enum_combo, input_float_with_format, input_u32, next_window_size_constraints,
         style_disabled,
     },
+    traits::Colored,
 };
 use nexus::imgui::{
-    ChildWindow, ComboBoxFlags, InputTextFlags, StyleVar, TreeNodeFlags, Ui, Window,
+    ChildWindow, ComboBoxFlags, InputTextFlags, StyleColor, StyleVar, TreeNodeFlags, Ui, Window,
 };
 use rfd::FileDialog;
 use std::{
@@ -237,7 +238,7 @@ impl Addon {
                 ui.same_line();
                 match &ctx.buffs_state {
                     true => {
-                        ui.text_colored(GREEN, "ok");
+                        ui.text_colored(GREEN, "available");
                         if ui.is_item_hovered() {
                             ui.tooltip(|| {
                                 for (id, buff) in &ctx.buffs {
@@ -263,16 +264,26 @@ impl Addon {
                 }
 
                 ui.text(format!("Combat: {}", ctx.ui.combat));
-                ui.text(format!(
-                    "Profession: {}",
-                    name_or_unknown_id(ctx.player.prof)
-                ));
-                ui.text(format!(
-                    "Specialization: {}",
-                    name_or_unknown_id(ctx.player.spec)
-                ));
-                ui.text(format!("Race: {}", name_or_unknown_id(ctx.player.race)));
-                ui.text(format!("Mount: {}", name_or_unknown_id(ctx.player.mount)));
+
+                ui.text("Profession:");
+                ui.same_line();
+                name_or_unknown_id_colored(ui, ctx.player.prof);
+
+                ui.text("Specialization:");
+                ui.same_line();
+                name_or_unknown_id_colored(ui, ctx.player.spec);
+
+                ui.text("Race:");
+                ui.same_line();
+                ui.text(match ctx.player.race {
+                    Ok(value) => value.to_string(),
+                    Err(id) => format!("Unknown ({id})"),
+                });
+
+                ui.text("Mount:");
+                ui.same_line();
+                name_or_unknown_id_colored(ui, ctx.player.mount);
+
                 ui.text(format!("Map id: {}", ctx.map.id));
                 ui.text(format!("Map category: {}", ctx.map.category));
 
@@ -285,13 +296,18 @@ impl Addon {
     }
 }
 
-fn name_or_unknown_id<T, N>(value: Result<T, N>) -> String
+fn name_or_unknown_id_colored<T, N>(ui: &Ui, value: Result<T, N>)
 where
-    T: fmt::Display,
+    T: AsRef<str> + Colored,
     N: fmt::Display,
 {
     match value {
-        Ok(value) => value.to_string(),
-        Err(id) => format!("Unknown ({id})"),
+        Ok(value) => {
+            let _color = value
+                .colored()
+                .map(|color| ui.push_style_color(StyleColor::Text, color));
+            ui.text(value);
+        }
+        Err(id) => ui.text(format!("Unknown ({id})")),
     }
 }
