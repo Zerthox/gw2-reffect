@@ -16,6 +16,7 @@ static ADDON: OnceLock<Mutex<Addon>> = OnceLock::new();
 #[derive(Debug)]
 pub struct Addon {
     debug: bool,
+    create_error: bool,
     packs: Vec<Pack>,
     context: Context,
 }
@@ -24,6 +25,7 @@ impl Addon {
     pub fn new() -> Self {
         Self {
             debug: false,
+            create_error: false,
             packs: Vec::new(),
             context: Context::default(),
         }

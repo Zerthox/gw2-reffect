@@ -3,9 +3,12 @@ use crate::{
     addon::Settings, elements::Pack, internal, texture_manager::TextureManager, util::file_name,
 };
 use nexus::gui::{register_render, RenderType};
-use std::fs;
+use rfd::FileDialog;
+use std::{fs, thread};
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
+
+const REPOSITORY: &str = env!("CARGO_PKG_REPOSITORY");
 
 impl Addon {
     pub fn load() {
@@ -106,6 +109,44 @@ impl Addon {
         log::info!("Saving packs");
         for pack in &self.packs {
             pack.save_to_file();
+        }
+    }
+
+    pub fn open_create_dialog(&self) {
+        // just spawn a thread to not have to deal with futures
+        thread::spawn(|| {
+            let packs = Self::packs_dir();
+            if let Some(file) = FileDialog::new()
+                .set_title("Save Pack")
+                .set_directory(&packs)
+                .add_filter("JSON", &["json"])
+                .save_file()
+            {
+                log::debug!("Request to create {}", file.display());
+                if let Some(dir) = file.parent() {
+                    if dir == packs {
+                        if let Some(pack) = Pack::create(file) {
+                            Self::lock().add_pack(pack);
+                        }
+                    } else {
+                        Self::lock().create_error = true;
+                        log::warn!("Unable to create pack in \"{}\"", dir.display());
+                    }
+                }
+            }
+        });
+    }
+
+    pub fn open_packs_folder(&self) {
+        if let Err(err) = open::that_detached(Self::packs_dir()) {
+            log::error!("Failed to open packs folder: {err}");
+        }
+    }
+
+    pub fn open_doc(&self, file: &'static str) {
+        let url = format!("{REPOSITORY}/tree/main/docs/{file}.md");
+        if let Err(err) = open::that_detached(url) {
+            log::error!("Failed to open docs URL: {err}");
         }
     }
 }

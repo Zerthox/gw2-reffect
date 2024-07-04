@@ -41,7 +41,7 @@ pub struct Context {
     pub player: PlayerContext,
 
     /// Current buffs by id.
-    pub buffs: BTreeMap<u32, Buff>,
+    pub buffs: BTreeMap<u32, Buff>, // TODO: switch to result/option here?
 
     /// Current buffs state.
     pub buffs_state: bool, // TODO: error enum in internals

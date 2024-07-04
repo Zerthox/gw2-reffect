@@ -1,22 +1,17 @@
 use super::Addon;
 use crate::{
-    elements::{Pack, TextDecoration},
+    elements::TextDecoration,
     id::IdGen,
     render_util::{
         enum_combo, input_float_with_format, input_u32, next_window_size_constraints,
-        style_disabled,
+        small_padding, style_disabled,
     },
     traits::Colored,
 };
 use nexus::imgui::{
     ChildWindow, ComboBoxFlags, InputTextFlags, StyleColor, StyleVar, TreeNodeFlags, Ui, Window,
 };
-use rfd::FileDialog;
-use std::{
-    fmt,
-    sync::atomic::{AtomicBool, Ordering},
-    thread,
-};
+use std::fmt;
 
 impl Addon {
     pub fn render(&mut self, ui: &Ui) {
@@ -27,6 +22,8 @@ impl Addon {
         if self.debug {
             self.render_debug(ui);
         }
+
+        self.render_popups(ui);
 
         self.context.edit.reset_allowed();
     }
@@ -126,58 +123,27 @@ impl Addon {
             IdGen::reset();
             self.load_packs();
         }
+        if ui.is_item_hovered() {
+            ui.tooltip_text("Reloads from pack files on disk");
+        }
+
         ui.same_line();
         if ui.button("Save changes") {
             self.save_packs();
         }
-        ui.same_line();
-        if ui.button("Open folder") {
-            if let Err(err) = open::that(Self::packs_dir()) {
-                log::error!("Failed to open packs folder: {err}");
-            }
+        if ui.is_item_hovered() {
+            ui.tooltip_text("Saves all changes made to pack files on disk");
         }
 
-        const POPUP_TITLE: &str = "Pack Creation Error";
-        static ERROR: AtomicBool = AtomicBool::new(false);
+        ui.same_line();
+        if ui.button("Open folder") {
+            self.open_packs_folder();
+        }
 
         ui.same_line();
         if ui.button("New pack") {
-            // just spawn a thread to not have to deal with futures
-            thread::spawn(move || {
-                let packs = Self::packs_dir();
-                if let Some(file) = FileDialog::new()
-                    .set_title("Save Pack")
-                    .set_directory(&packs)
-                    .add_filter("JSON", &["json"])
-                    .save_file()
-                {
-                    log::debug!("request to create {}", file.display());
-                    if let Some(dir) = file.parent() {
-                        if dir == packs {
-                            if let Some(pack) = Pack::create(file) {
-                                Self::lock().add_pack(pack);
-                            }
-                        } else {
-                            ERROR.store(true, Ordering::Relaxed);
-                            log::warn!("Unable to create pack in \"{}\"", dir.display());
-                        }
-                    }
-                }
-            });
+            self.open_create_dialog();
         }
-
-        if ERROR.swap(false, Ordering::Relaxed) {
-            ui.open_popup(POPUP_TITLE)
-        }
-        ui.popup_modal(POPUP_TITLE)
-            .always_auto_resize(true)
-            .build(ui, || {
-                ui.text("Can not create outside of packs folder");
-                if ui.button("Ok") {
-                    ui.close_current_popup();
-                }
-                ui.set_item_default_focus();
-            });
 
         ui.spacing();
 
@@ -189,27 +155,43 @@ impl Addon {
                     .size([0.33 * ui.window_content_region_width(), 0.0])
                     .build(ui, || {
                         // TODO: search?
+
                         ui.text_disabled("Select Element");
                         ui.separator();
                         ui.spacing();
 
-                        let _style = ui.push_style_var(StyleVar::IndentSpacing(10.0));
-                        let mut remove = None;
-                        for (i, pack) in self.packs.iter_mut().enumerate() {
-                            let deleted = pack.render_select_tree(ui, &mut self.context.edit);
-                            if deleted {
-                                remove = Some(i);
+                        if self.packs.is_empty() {
+                            ui.spacing();
+                            ui.text("No packs loaded");
+                            ui.text("Do you want to?");
+                            if ui.button("Read the docs") {
+                                self.open_doc("getting-started");
                             }
-                        }
-                        if let Some(index) = remove {
-                            self.delete_pack(index);
+                            if ui.button("Install existing") {
+                                self.open_packs_folder()
+                            }
+                            if ui.button("Create my own") {
+                                self.open_create_dialog();
+                            }
+                        } else {
+                            let _style = ui.push_style_var(StyleVar::IndentSpacing(10.0));
+                            let mut remove = None;
+                            for (i, pack) in self.packs.iter_mut().enumerate() {
+                                let deleted = pack.render_select_tree(ui, &mut self.context.edit);
+                                if deleted {
+                                    remove = Some(i);
+                                }
+                            }
+                            if let Some(index) = remove {
+                                self.delete_pack(index);
+                            }
                         }
                     });
 
                 next_window_size_constraints([250.0, -1.0], [f32::INFINITY, -1.0]);
                 ui.same_line();
                 ChildWindow::new("element-options").build(ui, || {
-                    let _style = ui.push_style_var(StyleVar::FramePadding([2.0, 2.0]));
+                    let _style = small_padding(ui);
                     for pack in &mut self.packs {
                         let rendered = pack.try_render_options(ui, &self.context.edit);
                         if rendered {
@@ -218,6 +200,25 @@ impl Addon {
                         }
                     }
                 });
+            });
+    }
+
+    fn render_popups(&mut self, ui: &Ui) {
+        const CREATE_ERROR_TITLE: &str = "Pack Creation Error";
+
+        if self.create_error {
+            self.create_error = false;
+            ui.open_popup(CREATE_ERROR_TITLE)
+        }
+
+        ui.popup_modal(CREATE_ERROR_TITLE)
+            .always_auto_resize(true)
+            .build(ui, || {
+                ui.text("Can not create outside of packs folder");
+                if ui.button("Ok") {
+                    ui.close_current_popup();
+                }
+                ui.set_item_default_focus();
             });
     }
 
@@ -248,7 +249,7 @@ impl Addon {
                                         let progress = remain as f32 / full as f32;
                                         ui.same_line();
                                         ui.text(format!(
-                                            "for {:.1}/{:.1}s {:.1}%",
+                                            "{:.1}/{:.1}s {:.1}%",
                                             remain as f32 / 1000.0,
                                             full as f32 / 1000.0,
                                             progress * 100.0,
