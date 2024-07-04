@@ -30,6 +30,7 @@ impl Addon {
         .revert_on_unload();
 
         let _ = fs::create_dir_all(Self::packs_dir());
+        let _ = fs::create_dir(Self::icons_dir());
 
         let mut plugin = Self::lock();
 

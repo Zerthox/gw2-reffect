@@ -1,4 +1,4 @@
-use crate::{assets::MONSTER_ICON, elements::IconSource};
+use crate::{addon::Addon, assets::MONSTER_ICON, elements::IconSource};
 use nexus::{
     imgui::TextureId,
     texture::{
@@ -104,6 +104,12 @@ impl TextureManager {
     }
 
     fn load_from_file(id: &str, path: impl AsRef<Path>) {
+        let path = path.as_ref();
+        let path = if path.is_absolute() {
+            path
+        } else {
+            &Addon::icons_dir().join(path)
+        };
         load_texture_from_file(id, path, Some(Self::RECEIVE_TEXTURE));
     }
 

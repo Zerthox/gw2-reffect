@@ -1,12 +1,10 @@
 use crate::{
+    addon::Addon,
     lockbox::Lockbox,
     render_util::{enum_combo, impl_static_variants},
     texture_manager::TextureManager,
 };
-use nexus::{
-    imgui::{ComboBoxFlags, TextureId, Ui},
-    paths::get_game_dir,
-};
+use nexus::imgui::{ComboBoxFlags, TextureId, Ui};
 use rfd::FileDialog;
 use serde::{Deserialize, Serialize};
 use std::{path::PathBuf, thread};
@@ -87,15 +85,15 @@ impl IconSource {
                 ui.same_line();
                 if ui.button("Select") {
                     thread::spawn(move || {
-                        let game_dir = get_game_dir().expect("no game directory");
+                        let dir = Addon::icons_dir();
                         if let Some(file) = FileDialog::new()
                             .set_title("Select Icon")
-                            .set_directory(&game_dir)
+                            .set_directory(&dir)
                             .add_filter("Image", &["png", "jpg", "jpeg"])
                             .pick_file()
                         {
-                            // try to get the relative path from game directory
-                            let file = match file.strip_prefix(game_dir) {
+                            // try to get the relative path from icons folder
+                            let file = match file.strip_prefix(dir) {
                                 Ok(relative) => relative.to_path_buf(),
                                 Err(_) => {
                                     log::warn!("Absolute icon path \"{}\"", file.display());

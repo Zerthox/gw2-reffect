@@ -45,4 +45,8 @@ impl Addon {
     pub fn packs_dir() -> PathBuf {
         Self::addon_dir().join("packs")
     }
+
+    pub fn icons_dir() -> PathBuf {
+        Self::addon_dir().join("icons")
+    }
 }
