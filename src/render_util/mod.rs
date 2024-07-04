@@ -17,6 +17,10 @@ pub fn next_window_size_constraints(size_min: [f32; 2], size_max: [f32; 2]) {
     }
 }
 
+pub fn small_padding<'ui>(ui: &'ui Ui) -> StyleStackToken<'ui> {
+    ui.push_style_var(StyleVar::FramePadding([2.0, 2.0]))
+}
+
 pub fn style_disabled<'ui>(ui: &'ui Ui) -> StyleStackToken<'ui> {
     ui.push_style_var(StyleVar::Alpha(0.5))
 }
@@ -34,4 +38,11 @@ pub fn cycle_progress(ui: &Ui, period_ms: u32) -> f32 {
     let time = (1000.0 * ui.time()) as u32;
     let passed = time % period_ms;
     passed as f32 / period_ms as f32
+}
+
+pub fn helper(ui: &Ui, contents: impl FnOnce()) {
+    ui.text_disabled("(?)");
+    if ui.is_item_hovered() {
+        ui.tooltip(contents);
+    }
 }

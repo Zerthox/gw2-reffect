@@ -89,3 +89,9 @@ pub struct ActiveBuff {
     pub apply: u32,
     pub runout: u32,
 }
+
+impl ActiveBuff {
+    pub fn full_duration(&self) -> u32 {
+        self.runout.saturating_sub(self.apply)
+    }
+}
