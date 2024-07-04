@@ -33,7 +33,8 @@ impl Trigger for BuffTrigger {
 impl BuffTrigger {
     fn force_update(&mut self, ctx: &Context) {
         let stacks = self.id.count_stacks(ctx);
-        self.active_memo = (self.id.always() || self.threshold.is_met(stacks)).then(|| {
+        let active = self.id.always() || ctx.buffs_state && self.threshold.is_met(stacks);
+        self.active_memo = active.then(|| {
             let (apply, runout) = self.id.time_range(ctx);
             ActiveBuff {
                 stacks,
