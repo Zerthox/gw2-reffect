@@ -32,6 +32,7 @@ impl<'a> RenderState<'a> {
     }
 
     pub fn with_offset(&self, offset: [f32; 2]) -> Self {
+        // TODO: positive offset always towards center of screen? need direction/anchor here probably
         Self {
             edit: self.edit,
             common: self.common,
