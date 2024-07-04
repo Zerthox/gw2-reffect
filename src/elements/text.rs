@@ -6,7 +6,7 @@ use crate::{
     traits::{Render, RenderOptions, TreeLeaf},
     trigger::{ActiveBuff, BuffTrigger},
 };
-use nexus::imgui::{ColorEdit, ColorPreview, InputTextFlags, Ui};
+use nexus::imgui::{ColorEdit, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -141,7 +141,7 @@ impl RenderOptions for Text {
         self.align.render_combo(ui);
 
         ColorEdit::new("Color", &mut self.color)
-            .preview(ColorPreview::Alpha)
+            .alpha(false)
             .build(ui);
 
         self.decoration.render_select(ui);

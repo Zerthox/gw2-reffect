@@ -23,7 +23,7 @@ pub struct Icon {
     pub stacks: bool,
 
     #[serde(alias = "color")]
-    pub tint: [f32; 3],
+    pub tint: [f32; 4],
 }
 
 impl Icon {
@@ -36,8 +36,8 @@ impl Icon {
     }
 
     fn texture_color(&self, ui: &Ui) -> [f32; 4] {
-        let [r, g, b] = self.tint;
-        [r, g, b, self.alpha(ui)]
+        let [r, g, b, a] = self.tint;
+        [r, g, b, a * self.alpha(ui)]
     }
 
     pub fn is_visible(&mut self, ctx: &Context, state: &RenderState) -> bool {
@@ -123,7 +123,9 @@ impl RenderOptions for Icon {
         ui.spacing();
         self.source.render_select(ui);
 
-        ColorEdit::new("Tint", &mut self.tint).build(ui);
+        ColorEdit::new("Tint", &mut self.tint)
+            .alpha(false)
+            .build(ui);
 
         // TODO: duration customizations
         ui.checkbox("Show Duration", &mut self.duration);
@@ -140,7 +142,7 @@ impl Default for Icon {
             source: IconSource::Unknown,
             duration: false,
             stacks: false,
-            tint: [1.0, 1.0, 1.0],
+            tint: [1.0, 1.0, 1.0, 1.0],
         }
     }
 }
