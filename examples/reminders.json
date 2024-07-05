@@ -61,7 +61,7 @@
                                 "Url": "https://wiki.guildwars2.com/images/6/67/Malnourished.png"
                             },
                             "stacks": false,
-                            "tint": [1.0, 1.0, 1.0]
+                            "tint": [1.0, 1.0, 1.0, 1.0]
                         },
                         {
                             "name": "Diminished",
@@ -73,7 +73,7 @@
                                 "Url": "https://wiki.guildwars2.com/images/7/71/Diminished.png"
                             },
                             "stacks": false,
-                            "tint": [1.0, 1.0, 1.0]
+                            "tint": [1.0, 1.0, 1.0, 1.0]
                         },
                         {
                             "name": "Reinforced",
@@ -85,7 +85,7 @@
                                 "Url": "https://wiki.guildwars2.com/images/8/83/Reinforced_Armor.png"
                             },
                             "stacks": false,
-                            "tint": [1.0, 1.0, 1.0]
+                            "tint": [1.0, 1.0, 1.0, 1.0]
                         }
                     ]
                 }

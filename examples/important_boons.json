@@ -36,7 +36,7 @@
                         "Url": "https://wiki.guildwars2.com/images/e/e5/Aegis.png"
                     },
                     "stacks": false,
-                    "tint": [1.0, 1.0, 1.0]
+                    "tint": [1.0, 1.0, 1.0, 1.0]
                 },
                 {
                     "name": "Might",
@@ -48,7 +48,7 @@
                         "Url": "https://wiki.guildwars2.com/images/7/7c/Might.png"
                     },
                     "stacks": true,
-                    "tint": [1.0, 1.0, 1.0]
+                    "tint": [1.0, 1.0, 1.0, 1.0]
                 },
                 {
                     "name": "Quickness",
@@ -60,7 +60,7 @@
                         "Url": "https://wiki.guildwars2.com/images/b/b4/Quickness.png"
                     },
                     "stacks": false,
-                    "tint": [1.0, 1.0, 1.0]
+                    "tint": [1.0, 1.0, 1.0, 1.0]
                 },
                 {
                     "name": "Alacrity",
@@ -72,7 +72,7 @@
                         "Url": "https://wiki.guildwars2.com/images/4/4c/Alacrity.png"
                     },
                     "stacks": false,
-                    "tint": [1.0, 1.0, 1.0]
+                    "tint": [1.0, 1.0, 1.0, 1.0]
                 },
                 {
                     "name": "Stability",
@@ -84,7 +84,7 @@
                         "Url": "https://wiki.guildwars2.com/images/a/ae/Stability.png"
                     },
                     "stacks": true,
-                    "tint": [1.0, 1.0, 1.0]
+                    "tint": [1.0, 1.0, 1.0, 1.0]
                 }
             ]
         }
