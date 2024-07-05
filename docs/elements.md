@@ -27,17 +27,17 @@ Keep in mind that you will have to share any used icon files alongside the pack 
 ![Icon](img/icon.png)
 
 
-## Grid
-Grids are a collection of multiple icons sharing the same that are automatically aligned according to the chosen layout and direction.
-A dynamic layout adjusts to the currently visible icons whereas a static one will keep the gaps.
-A grid can grow towards several directions, for example upwards, to the right or horizontally centered.
+## List
+Lists are a collection of multiple icons that are automatically aligned according to the chosen layout and direction.
+A dynamic layout adjusts to the currently visible icons whereas a static one will keep the gaps of hidden icons.
+A list can grow towards several directions, for example upwards, to the right or horizontally centered.
 
-![Grid](img/grid.png)
+![List](img/list.png)
 
-Individual icons in the grid have similar configuration options to an icon element.
-All icons in a grid have to share the same dimensions.
+Individual icons in the list have similar configuration options to an icon element.
+All icons in a list have to share the same dimensions.
 
-![Grid Icon](img/grid-icon.png)
+![List Icon](img/list-icon.png)
 
 
 ## Text
