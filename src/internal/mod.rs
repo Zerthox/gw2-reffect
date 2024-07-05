@@ -14,8 +14,6 @@ extern "C" {
     fn update_buffs() -> BuffsResult;
 }
 
-// TODO: allocator discrepancies?
-
 /// Returns the buffs currently present on the player or an error.
 ///
 /// # Safety

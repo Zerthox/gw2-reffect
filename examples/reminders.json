@@ -45,7 +45,7 @@
                         "map": "Any"
                     },
                     "animation": null,
-                    "type": "IconGrid",
+                    "type": "IconList",
                     "layout": "Dynamic",
                     "direction": "Horizontal",
                     "size": [48.0, 48.0],

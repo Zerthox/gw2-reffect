@@ -137,7 +137,7 @@ impl Addon {
 
         ui.same_line();
         if ui.button("Open folder") {
-            self.open_packs_folder();
+            self.open_addon_folder();
         }
 
         ui.same_line();

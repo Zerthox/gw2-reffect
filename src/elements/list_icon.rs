@@ -3,11 +3,11 @@ use crate::{context::Context, traits::RenderOptions};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
-// TODO: individual opacity in grid?
+// TODO: individual opacity in list?
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
-pub struct IconNamed {
+pub struct ListIcon {
     pub name: String,
 
     #[serde(flatten)]
@@ -17,7 +17,7 @@ pub struct IconNamed {
     pub open: bool,
 }
 
-impl IconNamed {
+impl ListIcon {
     pub fn is_visible(&mut self, ctx: &Context, state: &RenderState) -> bool {
         self.inner.is_visible(ctx, state)
     }
@@ -27,7 +27,7 @@ impl IconNamed {
     }
 }
 
-impl RenderOptions for IconNamed {
+impl RenderOptions for ListIcon {
     fn render_options(&mut self, ui: &Ui) {
         ui.input_text("Name", &mut self.name).build();
 
@@ -35,7 +35,7 @@ impl RenderOptions for IconNamed {
     }
 }
 
-impl Default for IconNamed {
+impl Default for ListIcon {
     fn default() -> Self {
         Self {
             name: "Unnamed".into(),

@@ -1,11 +1,11 @@
 use super::VisitMut;
-use crate::elements::{IconElement, IconGrid};
+use crate::elements::{IconElement, IconList};
 
 #[derive(Debug, Default, Clone, Copy)]
 pub struct Loader;
 
 impl VisitMut for Loader {
-    fn visit_icon_grid(&mut self, el: &mut IconGrid) {
+    fn visit_icon_list(&mut self, el: &mut IconList) {
         for icon in &mut el.icons {
             icon.inner.load();
         }

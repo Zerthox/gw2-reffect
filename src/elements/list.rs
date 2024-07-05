@@ -1,4 +1,4 @@
-use super::{Direction, IconNamed, Layout, RenderState};
+use super::{Direction, Layout, ListIcon, RenderState};
 use crate::{
     action::Action,
     colors,
@@ -18,20 +18,20 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
-pub struct IconGrid {
+pub struct IconList {
     pub layout: Layout,
     pub direction: Direction,
     pub size: [f32; 2],
     pub pad: f32,
-    pub icons: Vec<IconNamed>,
+    pub icons: Vec<ListIcon>,
 }
 
 // technically there is children, but they are not full elements
-impl TreeLeaf for IconGrid {}
+impl TreeLeaf for IconList {}
 
-impl Render for IconGrid {
+impl Render for IconList {
     fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
-        let render_icon = |icon: &mut IconNamed, i, len| {
+        let render_icon = |icon: &mut ListIcon, i, len| {
             let offset = self.direction.offset_for(self.size, self.pad, i, len);
             icon.render(ui, ctx, &state.with_offset(offset), self.size);
         };
@@ -62,7 +62,7 @@ impl Render for IconGrid {
     }
 }
 
-impl RenderOptions for IconGrid {
+impl RenderOptions for IconList {
     fn render_options(&mut self, ui: &Ui) {
         enum_combo(ui, "Layout", &mut self.layout, ComboBoxFlags::empty());
 
@@ -92,7 +92,7 @@ impl RenderOptions for IconGrid {
                 .flags(TreeNodeFlags::ALLOW_ITEM_OVERLAP)
                 .begin_with_close_button(ui, &mut remains);
 
-            let title = format!("Confirm Delete##gridicon{i}");
+            let title = format!("Confirm Delete##listicon{i}");
             if !remains {
                 ui.open_popup(&title);
             }
@@ -125,14 +125,14 @@ impl RenderOptions for IconGrid {
             }
         }
         if ui.button("Add Icon") {
-            self.icons.push(IconNamed::default());
+            self.icons.push(ListIcon::default());
         }
 
         action.perform(&mut self.icons);
     }
 }
 
-impl Default for IconGrid {
+impl Default for IconList {
     fn default() -> Self {
         Self {
             layout: Layout::Dynamic,

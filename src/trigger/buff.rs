@@ -7,8 +7,6 @@ use crate::{
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
-// TODO: update examples!
-
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct BuffTrigger {
