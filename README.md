@@ -1,7 +1,8 @@
 # Reffect
-Reffect is a Guild Wars 2 addon allowing customizable display of effects.
+Reffect is a [Guild Wars 2](https://guildwars2.com) addon allowing customizable display of effects.
 
 This project is inspired by [WeakAuras](https://github.com/WeakAuras/WeakAuras2) from World of Warcraft and [GW2Clarity](https://github.com/Friendly0Fire/GW2Clarity).
+Requires the [Nexus](https://github.com/RaidcoreGG/Nexus) addon manager ([website](https://raidcore.gg/Nexus)).
 
 **WARNING:** Reffect performs memory reading. Use the addon and created displays at your own risk. See [our information policy](#information-policy) below and the [Guild Wars 2 policy on third-party programs](https://help.guildwars2.com/hc/en-us/articles/360013625034-Policy-Third-Party-Programs).
 
