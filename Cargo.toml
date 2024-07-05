@@ -4,6 +4,7 @@ version = "0.1.0"
 authors = ["Zerthox"]
 edition = "2021"
 description = "Customizable effect displays"
+repository = "https://github.com/zerthox/gw2-reffect"
 rust-version = "1.76.0"
 
 [dependencies]
