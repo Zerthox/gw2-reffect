@@ -2,15 +2,17 @@
 Reffect does not come with any predefined display setups included.
 Instead users can create and share their own configurations.
 
+![Boons display](./img/boons.png)
+
 ## Installing existing packs
 Shared packs come as `.json` files.
 In order to install one, open the editor ingame and click on the `Open folder` button.
 Alternatively you can navigate to `Guild Wars 2\addons\reffect` manually.
-Simply drop the pack file into the `packs` folder and click `Reload packs` ingame.
+Simply drop the pack file into the `packs` folder and click `Reload packs`.
 Make sure to use `Save changes` first if you have done any unsaved modifications ingame.
 Also do not forget to copy any local icon files required by the pack to the `icons` folder.
 
-If you want to learn more about making your own adjustments the pack(s) you just installed, see the documentation on [elements](./elements.md).
+If you want to learn more about making your own adjustments the pack(s) you just installed, see the [documentation on elements](./elements.md).
 
 ## Creating own packs
 To start creating your own pack click on the `New pack` button.
@@ -18,7 +20,9 @@ You will be prompted with a dialog to decide the file name.
 The pack file can not be saved outside the packs folder as it would not be loaded otherwise.
 Now you can start adding elements to the pack by right clicking in the elements tree and choosing one of the types of elements listed under `Create`.
 This right-click context menu is also where you can move, cut, copy or delete elements and packs.
+
 Now you can start adjusting the elements, connecting them to specific effects or use filters to determine when they should be displayed.
+For further information, see the [documentation on elements](./elements.md).
 
 ### Finding effect ids
 If your use case requires an element to be tied to an effect, you need the skill id of the effect.

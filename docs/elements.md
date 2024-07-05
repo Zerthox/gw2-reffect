@@ -54,5 +54,13 @@ The following replacements are supported:
 # Additional element options
 
 ## Filter
+Filters allow restricting the visibility of elements.
+For example elements can be limited to in or out of combat, one or multiple specializations or specific maps.
+This is especially useful for elements that are not tied to an effect.
+
+![Filters](./img/filter.png)
 
 ## Animation
+Optionally an animation can be added to an element to further highlight its presence on screen.
+
+![Animation](./img/animation.png)
