@@ -1,7 +1,7 @@
 use crate::{
     action::Action,
     context::Context,
-    render_util::{enum_combo, impl_static_variants, input_u32},
+    render_util::{enum_combo, helper, impl_static_variants, input_u32},
     traits::RenderOptions,
 };
 use nexus::imgui::{ComboBoxFlags, Ui};
@@ -58,6 +58,14 @@ impl BuffTriggerId {
             Self::Any(ids) => ids,
         }
     }
+
+    fn helper(ui: &Ui) {
+        ui.same_line();
+        helper(ui, || {
+            ui.text("Can be found on the wiki");
+            ui.text("by hovering over the chatcode");
+        });
+    }
 }
 
 impl RenderOptions for BuffTriggerId {
@@ -79,6 +87,7 @@ impl RenderOptions for BuffTriggerId {
                 Self::None => {}
                 Self::Single(id) => {
                     input_u32(ui, "Effect Id", id, 0, 0);
+                    Self::helper(ui);
                 }
                 Self::Any(ids) => {
                     let mut action = Action::new();
@@ -88,6 +97,9 @@ impl RenderOptions for BuffTriggerId {
 
                         ui.same_line();
                         ui.text(format!("Effect Id {}", i + 1));
+                        if i == 0 {
+                            Self::helper(ui);
+                        }
                     }
                     if ui.button("Add Effect") {
                         ids.push(0);
