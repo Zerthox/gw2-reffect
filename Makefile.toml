@@ -46,7 +46,7 @@ script_runner = "@shell"
 run_task = { name = ["build-release", "copy-deps", "copy-release"] }
 
 [tasks.install-examples]
-script = "cp \"${CARGO_MAKE_CURRENT_TASK_INITIAL_MAKEFILE_DIRECTORY}/examples/*\" \"${GW2_PATH}/addons/reffect\""
+script = "cp \"${CARGO_MAKE_CURRENT_TASK_INITIAL_MAKEFILE_DIRECTORY}/examples/*\" \"${GW2_PATH}/addons/reffect/packs\""
 script_runner = "@shell"
 
 [tasks.uninstall]
