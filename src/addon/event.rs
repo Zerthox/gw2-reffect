@@ -29,8 +29,7 @@ impl Addon {
         )
         .revert_on_unload();
 
-        let _ = fs::create_dir_all(Self::packs_dir());
-        let _ = fs::create_dir(Self::icons_dir());
+        Self::create_dirs();
 
         let mut plugin = Self::lock();
 
@@ -55,10 +54,16 @@ impl Addon {
         TextureManager::unload();
     }
 
+    pub fn create_dirs() {
+        let _ = fs::create_dir_all(Self::packs_dir());
+        let _ = fs::create_dir(Self::icons_dir());
+    }
+
     pub fn load_packs(&mut self) {
         let dir = Self::packs_dir();
         log::info!("Loading packs from \"{}\"", dir.display());
 
+        Self::create_dirs();
         match fs::read_dir(&dir) {
             Ok(iter) => {
                 let files = iter.filter_map(|entry| entry.ok()).filter(|entry| {
@@ -108,6 +113,7 @@ impl Addon {
 
     pub fn save_packs(&self) {
         log::info!("Saving packs");
+        Self::create_dirs();
         for pack in &self.packs {
             pack.save_to_file();
         }
@@ -116,6 +122,7 @@ impl Addon {
     pub fn open_create_dialog(&self) {
         // just spawn a thread to not have to deal with futures
         thread::spawn(|| {
+            Self::create_dirs();
             let packs = Self::packs_dir();
             if let Some(file) = FileDialog::new()
                 .set_title("Save Pack")
