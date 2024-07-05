@@ -35,4 +35,4 @@ The information is retrieved with the following policy in mind:
 - Except for Boons & Conditions effects do not show durations above 5 seconds. *Ingame this information is usually only visible on hover. With 5s left effect icons start to blink, conveying the remaining duration to the player.*
 - No true stack count for duration stacking effects.
 - No information about effects hidden from the player.
-- No combinatory logic for multiple effects outside of grouping them into a single UI element.
+- No combining logic for multiple effects outside of grouping them into a single UI element.
