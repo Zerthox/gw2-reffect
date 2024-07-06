@@ -2,7 +2,7 @@ use super::Trigger;
 use crate::{
     action::Action,
     context::{Context, MapCategory},
-    render_util::{enum_combo, impl_static_variants, input_u32},
+    render_util::{enum_combo, helper, impl_static_variants, input_u32},
     traits::RenderOptions,
 };
 use nexus::imgui::{ComboBoxFlags, Ui};
@@ -46,6 +46,14 @@ impl RenderOptions<bool> for MapTrigger {
 
                     ui.same_line();
                     ui.text(format!("Map Id {}", i + 1));
+
+                    if i == 0 {
+                        ui.same_line();
+                        helper(ui, || {
+                            ui.text("Same as in GW2 API");
+                            ui.text("Can be found on the wiki");
+                        });
+                    }
                 }
                 if ui.button("Add Map") {
                     ids.push(0);

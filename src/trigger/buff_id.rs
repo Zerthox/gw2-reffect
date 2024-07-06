@@ -63,7 +63,7 @@ impl BuffTriggerId {
         ui.same_line();
         helper(ui, || {
             ui.text("Can be found on the wiki");
-            ui.text("by hovering over the chatcode");
+            ui.text("Hover over the chatcode");
         });
     }
 }
