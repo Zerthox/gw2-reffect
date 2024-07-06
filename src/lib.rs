@@ -19,10 +19,12 @@ mod util;
 mod visit;
 
 use addon::Addon;
+use nexus::AddonFlags;
 
 nexus::export! {
-    name: "Reffect",
+    name: "Reffect (alpha)",
     signature: -0xb359580,
+    flags: AddonFlags::IsVolatile,
     load: Addon::load,
     unload: Addon::unload,
 }

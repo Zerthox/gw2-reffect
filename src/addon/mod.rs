@@ -5,16 +5,20 @@ mod ui;
 pub use self::settings::*;
 
 use crate::{context::Context, elements::Pack};
+use arc_util::update::{Repository, Updater};
 use nexus::paths::get_addon_dir;
 use std::{
     path::PathBuf,
     sync::{Mutex, MutexGuard, OnceLock},
 };
 
+const VERSION: &str = env!("CARGO_PKG_VERSION");
+
 static ADDON: OnceLock<Mutex<Addon>> = OnceLock::new();
 
 #[derive(Debug)]
 pub struct Addon {
+    updater: Updater,
     debug: bool,
     create_error: bool,
     packs: Vec<Pack>,
@@ -24,6 +28,11 @@ pub struct Addon {
 impl Addon {
     pub fn new() -> Self {
         Self {
+            updater: Updater::unchecked(
+                "Reffect",
+                Repository::new("zerthox", "gw2-reffect"),
+                VERSION.parse().unwrap(),
+            ),
             debug: false,
             create_error: false,
             packs: Vec::new(),

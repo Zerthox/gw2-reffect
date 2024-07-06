@@ -32,11 +32,10 @@ impl Addon {
         Self::create_dirs();
 
         let mut plugin = Self::lock();
-
+        plugin.updater.check();
         if let Some(settings) = Settings::try_load() {
             plugin.context.load(settings.context);
         }
-
         plugin.load_packs();
     }
 
