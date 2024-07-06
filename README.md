@@ -19,8 +19,8 @@ Requires the [Nexus](https://github.com/RaidcoreGG/Nexus) addon manager ([websit
 
 ## Installation
 1. Install the [Nexus](https://github.com/RaidcoreGG/Nexus) addon manager ([website](https://raidcore.gg/Nexus)).
-2. Download `reffect_internal.dll` and place it in your game directory (e.g. `C:\Program Files\Guild Wars 2`) next to your `Gw2-64.exe`.
-3. Download `reffect.dll` and place it in your `addons` folder (e.g. `C:\Program Files\Guild Wars 2\addons`).
+2. Download [`reffect.dll`](../../releases/latest) and place it in your `addons` folder (e.g. `C:\Program Files\Guild Wars 2\addons`).
+3. Download [`reffect_internal.dll`](../../releases/latest) and place it in your game directory (e.g. `C:\Program Files\Guild Wars 2`) next to your `Gw2-64.exe`.
 4. *Optional: read the [getting started guide](./docs/getting-started.md) or [documentation on elements](./docs/elements.md).*
 
 ## Information Policy
