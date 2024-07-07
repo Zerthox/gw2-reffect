@@ -1,6 +1,6 @@
 use super::{CombatTrigger, Trigger};
 use crate::{
-    context::{Context, Mount, Profession, Specialization},
+    context::{Context, Mount, Specialization},
     render_util::enum_combo_bitflags,
     serde_bitflags,
     traits::RenderOptions,
@@ -15,9 +15,6 @@ pub struct PlayerTrigger {
     pub combat: CombatTrigger,
 
     #[serde(with = "serde_bitflags")]
-    pub profs: BitFlags<Profession>,
-
-    #[serde(with = "serde_bitflags")]
     pub specs: BitFlags<Specialization>,
 
     #[serde(with = "serde_bitflags")]
@@ -27,7 +24,6 @@ pub struct PlayerTrigger {
 impl Trigger for PlayerTrigger {
     fn is_active(&mut self, ctx: &Context) -> bool {
         self.combat.is_active(ctx)
-            && check_bitflags_optional(self.profs, ctx.player.prof.ok())
             && check_bitflags_optional(self.specs, ctx.player.spec.ok())
             && check_bitflags_optional(self.mounts, ctx.player.mount.ok())
     }
@@ -38,12 +34,6 @@ impl RenderOptions for PlayerTrigger {
         self.combat.render_options(ui);
 
         ui.spacing();
-        enum_combo_bitflags(
-            ui,
-            "Profession",
-            &mut self.profs,
-            ComboBoxFlags::HEIGHT_LARGE,
-        );
 
         enum_combo_bitflags(
             ui,
