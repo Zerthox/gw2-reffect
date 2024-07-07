@@ -2,7 +2,7 @@ use super::{Animation, Common, ElementType, RenderState};
 use crate::{
     action::ElementAction,
     context::{Context, EditState},
-    render_util::{delete_confirm_modal, item_context_menu, tree_select_empty},
+    render_util::{delete_confirm_modal, item_context_menu, style_disabled_if, tree_select_empty},
     traits::{Render, RenderOptions, TreeNode},
     trigger::{MetaTrigger, Trigger},
     visit::{Loader, VisitMut},
@@ -11,6 +11,7 @@ use nexus::imgui::{MenuItem, Ui};
 use serde::{Deserialize, Serialize};
 
 // TODO: conditions, e.g. lower opacity out of combat, color change based on stack threshold
+// TODO: anchor to parent vs screen
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(default)]
@@ -70,7 +71,10 @@ impl Element {
             .as_ref()
             .map(|children| children.is_empty())
             .unwrap_or(true);
-        let (token, clicked) = tree_select_empty(ui, &id, state.is_selected(self.common.id), leaf);
+        let (token, clicked) = {
+            let _style = style_disabled_if(ui, !self.common.enabled);
+            tree_select_empty(ui, &id, state.is_selected(self.common.id), leaf)
+        };
         if clicked {
             selected = state.select(self.common.id);
         }
@@ -105,7 +109,11 @@ impl Element {
             action = ElementAction::Delete;
         }
 
-        self.common.render_tree_label(ui, kind);
+        {
+            let _style = style_disabled_if(ui, !self.common.enabled);
+            self.common.render_tree_label(ui, kind);
+        }
+
         if token.is_some() {
             if let Some(children) = self.kind.children() {
                 selected |= self.common.render_tree_children(ui, state, children);

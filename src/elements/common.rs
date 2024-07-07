@@ -16,12 +16,14 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Common {
+    pub enabled: bool,
+
     #[serde(skip)]
     pub id: Id,
 
     pub name: String,
 
-    pub pos: [f32; 2], // TODO: anchor parent vs screen
+    pub pos: [f32; 2],
 
     pub opacity: f32,
 }
@@ -38,15 +40,22 @@ impl Common {
         state: &RenderState,
         contents: impl FnOnce(&RenderState),
     ) {
-        let state = state.with_offset(self.pos).for_element(self, ctx);
-        {
-            let _style = push_alpha_change(ui, self.opacity);
-            contents(&state);
-        }
+        let show = if ctx.edit.is_editing() {
+            ctx.edit.is_edited_or_parent(self.id)
+        } else {
+            self.enabled
+        };
+        if show {
+            let state = state.with_offset(self.pos).for_element(self, ctx);
+            {
+                let _style = push_alpha_change(ui, self.opacity);
+                contents(&state);
+            }
 
-        if ctx.edit.is_edited(self.id) {
-            // TODO: change edited element draw list to foreground?
-            self.render_edit_indicator(ui, &state);
+            if ctx.edit.is_edited(self.id) {
+                // TODO: change edited element draw list to foreground?
+                self.render_edit_indicator(ui, &state);
+            }
         }
     }
 
@@ -131,6 +140,8 @@ impl Common {
 
 impl RenderOptions for Common {
     fn render_options(&mut self, ui: &Ui) {
+        ui.checkbox("Enabled", &mut self.enabled);
+
         ui.input_text("Name", &mut self.name).build();
 
         let [x, y] = &mut self.pos;
@@ -153,6 +164,7 @@ impl RenderOptions for Common {
 impl Default for Common {
     fn default() -> Self {
         Self {
+            enabled: true,
             id: IdGen::generate(),
             name: "Unnamed".into(),
             pos: [0.0, 0.0],
@@ -164,6 +176,7 @@ impl Default for Common {
 impl Clone for Common {
     fn clone(&self) -> Self {
         Self {
+            enabled: self.enabled,
             id: IdGen::generate(), // we want a fresh id for the clone
             name: self.name.clone(),
             pos: self.pos,

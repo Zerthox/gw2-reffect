@@ -16,8 +16,6 @@ use std::path::PathBuf;
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Pack {
-    pub enabled: bool, // TODO: store enabled separately in addon settings?
-
     #[serde(flatten)]
     pub common: Common,
 
@@ -31,10 +29,7 @@ pub struct Pack {
 
 impl Pack {
     pub fn create(file: PathBuf) -> Option<Self> {
-        let mut pack = Self {
-            enabled: true,
-            ..Self::default()
-        };
+        let mut pack = Self::default();
         if let Some(name) = file.file_stem() {
             pack.common.name = name.to_string_lossy().into_owned();
         }
@@ -67,7 +62,7 @@ impl Pack {
         let show = if ctx.edit.is_editing() {
             edit
         } else {
-            self.enabled && ctx.ui.should_show()
+            self.common.enabled && ctx.ui.should_show()
         };
         if show {
             let pos = self.anchor.calc_pos(ui);
@@ -89,9 +84,10 @@ impl Pack {
         let selected = state.is_selected(self.common.id);
         let children = &mut self.elements;
 
-        let style = style_disabled_if(ui, !self.enabled);
-        let (token, selected) = tree_select_empty(ui, &id, selected, children.is_empty());
-        drop(style);
+        let (token, selected) = {
+            let _style = style_disabled_if(ui, !self.common.enabled);
+            tree_select_empty(ui, &id, selected, children.is_empty())
+        };
         if selected {
             state.select(self.common.id);
         }
@@ -106,9 +102,11 @@ impl Pack {
             ui.open_popup(&title);
         }
 
-        let style = style_disabled_if(ui, !self.enabled);
-        self.common.render_tree_label(ui, "Pack");
-        drop(style);
+        {
+            let _style = style_disabled_if(ui, !self.common.enabled);
+            self.common.render_tree_label(ui, "Pack");
+        }
+
         if token.is_some() {
             self.common.render_tree_children(ui, state, children);
         }
@@ -139,8 +137,6 @@ impl Pack {
     fn render_options(&mut self, ui: &Ui) {
         if let Some(_token) = ui.tab_bar(self.common.id_string()) {
             if let Some(_token) = ui.tab_item("Pack") {
-                ui.checkbox("Enabled", &mut self.enabled);
-
                 self.common.render_options(ui);
 
                 enum_combo(ui, "Anchor", &mut self.anchor, ComboBoxFlags::empty());
