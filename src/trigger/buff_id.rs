@@ -21,7 +21,7 @@ pub enum BuffTriggerId {
     Single(u32),
 
     /// Any of the buff ids, stacks are summed.
-    #[strum(serialize = "Any of")]
+    #[strum(serialize = "Multiple")]
     Any(Vec<u32>),
 }
 

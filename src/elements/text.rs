@@ -2,7 +2,7 @@ use super::{RenderState, TextAlign, TextDecoration};
 use crate::{
     component_wise::ComponentWise,
     context::{Context, ContextUpdate},
-    render_util::{draw_text_bg, helper, input_float_with_format, input_text_context_menu},
+    render_util::{draw_text_bg, helper, input_float_with_format, input_text_multi_with_menu},
     traits::{Render, RenderOptions, TreeLeaf},
     trigger::{ActiveBuff, BuffTrigger},
 };
@@ -112,10 +112,15 @@ impl RenderOptions for Text {
         self.buff.render_options(ui);
 
         ui.spacing();
-        ui.input_text_multiline("##text", &mut self.text, [0.0, 3.0 * ui.text_line_height()])
-            .allow_tab_input(true)
-            .build();
-        input_text_context_menu(ui, "##textctx", &mut self.text);
+
+        input_text_multi_with_menu(
+            ui,
+            "##text",
+            &mut self.text,
+            [0.0, 3.0 * ui.text_line_height()],
+            InputTextFlags::ALLOW_TAB_INPUT,
+        );
+
         ui.same_line();
         ui.text("Text"); // own label to fix helper position
         ui.same_line();

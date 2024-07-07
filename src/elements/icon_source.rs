@@ -1,7 +1,7 @@
 use crate::{
     addon::Addon,
     lockbox::Lockbox,
-    render_util::{enum_combo, impl_static_variants, input_text_context_menu},
+    render_util::{enum_combo, impl_static_variants, input_text_simple_menu},
     texture_manager::TextureManager,
 };
 use nexus::imgui::{ComboBoxFlags, TextureId, Ui};
@@ -115,7 +115,8 @@ impl IconSource {
                     .hint("https://wiki.guildwars2.com/...")
                     .auto_select_all(true)
                     .build();
-                input_text_context_menu(ui, "##urlctx", url);
+                input_text_simple_menu(ui, "##urlctx", url);
+
                 ui.same_line();
                 if ui.button("Load") {
                     self.load();

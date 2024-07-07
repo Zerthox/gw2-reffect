@@ -1,6 +1,6 @@
-use super::item_context_menu;
+use super::input_text_simple_menu;
 use crate::util::decode_skill;
-use nexus::imgui::{sys, InputTextFlags, MenuItem, Ui};
+use nexus::imgui::{sys, InputTextFlags, Ui};
 use std::ffi::CString;
 
 pub fn input_u32(
@@ -68,22 +68,6 @@ pub fn input_buff_id(ui: &Ui, label: impl AsRef<str>, id: &mut u32, flags: Input
             *id = new;
         }
     }
-    input_text_context_menu(ui, format!("##{label}ctx"), &mut text);
+    input_text_simple_menu(ui, format!("##{label}ctx"), &mut text);
     changed
-}
-
-pub fn input_text_context_menu(ui: &Ui, id: impl Into<String>, text: &mut String) {
-    item_context_menu(id, || {
-        if MenuItem::new("Copy").build(ui) {
-            ui.set_clipboard_text(&text);
-        }
-
-        let clipboard = ui.clipboard_text();
-        if MenuItem::new("Paste")
-            .enabled(clipboard.is_some())
-            .build(ui)
-        {
-            *text = clipboard.expect("pasting without clipboard text");
-        }
-    });
 }
