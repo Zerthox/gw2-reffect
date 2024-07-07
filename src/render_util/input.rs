@@ -1,3 +1,4 @@
+use crate::util::decode_skill;
 use nexus::imgui::{sys, InputTextFlags, Ui};
 use std::ffi::CString;
 
@@ -51,3 +52,24 @@ pub fn input_size(x: &mut f32, y: &mut f32) {
     input_float_with_format("Size x", x, 1.0, 10.0, "%.2f", InputTextFlags::empty());
     input_float_with_format("Size y", y, 1.0, 10.0, "%.2f", InputTextFlags::empty());
 }
+
+pub fn input_buff_id(ui: &Ui, label: impl AsRef<str>, id: &mut u32, flags: InputTextFlags) -> bool {
+    let mut text = id.to_string(); // TODO: switch to faster int/float to string conversion libraries
+    if ui
+        .input_text(label, &mut text)
+        .flags(flags | InputTextFlags::CALLBACK_RESIZE)
+        .build()
+    {
+        if let Ok(new) = text.parse() {
+            *id = new;
+        } else if let Some(new) = decode_skill(text.trim()) {
+            *id = new;
+        }
+        true
+    } else {
+        false
+    }
+}
+
+#[cfg(test)]
+mod tests {}

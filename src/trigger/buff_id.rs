@@ -1,10 +1,10 @@
 use crate::{
     action::Action,
     context::Context,
-    render_util::{enum_combo, helper, impl_static_variants, input_u32},
+    render_util::{enum_combo, helper, impl_static_variants, input_buff_id},
     traits::RenderOptions,
 };
-use nexus::imgui::{ComboBoxFlags, Ui};
+use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, IntoStaticStr};
 
@@ -48,6 +48,7 @@ impl BuffTriggerId {
                 .iter()
                 .find_map(|id| ctx.time_range(*id))
                 .unwrap_or((0, 0)), // times of first match
+                                    // TODO: max of apply and max of runout
         }
     }
 
@@ -63,7 +64,7 @@ impl BuffTriggerId {
         ui.same_line();
         helper(ui, || {
             ui.text("Can be found on the wiki");
-            ui.text("Hover over the chatcode");
+            ui.text("Type the id or paste the chat link");
         });
     }
 }
@@ -86,14 +87,16 @@ impl RenderOptions for BuffTriggerId {
             match self {
                 Self::None => {}
                 Self::Single(id) => {
-                    input_u32(ui, "Effect Id", id, 0, 0);
+                    input_buff_id(ui, "Effect Id", id, InputTextFlags::empty());
                     Self::helper(ui);
                 }
                 Self::Any(ids) => {
                     let mut action = Action::new();
                     for (i, id) in ids.iter_mut().enumerate() {
                         let _id = ui.push_id(i as i32);
-                        action.input_with_buttons(ui, i, || input_u32(ui, "##id", id, 0, 0));
+                        action.input_with_buttons(ui, i, || {
+                            input_buff_id(ui, "##id", id, InputTextFlags::empty())
+                        });
 
                         ui.same_line();
                         ui.text(format!("Effect Id {}", i + 1));
