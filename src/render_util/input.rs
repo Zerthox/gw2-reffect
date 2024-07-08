@@ -59,7 +59,7 @@ pub fn input_buff_id(ui: &Ui, label: impl AsRef<str>, id: &mut u32, flags: Input
     let mut text = id.to_string(); // TODO: switch to faster int/float to string conversion libraries
     let changed = ui
         .input_text(label, &mut text)
-        .flags(flags | InputTextFlags::CALLBACK_RESIZE)
+        .flags(flags | InputTextFlags::AUTO_SELECT_ALL | InputTextFlags::CALLBACK_RESIZE)
         .build();
     if changed {
         if let Ok(new) = text.parse() {
