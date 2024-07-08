@@ -31,13 +31,9 @@ impl Icon {
         self.source.load();
     }
 
-    fn alpha(&self, ui: &Ui) -> f32 {
-        ui.clone_style().alpha
-    }
-
     fn texture_color(&self, ui: &Ui) -> [f32; 4] {
         let [r, g, b, a] = self.tint;
-        [r, g, b, a * self.alpha(ui)]
+        [r, g, b, a * ui.clone_style().alpha]
     }
 
     pub fn is_visible(&mut self, ctx: &Context, state: &RenderState) -> bool {

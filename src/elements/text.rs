@@ -96,7 +96,9 @@ impl Render for Text {
             let font_size = font_scale * ui.current_font_size();
             let align = self.align.calc_pos(ui, text, font_scale);
             let pos = state.pos.add(align);
-            let color @ [_, _, _, alpha] = self.color;
+            let [r, g, b, a] = self.color;
+            let alpha = a * ui.clone_style().alpha;
+            let color = [r, g, b, alpha];
 
             self.decoration
                 .render(ui, text, pos, font_size, [0.0, 0.0, 0.0, alpha]);
