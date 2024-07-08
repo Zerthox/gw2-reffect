@@ -37,7 +37,7 @@ impl TextureManager {
         let mut textures = Self::lock();
         if !textures.exists(&source) {
             match &source {
-                IconSource::Unknown => {}
+                IconSource::Unknown | IconSource::Empty => {}
                 IconSource::File(path) => {
                     let id = textures.add_pending(source.clone());
                     drop(textures); // drop to avoid recursive locking

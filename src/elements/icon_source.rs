@@ -28,6 +28,7 @@ use strum::{AsRefStr, EnumIter, IntoStaticStr};
 pub enum IconSource {
     #[default]
     Unknown,
+    Empty,
     Url(String),
     File(PathBuf),
 }
@@ -38,7 +39,11 @@ impl IconSource {
     pub const UNKNOWN_ID: &'static str = "REFFECT_ICON_UNKNOWN";
 
     pub fn needs_load(&self) -> bool {
-        !matches!(self, Self::Unknown)
+        !matches!(self, Self::Unknown | Self::Empty)
+    }
+
+    pub fn is_empty(&self) -> bool {
+        matches!(self, Self::Empty)
     }
 
     pub fn load(&self) {
@@ -46,12 +51,16 @@ impl IconSource {
     }
 
     pub fn get_texture(&self) -> Option<TextureId> {
-        TextureManager::get_texture(self)
+        match self {
+            Self::Empty => None,
+            _ => TextureManager::get_texture(self),
+        }
     }
 
     pub fn generate_id(&self) -> String {
         match self {
             Self::Unknown => Self::UNKNOWN_ID.into(),
+            Self::Empty => String::new(),
             Self::File(path) => format!("REFFECT_ICON_FILE_\"{}\"", path.display()),
             Self::Url(url) => format!("REFFECT_ICON_URL_\"{url}\""),
         }
@@ -60,6 +69,7 @@ impl IconSource {
     pub fn pretty_print(&self) -> String {
         match self {
             Self::Unknown => "unknown".into(),
+            Self::Empty => "empty".into(),
             Self::File(path) => format!("file \"{}\"", path.display()),
             Self::Url(url) => format!("url \"{url}\""),
         }
@@ -69,7 +79,7 @@ impl IconSource {
         enum_combo(ui, "Icon", self, ComboBoxFlags::empty());
 
         match self {
-            Self::Unknown => {}
+            Self::Unknown | Self::Empty => {}
             Self::File(path) => {
                 ui.input_text("##path", &mut path.display().to_string())
                     .hint("No file")
