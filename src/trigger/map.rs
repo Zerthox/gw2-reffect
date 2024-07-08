@@ -48,7 +48,6 @@ impl RenderOptions<bool> for MapTrigger {
                     ui.text(format!("Map Id {}", i + 1));
 
                     if i == 0 {
-                        ui.same_line();
                         helper(ui, || {
                             ui.text("Same as in GW2 API");
                             ui.text("Can be found on the wiki");

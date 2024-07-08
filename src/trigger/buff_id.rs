@@ -61,7 +61,6 @@ impl BuffTriggerId {
     }
 
     fn helper(ui: &Ui) {
-        ui.same_line();
         helper(ui, || {
             ui.text("Can be found on the wiki");
             ui.text("Type the id or paste the chat link");

@@ -156,7 +156,6 @@ impl RenderOptions for Common {
         {
             self.opacity = opacity / 100.0;
         }
-        ui.same_line();
         helper(ui, || ui.text("Ctrl+click to type a number"));
 
         ui.spacing();

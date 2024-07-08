@@ -44,6 +44,7 @@ pub fn cycle_progress(ui: &Ui, period_ms: u32) -> f32 {
 }
 
 pub fn helper(ui: &Ui, contents: impl FnOnce()) {
+    ui.same_line();
     ui.text_disabled("(?)");
     if ui.is_item_hovered() {
         ui.tooltip(contents);
