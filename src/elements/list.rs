@@ -5,7 +5,7 @@ use crate::{
     context::Context,
     render_util::{
         collapsing_header_same_line_end, delete_confirm_modal, enum_combo, input_float_with_format,
-        input_size,
+        input_size, style_disabled_if,
     },
     traits::{Render, RenderOptions, TreeLeaf},
 };
@@ -88,19 +88,10 @@ impl RenderOptions for IconList {
             let _id = ui.push_id(i as i32);
 
             let mut remains = true;
+            let style = style_disabled_if(ui, !icon.enabled);
             let open = CollapsingHeader::new(format!("{}###icon{i}", icon.name))
                 .flags(TreeNodeFlags::ALLOW_ITEM_OVERLAP)
                 .begin_with_close_button(ui, &mut remains);
-
-            let title = format!("Confirm Delete##listicon{i}");
-            if !remains {
-                ui.open_popup(&title);
-            }
-            if delete_confirm_modal(ui, &title, || {
-                ui.text(format!("Delete Icon {}?", icon.name))
-            }) {
-                action = Action::Delete(i);
-            }
 
             let size_x = ui.frame_height();
             let [spacing_x, _] = ui.clone_style().item_spacing;
@@ -118,6 +109,17 @@ impl RenderOptions for IconList {
 
             button_color.end();
 
+            let title = format!("Confirm Delete##listicon{i}");
+            if !remains {
+                ui.open_popup(&title);
+            }
+            if delete_confirm_modal(ui, &title, || {
+                ui.text(format!("Delete Icon {}?", icon.name))
+            }) {
+                action = Action::Delete(i);
+            }
+
+            drop(style);
             if open {
                 // TODO: apply option to all context menu option
                 icon.render_options(ui);
