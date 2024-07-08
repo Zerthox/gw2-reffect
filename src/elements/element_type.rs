@@ -1,4 +1,4 @@
-use super::{Element, Group, IconElement, IconList, RenderState, Text};
+use super::{Bar, Element, Group, IconElement, IconList, RenderState, Text};
 use crate::{
     context::Context,
     render_util::impl_static_variants,
@@ -20,6 +20,8 @@ pub enum ElementType {
     IconList(IconList),
 
     Text(Text),
+
+    Bar(Bar),
 }
 
 impl_static_variants!(ElementType);
@@ -31,6 +33,7 @@ impl TreeNode for ElementType {
             Self::Icon(icon) => icon.children(),
             Self::IconList(list) => list.children(),
             Self::Text(text) => text.children(),
+            Self::Bar(bar) => bar.children(),
         }
     }
 }
@@ -42,6 +45,7 @@ impl Render for ElementType {
             Self::Icon(icon) => icon.render(ui, ctx, state),
             Self::IconList(list) => list.render(ui, ctx, state),
             Self::Text(text) => text.render(ui, ctx, state),
+            Self::Bar(bar) => bar.render(ui, ctx, state),
         }
     }
 }
@@ -53,6 +57,7 @@ impl RenderOptions for ElementType {
             Self::Icon(icon) => icon.render_options(ui),
             Self::IconList(list) => list.render_options(ui),
             Self::Text(text) => text.render_options(ui),
+            Self::Bar(bar) => bar.render_options(ui),
         }
     }
 }

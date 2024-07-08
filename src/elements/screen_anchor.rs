@@ -19,7 +19,7 @@ use strum::{AsRefStr, EnumIter, VariantArray};
     Serialize,
     Deserialize,
 )]
-pub enum Anchor {
+pub enum ScreenAnchor {
     #[strum(serialize = "Top Left")]
     TopLeft,
 
@@ -48,7 +48,7 @@ pub enum Anchor {
     BottomRight,
 }
 
-impl Anchor {
+impl ScreenAnchor {
     /// Calculates the screen position.
     pub fn calc_pos(&self, ui: &Ui) -> [f32; 2] {
         let [screen_x, screen_y] = ui.io().display_size;

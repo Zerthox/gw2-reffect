@@ -32,7 +32,7 @@ impl TreeLeaf for IconList {}
 impl Render for IconList {
     fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
         let render_icon = |icon: &mut ListIcon, i, len| {
-            let offset = self.direction.offset_for(self.size, self.pad, i, len);
+            let offset = self.direction.list_item_offset(self.size, self.pad, i, len);
             icon.render(ui, ctx, &state.with_offset(offset), self.size);
         };
 

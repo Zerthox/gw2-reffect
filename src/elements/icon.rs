@@ -1,4 +1,4 @@
-use super::{IconSource, RenderState, TextAlign, TextDecoration};
+use super::{AlignHorizontal, IconSource, RenderState, TextDecoration};
 use crate::{
     colors::{self, with_alpha},
     component_wise::ComponentWise,
@@ -85,7 +85,7 @@ impl Icon {
                     let [_, height] = size;
                     let font_size = 0.5 * height;
                     let font_scale = font_size / ui.current_font_size();
-                    let [x_offset, _] = TextAlign::Right.calc_pos(ui, &text, font_scale);
+                    let [x_offset, _] = AlignHorizontal::Right.text_offset(ui, &text, font_scale);
                     let pad = [1.0, 1.0];
                     let line_height = font_scale * ui.text_line_height();
                     let text_pos = end.add([x_offset, -line_height]).sub(pad);

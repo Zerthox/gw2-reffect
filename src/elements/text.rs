@@ -1,4 +1,4 @@
-use super::{RenderState, TextAlign, TextDecoration};
+use super::{AlignHorizontal, RenderState, TextDecoration};
 use crate::{
     component_wise::ComponentWise,
     context::{Context, ContextUpdate},
@@ -15,7 +15,7 @@ pub struct Text {
     pub buff: BuffTrigger,
     pub text: String,
     pub size: f32,
-    pub align: TextAlign,
+    pub align: AlignHorizontal,
     pub color: [f32; 4],
     pub decoration: TextDecoration,
 
@@ -94,7 +94,7 @@ impl Render for Text {
         if let Some(text) = &self.text_memo {
             let font_scale = self.size;
             let font_size = font_scale * ui.current_font_size();
-            let align = self.align.calc_pos(ui, text, font_scale);
+            let align = self.align.text_offset(ui, text, font_scale);
             let pos = state.pos.add(align);
             let [r, g, b, a] = self.color;
             let alpha = a * ui.clone_style().alpha;
@@ -125,7 +125,6 @@ impl RenderOptions for Text {
 
         ui.same_line();
         ui.text("Text"); // own label to fix helper position
-        ui.same_line();
         helper(ui, || {
             ui.text("%n for name");
             ui.text("%s for stacks");
@@ -161,7 +160,7 @@ impl Default for Text {
         Self {
             text: String::new(),
             buff: BuffTrigger::default(),
-            align: TextAlign::Center,
+            align: AlignHorizontal::Center,
             size: 1.0,
             color: [1.0, 1.0, 1.0, 1.0],
             decoration: TextDecoration::default(),

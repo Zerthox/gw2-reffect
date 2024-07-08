@@ -20,6 +20,12 @@ pub const fn with_alpha(mut color: Color, alpha: f32) -> Color {
     color
 }
 
+/// Adjusts the alpha value of a color with a factor.
+pub fn with_alpha_factor(mut color: Color, factor: f32) -> Color {
+    color[3] *= factor;
+    color
+}
+
 /// Linearly interpolates between two [`f32`]s.
 pub fn lerp_f32(a: f32, b: f32, t: f32) -> f32 {
     (1.0 - t) * a + t * b

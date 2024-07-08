@@ -2,7 +2,7 @@ mod load;
 
 pub use self::load::*;
 
-use crate::elements::{Element, ElementType, Group, IconElement, IconList, Text};
+use crate::elements::{Bar, Element, ElementType, Group, IconElement, IconList, Text};
 
 pub trait VisitMut {
     fn visit_elements(&mut self, elements: &mut [Element]) {
@@ -20,6 +20,7 @@ pub trait VisitMut {
             ElementType::Icon(icon) => self.visit_icon(icon),
             ElementType::IconList(list) => self.visit_icon_list(list),
             ElementType::Text(text) => self.visit_text(text),
+            ElementType::Bar(bar) => self.visit_bar(bar),
         }
     }
 
@@ -30,4 +31,6 @@ pub trait VisitMut {
     fn visit_icon(&mut self, _icon: &mut IconElement) {}
 
     fn visit_text(&mut self, _text: &mut Text) {}
+
+    fn visit_bar(&mut self, _bar: &mut Bar) {}
 }

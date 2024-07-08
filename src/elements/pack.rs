@@ -1,4 +1,4 @@
-use super::{Anchor, Common, Element, RenderState};
+use super::{Common, Element, RenderState, ScreenAnchor};
 use crate::{
     context::{Context, EditState},
     render_util::{
@@ -19,7 +19,7 @@ pub struct Pack {
     #[serde(flatten)]
     pub common: Common,
 
-    pub anchor: Anchor,
+    pub anchor: ScreenAnchor,
     pub layer: i32,
     pub elements: Vec<Element>,
 
@@ -58,6 +58,7 @@ impl Pack {
 
     /// Renders the pack.
     pub fn render(&mut self, ui: &Ui, ctx: &Context) {
+        // TODO: edit with pack selected broken
         let edit = ctx.edit.is_edited_or_parent(self.common.id);
         let show = if ctx.edit.is_editing() {
             edit
