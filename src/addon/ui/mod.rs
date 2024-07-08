@@ -22,8 +22,10 @@ impl Addon {
     }
 
     pub fn render_displays(&mut self, ui: &Ui) {
-        for pack in &mut self.packs {
-            pack.render(ui, &self.context);
+        if self.context.ui.should_show() || self.context.edit.is_editing() {
+            for pack in &mut self.packs {
+                pack.render(ui, &self.context);
+            }
         }
     }
 

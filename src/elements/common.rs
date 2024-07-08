@@ -40,11 +40,7 @@ impl Common {
         state: &RenderState,
         contents: impl FnOnce(&RenderState),
     ) {
-        let show = if ctx.edit.is_editing() {
-            ctx.edit.is_edited_or_parent(self.id)
-        } else {
-            self.enabled
-        };
+        let show = self.enabled || ctx.edit.is_edited_or_parent(self.id);
         if show {
             let state = state.with_offset(self.pos).for_element(self, ctx);
             {

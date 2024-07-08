@@ -58,22 +58,14 @@ impl Pack {
 
     /// Renders the pack.
     pub fn render(&mut self, ui: &Ui, ctx: &Context) {
-        // TODO: edit with pack selected broken
-        let edit = ctx.edit.is_edited_or_parent(self.common.id);
-        let show = if ctx.edit.is_editing() {
-            edit
-        } else {
-            self.common.enabled && ctx.ui.should_show()
-        };
-        if show {
-            let pos = self.anchor.calc_pos(ui);
-            let state = RenderState::new(ctx.edit.show_all && edit, pos, &self.common);
-            self.common.render(ui, ctx, &state, |state| {
-                for element in &mut self.elements {
-                    element.render(ui, ctx, state);
-                }
-            });
-        }
+        let edit = ctx.edit.show_all && ctx.edit.is_edited_or_parent(self.common.id);
+        let pos = self.anchor.calc_pos(ui);
+        let state = RenderState::new(edit, pos, &self.common);
+        self.common.render(ui, ctx, &state, |state| {
+            for element in &mut self.elements {
+                element.render(ui, ctx, state);
+            }
+        });
     }
 
     /// Renders the select tree.
