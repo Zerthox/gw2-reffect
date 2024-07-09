@@ -107,7 +107,7 @@ impl Icon {
                     let [width, height] = size;
                     let font_size = 0.5 * width.min(height);
                     let font_scale = font_size / ui.current_font_size();
-                    let [x_offset, _] = AlignHorizontal::Right.text_offset(ui, &text, font_scale);
+                    let [x_offset, _] = AlignHorizontal::Right.text_offset(ui, text, font_scale);
                     let pad = [1.0, 1.0];
                     let line_height = font_scale * ui.text_line_height();
                     let text_pos = end.add([x_offset, -line_height]).sub(pad);
@@ -116,8 +116,8 @@ impl Icon {
                     let color = with_alpha(colors::WHITE, alpha);
                     let shadow_color = with_alpha(colors::BLACK, alpha);
 
-                    TextDecoration::Shadow.render(ui, &text, text_pos, font_size, shadow_color);
-                    draw_text_bg(ui, &text, text_pos, font_size, color);
+                    TextDecoration::Shadow.render(ui, text, text_pos, font_size, shadow_color);
+                    draw_text_bg(ui, text, text_pos, font_size, color);
                 }
             }
 
