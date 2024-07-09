@@ -30,10 +30,19 @@ For further information, see the [documentation on elements](./elements.md).
 If your use case requires an element to be tied to an effect, you need the skill id of the effect.
 This can sometimes be a difficult part about creating new displays.
 
-Chat links retrieved by shift-clicking the effect contain the id.
+Chat links for effects contain their id.
 For a lot of effects these can be found on the [Guild Wars 2 Wiki](https://wiki.guildwars2.com).
+When searching for the effect by name, make sure the page is for **the effect, not the associated ability or trait!**
 Hovering over the chat link on the wiki page will show you the id.
-The wiki also features a [tool to decode chat links](https://wiki.guildwars2.com/wiki/Widget:Chat_link_decoder).
+
+![Wiki page for an effect](./img/wiki-effect.png)
+
+To quickly find the page for an effect you see ingame, start typing `/wiki` in your chat, then shift-click the effect and hit enter.
+In case there is no page associated with the effect id, the wiki will show you the id.
+
+![Wiki chat link search with no results](./img/wiki-no-result.png)
+
+The wiki also features a way to [search a page by id](https://wiki.guildwars2.com/wiki/Special:RunQuery/Search_by_id) and a [tool to decode chat links](https://wiki.guildwars2.com/wiki/Widget:Chat_link_decoder).
 
 [ArcDPS](https://deltaconnected.com/arcdps/) captures effect applications, which can be seen ingame in Arc's log window.
 The log window can be opened by navigating to the `About` tab in Arc's options and clicking the `log` checkbox.
