@@ -37,15 +37,10 @@ impl Text {
         }
     }
 
-    fn process_text(
-        text: &String,
-        active: &ActiveBuff,
-        ctx: &Context,
-        state: &RenderState,
-    ) -> String {
+    fn process_text(text: &str, active: &ActiveBuff, ctx: &Context, state: &RenderState) -> String {
         const PREFIX: char = '%';
 
-        let mut result = String::with_capacity(text.capacity()); // always same or larger size
+        let mut result = String::with_capacity(text.len()); // always same or larger size
 
         let mut prefix = false;
         for el in text.chars() {
@@ -54,10 +49,10 @@ impl Text {
                 match el {
                     'n' => result.push_str(&state.common.name),
                     's' => result.push_str(&active.stacks.to_string()),
-                    'r' => {
-                        let remaining = ctx.time_until(active.runout).unwrap_or(0) as f32 / 1000.0;
-                        result.push_str(&format!("{remaining:.1}"))
-                    }
+                    'r' => match ctx.time_until(active.runout) {
+                        Some(remain) => result.push_str(&format!("{:.1}", remain as f32 / 1000.0)),
+                        None => result.push('?'),
+                    },
                     'f' => {
                         let full = active.full_duration() as f32 / 1000.0;
                         result.push_str(&format!("{full:.1}"))
