@@ -29,7 +29,7 @@ The information is retrieved with the following policy in mind:
 
 1. The information must be currently conveyed to the player via the graphical user interface. If it is conveyed to the player anyway, we consider it fine to give the same pieces of information in an alternative format.
 
-2. The alternative display format must limit combination of individual pieces of information to a reasonably low logical complexity. Displaying the same information as the UI in a different position on screen with a different icon is fine. Displays with very complex logic based on a lot of individual pieces of information are not.
+2. The alternative display format must limit combination of individual pieces of information to a reasonably low logical complexity. We do **not** consider it fine to combine individual pieces of information to new information that is much more than the sum of its parts.
 
 ## Limitations 
 - Not available in competitive modes (PvP & WvW).
