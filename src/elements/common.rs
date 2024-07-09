@@ -109,7 +109,8 @@ impl Common {
 
                 if self.dragging {
                     let change = ui.window_pos().sub(bound_min);
-                    self.pos = self.pos.add(change);
+                    let [new_x, new_y] = self.pos.add(change);
+                    self.pos = [new_x.round(), new_y.round()];
                 }
             });
     }
