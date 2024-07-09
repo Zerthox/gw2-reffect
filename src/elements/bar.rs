@@ -1,10 +1,11 @@
 use super::{Align, Direction, Progress, RenderState};
 use crate::{
+    bounds::Bounds,
     colors::{self, with_alpha_factor},
     component_wise::ComponentWise,
     context::Context,
     render_util::{enum_combo, helper, input_float_with_format, input_size, Rect},
-    traits::{Bounds, Render, RenderOptions},
+    traits::{Render, RenderOptions},
     tree::TreeLeaf,
     trigger::BuffTrigger,
 };

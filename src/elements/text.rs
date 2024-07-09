@@ -1,11 +1,12 @@
 use super::{AlignHorizontal, RenderState, TextDecoration};
 use crate::{
+    bounds::Bounds,
     component_wise::ComponentWise,
     context::{Context, ContextUpdate},
     render_util::{
         draw_text_bg, helper, input_float_with_format, input_text_multi_with_menu, Rect,
     },
-    traits::{Bounds, Render, RenderOptions},
+    traits::{Render, RenderOptions},
     tree::TreeLeaf,
     trigger::{ActiveBuff, BuffTrigger},
 };

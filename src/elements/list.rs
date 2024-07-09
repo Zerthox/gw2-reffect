@@ -1,6 +1,7 @@
 use super::{Direction, Layout, ListIcon, RenderState};
 use crate::{
     action::Action,
+    bounds::Bounds,
     colors,
     component_wise::ComponentWise,
     context::Context,
@@ -8,7 +9,7 @@ use crate::{
         collapsing_header_same_line_end, delete_confirm_modal, enum_combo, input_float_with_format,
         input_size, style_disabled_if, Rect,
     },
-    traits::{Bounds, Render, RenderOptions},
+    traits::{Render, RenderOptions},
     tree::TreeLeaf,
 };
 use nexus::imgui::{

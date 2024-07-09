@@ -1,11 +1,13 @@
 use super::{Animation, Common, ElementType, RenderState};
 use crate::{
     action::ElementAction,
+    bounds::Bounds,
+    component_wise::ComponentWise,
     context::{Context, EditState},
     render_util::{
         delete_confirm_modal, item_context_menu, style_disabled_if, tree_select_empty, Rect,
     },
-    traits::{Bounds, Render, RenderOptions},
+    traits::{Render, RenderOptions},
     tree::{Loader, TreeNode, VisitMut},
     trigger::{MetaTrigger, Trigger},
 };
@@ -189,6 +191,7 @@ impl TreeNode for Element {
 
 impl Bounds for Element {
     fn bounding_box(&self, ui: &Ui, ctx: &Context, pos: [f32; 2]) -> Rect {
+        let pos = pos.add(self.common.pos);
         self.kind.bounding_box(ui, ctx, pos)
     }
 }

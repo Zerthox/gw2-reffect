@@ -1,6 +1,7 @@
 mod action;
 mod addon;
 mod assets;
+mod bounds;
 mod colors;
 mod component_wise;
 mod context;

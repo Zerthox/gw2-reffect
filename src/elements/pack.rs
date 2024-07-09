@@ -1,12 +1,13 @@
 use super::{Common, Element, RenderState, ScreenAnchor};
 use crate::{
+    bounds::Bounds,
     context::{Context, EditState},
     render_util::{
         delete_confirm_modal, enum_combo, item_context_menu, style_disabled, style_disabled_if,
         tree_select_empty,
     },
     schema::Schema,
-    traits::{Bounds, RenderOptions},
+    traits::RenderOptions,
     tree::{Loader, TreeNode, VisitMut},
 };
 use nexus::imgui::{ComboBoxFlags, MenuItem, Ui};
