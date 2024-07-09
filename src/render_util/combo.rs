@@ -5,15 +5,15 @@ use std::mem;
 use strum::VariantArray;
 
 pub trait EnumStaticVariants: Sized {
-    fn static_variants() -> &'static [Self];
+    fn with_variants<R>(action: impl FnOnce(&[Self]) -> R) -> R;
 }
 
 impl<T> EnumStaticVariants for T
 where
     T: VariantArray,
 {
-    fn static_variants() -> &'static [Self] {
-        Self::VARIANTS
+    fn with_variants<R>(action: impl FnOnce(&[Self]) -> R) -> R {
+        action(Self::VARIANTS)
     }
 }
 
@@ -21,12 +21,12 @@ where
 macro_rules! impl_static_variants {
     ($ty:ty) => {
         impl $crate::render_util::EnumStaticVariants for $ty {
-            fn static_variants() -> &'static [Self] {
-                use ::std::sync::OnceLock;
+            fn with_variants<R>(action: impl FnOnce(&[Self]) -> R) -> R {
+                use ::std::thread_local;
                 use ::strum::IntoEnumIterator;
 
-                static VARIANTS: OnceLock<Vec<$ty>> = OnceLock::new();
-                VARIANTS.get_or_init(|| <Self as IntoEnumIterator>::iter().collect())
+                thread_local! { static VARIANTS: Vec<$ty> = <$ty as IntoEnumIterator>::iter().collect(); };
+                VARIANTS.with(|variants| action(variants))
             }
         }
     };
@@ -45,18 +45,20 @@ where
 {
     let mut replaced = None;
     if let Some(_token) = ui.begin_combo_with_flags(label, &current, flags) {
-        for entry in T::static_variants() {
-            // distinguish only discriminants
-            let selected = mem::discriminant(entry) == mem::discriminant(current);
-            if Selectable::new(entry).selected(selected).build(ui) {
-                replaced = Some(mem::replace(current, entry.clone()));
-            }
+        T::with_variants(|variants| {
+            for entry in variants {
+                // distinguish only discriminants
+                let selected = mem::discriminant(entry) == mem::discriminant(current);
+                if Selectable::new(entry).selected(selected).build(ui) {
+                    replaced = Some(mem::replace(current, entry.clone()));
+                }
 
-            // handle focus
-            if selected {
-                ui.set_item_default_focus();
+                // handle focus
+                if selected {
+                    ui.set_item_default_focus();
+                }
             }
-        }
+        });
     }
     replaced
 }

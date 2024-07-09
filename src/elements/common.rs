@@ -110,13 +110,15 @@ impl Common {
     ) {
         if let Some(children) = children {
             ui.menu("Create", || {
-                for kind in ElementType::static_variants() {
-                    let name = kind.as_ref();
-                    if MenuItem::new(name).build(ui) {
-                        let new = Element::of_type(kind.clone());
-                        children.push(new);
+                ElementType::with_variants(|variants| {
+                    for kind in variants {
+                        let name = kind.as_ref();
+                        if MenuItem::new(name).build(ui) {
+                            let new = Element::of_type(kind.clone());
+                            children.push(new);
+                        }
                     }
-                }
+                })
             });
             if MenuItem::new("Paste")
                 .enabled(state.has_clipboard())
