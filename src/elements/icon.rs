@@ -40,7 +40,13 @@ impl Icon {
         self.buff.is_active_or_edit(ctx, state)
     }
 
-    pub fn bounds(&self, pos: [f32; 2], size: [f32; 2]) -> Rect {
+    pub fn rel_bounds(size: [f32; 2]) -> Rect {
+        let [half_x, half_y] = size.mul_scalar(0.5);
+
+        ([-half_x, -half_y], [half_x, half_y])
+    }
+
+    pub fn bounds(pos: [f32; 2], size: [f32; 2]) -> Rect {
         let half_size = size.mul_scalar(0.5);
         let start = pos.sub(half_size);
         let end = pos.add(half_size);
@@ -50,7 +56,7 @@ impl Icon {
     pub fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState, size: [f32; 2]) {
         let texture = self.source.get_texture();
         if self.source.is_empty() || texture.is_some() {
-            let (start, end) = self.bounds(state.pos, size);
+            let (start, end) = Self::bounds(state.pos, size);
             let color @ [_, _, _, alpha] = self.texture_color(ui);
 
             // render icon

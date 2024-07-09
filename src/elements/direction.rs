@@ -1,5 +1,5 @@
-use super::Align;
-use crate::component_wise::ComponentWise;
+use super::{Align, Icon};
+use crate::{component_wise::ComponentWise, render_util::Rect};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, VariantArray};
 
@@ -61,6 +61,16 @@ impl Direction {
         }
     }
 
+    pub fn list_start_offset(&self, size: [f32; 2], pad: f32, total: usize) -> [f32; 2] {
+        let [width, height] = size;
+        let last = total.saturating_sub(1) as f32;
+        match self {
+            Self::Right | Self::Left | Self::Up | Self::Down => [0.0, 0.0],
+            Self::Horizontal => [-0.5 * last * (width + pad), 0.0],
+            Self::Vertical => [0.0, -0.5 * last * (height + pad)],
+        }
+    }
+
     pub fn list_item_offset(
         &self,
         size: [f32; 2],
@@ -68,21 +78,42 @@ impl Direction {
         element: usize,
         total: usize,
     ) -> [f32; 2] {
-        // TODO: adjust center point of first element?
         let [width, height] = size;
         let i = element as f32;
         let offset_x = i * (width + pad);
         let offset_y = i * (height + pad);
-        let additional = total.saturating_sub(1) as f32;
-        let half = 0.5 * additional;
-        let half_pad = 0.5 * additional * pad;
+        let last = total.saturating_sub(1) as f32;
         match self {
             Self::Right => [offset_x, 0.0],
             Self::Left => [-offset_x, 0.0],
             Self::Up => [0.0, -offset_y],
             Self::Down => [0.0, offset_y],
-            Self::Horizontal => [offset_x - half * width - half_pad, 0.0],
-            Self::Vertical => [0.0, offset_y - half * height - half_pad],
+            Self::Horizontal => [offset_x - 0.5 * last * (width + pad), 0.0],
+            Self::Vertical => [0.0, offset_y - 0.5 * last * (height + pad)],
         }
+    }
+
+    pub fn icon_list_bounds(&self, size: [f32; 2], pad: f32, total: usize) -> Rect {
+        let [width, height] = size;
+        let last = total.saturating_sub(1) as f32;
+        let offset_x = last * (width + pad);
+        let offset_y = last * (height + pad);
+        let (min, max) = match self {
+            Self::Right => ([0.0, 0.0], [offset_x, 0.0]),
+            Self::Left => ([-offset_x, 0.0], [0.0, 0.0]),
+            Self::Up => ([0.0, -offset_y], [0.0, 0.0]),
+            Self::Down => ([0.0, 0.0], [0.0, offset_y]),
+            Self::Horizontal => {
+                let start = -0.5 * last * (width + pad);
+                ([start, 0.0], [start + offset_x, 0.0])
+            }
+            Self::Vertical => {
+                let start = -0.5 * last * (height + pad);
+                ([0.0, start], [0.0, start + offset_y])
+            }
+        };
+        let (min, _) = Icon::bounds(min, size);
+        let (_, max) = Icon::bounds(max, size);
+        (min, max)
     }
 }

@@ -23,7 +23,7 @@ impl ListIcon {
     }
 
     pub fn bounds(&self, pos: [f32; 2], size: [f32; 2]) -> Rect {
-        self.inner.bounds(pos, size)
+        Icon::bounds(pos, size)
     }
 }
 
