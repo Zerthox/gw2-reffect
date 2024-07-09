@@ -18,9 +18,12 @@ pub struct Icon {
     #[serde(rename = "icon")]
     pub source: IconSource,
 
-    pub duration: bool,
+    #[serde(alias = "duration")]
+    pub duration_bar: bool,
+    pub duration_text: bool,
 
-    pub stacks: bool,
+    #[serde(alias = "stacks")]
+    pub stacks_text: bool,
 
     #[serde(alias = "color")]
     pub tint: [f32; 4],
@@ -68,7 +71,7 @@ impl Icon {
             }
 
             // render duration bar
-            if self.duration {
+            if self.duration_bar {
                 if let Some(active) = self.buff.active_or_edit(ctx, state) {
                     if let Some(progress) = ctx.progress_remaining(active.apply, active.runout) {
                         // TODO: customization
@@ -93,12 +96,16 @@ impl Icon {
             }
 
             // render stack count
-            if self.stacks {
+            if self.stacks_text {
                 if let Some(stacks) = self.buff.active_stacks_or_edit(ctx, state) {
-                    let text = stacks.to_string();
+                    let text = if stacks > 99 {
+                        "!"
+                    } else {
+                        &stacks.to_string()
+                    };
 
-                    let [_, height] = size;
-                    let font_size = 0.5 * height;
+                    let [width, height] = size;
+                    let font_size = 0.5 * width.min(height);
                     let font_scale = font_size / ui.current_font_size();
                     let [x_offset, _] = AlignHorizontal::Right.text_offset(ui, &text, font_scale);
                     let pad = [1.0, 1.0];
@@ -111,6 +118,38 @@ impl Icon {
 
                     TextDecoration::Shadow.render(ui, &text, text_pos, font_size, shadow_color);
                     draw_text_bg(ui, &text, text_pos, font_size, color);
+                }
+            }
+
+            if self.duration_text {
+                if let Some(active) = self.buff.active_or_edit(ctx, state) {
+                    if let Some(remain) = ctx.time_until(active.runout) {
+                        // TODO: customization
+                        const MIN_REMAIN: u32 = 5000; // show from 5s remaining
+
+                        if remain < MIN_REMAIN {
+                            let text = format!("{:.1}", remain as f32 / 1000.0);
+
+                            let [width, height] = size;
+                            let font_size = 0.5 * width.min(height);
+                            let font_scale = font_size / ui.current_font_size();
+                            let offset = AlignHorizontal::Center.text_offset(ui, &text, font_scale);
+                            let text_pos = state.pos.add(offset);
+
+                            let alpha = 1.0; // FIXME: animation alpha ignored
+                            let color = with_alpha(colors::WHITE, alpha);
+                            let shadow_color = with_alpha(colors::BLACK, alpha);
+
+                            TextDecoration::Outline.render(
+                                ui,
+                                &text,
+                                text_pos,
+                                font_size,
+                                shadow_color,
+                            );
+                            draw_text_bg(ui, &text, text_pos, font_size, color);
+                        }
+                    }
                 }
             }
         } else {
@@ -139,10 +178,11 @@ impl RenderOptions for Icon {
             .build(ui);
 
         // TODO: duration customizations
-        ui.checkbox("Show Duration", &mut self.duration);
+        ui.checkbox("Show Duration Bar", &mut self.duration_bar);
+        ui.checkbox("Show Duration Text", &mut self.duration_text);
 
         // TODO: stacks customizations
-        ui.checkbox("Show Stacks", &mut self.stacks);
+        ui.checkbox("Show Stacks", &mut self.stacks_text);
     }
 }
 
@@ -151,8 +191,9 @@ impl Default for Icon {
         Self {
             buff: BuffTrigger::default(),
             source: IconSource::Unknown,
-            duration: false,
-            stacks: false,
+            duration_bar: false,
+            duration_text: false,
+            stacks_text: false,
             tint: [1.0, 1.0, 1.0, 1.0],
         }
     }
