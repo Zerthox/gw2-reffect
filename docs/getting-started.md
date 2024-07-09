@@ -2,6 +2,8 @@
 Reffect does not come with any predefined display setups included.
 Instead users can create and share their own configurations.
 
+Reffect has channels for discussion and sharing packs on the [Raidcore (Nexus) Discord](https://discord.gg/raidcore).
+
 ![Boons display](./img/boons.png)
 
 ## Installing existing packs
