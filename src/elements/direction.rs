@@ -80,7 +80,7 @@ impl Direction {
             Self::Right => [offset_x, 0.0],
             Self::Left => [-offset_x, 0.0],
             Self::Up => [0.0, -offset_y],
-            Self::Down => [0.0, offset_x],
+            Self::Down => [0.0, offset_y],
             Self::Horizontal => [offset_x - half * width - half_pad, 0.0],
             Self::Vertical => [0.0, offset_y - half * height - half_pad],
         }
