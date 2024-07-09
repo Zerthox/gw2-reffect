@@ -4,7 +4,7 @@ use crate::{
     component_wise::ComponentWise,
     context::Context,
     render_util::{enum_combo, helper, input_float_with_format, input_size, Rect},
-    traits::{Render, Bounds, RenderOptions},
+    traits::{Bounds, Render, RenderOptions},
     tree::TreeLeaf,
     trigger::BuffTrigger,
 };
@@ -34,7 +34,7 @@ impl TreeLeaf for Bar {}
 
 impl Render for Bar {
     fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
-        if let Some(active) = &self.buff.active_or_edit(ctx, &state) {
+        if let Some(active) = &self.buff.active_or_edit(ctx, state) {
             let alpha = ui.clone_style().alpha;
 
             let (start, end) = self.bounding_box(ui, ctx, state.pos);
