@@ -8,7 +8,7 @@ use crate::{
     traits::RenderOptions,
 };
 use nexus::imgui::{
-    Condition, InputTextFlags, MenuItem, MouseButton, Slider, SliderFlags, Ui, Window,
+    Condition, InputTextFlags, MenuItem, MouseButton, Slider, SliderFlags, StyleVar, Ui, Window,
 };
 use serde::{Deserialize, Serialize};
 
@@ -63,28 +63,31 @@ impl Common {
     /// Renders the element edit indicators.
     ///
     /// Updates the position if moved.
-    pub fn render_edit_indicators(&mut self, ui: &Ui, pos: [f32; 2], bounds: Rect) {
-        const SIZE: f32 = 5.0;
-        const HALF_SIZE: f32 = 0.5 * SIZE;
-        const OFFSET: [f32; 2] = [HALF_SIZE, HALF_SIZE];
+    pub fn render_edit_indicators(&mut self, ui: &Ui, anchor: [f32; 2], bounds: Rect) {
+        const ANCHOR_SIZE: f32 = 5.0;
+        const ANCHOR_OFFSET: [f32; 2] = [0.5 * ANCHOR_SIZE, 0.5 * ANCHOR_SIZE];
         const COLOR: [f32; 4] = [1.0, 0.0, 0.0, 0.8];
         const COLOR_DRAG: [f32; 4] = [1.0, 1.0, 0.0, 0.8];
 
         let (bound_min, bound_max) = bounds;
+        let window_pos = bound_min;
+        let window_size = bound_max.sub(window_pos);
+        let _style = ui.push_style_var(StyleVar::WindowPadding([0.0, 0.0]));
         Window::new("##reffect-edit")
             .position(
-                bound_min,
+                window_pos,
                 if self.dragging {
                     Condition::Never
                 } else {
                     Condition::Always
                 },
             )
-            .size(bound_max.sub(bound_min), Condition::Always)
+            .size(window_size, Condition::Always)
             .resizable(false)
             .draw_background(false)
             .title_bar(false)
             .focus_on_appearing(false)
+            .bring_to_front_on_focus(false)
             .nav_inputs(false)
             .nav_focus(false)
             .scrollable(false)
@@ -100,15 +103,15 @@ impl Common {
                     draw_list.add_rect(bound_min, bound_max, color).build();
                 }
 
-                let start = pos.sub(OFFSET);
-                let end = pos.add(OFFSET);
+                let start = anchor.sub(ANCHOR_OFFSET);
+                let end = anchor.add(ANCHOR_OFFSET);
                 draw_list.add_rect(start, end, color).filled(true).build();
 
-                let text_pos = pos.add([HALF_SIZE + 1.0, 0.0]);
+                let text_pos = anchor.add([0.5 * ANCHOR_SIZE + 1.0, 0.0]);
                 draw_list.add_text(text_pos, color, &self.name);
 
                 if self.dragging {
-                    let change = ui.window_pos().sub(bound_min);
+                    let change = ui.window_pos().sub(window_pos);
                     let [new_x, new_y] = self.pos.add(change);
                     self.pos = [new_x.round(), new_y.round()];
                 }
