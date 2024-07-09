@@ -67,7 +67,7 @@ impl Render for IconList {
 impl Bounds for IconList {
     fn bounding_box(&self, _ui: &Ui, _ctx: &Context, pos: [f32; 2]) -> Rect {
         // we calculate the bounds with all icons visible for now
-        // TODO: fix & move to direction
+        // FIXME: fix & move to direction
         let len = self.icons.len();
         if len > 0 {
             let first = self.direction.list_item_offset(self.size, self.pad, 0, len);

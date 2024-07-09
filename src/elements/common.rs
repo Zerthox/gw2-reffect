@@ -7,7 +7,9 @@ use crate::{
     render_util::{helper, input_float_with_format, push_alpha_change, EnumStaticVariants, Rect},
     traits::RenderOptions,
 };
-use nexus::imgui::{InputTextFlags, MenuItem, Slider, SliderFlags, Ui};
+use nexus::imgui::{
+    Condition, InputTextFlags, MenuItem, MouseButton, Slider, SliderFlags, Ui, Window,
+};
 use serde::{Deserialize, Serialize};
 
 // FIXME: common default is called twice when deserializing element/pack, generating unused ids
@@ -26,6 +28,9 @@ pub struct Common {
     pub pos: [f32; 2],
 
     pub opacity: f32,
+
+    #[serde(skip)]
+    dragging: bool,
 }
 
 impl Common {
@@ -63,20 +68,50 @@ impl Common {
         const HALF_SIZE: f32 = 0.5 * SIZE;
         const OFFSET: [f32; 2] = [HALF_SIZE, HALF_SIZE];
         const COLOR: [f32; 4] = [1.0, 0.0, 0.0, 0.8];
-
-        let draw_list = ui.get_foreground_draw_list();
+        const COLOR_DRAG: [f32; 4] = [1.0, 1.0, 0.0, 0.8];
 
         let (bound_min, bound_max) = bounds;
-        draw_list.add_rect(bound_min, bound_max, COLOR).build();
+        Window::new("##reffect-edit")
+            .position(
+                bound_min,
+                if self.dragging {
+                    Condition::Never
+                } else {
+                    Condition::Always
+                },
+            )
+            .size(bound_max.sub(bound_min), Condition::Always)
+            .resizable(false)
+            .draw_background(false)
+            .title_bar(false)
+            .focus_on_appearing(false)
+            .nav_inputs(false)
+            .nav_focus(false)
+            .scrollable(false)
+            .scroll_bar(false)
+            .build(ui, || {
+                let hover = ui.is_window_hovered();
+                self.dragging = hover && ui.is_mouse_down(MouseButton::Left);
+                let color = if self.dragging { COLOR_DRAG } else { COLOR };
 
-        let start = pos.sub(OFFSET);
-        let end = pos.add(OFFSET);
-        draw_list.add_rect(start, end, COLOR).filled(true).build();
+                let draw_list = ui.get_foreground_draw_list();
 
-        let text_pos = pos.add([HALF_SIZE + 1.0, 0.0]);
-        draw_list.add_text(text_pos, COLOR, &self.name);
+                if hover {
+                    draw_list.add_rect(bound_min, bound_max, color).build();
+                }
 
-        // TODO: allow dragging
+                let start = pos.sub(OFFSET);
+                let end = pos.add(OFFSET);
+                draw_list.add_rect(start, end, color).filled(true).build();
+
+                let text_pos = pos.add([HALF_SIZE + 1.0, 0.0]);
+                draw_list.add_text(text_pos, color, &self.name);
+
+                if self.dragging {
+                    let change = ui.window_pos().sub(bound_min);
+                    self.pos = self.pos.add(change);
+                }
+            });
     }
 
     pub fn render_tree_label(&self, ui: &Ui, kind: &str) {
@@ -176,6 +211,7 @@ impl Default for Common {
             name: "Unnamed".into(),
             pos: [0.0, 0.0],
             opacity: 1.0,
+            dragging: false,
         }
     }
 }
@@ -188,6 +224,7 @@ impl Clone for Common {
             name: self.name.clone(),
             pos: self.pos,
             opacity: self.opacity,
+            dragging: false,
         }
     }
 }
