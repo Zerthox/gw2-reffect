@@ -20,8 +20,8 @@ impl TreeLeaf for IconElement {}
 
 impl Render for IconElement {
     fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
-        if self.icon.is_visible(ctx, &state) {
-            self.icon.render(ui, ctx, &state, self.size)
+        if self.icon.is_visible(ctx, state) {
+            self.icon.render(ui, ctx, state, self.size)
         }
     }
 }
