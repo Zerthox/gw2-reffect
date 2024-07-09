@@ -1,7 +1,7 @@
 use crate::{
     addon::Addon,
     lockbox::Lockbox,
-    render_util::{enum_combo, impl_static_variants, input_text_simple_menu},
+    render_util::{enum_combo, helper_warn, impl_static_variants, input_text_simple_menu},
     texture_manager::TextureManager,
 };
 use nexus::imgui::{ComboBoxFlags, TextureId, Ui};
@@ -113,6 +113,10 @@ impl IconSource {
                             FILE.write(id, file);
                         }
                     });
+                }
+
+                if path.is_absolute() {
+                    helper_warn(ui, || ui.text("Non-shareable absolute icon path"));
                 }
 
                 if let Some(file) = FILE.try_take(id) {
