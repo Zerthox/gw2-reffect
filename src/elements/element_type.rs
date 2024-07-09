@@ -1,8 +1,9 @@
 use super::{Bar, Element, Group, IconElement, IconList, RenderState, Text};
 use crate::{
     context::Context,
-    render_util::impl_static_variants,
-    traits::{Render, RenderOptions, TreeNode},
+    render_util::{impl_static_variants, Rect},
+    traits::{Bounds, Render, RenderOptions},
+    tree::TreeNode,
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
@@ -46,6 +47,18 @@ impl Render for ElementType {
             Self::IconList(list) => list.render(ui, ctx, state),
             Self::Text(text) => text.render(ui, ctx, state),
             Self::Bar(bar) => bar.render(ui, ctx, state),
+        }
+    }
+}
+
+impl Bounds for ElementType {
+    fn bounding_box(&self, ui: &Ui, ctx: &Context, pos: [f32; 2]) -> Rect {
+        match self {
+            Self::Group(group) => group.bounding_box(ui, ctx, pos),
+            Self::Icon(icon) => icon.bounding_box(ui, ctx, pos),
+            Self::IconList(list) => list.bounding_box(ui, ctx, pos),
+            Self::Text(text) => text.bounding_box(ui, ctx, pos),
+            Self::Bar(bar) => bar.bounding_box(ui, ctx, pos),
         }
     }
 }

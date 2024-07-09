@@ -1,5 +1,5 @@
 use super::{Icon, RenderState};
-use crate::{context::Context, traits::RenderOptions};
+use crate::{context::Context, render_util::Rect, traits::RenderOptions};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
@@ -20,6 +20,10 @@ impl ListIcon {
 
     pub fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState, size: [f32; 2]) {
         self.inner.render(ui, ctx, state, size)
+    }
+
+    pub fn bounds(&self, pos: [f32; 2], size: [f32; 2]) -> Rect {
+        self.inner.bounds(pos, size)
     }
 }
 

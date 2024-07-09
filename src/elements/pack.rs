@@ -6,8 +6,8 @@ use crate::{
         tree_select_empty,
     },
     schema::Schema,
-    traits::{RenderOptions, TreeNode},
-    visit::{Loader, VisitMut},
+    traits::{Bounds, RenderOptions},
+    tree::{Loader, TreeNode, VisitMut},
 };
 use nexus::imgui::{ComboBoxFlags, MenuItem, Ui};
 use serde::{Deserialize, Serialize};
@@ -59,13 +59,19 @@ impl Pack {
     /// Renders the pack.
     pub fn render(&mut self, ui: &Ui, ctx: &Context) {
         let edit = ctx.edit.show_all && ctx.edit.is_edited_or_parent(self.common.id);
-        let pos = self.anchor.calc_pos(ui);
-        let state = RenderState::new(edit, pos, &self.common);
+        let anchor = self.anchor.calc_pos(ui);
+        let state = RenderState::new(edit, anchor, &self.common);
         self.common.render(ui, ctx, &state, |state| {
             for element in &mut self.elements {
-                element.render(ui, ctx, state);
+                element.render(ui, ctx, &state);
             }
         });
+
+        if ctx.edit.is_edited(self.common.id) {
+            let pos = self.common.pos(&state);
+            let bounds = Bounds::combined_bounds(self.elements.iter(), ui, ctx, pos);
+            self.common.render_edit_indicators(ui, pos, bounds)
+        }
     }
 
     /// Renders the select tree.

@@ -2,10 +2,12 @@ use super::{Animation, Common, ElementType, RenderState};
 use crate::{
     action::ElementAction,
     context::{Context, EditState},
-    render_util::{delete_confirm_modal, item_context_menu, style_disabled_if, tree_select_empty},
-    traits::{Render, RenderOptions, TreeNode},
+    render_util::{
+        delete_confirm_modal, item_context_menu, style_disabled_if, tree_select_empty, Rect,
+    },
+    traits::{Bounds, Render, RenderOptions},
+    tree::{Loader, TreeNode, VisitMut},
     trigger::{MetaTrigger, Trigger},
-    visit::{Loader, VisitMut},
 };
 use nexus::imgui::{MenuItem, Ui};
 use serde::{Deserialize, Serialize};
@@ -48,8 +50,8 @@ impl Element {
     /// Renders the element.
     pub fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
         self.common.render(ui, ctx, state, |state| {
-            if self.trigger.is_active_or_edit(ctx, state) {
-                let mut body = || self.kind.render(ui, ctx, state);
+            if self.trigger.is_active_or_edit(ctx, &state) {
+                let mut body = || self.kind.render(ui, ctx, &state);
                 if let Some(animation) = &mut self.animation {
                     animation.render(ui, body);
                 } else {
@@ -57,6 +59,12 @@ impl Element {
                 }
             }
         });
+
+        if ctx.edit.is_edited(self.common.id) {
+            let pos = self.common.pos(state);
+            let bounds = self.kind.bounding_box(ui, ctx, pos);
+            self.common.render_edit_indicators(ui, pos, bounds);
+        }
     }
 
     /// Renders the select tree.
@@ -176,5 +184,11 @@ impl Element {
 impl TreeNode for Element {
     fn children(&mut self) -> Option<&mut Vec<Element>> {
         self.kind.children()
+    }
+}
+
+impl Bounds for Element {
+    fn bounding_box(&self, ui: &Ui, ctx: &Context, pos: [f32; 2]) -> Rect {
+        self.kind.bounding_box(ui, ctx, pos)
     }
 }

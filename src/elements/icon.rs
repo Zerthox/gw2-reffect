@@ -3,7 +3,7 @@ use crate::{
     colors::{self, with_alpha},
     component_wise::ComponentWise,
     context::Context,
-    render_util::{draw_spinner_bg, draw_text_bg},
+    render_util::{draw_spinner_bg, draw_text_bg, Rect},
     traits::RenderOptions,
     trigger::{BuffTrigger, Trigger},
 };
@@ -40,12 +40,17 @@ impl Icon {
         self.buff.is_active_or_edit(ctx, state)
     }
 
+    pub fn bounds(&self, pos: [f32; 2], size: [f32; 2]) -> Rect {
+        let half_size = size.mul_scalar(0.5);
+        let start = pos.sub(half_size);
+        let end = pos.add(half_size);
+        (start, end)
+    }
+
     pub fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState, size: [f32; 2]) {
         let texture = self.source.get_texture();
         if self.source.is_empty() || texture.is_some() {
-            let half_size = size.mul_scalar(0.5);
-            let start = state.pos.sub(half_size);
-            let end = state.pos.add(half_size);
+            let (start, end) = self.bounds(state.pos, size);
             let color @ [_, _, _, alpha] = self.texture_color(ui);
 
             // render icon

@@ -14,9 +14,9 @@ mod schema;
 mod serde_bitflags;
 mod texture_manager;
 mod traits;
+mod tree;
 mod trigger;
 mod util;
-mod visit;
 
 use addon::Addon;
 use nexus::AddonFlags;

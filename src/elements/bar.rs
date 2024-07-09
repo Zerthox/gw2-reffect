@@ -3,8 +3,9 @@ use crate::{
     colors::{self, with_alpha_factor},
     component_wise::ComponentWise,
     context::Context,
-    render_util::{enum_combo, helper, input_float_with_format, input_size},
-    traits::{Render, RenderOptions, TreeLeaf},
+    render_util::{enum_combo, helper, input_float_with_format, input_size, Rect},
+    traits::{Render, Bounds, RenderOptions},
+    tree::TreeLeaf,
     trigger::BuffTrigger,
 };
 use arc_util::ui::render::input_u32;
@@ -33,13 +34,11 @@ impl TreeLeaf for Bar {}
 
 impl Render for Bar {
     fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
-        if let Some(active) = &self.buff.active_or_edit(ctx, state) {
+        if let Some(active) = &self.buff.active_or_edit(ctx, &state) {
             let alpha = ui.clone_style().alpha;
 
+            let (start, end) = self.bounding_box(ui, ctx, state.pos);
             let progress = self.progress.calc(ctx, active, self.max);
-            let offset = self.align.offset(self.size);
-            let start = state.pos.add(offset);
-            let end = start.add(self.size);
             let (fill_start, fill_end) = self.direction.progress_pos(start, self.size, progress);
 
             let draw_list = ui.get_background_draw_list();
@@ -58,6 +57,14 @@ impl Render for Bar {
                     .build();
             }
         }
+    }
+}
+
+impl Bounds for Bar {
+    fn bounding_box(&self, _ui: &Ui, _ctx: &Context, pos: [f32; 2]) -> Rect {
+        let offset = self.align.offset(self.size);
+        let start = pos.add(offset);
+        (start, start.add(self.size))
     }
 }
 

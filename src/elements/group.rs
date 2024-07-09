@@ -1,12 +1,12 @@
 use super::{Element, RenderState};
 use crate::{
     context::Context,
-    traits::{Render, RenderOptions, TreeNode},
+    render_util::Rect,
+    traits::{Bounds, Render, RenderOptions},
+    tree::TreeNode,
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
-
-// TODO: opacity
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(default)]
@@ -25,6 +25,12 @@ impl Render for Group {
         for member in &mut self.members {
             member.render(ui, ctx, state);
         }
+    }
+}
+
+impl Bounds for Group {
+    fn bounding_box(&self, ui: &Ui, ctx: &Context, pos: [f32; 2]) -> Rect {
+        Bounds::combined_bounds(&self.members, ui, ctx, pos)
     }
 }
 

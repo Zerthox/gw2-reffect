@@ -1,7 +1,3 @@
-mod load;
-
-pub use self::load::*;
-
 use crate::elements::{Bar, Element, ElementType, Group, IconElement, IconList, Text};
 
 pub trait VisitMut {

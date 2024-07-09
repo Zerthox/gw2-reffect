@@ -22,11 +22,11 @@ use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
 #[bitflags]
 #[repr(u8)]
 pub enum Race {
-    Asura = 1 << 1,
-    Charr = 1 << 2,
-    Human = 1 << 3,
-    Norn = 1 << 4,
-    Sylvari = 1 << 5,
+    Asura = 1 << 0,
+    Charr = 1 << 1,
+    Human = 1 << 2,
+    Norn = 1 << 3,
+    Sylvari = 1 << 4,
 }
 
 impl TryFrom<u8> for Race {

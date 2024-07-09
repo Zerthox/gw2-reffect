@@ -2,12 +2,14 @@ use super::{Direction, Layout, ListIcon, RenderState};
 use crate::{
     action::Action,
     colors,
+    component_wise::ComponentWise,
     context::Context,
     render_util::{
         collapsing_header_same_line_end, delete_confirm_modal, enum_combo, input_float_with_format,
-        input_size, style_disabled_if,
+        input_size, style_disabled_if, Rect,
     },
-    traits::{Render, RenderOptions, TreeLeaf},
+    traits::{Bounds, Render, RenderOptions},
+    tree::TreeLeaf,
 };
 use nexus::imgui::{
     self as ig, CollapsingHeader, ComboBoxFlags, InputTextFlags, StyleColor, TreeNodeFlags, Ui,
@@ -59,6 +61,24 @@ impl Render for IconList {
                 }
             }
         };
+    }
+}
+
+impl Bounds for IconList {
+    fn bounding_box(&self, _ui: &Ui, _ctx: &Context, pos: [f32; 2]) -> Rect {
+        // we calculate the bounds with all icons visible for now
+        // TODO: fix & move to direction
+        let len = self.icons.len();
+        if len > 0 {
+            let first = self.direction.list_item_offset(self.size, self.pad, 0, len);
+            let last = self
+                .direction
+                .list_item_offset(self.size, self.pad, len - 1, len);
+            let offset = self.size.mul_scalar(0.5);
+            (pos.add(offset).add(first), pos.sub(offset).add(last))
+        } else {
+            Rect::default()
+        }
     }
 }
 

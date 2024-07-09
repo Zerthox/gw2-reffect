@@ -1,8 +1,9 @@
 use super::{Icon, RenderState};
 use crate::{
     context::Context,
-    render_util::input_size,
-    traits::{Render, RenderOptions, TreeLeaf},
+    render_util::{input_size, Rect},
+    traits::{Bounds, Render, RenderOptions},
+    tree::TreeLeaf,
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
@@ -19,9 +20,15 @@ impl TreeLeaf for IconElement {}
 
 impl Render for IconElement {
     fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
-        if self.icon.is_visible(ctx, state) {
-            self.icon.render(ui, ctx, state, self.size)
+        if self.icon.is_visible(ctx, &state) {
+            self.icon.render(ui, ctx, &state, self.size)
         }
+    }
+}
+
+impl Bounds for IconElement {
+    fn bounding_box(&self, _ui: &Ui, _ctx: &Context, pos: [f32; 2]) -> Rect {
+        self.icon.bounds(pos, self.size)
     }
 }
 

@@ -4,7 +4,7 @@ use crate::{
     component_wise::ComponentWise,
     context::{Context, EditState},
     id::{Id, IdGen},
-    render_util::{helper, input_float_with_format, push_alpha_change, EnumStaticVariants},
+    render_util::{helper, input_float_with_format, push_alpha_change, EnumStaticVariants, Rect},
     traits::RenderOptions,
 };
 use nexus::imgui::{InputTextFlags, MenuItem, Slider, SliderFlags, Ui};
@@ -33,29 +33,32 @@ impl Common {
         self.id.to_string()
     }
 
+    pub fn visible(&self, ctx: &Context) -> bool {
+        self.enabled || ctx.edit.is_edited_or_parent(self.id)
+    }
+
+    pub fn pos(&self, state: &RenderState) -> [f32; 2] {
+        state.pos.add(self.pos)
+    }
+
     pub fn render(
         &self,
         ui: &Ui,
         ctx: &Context,
         state: &RenderState,
-        contents: impl FnOnce(&RenderState),
+        contents: impl FnOnce(RenderState),
     ) {
-        let show = self.enabled || ctx.edit.is_edited_or_parent(self.id);
-        if show {
-            let state = state.with_offset(self.pos).for_element(self, ctx);
-            {
-                let _style = push_alpha_change(ui, self.opacity);
-                contents(&state);
-            }
-
-            if ctx.edit.is_edited(self.id) {
-                // TODO: change edited element draw list to foreground?
-                self.render_edit_indicator(ui, &state);
-            }
+        if self.visible(ctx) {
+            let state = state.for_element(self, ctx);
+            let _style = push_alpha_change(ui, self.opacity);
+            contents(state);
         }
     }
 
-    fn render_edit_indicator(&self, ui: &Ui, state: &RenderState) {
+    /// Renders the element edit indicators.
+    ///
+    /// Updates the position if moved.
+    pub fn render_edit_indicators(&mut self, ui: &Ui, pos: [f32; 2], bounds: Rect) {
         const SIZE: f32 = 5.0;
         const HALF_SIZE: f32 = 0.5 * SIZE;
         const OFFSET: [f32; 2] = [HALF_SIZE, HALF_SIZE];
@@ -63,12 +66,17 @@ impl Common {
 
         let draw_list = ui.get_foreground_draw_list();
 
-        let start = state.pos.sub(OFFSET);
-        let end = state.pos.add(OFFSET);
+        let (bound_min, bound_max) = bounds;
+        draw_list.add_rect(bound_min, bound_max, COLOR).build();
+
+        let start = pos.sub(OFFSET);
+        let end = pos.add(OFFSET);
         draw_list.add_rect(start, end, COLOR).filled(true).build();
 
-        let pos = state.pos.add([HALF_SIZE + 1.0, 0.0]);
-        draw_list.add_text(pos, COLOR, &self.name);
+        let text_pos = pos.add([HALF_SIZE + 1.0, 0.0]);
+        draw_list.add_text(text_pos, COLOR, &self.name);
+
+        // TODO: allow dragging
     }
 
     pub fn render_tree_label(&self, ui: &Ui, kind: &str) {

@@ -2,8 +2,11 @@ use super::{AlignHorizontal, RenderState, TextDecoration};
 use crate::{
     component_wise::ComponentWise,
     context::{Context, ContextUpdate},
-    render_util::{draw_text_bg, helper, input_float_with_format, input_text_multi_with_menu},
-    traits::{Render, RenderOptions, TreeLeaf},
+    render_util::{
+        draw_text_bg, helper, input_float_with_format, input_text_multi_with_menu, Rect,
+    },
+    traits::{Bounds, Render, RenderOptions},
+    tree::TreeLeaf,
     trigger::{ActiveBuff, BuffTrigger},
 };
 use nexus::imgui::{ColorEdit, InputTextFlags, Ui};
@@ -83,6 +86,11 @@ impl Text {
 
         result
     }
+
+    fn calc_pos(&self, ui: &Ui, pos: [f32; 2], text: &str) -> [f32; 2] {
+        let offset = self.align.text_offset(ui, text, self.size);
+        pos.add(offset)
+    }
 }
 
 impl TreeLeaf for Text {}
@@ -94,8 +102,7 @@ impl Render for Text {
         if let Some(text) = &self.text_memo {
             let font_scale = self.size;
             let font_size = font_scale * ui.current_font_size();
-            let align = self.align.text_offset(ui, text, font_scale);
-            let pos = state.pos.add(align);
+            let pos = self.calc_pos(ui, state.pos, text);
             let [r, g, b, a] = self.color;
             let alpha = a * ui.clone_style().alpha;
             let color = [r, g, b, alpha];
@@ -104,6 +111,19 @@ impl Render for Text {
                 .render(ui, text, pos, font_size, [0.0, 0.0, 0.0, alpha]);
             draw_text_bg(ui, text, pos, font_size, color);
         }
+    }
+}
+
+impl Bounds for Text {
+    fn bounding_box(&self, ui: &Ui, _ctx: &Context, pos: [f32; 2]) -> Rect {
+        self.text_memo
+            .as_ref()
+            .map(|text| {
+                let pos = self.calc_pos(ui, pos, text);
+                let size = ui.calc_text_size(text);
+                (pos, pos.add(size.mul_scalar(self.size)))
+            })
+            .unwrap_or_default()
     }
 }
 

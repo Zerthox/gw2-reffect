@@ -14,6 +14,10 @@ pub use self::{
 use nexus::imgui::{sys, Style, StyleStackToken, StyleVar, Ui};
 use std::ptr;
 
+pub type Point = [f32; 2];
+
+pub type Rect = (Point, Point);
+
 pub fn next_window_size_constraints(size_min: [f32; 2], size_max: [f32; 2]) {
     unsafe {
         sys::igSetNextWindowSizeConstraints(size_min.into(), size_max.into(), None, ptr::null_mut())

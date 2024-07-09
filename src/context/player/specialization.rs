@@ -27,46 +27,55 @@ use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
 #[bitflags]
 #[repr(u64)]
 pub enum Specialization {
+    #[strum(serialize = "Guardian (core)")]
     Guardian = 1 << 0,
     Dragonhunter = 1 << 1,
     Firebrand = 1 << 2,
     Willbender = 1 << 3,
 
+    #[strum(serialize = "Warrior (core)")]
     Warrior = 1 << 5,
     Berserker = 1 << 6,
     Spellbreaker = 1 << 7,
     Bladesworn = 1 << 8,
 
+    #[strum(serialize = "Revenant (core)")]
     Revenant = 1 << 10,
     Herald = 1 << 11,
     Renegade = 1 << 12,
     Vindicator = 1 << 13,
 
+    #[strum(serialize = "Engineer (core)")]
     Engineer = 1 << 15,
     Scrapper = 1 << 16,
     Holosmith = 1 << 17,
     Mechanist = 1 << 18,
 
+    #[strum(serialize = "Ranger (core)")]
     Ranger = 1 << 20,
     Druid = 1 << 21,
     Soulbeast = 1 << 22,
     Untamed = 1 << 23,
 
+    #[strum(serialize = "Thief (core)")]
     Thief = 1 << 25,
     Daredevil = 1 << 26,
     Deadeye = 1 << 27,
     Specter = 1 << 28,
 
+    #[strum(serialize = "Elementalist (core)")]
     Elementalist = 1 << 30,
     Tempest = 1 << 31,
     Weaver = 1 << 32,
     Catalyst = 1 << 33,
 
+    #[strum(serialize = "Mesmer (core)")]
     Mesmer = 1 << 35,
     Chronomancer = 1 << 36,
     Mirage = 1 << 37,
     Virtuoso = 1 << 38,
 
+    #[strum(serialize = "Necromancer (core)")]
     Necromancer = 1 << 40,
     Reaper = 1 << 41,
     Scourge = 1 << 42,
