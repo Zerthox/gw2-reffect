@@ -1,6 +1,6 @@
 use super::{CombatTrigger, Trigger};
 use crate::{
-    context::{Context, Mount, Specialization},
+    context::{Context, Mount, Profession, Specialization},
     render_util::enum_combo_bitflags,
     serde_bitflags,
     traits::RenderOptions,
@@ -14,11 +14,27 @@ use serde::{Deserialize, Serialize};
 pub struct PlayerTrigger {
     pub combat: CombatTrigger,
 
+    #[serde(skip_serializing)]
+    #[serde(with = "serde_bitflags")]
+    profs: BitFlags<Profession>, // TODO: remove after grace period
+
     #[serde(with = "serde_bitflags")]
     pub specs: BitFlags<Specialization>,
 
     #[serde(with = "serde_bitflags")]
     pub mounts: BitFlags<Mount>,
+}
+
+impl PlayerTrigger {
+    pub fn load(&mut self) {
+        // translate old profs to specs if specs empty
+        // TODO: remove after grace period
+        if self.specs.is_empty() {
+            for prof in self.profs.iter() {
+                self.specs.insert(prof.specializations());
+            }
+        }
+    }
 }
 
 impl Trigger for PlayerTrigger {
@@ -60,4 +76,40 @@ where
     value
         .map(|value| check_bitflags(flags, value))
         .unwrap_or(true)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn prof_transition() {
+        let mut trigger = PlayerTrigger {
+            profs: Profession::Guardian | Profession::Necromancer,
+            ..Default::default()
+        };
+        trigger.load();
+        assert_eq!(
+            trigger.specs,
+            Specialization::Guardian
+                | Specialization::Dragonhunter
+                | Specialization::Firebrand
+                | Specialization::Willbender
+                | Specialization::Necromancer
+                | Specialization::Reaper
+                | Specialization::Scourge
+                | Specialization::Harbinger
+        );
+
+        let mut trigger = PlayerTrigger {
+            profs: Profession::Guardian | Profession::Necromancer,
+            specs: Specialization::Dragonhunter | Specialization::Reaper,
+            ..Default::default()
+        };
+        trigger.load();
+        assert_eq!(
+            trigger.specs,
+            Specialization::Dragonhunter | Specialization::Reaper
+        );
+    }
 }

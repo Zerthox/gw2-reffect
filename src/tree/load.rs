@@ -1,5 +1,8 @@
 use super::VisitMut;
-use crate::elements::{IconElement, IconList};
+use crate::{
+    elements::{IconElement, IconList},
+    trigger::MetaTrigger,
+};
 
 #[derive(Debug, Default, Clone, Copy)]
 pub struct Loader;
@@ -13,5 +16,9 @@ impl VisitMut for Loader {
 
     fn visit_icon(&mut self, el: &mut IconElement) {
         el.icon.load()
+    }
+
+    fn visit_meta_trigger(&mut self, trigger: &mut MetaTrigger) {
+        trigger.load();
     }
 }

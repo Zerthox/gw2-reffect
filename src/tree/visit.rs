@@ -1,4 +1,7 @@
-use crate::elements::{Bar, Element, ElementType, Group, IconElement, IconList, Text};
+use crate::{
+    elements::{Bar, Element, ElementType, Group, IconElement, IconList, Text},
+    trigger::MetaTrigger,
+};
 
 pub trait VisitMut {
     fn visit_elements(&mut self, elements: &mut [Element]) {
@@ -8,7 +11,12 @@ pub trait VisitMut {
     }
 
     fn visit_element(&mut self, element: &mut Element) {
-        match &mut element.kind {
+        self.visit_meta_trigger(&mut element.trigger);
+        self.visit_element_type(&mut element.kind);
+    }
+
+    fn visit_element_type(&mut self, element_type: &mut ElementType) {
+        match element_type {
             ElementType::Group(group) => {
                 self.visit_group(group);
                 self.visit_elements(&mut group.members);
@@ -29,4 +37,6 @@ pub trait VisitMut {
     fn visit_text(&mut self, _text: &mut Text) {}
 
     fn visit_bar(&mut self, _bar: &mut Bar) {}
+
+    fn visit_meta_trigger(&mut self, _trigger: &mut MetaTrigger) {}
 }

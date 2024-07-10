@@ -34,8 +34,7 @@ impl PlayerContext {
         if mumble.read_ui_tick() > 0 {
             match mumble.parse_identity() {
                 Ok(identity) => {
-                    self.prof =
-                        Profession::try_from(identity.profession as u8).map_err(|err| err.number);
+                    self.prof = Profession::try_from(identity.profession as u8);
                     self.spec = Specialization::try_from(self.prof.ok(), identity.spec)
                         .ok_or(identity.spec);
                     self.race = (identity.race as u8).try_into();

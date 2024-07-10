@@ -13,6 +13,12 @@ pub struct MetaTrigger {
     pub map: Memo<MapTrigger>, // memoize map
 }
 
+impl MetaTrigger {
+    pub fn load(&mut self) {
+        self.player.load();
+    }
+}
+
 impl Trigger for MetaTrigger {
     fn is_active(&mut self, ctx: &Context) -> bool {
         if ctx.has_update(ContextUpdate::Map) {
