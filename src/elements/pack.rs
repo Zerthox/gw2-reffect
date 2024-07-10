@@ -97,10 +97,6 @@ impl Pack {
             self.common.render_context_menu(ui, state, Some(children));
             open = MenuItem::new("Delete").build(ui);
         });
-        let title = format!("Confirm Delete##{id}");
-        if open {
-            ui.open_popup(&title);
-        }
 
         {
             let _style = style_disabled_if(ui, !self.common.enabled);
@@ -111,6 +107,10 @@ impl Pack {
             self.common.render_tree_children(ui, state, children);
         }
 
+        let title = format!("Confirm Delete##reffect{id}");
+        if open {
+            ui.open_popup(&title);
+        }
         delete_confirm_modal(ui, &title, || {
             ui.text(format!("Delete Pack {}?", self.common.name))
         })

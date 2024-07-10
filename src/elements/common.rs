@@ -92,6 +92,7 @@ impl Common {
             .nav_focus(false)
             .scrollable(false)
             .scroll_bar(false)
+            .save_settings(false)
             .build(ui, || {
                 let hover = ui.is_window_hovered();
                 self.dragging = hover && ui.is_mouse_down(MouseButton::Left);

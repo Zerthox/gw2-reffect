@@ -20,6 +20,7 @@ pub fn delete_confirm_modal(ui: &Ui, title: impl AsRef<str>, body: impl FnOnce()
 
     ui.popup_modal(title)
         .always_auto_resize(true)
+        .save_settings(false)
         .build(ui, || {
             body();
 

@@ -121,7 +121,7 @@ impl RenderOptions for IconList {
 
             button_color.end();
 
-            let title = format!("Confirm Delete##listicon{i}");
+            let title = format!("Confirm Delete##reffectlisticon{i}");
             if !remains {
                 ui.open_popup(&title);
             }

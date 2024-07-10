@@ -109,7 +109,7 @@ impl Element {
             }
             open = MenuItem::new("Delete").build(ui);
         });
-        let title = format!("Confirm Delete##{id}");
+        let title = format!("Confirm Delete##reffect{id}");
         if open {
             ui.open_popup(&title)
         }

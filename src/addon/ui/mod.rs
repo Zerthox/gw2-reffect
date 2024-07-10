@@ -30,7 +30,7 @@ impl Addon {
     }
 
     fn render_popups(&mut self, ui: &Ui) {
-        const CREATE_ERROR_TITLE: &str = "Pack Creation Error";
+        const CREATE_ERROR_TITLE: &str = "Pack Creation Error##reffect";
 
         if self.create_error {
             self.create_error = false;
@@ -39,6 +39,7 @@ impl Addon {
 
         ui.popup_modal(CREATE_ERROR_TITLE)
             .always_auto_resize(true)
+            .save_settings(false)
             .build(ui, || {
                 ui.text("Can not create outside of packs folder");
                 if ui.button("Ok") {
