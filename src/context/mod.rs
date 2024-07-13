@@ -10,7 +10,7 @@ use std::collections::BTreeMap;
 pub use self::{edit_state::*, links::*, map::*, player::*, settings::*, ui::*};
 
 use crate::{
-    internal::{get_buffs, Buff},
+    internal::{self, Buff},
     interval::Interval,
 };
 use enumflags2::{bitflags, BitFlags};
@@ -44,7 +44,7 @@ pub struct Context {
     pub buffs: BTreeMap<u32, Buff>, // TODO: switch to result/option here?
 
     /// Current buffs state.
-    pub buffs_state: bool, // TODO: error enum in internals
+    pub buffs_error: internal::Error,
 
     links: Links,
 
@@ -64,12 +64,15 @@ impl Context {
 
         if self.buffs_interval.triggered(self.now) {
             self.buffs.clear();
-            if let Some(buffs) = unsafe { get_buffs() } {
-                self.buffs
-                    .extend(buffs.iter().map(|buff| (buff.id, buff.clone())));
-                self.buffs_state = true;
-            } else {
-                self.buffs_state = false;
+            match unsafe { internal::get_buffs() } {
+                Ok(buffs) => {
+                    self.buffs_error = internal::Error::None;
+                    self.buffs
+                        .extend(buffs.iter().map(|buff| (buff.id, buff.clone())));
+                }
+                Err(err) => {
+                    self.buffs_error = err;
+                }
             }
             self.updates.insert(ContextUpdate::Buffs);
         }
@@ -124,9 +127,9 @@ impl Context {
         self.replace_player_interval(PLAYER_INTERVAL);
     }
 
-    /// Checks whether a given buff id is present.
-    pub fn has_buff(&self, id: u32) -> bool {
-        self.buff(id).is_some()
+    /// Returns whether buffs are available.
+    pub fn buffs_ok(&self) -> bool {
+        self.buffs_error == internal::Error::None
     }
 
     /// Returns the [`Buff`] for a given buff id, if present.
@@ -134,6 +137,11 @@ impl Context {
         self.buffs
             .get(&id)
             .filter(|buff| buff.runout_time > self.now)
+    }
+
+    /// Checks whether a given buff id is present.
+    pub fn has_buff(&self, id: u32) -> bool {
+        self.buff(id).is_some()
     }
 
     /// Returns the number of stacks for a given buff id, if present.
@@ -176,7 +184,7 @@ impl Default for Context {
             player: PlayerContext::empty(),
             map: MapContext::empty(),
             buffs: BTreeMap::new(),
-            buffs_state: false,
+            buffs_error: internal::Error::None,
             links: Links::load(),
             buffs_interval: Interval::new(BUFFS_INTERVAL),
             player_interval: Interval::new(PLAYER_INTERVAL),

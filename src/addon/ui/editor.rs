@@ -1,5 +1,6 @@
 use super::Addon;
 use crate::{
+    colors,
     id::IdGen,
     render_util::{next_window_size_constraints, small_padding},
 };
@@ -91,5 +92,14 @@ impl Addon {
                     }
                 });
             });
+
+        if !self.context.buffs_ok() {
+            let [_, max_y] = ui.window_content_region_max();
+            ui.set_cursor_pos([0.0, max_y - ui.text_line_height()]);
+            ui.text_colored(
+                colors::RED,
+                format!("Error: {}", self.context.buffs_error.message()),
+            );
+        }
     }
 }

@@ -7,6 +7,8 @@ use crate::{
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
+// TODO: replace with generic progress trigger or similar?
+
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct BuffTrigger {
@@ -31,7 +33,7 @@ impl Trigger for BuffTrigger {
 impl BuffTrigger {
     fn force_update(&mut self, ctx: &Context) {
         let stacks = self.id.count_stacks(ctx);
-        let active = self.id.always() || ctx.buffs_state && self.threshold.is_met(stacks);
+        let active = self.id.always() || ctx.buffs_ok() && self.threshold.is_met(stacks);
         self.active_memo = active.then(|| {
             let (apply, runout) = self.id.time_range(ctx);
             ActiveBuff {

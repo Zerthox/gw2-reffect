@@ -9,8 +9,6 @@ use std::slice;
 // FIXME: required to be next to exe! manual load instead?
 #[link(name = "reffect_internal", kind = "raw-dylib")]
 extern "C" {
-    pub fn initialize();
-
     fn update_buffs() -> BuffsResult;
 }
 
@@ -18,7 +16,11 @@ extern "C" {
 ///
 /// # Safety
 /// This is unsafe due to the caller choosing the lifetime of the buff slice.
-pub unsafe fn get_buffs<'a>() -> Option<&'a [Buff]> {
+pub unsafe fn get_buffs<'a>() -> Result<&'a [Buff], Error> {
     let result = unsafe { update_buffs() };
-    (!result.error).then(|| unsafe { slice::from_raw_parts(result.buffs, result.len) })
+    if result.error == Error::None {
+        Ok(unsafe { slice::from_raw_parts(result.buffs, result.len) })
+    } else {
+        Err(result.error)
+    }
 }

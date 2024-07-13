@@ -1,5 +1,5 @@
 use super::Addon;
-use crate::traits::Colored;
+use crate::{internal, traits::Colored};
 use nexus::imgui::{StyleColor, Ui, Window};
 use std::fmt;
 
@@ -19,13 +19,13 @@ impl Addon {
 
                 ui.text("Buffs status:");
                 ui.same_line();
-                match &ctx.buffs_state {
-                    true => {
+                match ctx.buffs_error {
+                    internal::Error::None => {
                         ui.text_colored(GREEN, "available");
                         if ui.is_item_hovered() {
                             ui.tooltip(|| {
                                 for (id, buff) in &ctx.buffs {
-                                    ui.text(format!("{}x {id}", buff.stacks));
+                                    ui.text(format!("{}x {id} {:?}", buff.stacks, buff.category));
                                     if let Some(remain) = ctx.time_until(buff.runout_time) {
                                         let full = buff.runout_time - buff.apply_time;
                                         let progress = remain as f32 / full as f32;
@@ -41,8 +41,11 @@ impl Addon {
                             });
                         }
                     }
-                    false => {
+                    err => {
                         ui.text_colored(RED, "unavailable");
+                        if ui.is_item_hovered() {
+                            ui.tooltip_text(err.message());
+                        }
                     }
                 }
 

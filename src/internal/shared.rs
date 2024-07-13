@@ -7,13 +7,40 @@
 #[repr(C)]
 pub struct BuffsResult {
     /// Whether there has been an error.
-    pub error: bool, // TODO: error enum
+    pub error: Error,
 
     /// Pointer to the buffs array.
     pub buffs: *const Buff,
 
     /// Length of the buffs array.
     pub len: usize,
+}
+
+/// Error codes.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[repr(u8)]
+pub enum Error {
+    None = 0,
+    Outdated = 1,
+    ContextNotFound = 2,
+    NoCharacter = 3,
+    CharacterState = 4,
+    CompetitiveMode = 5,
+    Windows = u8::MAX,
+}
+
+impl Error {
+    pub fn message(&self) -> &'static str {
+        match self {
+            Error::None => "None",
+            Error::Outdated => "Outdated",
+            Error::ContextNotFound => "Context not found",
+            Error::NoCharacter => "No character",
+            Error::CharacterState => "Unavailable for current character state",
+            Error::CompetitiveMode => "Unavailable in competitive modes",
+            Error::Windows => "Windows error",
+        }
+    }
 }
 
 /// Information about a currently applied buff.
@@ -57,4 +84,7 @@ pub enum Category {
 
     /// Buff is a Condition.
     Condition = 2,
+
+    /// Buff is hidden but gives a screen border.
+    ScreenBorder = 3,
 }
