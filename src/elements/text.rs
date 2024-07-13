@@ -147,6 +147,7 @@ impl RenderOptions for Text {
             ui.text("%r for duration remaining");
             ui.text("%f for duration full");
             ui.text("%p for duration progress");
+            ui.text("%% for % sign");
         });
 
         let mut size = 100.0 * self.size;
