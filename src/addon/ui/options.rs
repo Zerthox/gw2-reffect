@@ -26,11 +26,12 @@ impl Addon {
                 );
 
                 if ui.collapsing_header(
-                    "Stacks Display (WIP)",
+                    "Stacks Text (WIP)",
                     TreeNodeFlags::SPAN_AVAIL_WIDTH | TreeNodeFlags::DEFAULT_OPEN,
                 ) {
-                    // TODO: stacks settings
-                    let _style = style_disabled(ui);
+                    let _style = style_disabled(ui); // TODO: stacks settings
+
+                    let _id = ui.push_id("stackstext");
                     enum_combo(
                         ui,
                         "Decoration",
@@ -65,7 +66,48 @@ impl Addon {
                     );
                 }
 
-                // TODO: duration settings
+                if ui.collapsing_header(
+                    "Duration Text (WIP)",
+                    TreeNodeFlags::SPAN_AVAIL_WIDTH | TreeNodeFlags::DEFAULT_OPEN,
+                ) {
+                    let _style = style_disabled(ui); // TODO: duration text settings
+
+                    let _id = ui.push_id("duratext");
+                    enum_combo(
+                        ui,
+                        "Decoration",
+                        &mut TextDecoration::Outline,
+                        ComboBoxFlags::empty(),
+                    );
+
+                    input_float_with_format(
+                        "Size",
+                        &mut 100.0,
+                        1.0,
+                        10.0,
+                        "%.2f",
+                        InputTextFlags::READ_ONLY,
+                    );
+
+                    input_float_with_format(
+                        "Position x",
+                        &mut 0.0,
+                        10.0,
+                        100.0,
+                        "%.2f",
+                        InputTextFlags::READ_ONLY,
+                    );
+                    input_float_with_format(
+                        "Position y",
+                        &mut 0.0,
+                        10.0,
+                        100.0,
+                        "%.2f",
+                        InputTextFlags::READ_ONLY,
+                    );
+                }
+
+                // TODO: duration bar settings
 
                 if ui.collapsing_header("Advanced", TreeNodeFlags::SPAN_AVAIL_WIDTH) {
                     let mut buffs = self.context.get_buffs_interval();

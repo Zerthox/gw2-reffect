@@ -121,6 +121,7 @@ impl Icon {
                 }
             }
 
+            // render duration text
             if self.duration_text {
                 if let Some(active) = self.buff.active_or_edit(ctx, state) {
                     if let Some(remain) = ctx.time_until(active.runout) {
