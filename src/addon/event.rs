@@ -28,7 +28,6 @@ impl Addon {
         Self::create_dirs();
 
         let mut plugin = Self::lock();
-        plugin.updater.check();
         if let Some(settings) = Settings::try_load() {
             plugin.context.load(settings.context);
         }
@@ -37,14 +36,16 @@ impl Addon {
 
     pub fn unload() {
         log::info!("Reffect v{VERSION} unload");
-        let plugin = Self::lock();
 
-        Settings {
-            context: plugin.context.settings(),
+        {
+            let mut plugin = Self::lock();
+            Settings {
+                context: plugin.context.settings(),
+            }
+            .save();
+            plugin.save_packs();
+            plugin.internal.unload();
         }
-        .save();
-
-        plugin.save_packs();
 
         TextureManager::unload();
     }

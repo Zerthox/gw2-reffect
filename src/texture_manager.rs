@@ -34,6 +34,7 @@ impl TextureManager {
     }
 
     fn loader_thread(source: IconSource) {
+        // FIXME: exit with pending loads causes deadlock between loader & renderer threads
         let mut textures = Self::lock();
         if !textures.exists(&source) {
             match &source {
@@ -185,6 +186,7 @@ impl TextureLoader {
     fn exit_and_wait(self) {
         let Self { sender, handle } = self;
         drop(sender);
+        log::debug!("Waiting for texture loader");
         if handle.join().is_err() {
             log::error!("Failed to join texture loader");
         }

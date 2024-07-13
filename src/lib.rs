@@ -20,7 +20,7 @@ mod trigger;
 mod util;
 
 use addon::Addon;
-use nexus::AddonFlags;
+use nexus::{AddonFlags, UpdateProvider};
 
 nexus::export! {
     name: "Reffect (alpha)",
@@ -28,4 +28,6 @@ nexus::export! {
     flags: AddonFlags::IsVolatile,
     load: Addon::load,
     unload: Addon::unload,
+    provider: UpdateProvider::None, // FIXME: nexus version system is semver incompatible
+    update_link: env!("CARGO_PKG_REPOSITORY"),
 }

@@ -4,7 +4,7 @@ mod ui;
 
 pub use self::settings::*;
 
-use crate::{context::Context, elements::Pack};
+use crate::{context::Context, elements::Pack, internal::Internal};
 use arc_util::update::{Repository, Updater};
 use nexus::paths::get_addon_dir;
 use std::{
@@ -19,6 +19,7 @@ static ADDON: OnceLock<Mutex<Addon>> = OnceLock::new();
 #[derive(Debug)]
 pub struct Addon {
     updater: Updater,
+    internal: Internal,
     debug: bool,
     create_error: bool,
     packs: Vec<Pack>,
@@ -33,6 +34,7 @@ impl Addon {
                 Repository::new("zerthox", "gw2-reffect"),
                 VERSION.parse().unwrap(),
             ),
+            internal: Internal::load(),
             debug: false,
             create_error: false,
             packs: Vec::new(),

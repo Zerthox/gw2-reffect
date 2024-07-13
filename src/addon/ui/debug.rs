@@ -1,5 +1,5 @@
 use super::Addon;
-use crate::{internal, traits::Colored};
+use crate::traits::Colored;
 use nexus::imgui::{StyleColor, Ui, Window};
 use std::fmt;
 
@@ -20,7 +20,7 @@ impl Addon {
                 ui.text("Buffs status:");
                 ui.same_line();
                 match ctx.buffs_error {
-                    internal::Error::None => {
+                    None => {
                         ui.text_colored(GREEN, "available");
                         if ui.is_item_hovered() {
                             ui.tooltip(|| {
@@ -41,10 +41,10 @@ impl Addon {
                             });
                         }
                     }
-                    err => {
+                    Some(err) => {
                         ui.text_colored(RED, "unavailable");
                         if ui.is_item_hovered() {
-                            ui.tooltip_text(err.message());
+                            ui.tooltip_text(err.to_string());
                         }
                     }
                 }

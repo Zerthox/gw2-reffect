@@ -4,12 +4,11 @@ use crate::{
     colors::{self, with_alpha_factor},
     component_wise::ComponentWise,
     context::Context,
-    render_util::{enum_combo, helper, input_float_with_format, input_size, Rect},
+    render_util::{enum_combo, helper, input_float_with_format, input_size, input_u32, Rect},
     traits::{Render, RenderOptions},
     tree::TreeLeaf,
     trigger::BuffTrigger,
 };
-use arc_util::ui::render::input_u32;
 use nexus::imgui::{ColorEdit, ColorPreview, ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
 
@@ -78,7 +77,7 @@ impl RenderOptions for Bar {
         enum_combo(ui, "Progress", &mut self.progress, ComboBoxFlags::empty());
 
         if let Progress::Intensity = self.progress {
-            input_u32(ui, "Max", &mut self.max, 1, 10, InputTextFlags::empty());
+            input_u32(ui, "Max", &mut self.max, 1, 10);
             helper(ui, || ui.text("Maximum progress value"));
         }
 

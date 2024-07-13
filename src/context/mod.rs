@@ -5,15 +5,14 @@ mod player;
 mod settings;
 mod ui;
 
-use std::collections::BTreeMap;
-
 pub use self::{edit_state::*, links::*, map::*, player::*, settings::*, ui::*};
 
 use crate::{
-    internal::{self, Buff},
+    internal::{self, Buff, Internal},
     interval::Interval,
 };
 use enumflags2::{bitflags, BitFlags};
+use std::collections::BTreeMap;
 use windows::Win32::Media::timeGetTime;
 
 const BUFFS_INTERVAL: u32 = 100;
@@ -40,11 +39,11 @@ pub struct Context {
     /// Information about player character.
     pub player: PlayerContext,
 
-    /// Current buffs by id.
-    pub buffs: BTreeMap<u32, Buff>, // TODO: switch to result/option here?
+    /// Current buffs error.
+    pub buffs_error: Option<internal::Error>,
 
-    /// Current buffs state.
-    pub buffs_error: internal::Error,
+    /// Current buffs by id.
+    pub buffs: BTreeMap<u32, Buff>,
 
     links: Links,
 
@@ -55,7 +54,7 @@ pub struct Context {
 
 impl Context {
     /// Updates the context.
-    pub fn update(&mut self) {
+    pub fn update(&mut self, internal: &mut Internal) {
         self.updates = BitFlags::empty();
 
         self.now = unsafe { timeGetTime() };
@@ -64,16 +63,13 @@ impl Context {
 
         if self.buffs_interval.triggered(self.now) {
             self.buffs.clear();
-            match unsafe { internal::get_buffs() } {
-                Ok(buffs) => {
-                    self.buffs_error = internal::Error::None;
+            self.buffs_error = internal
+                .update_buffs()
+                .inspect(|buffs| {
                     self.buffs
                         .extend(buffs.iter().map(|buff| (buff.id, buff.clone())));
-                }
-                Err(err) => {
-                    self.buffs_error = err;
-                }
-            }
+                })
+                .err();
             self.updates.insert(ContextUpdate::Buffs);
         }
 
@@ -129,7 +125,7 @@ impl Context {
 
     /// Returns whether buffs are available.
     pub fn buffs_ok(&self) -> bool {
-        self.buffs_error == internal::Error::None
+        self.buffs_error.is_none()
     }
 
     /// Returns the [`Buff`] for a given buff id, if present.
@@ -183,8 +179,8 @@ impl Default for Context {
             ui: UiContext::empty(),
             player: PlayerContext::empty(),
             map: MapContext::empty(),
+            buffs_error: None,
             buffs: BTreeMap::new(),
-            buffs_error: internal::Error::None,
             links: Links::load(),
             buffs_interval: Interval::new(BUFFS_INTERVAL),
             player_interval: Interval::new(PLAYER_INTERVAL),

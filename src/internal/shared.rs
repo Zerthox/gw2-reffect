@@ -29,20 +29,6 @@ pub enum Error {
     Windows = u8::MAX,
 }
 
-impl Error {
-    pub fn message(&self) -> &'static str {
-        match self {
-            Error::None => "None",
-            Error::Outdated => "Outdated",
-            Error::ContextNotFound => "Context not found",
-            Error::NoCharacter => "No character",
-            Error::CharacterState => "Unavailable for current character state",
-            Error::CompetitiveMode => "Unavailable in competitive modes",
-            Error::Windows => "Windows error",
-        }
-    }
-}
-
 /// Information about a currently applied buff.
 ///
 /// Time related information is only given if currently visible.
