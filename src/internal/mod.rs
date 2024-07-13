@@ -58,7 +58,7 @@ impl Internal {
 
     /// Returns the internal exports.
     pub fn exports(&self) -> Result<&Container<Exports>, Error> {
-        self.0.as_ref().map_err(|err| err.clone())
+        self.0.as_ref().map_err(|err| *err)
     }
 
     /// Returns the current buffs or an error.
