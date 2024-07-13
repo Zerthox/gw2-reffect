@@ -27,18 +27,21 @@ Now you can start adjusting the elements, connecting them to specific effects or
 For further information, see the [documentation on elements](./elements.md).
 
 ### Finding effect ids
-If your use case requires an element to be tied to an effect, you need the skill id of the effect.
+If your use case requires an element to be tied to an effect, you need the **skill id or chat link** of the effect.
+Either can be pasted into Reffect's effect id input ingame.
 This can sometimes be a difficult part about creating new displays.
 
 Chat links for effects contain their id.
 For a lot of effects these can be found on the [Guild Wars 2 Wiki](https://wiki.guildwars2.com).
 When searching for the effect by name, make sure the page is for **the effect, not the associated ability or trait!**
-Hovering over the chat link on the wiki page will show you the id.
+Trait chat links will be rejected when pasted into Reffect ingame.
+Ability chat links however come from the same skill id pool, meaning they will be accepted and it can be more difficult to figure out what when wrong.
+(Hovering over the chat link on the wiki page will also show you the id.)
 
 ![Wiki page for an effect](./img/wiki-effect.png)
 
 To quickly find the page for an effect you see ingame, start typing `/wiki` in your chat, then shift-click the effect and hit enter.
-In case there is no page associated with the effect id, the wiki will show you the id.
+In case there is no page associated with the effect id, the wiki will show you the chat link you pasted as well as the corresponding id.
 
 ![Wiki chat link search with no results](./img/wiki-no-result.png)
 
