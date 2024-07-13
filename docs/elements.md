@@ -42,14 +42,24 @@ All icons in a list have to share the same dimensions.
 
 ## Text
 Custom text can be displayed, optionally tied to one or multiple effects.
-The following replacements are supported:
+This can be used as a fully customizable alternative to the simple stacks/duration  text built into icons.
+
+The following text replacements are supported:
 - `%n` for the name of the element
 - `%s` for the current number of effect stacks
 - `%r` for the remaining effect duration
 - `%f` for the initial full effect duration
 - `%p` for the effect duration progress (remaining effect duration in percent)
+- `%%` for a simple % sign
 
 ![Text](./img/text.png)
+
+
+## Bar
+Custom progress bars can be based on either the effect intensity or duration.
+They are a fully customizable alternative to the simple progress bar built into icons.
+
+![Bar](./img/bar.png)
 
 # Additional element options
 
