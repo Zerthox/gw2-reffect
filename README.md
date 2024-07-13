@@ -20,8 +20,7 @@ Requires the [Nexus](https://github.com/RaidcoreGG/Nexus) addon manager ([websit
 ## Installation
 1. Install the [Nexus](https://github.com/RaidcoreGG/Nexus) addon manager ([website](https://raidcore.gg/Nexus)).
 2. Download [`reffect.dll`](../../releases/latest) and place it in your `addons` folder (e.g. `C:\Program Files\Guild Wars 2\addons`).
-3. Download [`reffect_internal.dll`](../../releases/latest) and place it in your game directory (e.g. `C:\Program Files\Guild Wars 2`) next to your `Gw2-64.exe`.
-4. *Optional: read the [getting started guide](./docs/getting-started.md) or [documentation on elements](./docs/elements.md).*
+3. *Optional: read the [getting started guide](./docs/getting-started.md) or [documentation on elements](./docs/elements.md).*
 
 ## Information Policy
 Reffect uses memory reading to access internal information of the Guild Wars 2 game client.
@@ -33,7 +32,8 @@ The information is retrieved with the following policy in mind:
 
 ## Limitations 
 - Not available in competitive modes (PvP & WvW).
-- Except for Boons & Conditions effects do not show durations above 5 seconds. *Ingame this information is usually only visible on hover. With 5s left effect icons start to blink, conveying the remaining duration to the player.*
+- Generic effects do not show durations above 5 seconds. *Ingame this information is usually only visible on hover. With 5s left effect icons start to blink, conveying the remaining duration to the player.*
+- Screen border effects do not show durations.
 - No true stack count for duration stacking effects.
 - No information about effects hidden from the player.
 - No combining logic for multiple effects outside of grouping them into a single UI element.
