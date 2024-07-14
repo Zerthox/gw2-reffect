@@ -29,7 +29,7 @@ pub struct Addon {
 impl Addon {
     pub fn new() -> Self {
         Self {
-            updater: Updater::unchecked(
+            updater: Updater::new(
                 "Reffect",
                 Repository::new("zerthox", "gw2-reffect"),
                 VERSION.parse().unwrap(),
