@@ -28,6 +28,6 @@ nexus::export! {
     flags: AddonFlags::IsVolatile,
     load: Addon::load,
     unload: Addon::unload,
-    provider: UpdateProvider::None, // FIXME: nexus version system is semver incompatible
+    provider: UpdateProvider::GitHub,
     update_link: env!("CARGO_PKG_REPOSITORY"),
 }
