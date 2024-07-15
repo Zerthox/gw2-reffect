@@ -33,9 +33,14 @@ impl TextureManager {
         }
     }
 
-    fn loader_thread(source: IconSource) {
-        // FIXME: exit with pending loads causes deadlock between loader & renderer threads
+    fn loader_thread(source: IconSource) -> bool {
         let mut textures = Self::lock();
+
+        // check for stop
+        if textures.loader.is_none() {
+            return true;
+        }
+
         if !textures.exists(&source) {
             match &source {
                 IconSource::Unknown | IconSource::Empty => {}
@@ -52,6 +57,7 @@ impl TextureManager {
                 }
             }
         }
+        false
     }
 
     fn exists(&self, source: &IconSource) -> bool {
@@ -80,7 +86,9 @@ impl TextureManager {
     }
 
     pub fn unload() {
-        if let Some(loader) = Self::lock().loader.take() {
+        let mut lock = Self::lock();
+        if let Some(loader) = lock.loader.take() {
+            drop(lock); // drop to avoid deadlock with loader thread
             loader.exit_and_wait();
         }
     }
@@ -164,7 +172,7 @@ struct TextureLoader {
 }
 
 impl TextureLoader {
-    fn spawn(callback: impl Fn(IconSource) + Send + 'static) -> Option<Self> {
+    fn spawn(callback: impl Fn(IconSource) -> bool + Send + 'static) -> Option<Self> {
         let (sender, receiver) = mpsc::channel();
 
         let result = thread::Builder::new()
@@ -172,7 +180,10 @@ impl TextureLoader {
             .spawn(move || {
                 log::debug!("Texture loader spawn");
                 while let Ok(source) = receiver.recv() {
-                    callback(source);
+                    let stop = callback(source);
+                    if stop {
+                        break;
+                    }
                 }
                 log::debug!("Texture loader exit");
             });
