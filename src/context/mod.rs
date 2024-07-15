@@ -8,14 +8,14 @@ mod ui;
 pub use self::{edit_state::*, links::*, map::*, player::*, settings::*, ui::*};
 
 use crate::{
-    internal::{self, Buff, Internal},
+    internal::{self, Buff, Internal, Resources},
     interval::Interval,
 };
 use enumflags2::{bitflags, BitFlags};
 use std::collections::BTreeMap;
 use windows::Win32::Media::timeGetTime;
 
-const BUFFS_INTERVAL: u32 = 100;
+const OWN_INTERVAL: u32 = 100;
 
 const PLAYER_INTERVAL: u32 = 1_000;
 
@@ -39,17 +39,20 @@ pub struct Context {
     /// Information about player character.
     pub player: PlayerContext,
 
-    /// Current buffs error.
-    pub buffs_error: Option<internal::Error>,
+    /// Current own character error.
+    pub own_error: Option<internal::Error>,
 
-    /// Current buffs by id.
-    pub buffs: BTreeMap<u32, Buff>,
+    /// Current own buffs by id.
+    pub own_buffs: BTreeMap<u32, Buff>,
 
-    links: Links,
+    /// Current own resources.
+    pub resources: Resources,
 
-    buffs_interval: Interval,
+    pub links: Links,
 
-    player_interval: Interval,
+    pub own_interval: Interval,
+
+    pub player_interval: Interval,
 }
 
 impl Context {
@@ -61,16 +64,17 @@ impl Context {
 
         self.ui.update(&self.links);
 
-        if self.buffs_interval.triggered(self.now) {
-            self.buffs.clear();
-            self.buffs_error = internal
-                .update_buffs()
-                .inspect(|buffs| {
-                    self.buffs
+        if self.own_interval.triggered(self.now) {
+            self.own_buffs.clear();
+            self.own_error = internal
+                .update_self()
+                .map(|(buffs, resources)| {
+                    self.own_buffs
                         .extend(buffs.iter().map(|buff| (buff.id, buff.clone())));
+                    self.resources = resources;
                 })
                 .err();
-            self.updates.insert(ContextUpdate::Buffs);
+            self.updates.insert(ContextUpdate::OwnCharacter);
         }
 
         if let Some(mumble) = self.links.mumble() {
@@ -97,40 +101,20 @@ impl Context {
         self.edit.is_editing() || self.has_update(update)
     }
 
-    /// Returns the interval for buff updates.
-    pub fn get_buffs_interval(&self) -> u32 {
-        self.buffs_interval.frequency
-    }
-
-    /// Returns the interval for player updates.
-    pub fn get_player_interval(&self) -> u32 {
-        self.player_interval.frequency
-    }
-
-    /// Changes the interval for buff updates.
-    pub fn replace_buffs_interval(&mut self, interval: u32) {
-        self.buffs_interval = Interval::new(interval);
-    }
-
-    /// Changes the interval for player updates.
-    pub fn replace_player_interval(&mut self, interval: u32) {
-        self.player_interval = Interval::new(interval);
-    }
-
     /// Resets the intervals for all updates.
     pub fn reset_intervals(&mut self) {
-        self.replace_buffs_interval(BUFFS_INTERVAL);
-        self.replace_player_interval(PLAYER_INTERVAL);
+        self.own_interval.frequency = OWN_INTERVAL;
+        self.player_interval.frequency = PLAYER_INTERVAL;
     }
 
-    /// Returns whether buffs are available.
-    pub fn buffs_ok(&self) -> bool {
-        self.buffs_error.is_none()
+    /// Returns whether own character state is available.
+    pub fn is_self_ok(&self) -> bool {
+        self.own_error.is_none()
     }
 
     /// Returns the [`Buff`] for a given buff id, if present.
     pub fn buff(&self, id: u32) -> Option<&Buff> {
-        self.buffs
+        self.own_buffs
             .get(&id)
             .filter(|buff| buff.runout_time > self.now)
     }
@@ -179,10 +163,11 @@ impl Default for Context {
             ui: UiContext::empty(),
             player: PlayerContext::empty(),
             map: MapContext::empty(),
-            buffs_error: None,
-            buffs: BTreeMap::new(),
+            own_error: None,
+            own_buffs: BTreeMap::new(),
+            resources: Resources::default(),
             links: Links::load(),
-            buffs_interval: Interval::new(BUFFS_INTERVAL),
+            own_interval: Interval::new(OWN_INTERVAL),
             player_interval: Interval::new(PLAYER_INTERVAL),
         }
     }
@@ -192,6 +177,6 @@ impl Default for Context {
 #[bitflags]
 #[repr(u8)]
 pub enum ContextUpdate {
-    Buffs = 1 << 0,
+    OwnCharacter = 1 << 0,
     Map = 1 << 1,
 }

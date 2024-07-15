@@ -8,7 +8,7 @@ use crate::{
     },
     traits::{Render, RenderOptions},
     tree::TreeLeaf,
-    trigger::{ActiveBuff, BuffTrigger},
+    trigger::{ProgressActive, ProgressTrigger},
 };
 use nexus::imgui::{ColorEdit, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
@@ -16,7 +16,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Text {
-    pub buff: BuffTrigger,
+    pub buff: ProgressTrigger,
     pub text: String,
     pub size: f32,
     pub align: AlignHorizontal,
@@ -29,7 +29,7 @@ pub struct Text {
 
 impl Text {
     pub fn update_text(&mut self, ctx: &Context, state: &RenderState) {
-        if ctx.has_update_or_edit(ContextUpdate::Buffs) {
+        if ctx.has_update_or_edit(ContextUpdate::OwnCharacter) {
             self.text_memo = self
                 .buff
                 .active_or_edit(ctx, state)
@@ -37,7 +37,12 @@ impl Text {
         }
     }
 
-    fn process_text(text: &str, active: &ActiveBuff, ctx: &Context, state: &RenderState) -> String {
+    fn process_text(
+        text: &str,
+        active: &ProgressActive,
+        ctx: &Context,
+        state: &RenderState,
+    ) -> String {
         const PREFIX: char = '%';
 
         let mut result = String::with_capacity(text.len()); // always same or larger size
@@ -48,21 +53,12 @@ impl Text {
                 prefix = false;
                 match el {
                     'n' => result.push_str(&state.common.name),
-                    's' => result.push_str(&active.stacks.to_string()),
-                    'r' => match ctx.time_until(active.runout) {
-                        Some(remain) => result.push_str(&format!("{:.1}", remain as f32 / 1000.0)),
-                        None => result.push('?'),
-                    },
-                    'f' => {
-                        let full = active.full_duration() as f32 / 1000.0;
-                        result.push_str(&format!("{full:.1}"))
-                    }
+                    's' => result.push_str(&active.intensity().to_string()),
+                    'r' => result.push_str(&active.current_text(ctx.now)),
+                    'f' => result.push_str(&active.max_text()),
                     'p' => {
-                        let progress = ctx
-                            .progress_remaining(active.apply, active.runout)
-                            .unwrap_or(0.0);
-                        let percent = (100.0 * progress) as u32;
-                        result.push_str(&percent.to_string());
+                        let progress = active.progress_or_default(ctx.now);
+                        result.push_str(&format!("{:.0}", (100.0 * progress).round()));
                     }
                     PREFIX => result.push(PREFIX),
                     other => {
@@ -144,9 +140,9 @@ impl RenderOptions for Text {
         helper(ui, || {
             ui.text("%n for name");
             ui.text("%s for stacks");
-            ui.text("%r for duration remaining");
-            ui.text("%f for duration full");
-            ui.text("%p for duration progress");
+            ui.text("%r for progress remaining");
+            ui.text("%f for progress full");
+            ui.text("%p for progress percent");
             ui.text("%% for % sign");
         });
 
@@ -176,7 +172,7 @@ impl Default for Text {
     fn default() -> Self {
         Self {
             text: String::new(),
-            buff: BuffTrigger::default(),
+            buff: ProgressTrigger::default(),
             align: AlignHorizontal::Center,
             size: 1.0,
             color: [1.0, 1.0, 1.0, 1.0],

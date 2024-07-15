@@ -110,15 +110,20 @@ impl Addon {
                 // TODO: duration bar settings
 
                 if ui.collapsing_header("Advanced", TreeNodeFlags::SPAN_AVAIL_WIDTH) {
-                    let mut buffs = self.context.get_buffs_interval();
-                    if input_u32(ui, "Effect update interval", &mut buffs, 10, 100) {
-                        self.context.replace_buffs_interval(buffs);
-                    }
-
-                    let mut player = self.context.get_player_interval();
-                    if input_u32(ui, "Player update interval", &mut player, 10, 100) {
-                        self.context.replace_player_interval(player);
-                    }
+                    input_u32(
+                        ui,
+                        "Own character update interval",
+                        &mut self.context.own_interval.frequency,
+                        10,
+                        100,
+                    );
+                    input_u32(
+                        ui,
+                        "Player update interval",
+                        &mut self.context.player_interval.frequency,
+                        10,
+                        100,
+                    );
 
                     if ui.button("Reset update intervals") {
                         self.context.reset_intervals();

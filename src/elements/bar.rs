@@ -7,7 +7,7 @@ use crate::{
     render_util::{enum_combo, helper, input_float_with_format, input_size, input_u32, Rect},
     traits::{Render, RenderOptions},
     tree::TreeLeaf,
-    trigger::BuffTrigger,
+    trigger::ProgressTrigger,
 };
 use nexus::imgui::{ColorEdit, ColorPreview, ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
@@ -15,7 +15,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Bar {
-    pub buff: BuffTrigger,
+    pub buff: ProgressTrigger,
     pub progress: Progress,
     pub max: u32,
 
@@ -123,7 +123,7 @@ impl RenderOptions for Bar {
 impl Default for Bar {
     fn default() -> Self {
         Self {
-            buff: BuffTrigger::default(),
+            buff: ProgressTrigger::default(),
             progress: Progress::default(),
             max: 25,
             align: Align::Center,

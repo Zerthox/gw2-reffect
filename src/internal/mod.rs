@@ -1,9 +1,12 @@
 mod error;
 mod shared;
 
-pub use self::{error::*, shared::Buff};
+pub use self::{
+    error::*,
+    shared::{Buff, Resource, Resources},
+};
 
-use self::shared::BuffsResult;
+use self::shared::SelfResult;
 use dlopen2::wrapper::{Container, WrapperApi};
 use nexus::paths::get_game_dir;
 use std::{fmt, fs, path::PathBuf, slice};
@@ -15,7 +18,7 @@ static DLL: &[u8] = include_bytes!(concat!(
 
 #[derive(Debug, WrapperApi)]
 pub struct Exports {
-    update_buffs: extern "C-unwind" fn() -> BuffsResult,
+    update_self: extern "C-unwind" fn() -> SelfResult,
 }
 
 pub struct Internal(Result<Container<Exports>, Error>);
@@ -61,12 +64,15 @@ impl Internal {
         self.0.as_ref().map_err(|err| *err)
     }
 
-    /// Returns the current buffs or an error.
-    pub fn update_buffs(&mut self) -> Result<&[Buff], Error> {
+    /// Updates and returns the current character state or an error.
+    pub fn update_self(&mut self) -> Result<(&[Buff], Resources), Error> {
         let exports = self.exports()?;
-        let result = exports.update_buffs();
+        let result = exports.update_self();
         if result.error == shared::Error::None {
-            Ok(unsafe { slice::from_raw_parts(result.buffs, result.len) })
+            Ok((
+                unsafe { slice::from_raw_parts(result.buffs, result.len) },
+                result.resources,
+            ))
         } else {
             Err(result.error.into())
         }

@@ -2,10 +2,10 @@
 
 /// Result returned.
 ///
-/// **Important:** the array is only valid to read until the next update.
+/// **Important:** the information is only valid to read until the next update.
 #[derive(Debug, Clone)]
 #[repr(C)]
-pub struct BuffsResult {
+pub struct SelfResult {
     /// Whether there has been an error.
     pub error: Error,
 
@@ -14,6 +14,9 @@ pub struct BuffsResult {
 
     /// Length of the buffs array.
     pub len: usize,
+
+    /// Profession resources.
+    pub resources: Resources,
 }
 
 /// Error codes.
@@ -22,10 +25,13 @@ pub struct BuffsResult {
 pub enum Error {
     None = 0,
     Outdated = 1,
-    ContextNotFound = 2,
-    NoCharacter = 3,
-    CharacterState = 4,
-    CompetitiveMode = 5,
+    NoMumble = 2,
+    CompetitiveMode = 3,
+    ContextNotFound = 4,
+    NoCharacter = 5,
+    CharacterState = 6,
+    BuffsNotFound = 7,
+    ResourceNotFound = 8,
     Windows = u8::MAX,
 }
 
@@ -73,4 +79,26 @@ pub enum Category {
 
     /// Buff is hidden but gives a screen border.
     ScreenBorder = 3,
+}
+
+/// Information about profession resources.
+#[derive(Debug, Clone, Default)]
+#[repr(C)]
+pub struct Resources {
+    /// Primary profession resource.
+    pub primary: Resource,
+
+    /// Secondary profession resource.
+    pub secondary: Resource,
+}
+
+/// Information about a profession resource.
+#[derive(Debug, Clone, Default)]
+#[repr(C)]
+pub struct Resource {
+    /// Current amount.
+    pub current: u32,
+
+    /// Maximum amount.
+    pub max: u32,
 }

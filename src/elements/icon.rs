@@ -5,7 +5,7 @@ use crate::{
     context::Context,
     render_util::{draw_spinner_bg, draw_text_bg, Rect},
     traits::RenderOptions,
-    trigger::{BuffTrigger, Trigger},
+    trigger::{ProgressTrigger, Trigger},
 };
 use nexus::imgui::{ColorEdit, Ui};
 use serde::{Deserialize, Serialize};
@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Icon {
-    pub buff: BuffTrigger,
+    pub buff: ProgressTrigger,
 
     #[serde(rename = "icon")]
     pub source: IconSource,
@@ -73,7 +73,7 @@ impl Icon {
             // render duration bar
             if self.duration_bar {
                 if let Some(active) = self.buff.active_or_edit(ctx, state) {
-                    if let Some(progress) = ctx.progress_remaining(active.apply, active.runout) {
+                    if let Some(progress) = active.progress(ctx.now) {
                         // TODO: customization
                         const HEIGHT: f32 = 2.0;
                         const PAD_X: f32 = 0.0;
@@ -97,7 +97,8 @@ impl Icon {
 
             // render stack count
             if self.stacks_text {
-                if let Some(stacks) = self.buff.active_stacks_or_edit(ctx, state) {
+                if let Some(active) = self.buff.active_or_edit(ctx, state) {
+                    let stacks = active.intensity();
                     let text = if stacks > 99 {
                         "!"
                     } else {
@@ -124,12 +125,12 @@ impl Icon {
             // render duration text
             if self.duration_text {
                 if let Some(active) = self.buff.active_or_edit(ctx, state) {
-                    if let Some(remain) = ctx.time_until(active.runout) {
+                    if let Some(remain) = active.current(ctx.now) {
                         // TODO: customization
                         const MIN_REMAIN: u32 = 5000; // show from 5s remaining
 
                         if remain < MIN_REMAIN {
-                            let text = format!("{:.1}", remain as f32 / 1000.0);
+                            let text = active.current_text(ctx.now);
 
                             let [width, height] = size;
                             let font_size = 0.5 * width.min(height);
@@ -190,7 +191,7 @@ impl RenderOptions for Icon {
 impl Default for Icon {
     fn default() -> Self {
         Self {
-            buff: BuffTrigger::default(),
+            buff: ProgressTrigger::default(),
             source: IconSource::Unknown,
             duration_bar: false,
             duration_text: false,

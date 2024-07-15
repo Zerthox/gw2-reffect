@@ -1,5 +1,5 @@
 use super::Addon;
-use crate::traits::Colored;
+use crate::{internal::Resources, traits::Colored};
 use nexus::imgui::{StyleColor, Ui, Window};
 use std::fmt;
 
@@ -17,14 +17,23 @@ impl Addon {
 
                 ui.text(format!("Show elements: {}", ctx.ui.should_show()));
 
-                ui.text("Buffs status:");
+                ui.text("Own character state:");
                 ui.same_line();
-                match ctx.buffs_error {
+                match ctx.own_error {
                     None => {
                         ui.text_colored(GREEN, "available");
                         if ui.is_item_hovered() {
                             ui.tooltip(|| {
-                                for (id, buff) in &ctx.buffs {
+                                let Resources { primary, secondary } = &ctx.resources;
+                                ui.text(format!("Primary: {}/{}", primary.current, primary.max));
+                                ui.text(format!(
+                                    "Secondary: {}/{}",
+                                    secondary.current, secondary.max
+                                ));
+
+                                ui.spacing();
+
+                                for (id, buff) in &ctx.own_buffs {
                                     ui.text(format!("{}x {id} {:?}", buff.stacks, buff.category));
                                     if let Some(remain) = ctx.time_until(buff.runout_time) {
                                         let full = buff.runout_time - buff.apply_time;

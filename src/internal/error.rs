@@ -25,10 +25,13 @@ impl fmt::Display for InternalError {
         match self {
             Self::None => write!(f, "None"),
             Self::Outdated => write!(f, "Outdated"),
+            Self::NoMumble => write!(f, "No mumble"),
+            Self::CompetitiveMode => write!(f, "Unavailable in competitive modes"),
             Self::ContextNotFound => write!(f, "Context not found"),
             Self::NoCharacter => write!(f, "No character"),
             Self::CharacterState => write!(f, "Unavailable for current character state"),
-            Self::CompetitiveMode => write!(f, "Unavailable in competitive modes"),
+            Self::BuffsNotFound => write!(f, "Failed go get character effects"),
+            Self::ResourceNotFound => write!(f, "Failed go get character resources"),
             Self::Windows => write!(f, "Windows error"),
         }
     }

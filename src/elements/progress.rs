@@ -1,4 +1,4 @@
-use crate::{context::Context, trigger::ActiveBuff};
+use crate::{context::Context, trigger::ProgressActive};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, VariantArray};
 
@@ -25,12 +25,16 @@ pub enum Progress {
 }
 
 impl Progress {
-    pub fn calc(&self, ctx: &Context, active: &ActiveBuff, max: u32) -> f32 {
+    pub fn calc(&self, ctx: &Context, active: &ProgressActive, max: u32) -> f32 {
         match self {
-            Self::Duration => ctx
-                .progress_remaining(active.apply, active.runout)
-                .unwrap_or(1.0), // default to full bar
-            Self::Intensity => active.stacks as f32 / max as f32,
+            Self::Duration => active.progress_or_default(ctx.now),
+            Self::Intensity => {
+                if max > 0 {
+                    active.intensity() as f32 / max as f32
+                } else {
+                    0.0
+                }
+            }
         }
     }
 }

@@ -93,7 +93,7 @@ impl Addon {
                 });
             });
 
-        if let Some(err) = self.context.buffs_error {
+        if let Some(err) = self.context.own_error {
             let [_, max_y] = ui.window_content_region_max();
             ui.set_cursor_pos([0.0, max_y - ui.text_line_height()]);
             ui.text_colored(colors::RED, format!("Error: {err}"));
