@@ -1,3 +1,4 @@
+use super::ProgressActive;
 use crate::{
     action::Action,
     colors,
@@ -10,15 +11,12 @@ use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, IntoStaticStr};
 
-use super::ProgressActive;
-
-// FIXME: serde does not support flatten aliases, see https://github.com/serde-rs/serde/pull/2387
 #[derive(Debug, Default, Clone, AsRefStr, IntoStaticStr, EnumIter, Serialize, Deserialize)]
 pub enum ProgressSource {
     /// Always active, no associated progress.
     #[default]
-    #[serde(alias = "Always")]
-    None,
+    #[serde(alias = "None")]
+    Always,
 
     /// Single buff id.
     #[serde(alias = "Single")]
@@ -44,13 +42,13 @@ impl_static_variants!(ProgressSource);
 
 impl ProgressSource {
     pub fn always(&self) -> bool {
-        matches!(self, Self::None)
+        matches!(self, Self::Always)
     }
 
     pub fn progress(&self, ctx: &Context) -> ProgressActive {
         match self {
-            ProgressSource::None => ProgressActive::Resource(Resource { current: 1, max: 1 }),
-            ProgressSource::Buff(id) => {
+            Self::Always => ProgressActive::Resource(Resource { current: 1, max: 1 }),
+            Self::Buff(id) => {
                 let stacks = ctx.stacks_of(*id).unwrap_or(0);
                 let (apply, runout) = ctx.time_range(*id).unwrap_or((0, 0));
                 ProgressActive::Buff {
@@ -59,7 +57,7 @@ impl ProgressSource {
                     runout,
                 }
             }
-            ProgressSource::AnyBuff(ids) => {
+            Self::AnyBuff(ids) => {
                 let stacks = ids.iter().filter_map(|id| ctx.stacks_of(*id)).sum(); // sum of all stacks
                 let (apply, runout) = ids
                     .iter()
@@ -71,11 +69,25 @@ impl ProgressSource {
                     runout,
                 }
             }
-            ProgressSource::PrimaryResource => {
-                ProgressActive::Resource(ctx.resources.primary.clone())
+            Self::PrimaryResource => ProgressActive::Resource(ctx.resources.primary.clone()),
+            Self::SecondaryResource => ProgressActive::Resource(ctx.resources.secondary.clone()),
+        }
+    }
+
+    pub fn progress_edit(&self, ctx: &Context) -> ProgressActive {
+        match self {
+            Self::Always => ProgressActive::Resource(Resource { current: 1, max: 1 }),
+            Self::Buff(_) | Self::AnyBuff(_) => {
+                let apply = ctx.now - (ctx.now % 5000);
+                ProgressActive::Buff {
+                    stacks: 1,
+                    apply,
+                    runout: apply + 5000,
+                }
             }
-            ProgressSource::SecondaryResource => {
-                ProgressActive::Resource(ctx.resources.secondary.clone())
+            Self::PrimaryResource | Self::SecondaryResource => {
+                let current = (ctx.now % 5000) / 100;
+                ProgressActive::Resource(Resource { current, max: 50 })
             }
         }
     }

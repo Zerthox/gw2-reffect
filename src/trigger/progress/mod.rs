@@ -53,17 +53,12 @@ impl ProgressTrigger {
     pub fn active_or_edit(&mut self, ctx: &Context, state: &RenderState) -> Option<ProgressActive> {
         if ctx.edit.is_editing() {
             if state.is_edit(ctx) {
-                let apply = ctx.now - (ctx.now % 5000);
-                Some(ProgressActive::Buff {
-                    stacks: 1,
-                    runout: apply + 5000,
-                    apply,
-                })
+                Some(self.source.progress_edit(ctx))
             } else {
                 None
             }
         } else {
-            self.active(ctx).map(Clone::clone)
+            self.active(ctx).cloned()
         }
     }
 }

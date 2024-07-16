@@ -26,8 +26,8 @@ pub enum ProgressThreshold {
     #[strum(serialize = "Max amount")]
     Max(u32),
 
-    /// Range of.
-    #[strum(serialize = "Range of")]
+    /// Range of amounts.
+    #[strum(serialize = "Amount between")]
     Between(u32, u32),
 }
 
