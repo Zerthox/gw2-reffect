@@ -15,7 +15,7 @@ impl ProgressActive {
     pub fn intensity(&self) -> u32 {
         match self {
             Self::Buff { stacks, .. } => *stacks,
-            Self::Resource(res) => res.current,
+            Self::Resource(resource) => resource.current,
         }
     }
 
@@ -23,7 +23,7 @@ impl ProgressActive {
     pub fn current(&self, now: u32) -> Option<u32> {
         match self {
             Self::Buff { runout, .. } => Self::time_between_checked(now, *runout),
-            Self::Resource(res) => Some(res.current),
+            Self::Resource(resource) => Some(resource.current),
         }
     }
 
@@ -53,7 +53,7 @@ impl ProgressActive {
     pub fn max(&self) -> u32 {
         match self {
             Self::Buff { apply, runout, .. } => runout.saturating_sub(*apply),
-            Self::Resource(res) => res.max,
+            Self::Resource(resource) => resource.max,
         }
     }
 
@@ -63,7 +63,7 @@ impl ProgressActive {
             Self::Buff { apply, runout, .. } => {
                 Self::format_seconds(Self::time_between(*apply, *runout))
             }
-            Self::Resource(res) => res.max.to_string(),
+            Self::Resource(resource) => resource.max.to_string(),
         }
     }
 

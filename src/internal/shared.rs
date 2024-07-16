@@ -1,5 +1,3 @@
-#![allow(unused)]
-
 /// Result returned.
 ///
 /// **Important:** the information is only valid to read until the next update.
@@ -31,7 +29,8 @@ pub enum Error {
     NoCharacter = 5,
     CharacterState = 6,
     BuffsNotFound = 7,
-    ResourceNotFound = 8,
+    HealthNotFound = 8,
+    ResourceNotFound = 9,
     Windows = u8::MAX,
 }
 
@@ -81,10 +80,16 @@ pub enum Category {
     ScreenBorder = 3,
 }
 
-/// Information about profession resources.
+/// Information about resources.
 #[derive(Debug, Clone, Default)]
 #[repr(C)]
 pub struct Resources {
+    /// Health.
+    pub health: Resource,
+
+    /// Barrier.
+    pub barrier: Resource,
+
     /// Primary profession resource.
     pub primary: Resource,
 
@@ -92,7 +97,7 @@ pub struct Resources {
     pub secondary: Resource,
 }
 
-/// Information about a profession resource.
+/// Information about a resource.
 #[derive(Debug, Clone, Default)]
 #[repr(C)]
 pub struct Resource {

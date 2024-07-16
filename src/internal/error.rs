@@ -31,6 +31,7 @@ impl fmt::Display for InternalError {
             Self::NoCharacter => write!(f, "No character"),
             Self::CharacterState => write!(f, "Unavailable for current character state"),
             Self::BuffsNotFound => write!(f, "Failed go get character effects"),
+            Self::HealthNotFound => write!(f, "Failed go get character health"),
             Self::ResourceNotFound => write!(f, "Failed go get character resources"),
             Self::Windows => write!(f, "Windows error"),
         }

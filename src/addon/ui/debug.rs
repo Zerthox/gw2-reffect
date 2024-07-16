@@ -24,7 +24,14 @@ impl Addon {
                         ui.text_colored(GREEN, "available");
                         if ui.is_item_hovered() {
                             ui.tooltip(|| {
-                                let Resources { primary, secondary } = &ctx.resources;
+                                let Resources {
+                                    health,
+                                    barrier,
+                                    primary,
+                                    secondary,
+                                } = &ctx.resources;
+                                ui.text(format!("Health: {}/{}", health.current, health.max));
+                                ui.text(format!("Barrier: {}/{}", barrier.current, barrier.max));
                                 ui.text(format!("Primary: {}/{}", primary.current, primary.max));
                                 ui.text(format!(
                                     "Secondary: {}/{}",

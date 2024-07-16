@@ -29,6 +29,12 @@ pub enum ProgressSource {
     #[strum(serialize = "Multiple Effects")]
     AnyBuff(Vec<u32>),
 
+    /// Health.
+    Health,
+
+    /// Barrier.
+    Barrier,
+
     /// Primary resource.
     #[strum(serialize = "Primary Resource")]
     PrimaryResource,
@@ -69,6 +75,8 @@ impl ProgressSource {
                     runout,
                 }
             }
+            Self::Health => ProgressActive::Resource(ctx.resources.health.clone()),
+            Self::Barrier => ProgressActive::Resource(ctx.resources.barrier.clone()),
             Self::PrimaryResource => ProgressActive::Resource(ctx.resources.primary.clone()),
             Self::SecondaryResource => ProgressActive::Resource(ctx.resources.secondary.clone()),
         }
@@ -85,7 +93,7 @@ impl ProgressSource {
                     runout: apply + 5000,
                 }
             }
-            Self::PrimaryResource | Self::SecondaryResource => {
+            Self::Health | Self::Barrier | Self::PrimaryResource | Self::SecondaryResource => {
                 let current = (ctx.now % 5000) / 100;
                 ProgressActive::Resource(Resource { current, max: 50 })
             }
