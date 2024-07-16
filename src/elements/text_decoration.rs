@@ -1,6 +1,6 @@
 use crate::{
     component_wise::ComponentWise,
-    render_util::{draw_text_bg, enum_combo},
+    render_util::{draw_text_bg, enum_combo, helper_warn},
 };
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
@@ -77,8 +77,10 @@ impl TextDecoration {
 
     pub fn render_select(&mut self, ui: &Ui) {
         enum_combo(ui, "Decoration", self, ComboBoxFlags::empty());
-        if ui.is_item_hovered() {
-            ui.tooltip_text("Warning: many text decorations may negatively impact performance");
+        if *self != Self::None {
+            helper_warn(ui, || {
+                ui.text("Warning: many text decorations may negatively impact performance")
+            });
         }
     }
 }
