@@ -1,9 +1,11 @@
 use crate::{
     render_util::{cycle_progress, enum_combo, input_u32, push_alpha_change},
     traits::RenderOptions,
+    util::non_zero_u32,
 };
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
+use std::num::NonZero;
 use strum::{AsRefStr, EnumIter, VariantArray};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -13,7 +15,7 @@ pub struct Animation {
     pub kind: AnimationKind,
 
     /// Animation period in milliseconds.
-    pub period: u32,
+    pub period: NonZero<u32>,
 }
 
 impl Animation {
@@ -27,7 +29,10 @@ impl RenderOptions for Animation {
     fn render_options(&mut self, ui: &Ui) {
         enum_combo(ui, "Animation", &mut self.kind, ComboBoxFlags::empty());
 
-        input_u32(ui, "Period", &mut self.period, 100, 1000);
+        let mut period = self.period.get();
+        if input_u32(ui, "Period", &mut period, 100, 1000) {
+            self.period = NonZero::new(period).unwrap_or(non_zero_u32!(1));
+        }
     }
 }
 
@@ -35,7 +40,7 @@ impl Default for Animation {
     fn default() -> Self {
         Self {
             kind: AnimationKind::Pulse,
-            period: 3000,
+            period: non_zero_u32!(3000),
         }
     }
 }

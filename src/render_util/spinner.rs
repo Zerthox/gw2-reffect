@@ -1,4 +1,5 @@
 use super::cycle_progress;
+use crate::util::non_zero_u32;
 use nexus::imgui::{sys, ImColor32, Ui};
 use std::f32::consts::PI;
 
@@ -30,7 +31,7 @@ fn draw_list_spinner(
 ) {
     let thickness = 0.2 * radius;
     let segments = 30;
-    let progress = cycle_progress(ui, 1000);
+    let progress = cycle_progress(ui, non_zero_u32!(1000));
     let start = 2.0 * PI * progress;
     let end = start + 1.5 * PI;
 

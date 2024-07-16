@@ -10,7 +10,7 @@ pub fn input_u32(
     step: u32,
     step_fast: u32,
 ) -> bool {
-    let mut int = *value as _;
+    let mut int = i32::try_from(*value).unwrap_or(i32::MAX);
     if ui
         .input_int(label, &mut int)
         .step(step as _)
