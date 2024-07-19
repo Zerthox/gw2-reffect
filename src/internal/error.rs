@@ -37,3 +37,13 @@ impl fmt::Display for InternalError {
         }
     }
 }
+
+impl InternalError {
+    pub fn into_result<T>(self, data: impl FnOnce() -> T) -> Result<T, Error> {
+        if self == Self::None {
+            Ok(data())
+        } else {
+            Err(self.into())
+        }
+    }
+}

@@ -19,7 +19,7 @@ impl Addon {
 
                 ui.text("Own character state:");
                 ui.same_line();
-                match ctx.own_error {
+                match ctx.own_buffs_error {
                     None => {
                         ui.text_colored(GREEN, "available");
                         if ui.is_item_hovered() {

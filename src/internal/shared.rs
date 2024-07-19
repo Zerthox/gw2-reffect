@@ -1,22 +1,3 @@
-/// Result returned.
-///
-/// **Important:** the information is only valid to read until the next update.
-#[derive(Debug, Clone)]
-#[repr(C)]
-pub struct SelfResult {
-    /// Whether there has been an error.
-    pub error: Error,
-
-    /// Pointer to the buffs array.
-    pub buffs: *const Buff,
-
-    /// Length of the buffs array.
-    pub len: usize,
-
-    /// Profession resources.
-    pub resources: Resources,
-}
-
 /// Error codes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(u8)]
@@ -32,6 +13,33 @@ pub enum Error {
     HealthNotFound = 8,
     ResourceNotFound = 9,
     Windows = u8::MAX,
+}
+
+/// Result returned for own character.
+#[derive(Debug, Clone)]
+#[repr(C)]
+pub struct SelfResult {
+    /// Buffs.
+    pub own_buffs: BuffsResult,
+
+    /// Profession resources.
+    pub own_resources: ResourcesResult,
+}
+
+/// Current buffs.
+///
+/// **Important:** pointers are only valid to read until the next update.
+#[derive(Debug, Clone)]
+#[repr(C)]
+pub struct BuffsResult {
+    /// Whether there has been an error obtaining buffs.
+    pub error: Error,
+
+    /// Pointer to the buffs array.
+    pub buffs: *const Buff,
+
+    /// Length of the buffs array.
+    pub len: usize,
 }
 
 /// Information about a currently applied buff.
@@ -55,6 +63,7 @@ pub struct Buff {
     pub stacks: u32,
 
     /// Most recent application timestamp or [`u32::MAX`] if time not visible.
+    // TODO: default to 0 instead?
     pub apply_time: u32,
 
     /// Predicted runout timestamp or [`u32::MAX`] if time not visible.
@@ -80,8 +89,19 @@ pub enum Category {
     ScreenBorder = 3,
 }
 
+/// Result returned for resources.
+#[derive(Debug, Clone)]
+#[repr(C)]
+pub struct ResourcesResult {
+    /// Whether there has been an error obtaining resources.
+    pub error: Error,
+
+    /// Resources.
+    pub resources: Resources,
+}
+
 /// Information about resources.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 #[repr(C)]
 pub struct Resources {
     /// Health.
@@ -91,10 +111,23 @@ pub struct Resources {
     pub barrier: Resource,
 
     /// Primary profession resource.
+    // TODO: separate error state for profession resources?
     pub primary: Resource,
 
     /// Secondary profession resource.
     pub secondary: Resource,
+}
+
+impl Resources {
+    /// Creates empty resources.
+    pub const fn empty() -> Self {
+        Self {
+            health: Resource::empty(),
+            barrier: Resource::empty(),
+            primary: Resource::empty(),
+            secondary: Resource::empty(),
+        }
+    }
 }
 
 /// Information about a resource.
@@ -106,4 +139,16 @@ pub struct Resource {
 
     /// Maximum amount.
     pub max: u32,
+}
+
+impl Resource {
+    /// Creates an empty resource.
+    pub const fn empty() -> Self {
+        Self::new(0, 0)
+    }
+
+    /// Creates a resources with the given values.
+    pub const fn new(current: u32, max: u32) -> Self {
+        Self { current, max }
+    }
 }

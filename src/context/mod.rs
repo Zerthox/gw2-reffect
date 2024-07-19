@@ -8,7 +8,7 @@ mod ui;
 pub use self::{edit_state::*, links::*, map::*, player::*, settings::*, ui::*};
 
 use crate::{
-    internal::{self, Buff, Internal, Resources},
+    internal::{Buff, Error, Internal, Resources},
     interval::Interval,
 };
 use enumflags2::{bitflags, BitFlags};
@@ -39,14 +39,17 @@ pub struct Context {
     /// Information about player character.
     pub player: PlayerContext,
 
-    /// Current own character error.
-    pub own_error: Option<internal::Error>,
-
     /// Current own buffs by id.
     pub own_buffs: BTreeMap<u32, Buff>,
 
+    /// Current own buffs error.
+    pub own_buffs_error: Option<Error>,
+
     /// Current own resources.
     pub resources: Resources,
+
+    /// Current own resources error.
+    pub resources_error: Option<Error>,
 
     pub links: Links,
 
@@ -65,16 +68,7 @@ impl Context {
         self.ui.update(&self.links);
 
         if self.own_interval.triggered(self.now) {
-            self.own_buffs.clear();
-            self.own_error = internal
-                .update_self()
-                .map(|(buffs, resources)| {
-                    self.own_buffs
-                        .extend(buffs.iter().map(|buff| (buff.id, buff.clone())));
-                    self.resources = resources;
-                })
-                .err();
-            self.updates.insert(ContextUpdate::OwnCharacter);
+            self.update_own_character(internal);
         }
 
         if let Some(mumble) = self.links.mumble() {
@@ -89,6 +83,25 @@ impl Context {
                 }
             }
         }
+    }
+
+    fn update_own_character(&mut self, internal: &mut Internal) {
+        self.own_buffs.clear();
+
+        let (buffs, resources) = internal.update_self();
+        self.own_buffs_error = buffs
+            .map(|buffs| {
+                self.own_buffs
+                    .extend(buffs.iter().map(|buff| (buff.id, buff.clone())));
+            })
+            .err();
+
+        (self.resources, self.resources_error) = match resources {
+            Ok(resources) => (resources, None),
+            Err(err) => (Resources::empty(), Some(err)),
+        };
+
+        self.updates.insert(ContextUpdate::OwnCharacter);
     }
 
     /// Whether the given update has happened.
@@ -109,7 +122,7 @@ impl Context {
 
     /// Returns whether own character state is available.
     pub fn is_self_ok(&self) -> bool {
-        self.own_error.is_none()
+        self.own_buffs_error.is_none()
     }
 
     /// Returns the [`Buff`] for a given buff id, if present.
@@ -163,9 +176,10 @@ impl Default for Context {
             ui: UiContext::empty(),
             player: PlayerContext::empty(),
             map: MapContext::empty(),
-            own_error: None,
+            own_buffs_error: None,
             own_buffs: BTreeMap::new(),
-            resources: Resources::default(),
+            resources_error: None,
+            resources: Resources::empty(),
             links: Links::load(),
             own_interval: Interval::new(OWN_INTERVAL),
             player_interval: Interval::new(PLAYER_INTERVAL),

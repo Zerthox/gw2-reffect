@@ -19,14 +19,6 @@ impl ProgressActive {
         }
     }
 
-    /// Returns the current amount in its native unit.
-    pub fn current(&self, now: u32) -> Option<u32> {
-        match self {
-            Self::Buff { runout, .. } => Self::time_between_checked(now, *runout),
-            Self::Resource(resource) => Some(resource.current),
-        }
-    }
-
     /// Returns the current progress between `0.0` and `1.0`.
     pub fn progress(&self, now: u32) -> Option<f32> {
         let current = self.current(now)?;
@@ -36,7 +28,24 @@ impl ProgressActive {
 
     /// Returns the current progress between `0.0` and `1.0`.
     pub fn progress_or_default(&self, now: u32) -> f32 {
-        self.progress(now).unwrap_or(1.0)
+        if let Some(current) = self.current(now) {
+            let max = self.max();
+            if max != 0 {
+                current as f32 / max as f32
+            } else {
+                0.0 // default to 0 for no max
+            }
+        } else {
+            1.0 // default to 1 for no current
+        }
+    }
+
+    /// Returns the current amount in its native unit.
+    pub fn current(&self, now: u32) -> Option<u32> {
+        match self {
+            Self::Buff { runout, .. } => Self::time_between_checked(now, *runout),
+            Self::Resource(resource) => Some(resource.current),
+        }
     }
 
     /// Returns the current amount as text.
@@ -45,7 +54,13 @@ impl ProgressActive {
             Self::Buff { runout, .. } => Self::time_between_checked(now, *runout)
                 .map(Self::format_seconds)
                 .unwrap_or_else(|| "?".into()),
-            Self::Resource(res) => res.current.to_string(),
+            Self::Resource(res) => {
+                if res.max != 0 {
+                    res.current.to_string()
+                } else {
+                    "?".into()
+                }
+            }
         }
     }
 
@@ -60,10 +75,16 @@ impl ProgressActive {
     /// Returns the maximum amount as text.
     pub fn max_text(&self) -> String {
         match self {
-            Self::Buff { apply, runout, .. } => {
-                Self::format_seconds(Self::time_between(*apply, *runout))
+            Self::Buff { apply, runout, .. } => Self::time_between_checked(*apply, *runout)
+                .map(Self::format_seconds)
+                .unwrap_or_else(|| "?".into()),
+            Self::Resource(resource) => {
+                if resource.max != 0 {
+                    resource.max.to_string()
+                } else {
+                    "?".into()
+                }
             }
-            Self::Resource(resource) => resource.max.to_string(),
         }
     }
 

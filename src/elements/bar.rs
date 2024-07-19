@@ -29,6 +29,7 @@ pub struct Bar {
     pub border_size: f32,
     pub border_color: [f32; 4],
 }
+// TODO: ticks!
 
 impl TreeLeaf for Bar {}
 

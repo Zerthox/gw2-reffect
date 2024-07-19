@@ -65,16 +65,20 @@ impl Internal {
     }
 
     /// Updates and returns the current character state or an error.
-    pub fn update_self(&mut self) -> Result<(&[Buff], Resources), Error> {
-        let exports = self.exports()?;
-        let result = exports.update_self();
-        if result.error == shared::Error::None {
-            Ok((
-                unsafe { slice::from_raw_parts(result.buffs, result.len) },
-                result.resources,
-            ))
-        } else {
-            Err(result.error.into())
+    pub fn update_self(&mut self) -> (Result<&[Buff], Error>, Result<Resources, Error>) {
+        match self.exports() {
+            Ok(exports) => {
+                let SelfResult {
+                    own_buffs,
+                    own_resources,
+                } = exports.update_self();
+                let buffs = own_buffs.error.into_result(|| unsafe {
+                    slice::from_raw_parts(own_buffs.buffs, own_buffs.len)
+                });
+                let resources = own_resources.error.into_result(|| own_resources.resources);
+                (buffs, resources)
+            }
+            Err(err) => (Err(err), Err(err)),
         }
     }
 }
