@@ -95,8 +95,14 @@ impl Addon {
 
         if let Some(err) = self.context.own_buffs_error {
             let [_, max_y] = ui.window_content_region_max();
-            ui.set_cursor_pos([0.0, max_y - ui.text_line_height()]);
-            ui.text_colored(colors::RED, format!("Error: {err}"));
+            ui.set_cursor_pos([0.0, max_y - 1.0 * ui.text_line_height()]);
+            ui.text_colored(colors::RED, format!("Buffs Error: {err}"));
+        }
+
+        if let Some(err) = self.context.resources_error {
+            let [_, max_y] = ui.window_content_region_max();
+            ui.set_cursor_pos([0.0, max_y - 2.0 * ui.text_line_height()]);
+            ui.text_colored(colors::RED, format!("Resources Error: {err}"));
         }
     }
 }
