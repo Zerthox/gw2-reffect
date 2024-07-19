@@ -1,7 +1,6 @@
 use super::ProgressActive;
 use crate::{
     action::Action,
-    colors,
     context::Context,
     internal::Resource,
     render_util::{enum_combo, helper, impl_static_variants, input_buff_id},
@@ -15,8 +14,8 @@ use strum::{AsRefStr, EnumIter, IntoStaticStr};
 pub enum ProgressSource {
     /// Always active, no associated progress.
     #[default]
-    #[serde(alias = "None")]
-    Always,
+    #[serde(alias = "Always")]
+    None,
 
     /// Single buff id.
     #[serde(alias = "Single")]
@@ -35,11 +34,11 @@ pub enum ProgressSource {
     /// Barrier.
     Barrier,
 
-    /// Primary resource.
+    /// Primary profession resource.
     #[strum(serialize = "Primary Resource")]
     PrimaryResource,
 
-    /// Secondary resource.
+    /// Secondary profession resource.
     #[strum(serialize = "Secondary Resource")]
     SecondaryResource,
 }
@@ -48,12 +47,12 @@ impl_static_variants!(ProgressSource);
 
 impl ProgressSource {
     pub fn always(&self) -> bool {
-        matches!(self, Self::Always)
+        matches!(self, Self::None)
     }
 
     pub fn progress(&self, ctx: &Context) -> ProgressActive {
         match self {
-            Self::Always => ProgressActive::Resource(Resource { current: 1, max: 1 }),
+            Self::None => ProgressActive::Resource(Resource { current: 1, max: 1 }),
             Self::Buff(id) => {
                 let stacks = ctx.stacks_of(*id).unwrap_or(0);
                 let (apply, runout) = ctx.time_range(*id).unwrap_or((0, 0));
@@ -84,7 +83,7 @@ impl ProgressSource {
 
     pub fn progress_edit(&self, ctx: &Context) -> ProgressActive {
         match self {
-            Self::Always => ProgressActive::Resource(Resource { current: 1, max: 1 }),
+            Self::None => ProgressActive::Resource(Resource { current: 1, max: 1 }),
             Self::Buff(_) | Self::AnyBuff(_) => {
                 let apply = ctx.now - (ctx.now % 5000);
                 ProgressActive::Buff {
@@ -130,10 +129,7 @@ impl RenderOptions for ProgressSource {
                     _ => {}
                 }
             }
-            helper(ui, || {
-                ui.text("Source of information");
-                ui.text_colored(colors::RED, "Some resources are not yet implemented");
-            });
+            helper(ui, || ui.text("Source of information"));
 
             match self {
                 Self::Buff(id) => {

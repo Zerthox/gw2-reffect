@@ -1,5 +1,5 @@
 use crate::{
-    render_util::{enum_combo, input_u32},
+    render_util::{enum_combo, helper, input_u32},
     traits::RenderOptions,
 };
 use nexus::imgui::{ComboBoxFlags, Ui};
@@ -59,6 +59,7 @@ impl RenderOptions for ProgressThreshold {
     fn render_options(&mut self, ui: &Ui) {
         ui.group(|| {
             enum_combo(ui, "Threshold", self, ComboBoxFlags::empty());
+            helper(ui, || ui.text("When to display"));
 
             match self {
                 Self::Always | Self::Present | Self::Missing => {}
