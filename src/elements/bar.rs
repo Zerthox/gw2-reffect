@@ -1,15 +1,20 @@
 use super::{Align, Direction, Progress, RenderState};
 use crate::{
+    action::Action,
     bounds::Bounds,
     colors::{self, with_alpha_factor},
     component_wise::ComponentWise,
     context::Context,
-    render_util::{enum_combo, helper, input_float_with_format, input_size, input_u32, Rect},
+    render_util::{
+        enum_combo, helper, helper_slider, input_float_with_format, input_size, input_u32, Rect,
+    },
     traits::{Render, RenderOptions},
     tree::TreeLeaf,
     trigger::ProgressTrigger,
 };
-use nexus::imgui::{ColorEdit, ColorPreview, ComboBoxFlags, InputTextFlags, Ui};
+use nexus::imgui::{
+    ColorEdit, ColorPreview, ComboBoxFlags, InputTextFlags, Slider, SliderFlags, Ui,
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -31,9 +36,11 @@ pub struct Bar {
     pub border: bool,
     pub border_size: f32,
     pub border_color: [f32; 4],
-}
 
-// TODO: ticks!
+    pub tick_color: [f32; 4],
+    pub tick_size: f32,
+    pub ticks: Vec<f32>,
+}
 
 impl TreeLeaf for Bar {}
 
@@ -44,7 +51,10 @@ impl Render for Bar {
 
             let (start, end) = self.bounding_box(ui, ctx, state.pos);
             let progress = self.progress_kind.calc(ctx, active, self.max);
-            let (fill_start, fill_end) = self.direction.progress_pos(start, self.size, progress);
+            let (offset_start, offset_end) =
+                self.direction.progress_rect_offset(self.size, progress);
+            let fill_start = start.add(offset_start);
+            let fill_end = start.add(offset_end);
 
             let draw_list = ui.get_background_draw_list();
             draw_list
@@ -59,6 +69,17 @@ impl Render for Bar {
                 draw_list
                     .add_rect(start, end, with_alpha_factor(self.border_color, alpha))
                     .thickness(self.border_size)
+                    .build();
+            }
+
+            let end_offset = self.direction.tick_end_offset(self.size);
+            for tick in &self.ticks {
+                let offset = self.direction.progress_value_offset(self.size, *tick);
+                let start = start.add(offset);
+                let end = start.add(end_offset);
+                draw_list
+                    .add_line(start, end, self.tick_color)
+                    .thickness(self.tick_size)
                     .build();
             }
         }
@@ -123,9 +144,50 @@ impl RenderOptions for Bar {
             }
 
             ColorEdit::new("Border color", &mut self.border_color)
+                .preview(ColorPreview::Alpha)
                 .alpha_bar(true)
-                // .preview(ColorPreview::Alpha)
                 .build(ui);
+        }
+
+        ui.spacing();
+
+        if input_float_with_format(
+            "Tick size",
+            &mut self.tick_size,
+            1.0,
+            10.0,
+            "%.1f",
+            InputTextFlags::empty(),
+        ) {
+            self.tick_size = self.tick_size.max(0.0);
+        }
+
+        ColorEdit::new("Tick color", &mut self.tick_color)
+            .preview(ColorPreview::Alpha)
+            .alpha_bar(true)
+            .build(ui);
+
+        let mut action = Action::new();
+        for (i, tick) in self.ticks.iter_mut().enumerate() {
+            action.input_with_buttons(ui, i, || {
+                let mut value = 100.0 * *tick;
+                if Slider::new(format!("##tick{i}"), 0.0, 100.0)
+                    .flags(SliderFlags::ALWAYS_CLAMP)
+                    .display_format("%.1f")
+                    .build(ui, &mut value)
+                {
+                    *tick = value / 100.0;
+                }
+            });
+            ui.same_line();
+            ui.text(format!("Tick {}", i + 1));
+            if i == 0 {
+                helper_slider(ui);
+            }
+        }
+        action.perform(&mut self.ticks);
+        if ui.button("Add Tick") {
+            self.ticks.push(0.5);
         }
     }
 }
@@ -144,6 +206,9 @@ impl Default for Bar {
             border: true,
             border_size: 1.0,
             border_color: colors::BLACK,
+            tick_color: colors::BLACK,
+            tick_size: 1.0,
+            ticks: Vec::new(),
         }
     }
 }

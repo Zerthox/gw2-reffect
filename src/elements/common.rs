@@ -4,7 +4,9 @@ use crate::{
     component_wise::ComponentWise,
     context::{Context, EditState},
     id::{Id, IdGen},
-    render_util::{helper, input_float_with_format, push_alpha_change, EnumStaticVariants, Rect},
+    render_util::{
+        helper_slider, input_float_with_format, push_alpha_change, EnumStaticVariants, Rect,
+    },
     traits::RenderOptions,
 };
 use nexus::imgui::{
@@ -202,7 +204,7 @@ impl RenderOptions for Common {
         {
             self.opacity = opacity / 100.0;
         }
-        helper(ui, || ui.text("Ctrl+click to type a number"));
+        helper_slider(ui);
 
         ui.spacing();
     }

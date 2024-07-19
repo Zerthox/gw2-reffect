@@ -36,3 +36,9 @@ pub fn close_button(ui: &Ui, id_label: impl AsRef<str>) -> bool {
 
     clicked
 }
+
+pub fn button_size_with_spacing(ui: &Ui) -> f32 {
+    let button_size = ui.frame_height();
+    let [spacing, _] = ui.clone_style().item_inner_spacing;
+    button_size + spacing
+}

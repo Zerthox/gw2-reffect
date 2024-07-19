@@ -7,7 +7,7 @@ use crate::{
     traits::RenderOptions,
     trigger::{ProgressTrigger, Trigger},
 };
-use nexus::imgui::{ColorEdit, Ui};
+use nexus::imgui::{ColorEdit, ColorPreview, Ui};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -177,7 +177,8 @@ impl RenderOptions for Icon {
         self.source.render_select(ui);
 
         ColorEdit::new("Tint", &mut self.tint)
-            .alpha(false)
+            .preview(ColorPreview::Alpha)
+            .alpha_bar(true)
             .build(ui);
 
         // TODO: duration customizations

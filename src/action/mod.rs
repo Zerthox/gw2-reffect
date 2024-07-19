@@ -1,6 +1,6 @@
 mod element;
 
-use crate::render_util::close_button;
+use crate::render_util::{button_size_with_spacing, close_button};
 use nexus::imgui::{Direction, Ui};
 
 pub use self::element::*;
@@ -72,9 +72,7 @@ impl Action {
     }
 
     pub fn set_next_input_size(ui: &Ui) {
-        let button_size = ui.frame_height();
-        let [spacing, _] = ui.clone_style().item_inner_spacing;
-        let width = ui.calc_item_width() - 3.0 * (button_size + spacing);
+        let width = ui.calc_item_width() - 3.0 * button_size_with_spacing(ui);
         ui.set_next_item_width(width);
     }
 }

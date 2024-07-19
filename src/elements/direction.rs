@@ -1,5 +1,5 @@
 use super::{Align, Icon};
-use crate::{component_wise::ComponentWise, render_util::Rect};
+use crate::render_util::Rect;
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, VariantArray};
 
@@ -38,26 +38,41 @@ impl Direction {
         }
     }
 
-    pub fn progress_pos(
-        &self,
-        start: [f32; 2],
-        size: [f32; 2],
-        progress: f32,
-    ) -> ([f32; 2], [f32; 2]) {
+    pub fn progress_rect_offset(&self, size: [f32; 2], progress: f32) -> ([f32; 2], [f32; 2]) {
         let [width, height] = size;
         match self {
-            Self::Right => (start, start.add([progress * width, height])),
-            Self::Left => (start.add([(1.0 - progress) * width, 0.0]), start.add(size)),
-            Self::Up => (start.add([0.0, (1.0 - progress) * height]), start.add(size)),
-            Self::Down => (start, start.add([width, progress * height])),
+            Self::Right => ([0.0, 0.0], [progress * width, height]),
+            Self::Left => ([(1.0 - progress) * width, 0.0], size),
+            Self::Up => ([0.0, (1.0 - progress) * height], size),
+            Self::Down => ([0.0, 0.0], [width, progress * height]),
             Self::Horizontal => (
-                start.add([(0.5 - 0.5 * progress) * width, 0.0]),
-                start.add([(0.5 + 0.5 * progress) * width, height]),
+                [(0.5 - 0.5 * progress) * width, 0.0],
+                [(0.5 + 0.5 * progress) * width, height],
             ),
             Self::Vertical => (
-                start.add([0.0, (0.5 - 0.5 * progress) * height]),
-                start.add([width, (0.5 + 0.5 * progress) * height]),
+                [0.0, (0.5 - 0.5 * progress) * height],
+                [width, (0.5 + 0.5 * progress) * height],
             ),
+        }
+    }
+
+    pub fn progress_value_offset(&self, size: [f32; 2], progress: f32) -> [f32; 2] {
+        let [width, height] = size;
+        match self {
+            Self::Right => [progress * width, 0.0],
+            Self::Left => [(1.0 - progress) * width, 0.0],
+            Self::Up => [0.0, (1.0 - progress) * height],
+            Self::Down => [0.0, progress * height],
+            Self::Horizontal => [(0.5 + 0.5 * progress) * width, 0.0],
+            Self::Vertical => [0.0, (0.5 + 0.5 * progress) * height],
+        }
+    }
+
+    pub fn tick_end_offset(&self, size: [f32; 2]) -> [f32; 2] {
+        let [width, height] = size;
+        match self {
+            Self::Right | Self::Left | Self::Horizontal => [0.0, height],
+            Self::Up | Self::Down | Self::Vertical => [width, 0.0],
         }
     }
 
