@@ -1,6 +1,6 @@
 use crate::{
     elements::{Bar, Element, ElementType, Group, IconElement, IconList, Text},
-    trigger::MetaTrigger,
+    trigger::FilterTrigger,
 };
 
 pub trait VisitMut {
@@ -11,7 +11,7 @@ pub trait VisitMut {
     }
 
     fn visit_element(&mut self, element: &mut Element) {
-        self.visit_meta_trigger(&mut element.trigger);
+        self.visit_filter_trigger(&mut element.filter);
         self.visit_element_type(&mut element.kind);
     }
 
@@ -38,5 +38,5 @@ pub trait VisitMut {
 
     fn visit_bar(&mut self, _bar: &mut Bar) {}
 
-    fn visit_meta_trigger(&mut self, _trigger: &mut MetaTrigger) {}
+    fn visit_filter_trigger(&mut self, _trigger: &mut FilterTrigger) {}
 }

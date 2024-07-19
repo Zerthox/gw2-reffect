@@ -8,18 +8,18 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(default)]
-pub struct MetaTrigger {
+pub struct FilterTrigger {
     pub player: PlayerTrigger, // player not memoized due to combat & mount
     pub map: Memo<MapTrigger>, // memoize map
 }
 
-impl MetaTrigger {
+impl FilterTrigger {
     pub fn load(&mut self) {
         self.player.load();
     }
 }
 
-impl Trigger for MetaTrigger {
+impl Trigger for FilterTrigger {
     fn is_active(&mut self, ctx: &Context) -> bool {
         if ctx.has_update(ContextUpdate::Map) {
             self.map.update(ctx);
@@ -29,7 +29,7 @@ impl Trigger for MetaTrigger {
     }
 }
 
-impl RenderOptions for MetaTrigger {
+impl RenderOptions for FilterTrigger {
     fn render_options(&mut self, ui: &Ui) {
         self.player.render_options(ui);
 

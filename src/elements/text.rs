@@ -16,7 +16,9 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Text {
-    pub buff: ProgressTrigger,
+    #[serde(alias = "buff")]
+    pub progress: ProgressTrigger,
+
     pub text: String,
     pub size: f32,
     pub align: AlignHorizontal,
@@ -31,7 +33,7 @@ impl Text {
     pub fn update_text(&mut self, ctx: &Context, state: &RenderState) {
         if ctx.has_update_or_edit(ContextUpdate::OwnCharacter) {
             self.text_memo = self
-                .buff
+                .progress
                 .active_or_edit(ctx, state)
                 .map(|active| Self::process_text(&self.text, &active, ctx, state));
         }
@@ -123,7 +125,7 @@ impl RenderOptions for Text {
     fn render_options(&mut self, ui: &Ui) {
         // TODO: we rely on buffs interval refreshing the text memo
 
-        self.buff.render_options(ui);
+        self.progress.render_options(ui);
 
         ui.spacing();
 
@@ -172,7 +174,7 @@ impl Default for Text {
     fn default() -> Self {
         Self {
             text: String::new(),
-            buff: ProgressTrigger::default(),
+            progress: ProgressTrigger::default(),
             align: AlignHorizontal::Center,
             size: 1.0,
             color: [1.0, 1.0, 1.0, 1.0],

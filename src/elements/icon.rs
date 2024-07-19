@@ -13,7 +13,8 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Icon {
-    pub buff: ProgressTrigger,
+    #[serde(alias = "buff")]
+    pub progress: ProgressTrigger,
 
     #[serde(rename = "icon")]
     pub source: IconSource,
@@ -40,7 +41,7 @@ impl Icon {
     }
 
     pub fn is_visible(&mut self, ctx: &Context, state: &RenderState) -> bool {
-        self.buff.is_active_or_edit(ctx, state)
+        self.progress.is_active_or_edit(ctx, state)
     }
 
     pub fn rel_bounds(size: [f32; 2]) -> Rect {
@@ -72,7 +73,7 @@ impl Icon {
 
             // render duration bar
             if self.duration_bar {
-                if let Some(active) = self.buff.active_or_edit(ctx, state) {
+                if let Some(active) = self.progress.active_or_edit(ctx, state) {
                     if let Some(progress) = active.progress(ctx.now) {
                         // TODO: customization
                         const HEIGHT: f32 = 2.0;
@@ -97,7 +98,7 @@ impl Icon {
 
             // render stack count
             if self.stacks_text {
-                if let Some(active) = self.buff.active_or_edit(ctx, state) {
+                if let Some(active) = self.progress.active_or_edit(ctx, state) {
                     let stacks = active.intensity();
                     let text = if stacks > 99 {
                         "!"
@@ -124,7 +125,7 @@ impl Icon {
 
             // render duration text
             if self.duration_text {
-                if let Some(active) = self.buff.active_or_edit(ctx, state) {
+                if let Some(active) = self.progress.active_or_edit(ctx, state) {
                     if let Some(remain) = active.current(ctx.now) {
                         // TODO: customization
                         const MIN_REMAIN: u32 = 5000; // show from 5s remaining
@@ -170,7 +171,7 @@ impl Icon {
 impl RenderOptions for Icon {
     fn render_options(&mut self, ui: &Ui) {
         ui.spacing();
-        self.buff.render_options(ui);
+        self.progress.render_options(ui);
 
         ui.spacing();
         self.source.render_select(ui);
@@ -191,7 +192,7 @@ impl RenderOptions for Icon {
 impl Default for Icon {
     fn default() -> Self {
         Self {
-            buff: ProgressTrigger::default(),
+            progress: ProgressTrigger::default(),
             source: IconSource::Unknown,
             duration_bar: false,
             duration_text: false,

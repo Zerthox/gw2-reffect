@@ -9,7 +9,7 @@ use crate::{
     },
     traits::{Render, RenderOptions},
     tree::{Loader, TreeNode, VisitMut},
-    trigger::{MetaTrigger, Trigger},
+    trigger::{FilterTrigger, Trigger},
 };
 use nexus::imgui::{MenuItem, Ui};
 use serde::{Deserialize, Serialize};
@@ -23,8 +23,9 @@ pub struct Element {
     #[serde(flatten)]
     pub common: Common,
 
-    // TODO: move trigger, animation to common to allow on pack? need to figure out pack render conditions, debug tab
-    pub trigger: MetaTrigger,
+    // TODO: move filter, animation to common to allow on pack? need to figure out pack render conditions, debug tab
+    #[serde(alias = "trigger")]
+    pub filter: FilterTrigger,
 
     pub animation: Option<Animation>,
 
@@ -52,7 +53,7 @@ impl Element {
     /// Renders the element.
     pub fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
         self.common.render(ui, ctx, state, |state| {
-            if self.trigger.is_active_or_edit(ctx, &state) {
+            if self.filter.is_active_or_edit(ctx, &state) {
                 let mut body = || self.kind.render(ui, ctx, &state);
                 if let Some(animation) = &mut self.animation {
                     animation.render(ui, body);
@@ -159,7 +160,7 @@ impl Element {
             }
 
             if let Some(_token) = ui.tab_item("Filter") {
-                self.trigger.render_options(ui);
+                self.filter.render_options(ui);
             }
 
             if let Some(_token) = ui.tab_item("Animation") {

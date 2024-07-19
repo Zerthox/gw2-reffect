@@ -1,7 +1,7 @@
 use super::VisitMut;
 use crate::{
     elements::{IconElement, IconList},
-    trigger::MetaTrigger,
+    trigger::FilterTrigger,
 };
 
 #[derive(Debug, Default, Clone, Copy)]
@@ -18,7 +18,7 @@ impl VisitMut for Loader {
         el.icon.load()
     }
 
-    fn visit_meta_trigger(&mut self, trigger: &mut MetaTrigger) {
+    fn visit_filter_trigger(&mut self, trigger: &mut FilterTrigger) {
         trigger.load();
     }
 }

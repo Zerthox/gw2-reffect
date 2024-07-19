@@ -15,8 +15,11 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Bar {
-    pub buff: ProgressTrigger,
-    pub progress: Progress,
+    #[serde(alias = "buff")]
+    pub progress_trigger: ProgressTrigger,
+
+    #[serde(alias = "progress")]
+    pub progress_kind: Progress,
     pub max: u32,
 
     pub size: [f32; 2],
@@ -29,17 +32,18 @@ pub struct Bar {
     pub border_size: f32,
     pub border_color: [f32; 4],
 }
+
 // TODO: ticks!
 
 impl TreeLeaf for Bar {}
 
 impl Render for Bar {
     fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
-        if let Some(active) = &self.buff.active_or_edit(ctx, state) {
+        if let Some(active) = &self.progress_trigger.active_or_edit(ctx, state) {
             let alpha = ui.clone_style().alpha;
 
             let (start, end) = self.bounding_box(ui, ctx, state.pos);
-            let progress = self.progress.calc(ctx, active, self.max);
+            let progress = self.progress_kind.calc(ctx, active, self.max);
             let (fill_start, fill_end) = self.direction.progress_pos(start, self.size, progress);
 
             let draw_list = ui.get_background_draw_list();
@@ -71,13 +75,18 @@ impl Bounds for Bar {
 
 impl RenderOptions for Bar {
     fn render_options(&mut self, ui: &Ui) {
-        self.buff.render_options(ui);
+        self.progress_trigger.render_options(ui);
 
         ui.spacing();
 
-        enum_combo(ui, "Progress", &mut self.progress, ComboBoxFlags::empty());
+        enum_combo(
+            ui,
+            "Progress",
+            &mut self.progress_kind,
+            ComboBoxFlags::empty(),
+        );
 
-        if let Progress::Intensity = self.progress {
+        if let Progress::Intensity = self.progress_kind {
             input_u32(ui, "Max", &mut self.max, 1, 10);
             helper(ui, || ui.text("Maximum progress value"));
         }
@@ -124,8 +133,8 @@ impl RenderOptions for Bar {
 impl Default for Bar {
     fn default() -> Self {
         Self {
-            buff: ProgressTrigger::default(),
-            progress: Progress::default(),
+            progress_trigger: ProgressTrigger::default(),
+            progress_kind: Progress::default(),
             max: 25,
             align: Align::Center,
             size: [128.0, 12.0],
