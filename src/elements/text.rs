@@ -67,7 +67,7 @@ impl Text {
                     'f' => result.push_str(&active.max_text()),
                     'p' => {
                         let progress = active.progress_or_default(ctx.now);
-                        result.push_str(&format!("{:.0}", (100.0 * progress).round()));
+                        result.push_str(&format!("{:.1}", (100.0 * progress)));
                     }
                     PREFIX => result.push(PREFIX),
                     other => {
