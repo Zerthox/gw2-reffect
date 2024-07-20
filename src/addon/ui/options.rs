@@ -26,7 +26,7 @@ impl Addon {
                 );
 
                 if ui.collapsing_header(
-                    "Stacks Text (WIP)",
+                    "Stacks Text (soon)",
                     TreeNodeFlags::SPAN_AVAIL_WIDTH | TreeNodeFlags::DEFAULT_OPEN,
                 ) {
                     let _style = style_disabled(ui); // TODO: stacks settings
@@ -67,7 +67,7 @@ impl Addon {
                 }
 
                 if ui.collapsing_header(
-                    "Duration Text (WIP)",
+                    "Duration Text (soon)",
                     TreeNodeFlags::SPAN_AVAIL_WIDTH | TreeNodeFlags::DEFAULT_OPEN,
                 ) {
                     let _style = style_disabled(ui); // TODO: duration text settings
