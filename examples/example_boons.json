@@ -8,13 +8,13 @@
     "layer": 0,
     "elements": [
         {
+            "enabled": true,
             "name": "Boon Icons",
             "pos": [0.0, 0.0],
             "opacity": 0.8,
-            "trigger": {
+            "filter": {
                 "player": {
                     "combat": null,
-                    "profs": [],
                     "specs": [],
                     "mounts": []
                 },
@@ -28,68 +28,88 @@
             "pad": 2.0,
             "icons": [
                 {
+                    "enabled": true,
                     "name": "Aegis",
-                    "buff": {
-                        "id": { "Single": 743 },
+                    "progress": {
+                        "source": {
+                            "Buff": 743
+                        },
                         "threshold": "Present"
                     },
                     "icon": {
                         "Url": "https://wiki.guildwars2.com/images/e/e5/Aegis.png"
                     },
-                    "duration": true,
-                    "stacks": false,
+                    "duration_bar": true,
+                    "duration_text": false,
+                    "stacks_text": false,
                     "tint": [1.0, 1.0, 1.0, 1.0]
                 },
                 {
+                    "enabled": true,
                     "name": "Might",
-                    "buff": {
-                        "id": { "Single": 740 },
+                    "progress": {
+                        "source": {
+                            "Buff": 740
+                        },
                         "threshold": "Present"
                     },
                     "icon": {
                         "Url": "https://wiki.guildwars2.com/images/7/7c/Might.png"
                     },
-                    "duration": true,
-                    "stacks": true,
+                    "duration_bar": true,
+                    "duration_text": false,
+                    "stacks_text": true,
                     "tint": [1.0, 1.0, 1.0, 1.0]
                 },
                 {
+                    "enabled": true,
                     "name": "Quickness",
-                    "buff": {
-                        "id": { "Single": 1187 },
+                    "progress": {
+                        "source": {
+                            "Buff": 1187
+                        },
                         "threshold": "Present"
                     },
                     "icon": {
                         "Url": "https://wiki.guildwars2.com/images/b/b4/Quickness.png"
                     },
-                    "duration": true,
-                    "stacks": false,
+                    "duration_bar": true,
+                    "duration_text": false,
+                    "stacks_text": false,
                     "tint": [1.0, 1.0, 1.0, 1.0]
                 },
                 {
+                    "enabled": true,
                     "name": "Alacrity",
-                    "buff": {
-                        "id": { "Single": 30328 },
+                    "progress": {
+                        "source": {
+                            "Buff": 30328
+                        },
                         "threshold": "Present"
                     },
                     "icon": {
                         "Url": "https://wiki.guildwars2.com/images/4/4c/Alacrity.png"
                     },
-                    "duration": true,
-                    "stacks": false,
+                    "duration_bar": true,
+                    "duration_text": false,
+                    "stacks_text": false,
                     "tint": [1.0, 1.0, 1.0, 1.0]
                 },
                 {
+                    "enabled": true,
                     "name": "Stability",
-                    "buff": {
-                        "id": { "Single": 1122 },
+                    "progress": {
+                        "source": {
+                            "Buff": 1122
+                        },
                         "threshold": "Present"
                     },
                     "icon": {
                         "Url": "https://wiki.guildwars2.com/images/a/ae/Stability.png"
                     },
-                    "duration": true,
-                    "stacks": true,
+                    "duration_bar": true,
+                    "duration_text": false,
+                    "stacks_text": true,
                     "tint": [1.0, 1.0, 1.0, 1.0]
                 }
             ]

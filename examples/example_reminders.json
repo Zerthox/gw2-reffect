@@ -8,13 +8,13 @@
     "layer": 1,
     "elements": [
         {
+            "enabled": true,
             "name": "Instanced",
             "pos": [0.0, 0.0],
             "opacity": 1.0,
-            "trigger": {
+            "filter": {
                 "player": {
                     "combat": null,
-                    "profs": [],
                     "specs": [],
                     "mounts": []
                 },
@@ -33,13 +33,13 @@
             "type": "Group",
             "members": [
                 {
+                    "enabled": true,
                     "name": "Reminder Icons",
                     "pos": [0.0, 0.0],
                     "opacity": 0.7,
-                    "trigger": {
+                    "filter": {
                         "player": {
                             "combat": null,
-                            "profs": [],
                             "specs": [],
                             "mounts": []
                         },
@@ -53,42 +53,54 @@
                     "pad": 5.0,
                     "icons": [
                         {
+                            "enabled": true,
                             "name": "Malnourished",
-                            "buff": {
-                                "id": { "Single": 46587 },
+                            "progress": {
+                                "source": {
+                                    "Buff": 46587
+                                },
                                 "threshold": "Present"
                             },
                             "icon": {
                                 "Url": "https://wiki.guildwars2.com/images/6/67/Malnourished.png"
                             },
-                            "duration": false,
-                            "stacks": false,
+                            "duration_bar": false,
+                            "duration_text": false,
+                            "stacks_text": false,
                             "tint": [1.0, 1.0, 1.0, 1.0]
                         },
                         {
+                            "enabled": true,
                             "name": "Diminished",
-                            "buff": {
-                                "id": { "Single": 46668 },
+                            "progress": {
+                                "source": {
+                                    "Buff": 46668
+                                },
                                 "threshold": "Present"
                             },
                             "icon": {
                                 "Url": "https://wiki.guildwars2.com/images/7/71/Diminished.png"
                             },
-                            "duration": false,
-                            "stacks": false,
+                            "duration_bar": false,
+                            "duration_text": false,
+                            "stacks_text": false,
                             "tint": [1.0, 1.0, 1.0, 1.0]
                         },
                         {
+                            "enabled": true,
                             "name": "Reinforced",
-                            "buff": {
-                                "id": { "Single": 9283 },
+                            "progress": {
+                                "source": {
+                                    "Buff": 9283
+                                },
                                 "threshold": "Missing"
                             },
                             "icon": {
                                 "Url": "https://wiki.guildwars2.com/images/8/83/Reinforced_Armor.png"
                             },
-                            "duration": false,
-                            "stacks": false,
+                            "duration_bar": false,
+                            "duration_text": false,
+                            "stacks_text": false,
                             "tint": [1.0, 1.0, 1.0, 1.0]
                         }
                     ]
