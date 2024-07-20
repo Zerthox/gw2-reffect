@@ -10,6 +10,7 @@ pub use self::{edit_state::*, links::*, map::*, player::*, settings::*, ui::*};
 use crate::{
     internal::{Buff, Error, Internal, Resources},
     interval::Interval,
+    render_util::Font,
 };
 use enumflags2::{bitflags, BitFlags};
 use std::collections::BTreeMap;
@@ -56,6 +57,8 @@ pub struct Context {
     pub own_interval: Interval,
 
     pub player_interval: Interval,
+
+    pub font: Option<Font>,
 }
 
 impl Context {
@@ -183,6 +186,7 @@ impl Default for Context {
             links: Links::load(),
             own_interval: Interval::new(OWN_INTERVAL),
             player_interval: Interval::new(PLAYER_INTERVAL),
+            font: None,
         }
     }
 }

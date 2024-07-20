@@ -94,13 +94,10 @@ impl Text {
     }
 
     pub fn load(&mut self) {
-        if let Some(name) = &self.font_name {
-            if let Some(font_id) = Font::try_from_name(name) {
-                self.loaded_font = Some(font_id);
-            } else {
-                log::warn!("Failed to find font \"{name}\"");
-            }
-        }
+        self.loaded_font = self
+            .font_name
+            .as_ref()
+            .and_then(|name| Font::from_name_or_warn(name));
     }
 }
 

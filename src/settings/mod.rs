@@ -1,12 +1,11 @@
+use super::Addon;
+use crate::context::ContextSettings;
+use serde::{Deserialize, Serialize};
 use std::{
     fs::File,
     io::{BufReader, BufWriter},
     path::PathBuf,
 };
-
-use super::Addon;
-use crate::context::ContextSettings;
-use serde::{Deserialize, Serialize};
 
 // TODO: setting for icon stacks text
 

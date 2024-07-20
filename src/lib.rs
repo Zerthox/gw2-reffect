@@ -13,6 +13,7 @@ mod lockbox;
 mod render_util;
 mod schema;
 mod serde_bitflags;
+mod settings;
 mod texture_manager;
 mod traits;
 mod tree;

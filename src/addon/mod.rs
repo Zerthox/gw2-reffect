@@ -1,8 +1,5 @@
 mod event;
-mod settings;
 mod ui;
-
-pub use self::settings::*;
 
 use crate::{context::Context, elements::Pack, internal::Internal};
 use arc_util::update::{Repository, Updater};

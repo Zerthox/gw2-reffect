@@ -29,6 +29,15 @@ impl Font {
         unsafe { Self::get_all() }.find(|font| unsafe { font.name_raw() } == name.as_c_str())
     }
 
+    pub fn from_name_or_warn(name: impl AsRef<str>) -> Option<Self> {
+        let name = name.as_ref();
+        let result = Self::try_from_name(name);
+        if result.is_none() {
+            log::warn!("Failed to find font \"{name}\"");
+        }
+        result
+    }
+
     pub unsafe fn name_raw<'a>(&self) -> &'a CStr {
         unsafe {
             let config = (*self.as_ptr()).ConfigData;
@@ -51,6 +60,8 @@ impl Font {
     }
 }
 
+unsafe impl Send for Font {}
+
 pub struct FontToken;
 
 impl Drop for FontToken {
@@ -59,10 +70,8 @@ impl Drop for FontToken {
     }
 }
 
-unsafe impl Send for Font {}
-
 pub fn font_select(ui: &Ui, label: impl AsRef<str>, current: &mut Option<Font>) -> bool {
-    const DEFAULT: &str = "Default";
+    const INHERIT: &str = "Inherit";
 
     let mut changed = false;
     let preview = match *current {
@@ -70,11 +79,11 @@ pub fn font_select(ui: &Ui, label: impl AsRef<str>, current: &mut Option<Font>) 
             let name = unsafe { font.name_raw() };
             name.to_string_lossy()
         }
-        None => Cow::Borrowed(DEFAULT),
+        None => Cow::Borrowed(INHERIT),
     };
 
     if let Some(_token) = ui.begin_combo_with_flags(label, preview, ComboBoxFlags::HEIGHT_LARGE) {
-        if Selectable::new(DEFAULT).build(ui) {
+        if Selectable::new(INHERIT).build(ui) {
             *current = None;
             changed = true;
         }

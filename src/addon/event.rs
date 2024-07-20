@@ -1,5 +1,5 @@
 use super::Addon;
-use crate::{addon::Settings, elements::Pack, texture_manager::TextureManager, util::file_name};
+use crate::{elements::Pack, settings::Settings, texture_manager::TextureManager, util::file_name};
 use nexus::gui::{register_render, RenderType};
 use rfd::FileDialog;
 use std::{fs, thread};

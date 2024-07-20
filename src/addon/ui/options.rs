@@ -1,7 +1,7 @@
 use super::Addon;
 use crate::{
     elements::TextDecoration,
-    render_util::{enum_combo, input_float_with_format, input_u32, style_disabled},
+    render_util::{enum_combo, font_select, input_float_with_format, input_u32, style_disabled},
 };
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, TreeNodeFlags, Ui};
 
@@ -24,6 +24,8 @@ impl Addon {
                     "Show all pack elements during edit mode",
                     &mut self.context.edit.show_all,
                 );
+
+                font_select(ui, "Font", &mut self.context.font);
 
                 if ui.collapsing_header(
                     "Stacks Text (soon)",
