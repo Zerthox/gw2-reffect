@@ -118,8 +118,8 @@ impl Icon {
                     let color = with_alpha(colors::WHITE, alpha);
                     let shadow_color = with_alpha(colors::BLACK, alpha);
 
-                    TextDecoration::Shadow.render(ui, text, text_pos, font_size, shadow_color);
-                    draw_text_bg(ui, text, text_pos, font_size, color);
+                    TextDecoration::Shadow.render(ui, text, text_pos, font_scale, shadow_color);
+                    draw_text_bg(ui, text, text_pos, font_scale, color);
                 }
             }
 
@@ -147,10 +147,10 @@ impl Icon {
                                 ui,
                                 &text,
                                 text_pos,
-                                font_size,
+                                font_scale,
                                 shadow_color,
                             );
-                            draw_text_bg(ui, &text, text_pos, font_size, color);
+                            draw_text_bg(ui, &text, text_pos, font_scale, color);
                         }
                     }
                 }

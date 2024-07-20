@@ -1,6 +1,6 @@
 use super::VisitMut;
 use crate::{
-    elements::{IconElement, IconList},
+    elements::{IconElement, IconList, Text},
     trigger::FilterTrigger,
 };
 
@@ -16,6 +16,10 @@ impl VisitMut for Loader {
 
     fn visit_icon(&mut self, el: &mut IconElement) {
         el.icon.load()
+    }
+
+    fn visit_text(&mut self, text: &mut Text) {
+        text.load();
     }
 
     fn visit_filter_trigger(&mut self, trigger: &mut FilterTrigger) {

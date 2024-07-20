@@ -4,7 +4,8 @@ use crate::{
     component_wise::ComponentWise,
     context::{Context, ContextUpdate},
     render_util::{
-        draw_text_bg, helper, input_float_with_format, input_text_multi_with_menu, Rect,
+        draw_text_bg, font_select, helper, input_float_with_format, input_text_multi_with_menu,
+        Font, Rect,
     },
     traits::{Render, RenderOptions},
     tree::TreeLeaf,
@@ -20,10 +21,16 @@ pub struct Text {
     pub progress: ProgressTrigger,
 
     pub text: String,
+
+    #[serde(rename = "font")]
+    pub font_name: Option<String>,
     pub size: f32,
     pub align: AlignHorizontal,
     pub color: [f32; 4],
     pub decoration: TextDecoration,
+
+    #[serde(skip)]
+    loaded_font: Option<Font>,
 
     #[serde(skip)]
     text_memo: Option<String>,
@@ -85,6 +92,16 @@ impl Text {
         let offset = self.align.text_offset(ui, text, self.size);
         pos.add(offset)
     }
+
+    pub fn load(&mut self) {
+        if let Some(name) = &self.font_name {
+            if let Some(font_id) = Font::try_from_name(name) {
+                self.loaded_font = Some(font_id);
+            } else {
+                log::warn!("Failed to find font \"{name}\"");
+            }
+        }
+    }
 }
 
 impl TreeLeaf for Text {}
@@ -94,16 +111,16 @@ impl Render for Text {
         self.update_text(ctx, state);
 
         if let Some(text) = &self.text_memo {
+            let _font = self.loaded_font.map(|font| font.push());
             let font_scale = self.size;
-            let font_size = font_scale * ui.current_font_size();
             let pos = self.calc_pos(ui, state.pos, text);
             let [r, g, b, a] = self.color;
             let alpha = a * ui.clone_style().alpha;
             let color = [r, g, b, alpha];
 
             self.decoration
-                .render(ui, text, pos, font_size, [0.0, 0.0, 0.0, alpha]);
-            draw_text_bg(ui, text, pos, font_size, color);
+                .render(ui, text, pos, font_scale, [0.0, 0.0, 0.0, alpha]);
+            draw_text_bg(ui, text, pos, font_scale, color);
         }
     }
 }
@@ -160,6 +177,10 @@ impl RenderOptions for Text {
             self.size = size / 100.0;
         }
 
+        if font_select(ui, "Font", &mut self.loaded_font) {
+            self.font_name = self.loaded_font.map(|font| font.name_owned());
+        }
+
         self.align.render_combo(ui);
 
         ColorEdit::new("Color", &mut self.color)
@@ -177,8 +198,10 @@ impl Default for Text {
             progress: ProgressTrigger::default(),
             align: AlignHorizontal::Center,
             size: 1.0,
+            font_name: None,
             color: [1.0, 1.0, 1.0, 1.0],
             decoration: TextDecoration::default(),
+            loaded_font: None,
             text_memo: None,
         }
     }

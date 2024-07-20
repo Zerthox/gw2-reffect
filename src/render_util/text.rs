@@ -5,7 +5,7 @@ pub fn draw_text_bg(
     ui: &Ui,
     text: impl AsRef<str>,
     pos: [f32; 2],
-    font_size: f32,
+    font_scale: f32,
     color: impl Into<ImColor32>,
 ) {
     let range = text.as_ref().as_bytes().as_ptr_range();
@@ -14,11 +14,12 @@ pub fn draw_text_bg(
     unsafe {
         let bg = sys::igGetBackgroundDrawList();
         let font = sys::igGetFont();
+        let font_size = sys::igGetFontSize();
 
         sys::ImDrawList_AddText_FontPtr(
             bg,
             font,
-            font_size,
+            font_scale * font_size,
             pos.into(),
             color.into().into(),
             range.start.cast(),

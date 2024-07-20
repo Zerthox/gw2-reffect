@@ -1,5 +1,6 @@
 mod button;
 mod combo;
+mod font;
 mod helper;
 mod input;
 mod input_text;
@@ -10,8 +11,8 @@ mod text;
 mod tree;
 
 pub use self::{
-    button::*, combo::*, helper::*, input::*, input_text::*, popup::*, spinner::*, style::*,
-    text::*, tree::*,
+    button::*, combo::*, font::*, helper::*, input::*, input_text::*, popup::*, spinner::*,
+    style::*, text::*, tree::*,
 };
 
 use nexus::imgui::{sys, Ui};

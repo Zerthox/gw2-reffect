@@ -78,6 +78,9 @@ impl IconSource {
     pub fn render_select(&mut self, ui: &Ui) {
         enum_combo(ui, "Icon", self, ComboBoxFlags::empty());
 
+        // we assume this stays in place, otherwise we consider the file dialog invalidated
+        let id = self as *mut _ as usize;
+
         match self {
             Self::Unknown | Self::Empty => {}
             Self::File(path) => {
@@ -86,9 +89,6 @@ impl IconSource {
                     .auto_select_all(true)
                     .read_only(true)
                     .build();
-
-                // we assume this stays in place, otherwise we consider the file dialog invalidated
-                let id = path.as_os_str().as_encoded_bytes().as_ptr() as usize;
 
                 static FILE: Lockbox<usize, PathBuf> = Lockbox::new();
 

@@ -40,8 +40,8 @@ pub enum TextDecoration {
 }
 
 impl TextDecoration {
-    fn render_at(ui: &Ui, pos: [f32; 2], text: &str, font_size: f32, color: [f32; 4]) {
-        draw_text_bg(ui, text, pos, font_size, color)
+    fn render_at(ui: &Ui, pos: [f32; 2], text: &str, font_scale: f32, color: [f32; 4]) {
+        draw_text_bg(ui, text, pos, font_scale, color)
     }
 
     pub fn render(
@@ -49,27 +49,27 @@ impl TextDecoration {
         ui: &Ui,
         text: impl AsRef<str>,
         pos: [f32; 2],
-        font_size: f32,
+        font_scale: f32,
         color: [f32; 4],
     ) {
         // FIXME: shadow renders behind transparent text
         let text = text.as_ref();
         match self {
             Self::None => {}
-            Self::Shadow => Self::render_at(ui, pos.add([1.0, 1.0]), text, font_size, color),
+            Self::Shadow => Self::render_at(ui, pos.add([1.0, 1.0]), text, font_scale, color),
             Self::ShadowDouble => {
                 for offset in [[0.0, 1.0], [1.0, 0.0]] {
-                    Self::render_at(ui, pos.add(offset), text, font_size, color)
+                    Self::render_at(ui, pos.add(offset), text, font_scale, color)
                 }
             }
             Self::Outline => {
                 for offset in [[-1.0, -1.0], [1.0, 1.0]] {
-                    Self::render_at(ui, pos.add(offset), text, font_size, color)
+                    Self::render_at(ui, pos.add(offset), text, font_scale, color)
                 }
             }
             Self::OutlineDouble => {
                 for offset in [[-1.0, -1.0], [-1.0, 1.0], [1.0, -1.0], [1.0, 1.0]] {
-                    Self::render_at(ui, pos.add(offset), text, font_size, color)
+                    Self::render_at(ui, pos.add(offset), text, font_scale, color)
                 }
             }
         }
