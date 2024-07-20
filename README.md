@@ -1,5 +1,5 @@
 # Reffect
-Reffect is a [Guild Wars 2](https://guildwars2.com) addon allowing customizable display of effects.
+Reffect is a [Guild Wars 2](https://guildwars2.com) addon allowing customizable display of effects and resources.
 
 This project is inspired by [WeakAuras](https://github.com/WeakAuras/WeakAuras2) from World of Warcraft and [GW2Clarity](https://github.com/Friendly0Fire/GW2Clarity).
 Requires the [Nexus](https://github.com/RaidcoreGG/Nexus) addon manager ([website](https://raidcore.gg/Nexus)). We have channels for discussion and sharing packs on the [Raidcore (Nexus) Discord](https://discord.gg/raidcore).
@@ -38,3 +38,4 @@ The information is retrieved with the following policy in mind:
 - No true stack count for duration stacking effects.
 - No information about effects hidden from the player.
 - No combining logic for multiple effects outside of grouping them into a single UI element.
+- No information about profession resources when hidden from the player.

@@ -3,7 +3,7 @@ name = "reffect"
 version = "0.2.0"
 authors = ["Zerthox"]
 edition = "2021"
-description = "Customizable effect displays"
+description = "Customizable effect & resource displays"
 repository = "https://github.com/zerthox/gw2-reffect"
 rust-version = "1.76.0"
 
