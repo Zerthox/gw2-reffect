@@ -39,10 +39,7 @@ impl Addon {
 
         {
             let mut plugin = Self::lock();
-            Settings {
-                context: plugin.context.settings(),
-            }
-            .save();
+            Settings::new(&plugin.context).save();
             plugin.save_packs();
             plugin.internal.unload();
         }

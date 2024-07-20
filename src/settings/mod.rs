@@ -1,5 +1,5 @@
 use super::Addon;
-use crate::context::ContextSettings;
+use crate::context::{Context, ContextSettings};
 use serde::{Deserialize, Serialize};
 use std::{
     fs::File,
@@ -9,13 +9,23 @@ use std::{
 
 // TODO: setting for icon stacks text
 
+const VERSION: &str = env!("CARGO_PKG_VERSION");
+
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Settings {
+    pub version: String,
     pub context: ContextSettings,
 }
 
 impl Settings {
+    pub fn new(context: &Context) -> Self {
+        Self {
+            version: VERSION.into(),
+            context: context.settings(),
+        }
+    }
+
     pub fn file() -> PathBuf {
         Addon::addon_dir().join("settings.json")
     }

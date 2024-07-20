@@ -16,7 +16,6 @@ impl Addon {
         }
 
         self.render_popups(ui);
-        self.updater.render(ui);
 
         self.context.edit.reset_allowed();
     }
