@@ -18,7 +18,7 @@ impl Font {
         let len = (*atlas).Fonts.Size;
 
         slice::from_raw_parts(data, len as usize)
-            .into_iter()
+            .iter()
             .copied()
             .filter_map(NonNull::new)
             .map(Self)
@@ -26,12 +26,7 @@ impl Font {
 
     pub fn try_from_name(name: impl AsRef<str>) -> Option<Self> {
         let name = CString::new(name.as_ref()).ok()?;
-        for font in unsafe { Self::get_all() } {
-            if unsafe { font.name_raw() } == name.as_c_str() {
-                return Some(font);
-            }
-        }
-        None
+        unsafe { Self::get_all() }.find(|font| unsafe { font.name_raw() } == name.as_c_str())
     }
 
     pub unsafe fn name_raw<'a>(&self) -> &'a CStr {
