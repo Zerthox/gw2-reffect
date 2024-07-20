@@ -26,6 +26,10 @@ pub enum ProgressThreshold {
     #[strum(serialize = "Max amount")]
     Max(u32),
 
+    /// Exact amount.
+    #[strum(serialize = "Exact amount")]
+    Exact(u32),
+
     /// Range of amounts.
     #[strum(serialize = "Amount between")]
     Between(u32, u32),
@@ -38,6 +42,7 @@ impl VariantArray for ProgressThreshold {
         Self::Missing,
         Self::Min(1),
         Self::Max(1),
+        Self::Exact(1),
         Self::Between(0, 1),
     ];
 }
@@ -50,6 +55,7 @@ impl ProgressThreshold {
             Self::Missing => progress == 0,
             Self::Min(required) => progress >= required,
             Self::Max(required) => progress <= required,
+            Self::Exact(required) => progress == required,
             Self::Between(min, max) => (min..=max).contains(&progress),
         }
     }
@@ -63,7 +69,7 @@ impl RenderOptions for ProgressThreshold {
 
             match self {
                 Self::Always | Self::Present | Self::Missing => {}
-                Self::Min(required) | Self::Max(required) => {
+                Self::Min(required) | Self::Max(required) | Self::Exact(required) => {
                     input_u32(ui, "Amount", required, 1, 10);
                 }
                 Self::Between(min, max) => {
