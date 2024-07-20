@@ -1,7 +1,7 @@
 #[derive(Debug, Clone)]
 pub struct Interval {
     pub frequency: u32,
-    pub next_update: u32,
+    next_update: u32,
 }
 
 impl Interval {
@@ -12,13 +12,17 @@ impl Interval {
         }
     }
 
-    pub fn triggered(&mut self, time: u32) -> bool {
-        if time >= self.next_update {
-            self.next_update = time + self.frequency;
+    pub fn triggered(&mut self, now: u32) -> bool {
+        if now >= self.next_update {
+            self.refresh_next_update(now);
             true
         } else {
             false
         }
+    }
+
+    pub fn refresh_next_update(&mut self, now: u32) {
+        self.next_update = now + self.frequency;
     }
 }
 

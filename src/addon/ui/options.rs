@@ -1,7 +1,9 @@
 use super::Addon;
 use crate::{
     elements::TextDecoration,
-    render_util::{enum_combo, font_select, input_float_with_format, input_u32, style_disabled},
+    render_util::{
+        enum_combo, font_select, helper, input_float_with_format, input_u32, style_disabled,
+    },
 };
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, TreeNodeFlags, Ui};
 
@@ -112,20 +114,39 @@ impl Addon {
                 // TODO: duration bar settings
 
                 if ui.collapsing_header("Advanced", TreeNodeFlags::SPAN_AVAIL_WIDTH) {
-                    input_u32(
+                    if input_u32(
                         ui,
-                        "Own character update interval",
+                        "Own character interval",
                         &mut self.context.own_interval.frequency,
                         10,
                         100,
-                    );
-                    input_u32(
+                    ) {
+                        self.context
+                            .own_interval
+                            .refresh_next_update(self.context.now);
+                    }
+                    helper(ui, || {
+                        ui.text(
+                            "Interval between updates for own buffs & resources in milliseconds",
+                        )
+                    });
+
+                    if input_u32(
                         ui,
-                        "Player update interval",
+                        "Player interval",
                         &mut self.context.player_interval.frequency,
                         10,
                         100,
-                    );
+                    ) {
+                        self.context
+                            .player_interval
+                            .refresh_next_update(self.context.now);
+                    }
+                    helper(ui, || {
+                        ui.text(
+                            "Interval between updates for profession, specialization, map etc. in milliseconds",
+                        )
+                    });
 
                     if ui.button("Reset update intervals") {
                         self.context.reset_intervals();
