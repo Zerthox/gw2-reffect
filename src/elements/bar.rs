@@ -1,4 +1,4 @@
-use super::{Align, Direction, Progress, RenderState};
+use super::{Align, Direction, Progress, RenderState, Unit};
 use crate::{
     action::Action,
     bounds::Bounds,
@@ -37,8 +37,9 @@ pub struct Bar {
     pub border_size: f32,
     pub border_color: [f32; 4],
 
-    pub tick_color: [f32; 4],
     pub tick_size: f32,
+    pub tick_color: [f32; 4],
+    pub tick_unit: Unit,
     pub ticks: Vec<f32>,
 }
 
@@ -73,14 +74,19 @@ impl Render for Bar {
             }
 
             let end_offset = self.direction.tick_end_offset(self.size);
+            let max = active.max();
             for tick in &self.ticks {
-                let offset = self.direction.progress_value_offset(self.size, *tick);
-                let start = start.add(offset);
-                let end = start.add(end_offset);
-                draw_list
-                    .add_line(start, end, self.tick_color)
-                    .thickness(self.tick_size)
-                    .build();
+                if let Some(tick_progress) = self.tick_unit.calc_progress(*tick, max) {
+                    let offset = self
+                        .direction
+                        .progress_value_offset(self.size, tick_progress);
+                    let start = start.add(offset);
+                    let end = start.add(end_offset);
+                    draw_list
+                        .add_line(start, end, self.tick_color)
+                        .thickness(self.tick_size)
+                        .build();
+                }
             }
         }
     }
@@ -167,27 +173,55 @@ impl RenderOptions for Bar {
             .alpha_bar(true)
             .build(ui);
 
+        if let Some(prev) = enum_combo(ui, "Tick unit", &mut self.tick_unit, ComboBoxFlags::empty())
+        {
+            let new = self.tick_unit;
+            for tick in &mut self.ticks {
+                match (prev, new) {
+                    (Unit::Percent, Unit::Absolute) => *tick *= 100.0,
+                    (Unit::Absolute, Unit::Percent) => *tick /= 100.0,
+                    _ => {}
+                }
+            }
+        }
+
         let mut action = Action::new();
         for (i, tick) in self.ticks.iter_mut().enumerate() {
-            action.input_with_buttons(ui, i, || {
-                let mut value = 100.0 * *tick;
-                if Slider::new(format!("##tick{i}"), 0.0, 100.0)
-                    .flags(SliderFlags::ALWAYS_CLAMP)
-                    .display_format("%.1f")
-                    .build(ui, &mut value)
-                {
-                    *tick = value / 100.0;
+            let _id = ui.push_id(i as i32);
+            action.input_with_buttons(ui, i, || match self.tick_unit {
+                Unit::Absolute => {
+                    input_float_with_format(
+                        "##tick",
+                        tick,
+                        0.0,
+                        0.0,
+                        "%.1f",
+                        InputTextFlags::empty(),
+                    );
+                }
+                Unit::Percent => {
+                    let mut value = 100.0 * *tick;
+                    if Slider::new("##tick", 0.0, 100.0)
+                        .flags(SliderFlags::ALWAYS_CLAMP)
+                        .display_format("%.1f")
+                        .build(ui, &mut value)
+                    {
+                        *tick = value / 100.0;
+                    }
                 }
             });
             ui.same_line();
             ui.text(format!("Tick {}", i + 1));
-            if i == 0 {
+            if self.tick_unit == Unit::Percent && i == 0 {
                 helper_slider(ui);
             }
         }
         action.perform(&mut self.ticks);
         if ui.button("Add Tick") {
-            self.ticks.push(0.5);
+            self.ticks.push(match self.tick_unit {
+                Unit::Percent => 0.5,
+                Unit::Absolute => 1.0,
+            });
         }
     }
 }
@@ -206,8 +240,9 @@ impl Default for Bar {
             border: true,
             border_size: 1.0,
             border_color: colors::BLACK,
-            tick_color: colors::BLACK,
             tick_size: 1.0,
+            tick_color: colors::BLACK,
+            tick_unit: Unit::default(),
             ticks: Vec::new(),
         }
     }

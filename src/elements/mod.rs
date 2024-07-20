@@ -20,10 +20,11 @@ mod render_state;
 mod screen_anchor;
 mod text;
 mod text_decoration;
+mod unit;
 
 pub use self::{
     align::*, align_horizontal::*, animation::*, bar::*, common::*, direction::*, dnd::*,
     element::*, element_type::*, group::*, icon::*, icon_element::*, icon_source::*, layout::*,
     list::*, list_icon::*, pack::*, progress::*, render_state::*, screen_anchor::*, text::*,
-    text_decoration::*,
+    text_decoration::*, unit::*,
 };
