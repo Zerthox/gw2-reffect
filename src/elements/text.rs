@@ -94,10 +94,7 @@ impl Text {
     }
 
     pub fn load(&mut self) {
-        self.loaded_font = self
-            .font_name
-            .as_ref()
-            .and_then(|name| Font::from_name_or_warn(name));
+        self.loaded_font = self.font_name.as_ref().and_then(Font::from_name_or_warn);
     }
 }
 

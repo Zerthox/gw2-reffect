@@ -48,7 +48,7 @@ impl Context {
         } = settings;
         self.edit.during_combat = edit_during_combat;
         self.edit.show_all = edit_show_all;
-        self.font = font.and_then(|name| Font::from_name_or_warn(name));
+        self.font = font.and_then(Font::from_name_or_warn);
         self.own_interval.frequency = own_interval;
         self.player_interval.frequency = player_interval;
     }
