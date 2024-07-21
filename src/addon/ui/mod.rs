@@ -7,7 +7,7 @@ use nexus::imgui::Ui;
 
 impl Addon {
     pub fn render(&mut self, ui: &Ui) {
-        self.context.update(&mut self.internal); // TODO: perform update in separate thread?
+        self.context.update(&self.internal); // TODO: perform update in separate thread?
 
         self.render_displays(ui);
 

@@ -27,7 +27,7 @@ pub struct Result<T> {
     /// Whether there has been an error.
     pub error: Error,
 
-    /// Only valid if [`Error::None`].
+    /// Only valid to read if [`Error::None`].
     pub value: T,
 }
 
@@ -40,7 +40,11 @@ impl<T> From<std::result::Result<T, Error>> for Result<T> {
             },
             Err(error) => Self {
                 error,
-                value: unsafe { MaybeUninit::uninit().assume_init() },
+                value: unsafe {
+                    // not accessing this is part of our contract
+                    #[allow(clippy::uninit_assumed_init)]
+                    MaybeUninit::uninit().assume_init()
+                },
             },
         }
     }
