@@ -3,7 +3,7 @@ mod shared;
 
 pub use self::{
     error::*,
-    shared::{Buff, Resource, Resources},
+    shared::{Buff, Resource, Resources, Traits},
 };
 
 use self::shared::SelfResult;
@@ -19,6 +19,7 @@ static DLL: &[u8] = include_bytes!(concat!(
 #[derive(Debug, WrapperApi)]
 pub struct Exports {
     update_self: extern "C-unwind" fn() -> SelfResult,
+    get_traits: extern "C-unwind" fn() -> shared::Result<Traits>,
 }
 
 pub struct Internal(Result<Container<Exports>, Error>);
@@ -65,21 +66,24 @@ impl Internal {
     }
 
     /// Updates and returns the current character state or an error.
-    pub fn update_self(&mut self) -> (Result<&[Buff], Error>, Result<Resources, Error>) {
+    pub fn update_self(&self) -> (Result<&[Buff], Error>, Result<Resources, Error>) {
         match self.exports() {
             Ok(exports) => {
-                let SelfResult {
-                    own_buffs,
-                    own_resources,
-                } = exports.update_self();
-                let buffs = own_buffs.error.into_result(|| unsafe {
-                    slice::from_raw_parts(own_buffs.buffs, own_buffs.len)
-                });
-                let resources = own_resources.error.into_result(|| own_resources.resources);
+                let SelfResult { buffs, resources } = exports.update_self();
+                let buffs = Result::from(buffs)
+                    .map(|value| unsafe { slice::from_raw_parts(value.buffs, value.len) })
+                    .map_err(Into::into);
+                let resources = Result::from(resources).map_err(Into::into);
                 (buffs, resources)
             }
             Err(err) => (Err(err), Err(err)),
         }
+    }
+
+    /// Returns the current character traits or an error.
+    pub fn get_traits(&self) -> Result<Traits, Error> {
+        let exports = self.exports()?;
+        Result::from(exports.get_traits()).map_err(Into::into)
     }
 }
 

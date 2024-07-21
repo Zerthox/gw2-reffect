@@ -1,5 +1,5 @@
 use super::input_text_simple_menu;
-use crate::util::decode_skill;
+use crate::util::{decode_skill, decode_trait};
 use nexus::imgui::{sys, InputTextFlags, Ui};
 use std::ffi::CString;
 
@@ -54,7 +54,13 @@ pub fn input_size(x: &mut f32, y: &mut f32) {
     input_float_with_format("Size y", y, 1.0, 10.0, "%.2f", InputTextFlags::empty());
 }
 
-pub fn input_buff_id(ui: &Ui, label: impl AsRef<str>, id: &mut u32, flags: InputTextFlags) -> bool {
+pub fn input_chatcode(
+    ui: &Ui,
+    label: impl AsRef<str>,
+    id: &mut u32,
+    flags: InputTextFlags,
+    decode: impl FnOnce(&str) -> Option<u32>,
+) -> bool {
     let label = label.as_ref();
     let mut text = id.to_string(); // TODO: switch to faster int/float to string conversion libraries
     let changed = ui
@@ -64,10 +70,28 @@ pub fn input_buff_id(ui: &Ui, label: impl AsRef<str>, id: &mut u32, flags: Input
     if changed {
         if let Ok(new) = text.parse() {
             *id = new;
-        } else if let Some(new) = decode_skill(text.trim()) {
+        } else if let Some(new) = decode(text.trim()) {
             *id = new;
         }
     }
     input_text_simple_menu(ui, format!("##{label}ctx"), &mut text);
     changed
+}
+
+pub fn input_skill_id(
+    ui: &Ui,
+    label: impl AsRef<str>,
+    id: &mut u32,
+    flags: InputTextFlags,
+) -> bool {
+    input_chatcode(ui, label, id, flags, decode_skill)
+}
+
+pub fn input_trait_id(
+    ui: &Ui,
+    label: impl AsRef<str>,
+    id: &mut u32,
+    flags: InputTextFlags,
+) -> bool {
+    input_chatcode(ui, label, id, flags, decode_trait)
 }

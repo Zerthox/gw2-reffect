@@ -1,3 +1,5 @@
+use std::mem::MaybeUninit;
+
 /// Error codes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(u8)]
@@ -11,8 +13,48 @@ pub enum Error {
     CharacterState = 6,
     BuffsNotFound = 7,
     HealthNotFound = 8,
-    ResourceNotFound = 9,
+    SpecNotFound = 9,
     Windows = u8::MAX,
+}
+
+/// Result representing success or failures.
+///
+/// FFI-safe version of [`std::result::Result`].
+#[derive(Debug, Clone)]
+#[repr(C)]
+#[must_use]
+pub struct Result<T> {
+    /// Whether there has been an error.
+    pub error: Error,
+
+    /// Only valid if [`Error::None`].
+    pub value: T,
+}
+
+impl<T> From<std::result::Result<T, Error>> for Result<T> {
+    fn from(result: std::result::Result<T, Error>) -> Self {
+        match result {
+            Ok(value) => Self {
+                error: Error::None,
+                value,
+            },
+            Err(error) => Self {
+                error,
+                value: unsafe { MaybeUninit::uninit().assume_init() },
+            },
+        }
+    }
+}
+
+impl<T> From<Result<T>> for std::result::Result<T, Error> {
+    fn from(result: Result<T>) -> Self {
+        let Result { error, value } = result;
+        if let Error::None = error {
+            Ok(value)
+        } else {
+            Err(error)
+        }
+    }
 }
 
 /// Result returned for own character.
@@ -20,10 +62,10 @@ pub enum Error {
 #[repr(C)]
 pub struct SelfResult {
     /// Buffs.
-    pub own_buffs: BuffsResult,
+    pub buffs: Result<Buffs>,
 
     /// Profession resources.
-    pub own_resources: ResourcesResult,
+    pub resources: Result<Resources>,
 }
 
 /// Current buffs.
@@ -31,10 +73,7 @@ pub struct SelfResult {
 /// **Important:** pointers are only valid to read until the next update.
 #[derive(Debug, Clone)]
 #[repr(C)]
-pub struct BuffsResult {
-    /// Whether there has been an error obtaining buffs.
-    pub error: Error,
-
+pub struct Buffs {
     /// Pointer to the buffs array.
     pub buffs: *const Buff,
 
@@ -89,17 +128,6 @@ pub enum Category {
     ScreenBorder = 3,
 }
 
-/// Result returned for resources.
-#[derive(Debug, Clone)]
-#[repr(C)]
-pub struct ResourcesResult {
-    /// Whether there has been an error obtaining resources.
-    pub error: Error,
-
-    /// Resources.
-    pub resources: Resources,
-}
-
 /// Information about resources.
 #[derive(Debug, Clone)]
 #[repr(C)]
@@ -152,3 +180,6 @@ impl Resource {
         Self { current, max }
     }
 }
+
+/// Player traits.
+pub type Traits = [u32; 9];

@@ -17,9 +17,34 @@ impl Addon {
 
                 ui.text(format!("Show elements: {}", ctx.ui.should_show()));
 
-                ui.text("Own character state:");
+                ui.text("Own traits:");
                 ui.same_line();
-                match ctx.own_buffs_error {
+                match ctx.player.traits {
+                    Ok(traits) => {
+                        ui.text_colored(GREEN, "available");
+                        if ui.is_item_hovered() {
+                            ui.tooltip(|| {
+                                for [a, b, c] in [
+                                    [traits[0], traits[1], traits[2]],
+                                    [traits[3], traits[4], traits[5]],
+                                    [traits[6], traits[7], traits[8]],
+                                ] {
+                                    ui.text(format!("{a: >4} {b: >4} {c: >4}"));
+                                }
+                            });
+                        }
+                    }
+                    Err(err) => {
+                        ui.text_colored(RED, "unavailable");
+                        if ui.is_item_hovered() {
+                            ui.tooltip_text(err.to_string());
+                        }
+                    }
+                }
+
+                ui.text("Own resources:");
+                ui.same_line();
+                match ctx.resources_error {
                     None => {
                         ui.text_colored(GREEN, "available");
                         if ui.is_item_hovered() {
@@ -37,9 +62,24 @@ impl Addon {
                                     "Secondary: {}/{}",
                                     secondary.current, secondary.max
                                 ));
+                            });
+                        }
+                    }
+                    Some(err) => {
+                        ui.text_colored(RED, "unavailable");
+                        if ui.is_item_hovered() {
+                            ui.tooltip_text(err.to_string());
+                        }
+                    }
+                }
 
-                                ui.spacing();
-
+                ui.text("Own buffs:");
+                ui.same_line();
+                match ctx.own_buffs_error {
+                    None => {
+                        ui.text_colored(GREEN, "available");
+                        if ui.is_item_hovered() {
+                            ui.tooltip(|| {
                                 for (id, buff) in &ctx.own_buffs {
                                     ui.text(format!("{}x {id} {:?}", buff.stacks, buff.category));
                                     if let Some(remain) = ctx.time_until(buff.runout_time) {

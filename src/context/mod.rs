@@ -63,7 +63,7 @@ pub struct Context {
 
 impl Context {
     /// Updates the context.
-    pub fn update(&mut self, internal: &mut Internal) {
+    pub fn update(&mut self, internal: &Internal) {
         self.updates = BitFlags::empty();
 
         self.now = unsafe { timeGetTime() };
@@ -78,17 +78,19 @@ impl Context {
             self.player.update_fast(mumble);
 
             if self.player_interval.triggered(self.now) {
-                self.player.update_slow(mumble);
+                self.player.update_slow(mumble, internal);
                 let map_changed = self.map.update(mumble);
                 if map_changed {
                     self.updates.insert(ContextUpdate::Map);
                     log::debug!("Updating slow triggers for map id {}", self.map.id);
                 }
             }
+
+            self.updates.insert(ContextUpdate::Player);
         }
     }
 
-    fn update_own_character(&mut self, internal: &mut Internal) {
+    fn update_own_character(&mut self, internal: &Internal) {
         self.own_buffs.clear();
 
         let (buffs, resources) = internal.update_self();
@@ -196,5 +198,6 @@ impl Default for Context {
 #[repr(u8)]
 pub enum ContextUpdate {
     OwnCharacter = 1 << 0,
-    Map = 1 << 1,
+    Player = 1 << 1,
+    Map = 1 << 2,
 }

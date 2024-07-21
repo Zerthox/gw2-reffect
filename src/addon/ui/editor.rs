@@ -2,6 +2,7 @@ use super::Addon;
 use crate::{
     colors,
     id::IdGen,
+    internal::Error,
     render_util::{next_window_size_constraints, small_padding},
 };
 use nexus::imgui::{ChildWindow, StyleVar, Ui};
@@ -93,16 +94,24 @@ impl Addon {
                 });
             });
 
-        if let Some(err) = self.context.own_buffs_error {
-            let [_, max_y] = ui.window_content_region_max();
-            ui.set_cursor_pos([0.0, max_y - 1.0 * ui.text_line_height()]);
-            ui.text_colored(colors::RED, format!("Buffs Error: {err}"));
-        }
-
-        if let Some(err) = self.context.resources_error {
-            let [_, max_y] = ui.window_content_region_max();
-            ui.set_cursor_pos([0.0, max_y - 2.0 * ui.text_line_height()]);
-            ui.text_colored(colors::RED, format!("Resources Error: {err}"));
-        }
+        render_errors(
+            ui,
+            [
+                ("Buffs", self.context.own_buffs_error),
+                ("Resources", self.context.resources_error),
+                ("Traits", self.context.player.traits.err()),
+            ],
+        );
+    }
+}
+fn render_errors<'a>(ui: &Ui, errors: impl IntoIterator<Item = (&'a str, Option<Error>)>) {
+    let [_, max_y] = ui.window_content_region_max();
+    for (i, (name, err)) in errors
+        .into_iter()
+        .filter_map(|(name, err)| err.map(|err| (name, err)))
+        .enumerate()
+    {
+        ui.set_cursor_pos([0.0, max_y - (1.0 + i as f32) * ui.text_line_height()]);
+        ui.text_colored(colors::RED, format!("{name} Error: {err}"));
     }
 }

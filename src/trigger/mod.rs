@@ -1,11 +1,10 @@
-mod combat;
 mod filter;
 mod map;
 mod memo;
 mod player;
 mod progress;
 
-pub use self::{combat::*, filter::*, map::*, player::*, progress::*};
+pub use self::{filter::*, map::*, player::*, progress::*};
 
 use crate::{context::Context, elements::RenderState};
 

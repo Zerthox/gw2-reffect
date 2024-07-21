@@ -10,6 +10,9 @@ use crate::{
 use nexus::imgui::{ColorEdit, ColorPreview, Ui};
 use serde::{Deserialize, Serialize};
 
+// TODO: vec with conditions as enum with members
+// on element field with properties changeable by conditions, go through conditions & update when update flag set (memo between updates)
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Icon {

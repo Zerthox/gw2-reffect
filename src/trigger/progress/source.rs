@@ -3,7 +3,7 @@ use crate::{
     action::Action,
     context::Context,
     internal::Resource,
-    render_util::{enum_combo, helper, impl_static_variants, input_buff_id},
+    render_util::{enum_combo, helper, impl_static_variants, input_skill_id},
     traits::RenderOptions,
 };
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
@@ -133,7 +133,7 @@ impl RenderOptions for ProgressSource {
 
             match self {
                 Self::Buff(id) => {
-                    input_buff_id(ui, "Effect Id", id, InputTextFlags::empty());
+                    input_skill_id(ui, "Effect Id", id, InputTextFlags::empty());
                     Self::helper(ui);
                 }
                 Self::AnyBuff(ids) => {
@@ -141,7 +141,7 @@ impl RenderOptions for ProgressSource {
                     for (i, id) in ids.iter_mut().enumerate() {
                         let _id = ui.push_id(i as i32);
                         action.input_with_buttons(ui, i, || {
-                            input_buff_id(ui, "##id", id, InputTextFlags::empty())
+                            input_skill_id(ui, "##id", id, InputTextFlags::empty())
                         });
 
                         ui.same_line();

@@ -2,8 +2,9 @@ use super::shared::Error as InternalError;
 use std::fmt;
 use thiserror::Error;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Error)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Error)]
 pub enum Error {
+    #[default]
     #[error("Failed to extract internal")]
     Extract,
 
@@ -32,18 +33,8 @@ impl fmt::Display for InternalError {
             Self::CharacterState => write!(f, "Unavailable for current character state"),
             Self::BuffsNotFound => write!(f, "Failed go get character effects"),
             Self::HealthNotFound => write!(f, "Failed go get character health"),
-            Self::ResourceNotFound => write!(f, "Failed go get character resources"),
+            Self::SpecNotFound => write!(f, "Failed go get character specs"),
             Self::Windows => write!(f, "Windows error"),
-        }
-    }
-}
-
-impl InternalError {
-    pub fn into_result<T>(self, data: impl FnOnce() -> T) -> Result<T, Error> {
-        if self == Self::None {
-            Ok(data())
-        } else {
-            Err(self.into())
         }
     }
 }
