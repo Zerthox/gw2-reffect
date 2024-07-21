@@ -23,7 +23,7 @@ impl TraitTrigger {
         self.memo = if let Ok(traits) = &ctx.player.traits {
             self.traits.iter().all(|req| req.is_met(traits))
         } else {
-            false
+            true
         };
     }
 }
