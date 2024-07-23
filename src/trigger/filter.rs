@@ -1,6 +1,6 @@
 use super::{memo::Memo, MapTrigger, PlayerTrigger, Trigger};
 use crate::{
-    context::{Context, ContextUpdate},
+    context::{Context, ContextUpdate, EditState},
     traits::RenderOptions,
 };
 use nexus::imgui::Ui;
@@ -30,11 +30,11 @@ impl Trigger for FilterTrigger {
 }
 
 impl RenderOptions for FilterTrigger {
-    fn render_options(&mut self, ui: &Ui) {
-        self.player.render_options(ui);
+    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
+        self.player.render_options(ui, state);
 
         ui.spacing();
-        let changed = self.map.render_options(ui);
+        let changed = self.map.render_options(ui, state);
         if changed {
             // map trigger changed, ensure fresh state next access
             self.map.clear();

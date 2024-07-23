@@ -5,7 +5,7 @@ pub use self::{combat::*, traits::*};
 
 use super::Trigger;
 use crate::{
-    context::{Context, Mount, Profession, Specialization},
+    context::{Context, EditState, Mount, Profession, Specialization},
     render_util::enum_combo_bitflags,
     serde_bitflags,
     traits::RenderOptions,
@@ -55,8 +55,8 @@ impl Trigger for PlayerTrigger {
 }
 
 impl RenderOptions for PlayerTrigger {
-    fn render_options(&mut self, ui: &Ui) {
-        self.combat.render_options(ui);
+    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
+        self.combat.render_options(ui, state);
 
         ui.spacing();
 
@@ -66,7 +66,7 @@ impl RenderOptions for PlayerTrigger {
             &mut self.specs,
             ComboBoxFlags::HEIGHT_LARGE,
         );
-        self.traits.render_options(ui);
+        self.traits.render_options(ui, state);
 
         ui.spacing();
 

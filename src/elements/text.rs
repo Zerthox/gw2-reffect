@@ -2,7 +2,7 @@ use super::{AlignHorizontal, RenderState, TextDecoration};
 use crate::{
     bounds::Bounds,
     component_wise::ComponentWise,
-    context::{Context, ContextUpdate},
+    context::{Context, ContextUpdate, EditState},
     render_util::{
         draw_text_bg, font_select, helper, input_float_with_format, input_text_multi_with_menu,
         Font, Rect,
@@ -133,10 +133,10 @@ impl Bounds for Text {
 }
 
 impl RenderOptions for Text {
-    fn render_options(&mut self, ui: &Ui) {
+    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
         // TODO: we rely on buffs interval refreshing the text memo
 
-        self.progress.render_options(ui);
+        self.progress.render_options(ui, state);
 
         ui.spacing();
 

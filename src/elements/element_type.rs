@@ -1,7 +1,7 @@
 use super::{Bar, Element, Group, IconElement, IconList, RenderState, Text};
 use crate::{
     bounds::Bounds,
-    context::Context,
+    context::{Context, EditState},
     render_util::{impl_static_variants, Rect},
     traits::{Render, RenderOptions},
     tree::TreeNode,
@@ -65,13 +65,13 @@ impl Bounds for ElementType {
 }
 
 impl RenderOptions for ElementType {
-    fn render_options(&mut self, ui: &Ui) {
+    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
         match self {
-            Self::Group(group) => group.render_options(ui),
-            Self::Icon(icon) => icon.render_options(ui),
-            Self::IconList(list) => list.render_options(ui),
-            Self::Text(text) => text.render_options(ui),
-            Self::Bar(bar) => bar.render_options(ui),
+            Self::Group(group) => group.render_options(ui, state),
+            Self::Icon(icon) => icon.render_options(ui, state),
+            Self::IconList(list) => list.render_options(ui, state),
+            Self::Text(text) => text.render_options(ui, state),
+            Self::Bar(bar) => bar.render_options(ui, state),
         }
     }
 }

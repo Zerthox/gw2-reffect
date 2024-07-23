@@ -1,7 +1,7 @@
 use super::{Icon, RenderState};
 use crate::{
     bounds::Bounds,
-    context::Context,
+    context::{Context, EditState},
     render_util::{input_size, Rect},
     traits::{Render, RenderOptions},
     tree::TreeLeaf,
@@ -34,11 +34,11 @@ impl Bounds for IconElement {
 }
 
 impl RenderOptions for IconElement {
-    fn render_options(&mut self, ui: &Ui) {
+    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
         let [x, y] = &mut self.size;
         input_size(x, y);
 
-        self.icon.render_options(ui);
+        self.icon.render_options(ui, state);
     }
 }
 

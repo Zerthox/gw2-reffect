@@ -85,7 +85,7 @@ impl Addon {
                 ChildWindow::new("element-options").build(ui, || {
                     let _style = small_padding(ui);
                     for pack in &mut self.packs {
-                        let rendered = pack.try_render_options(ui, &self.context.edit);
+                        let rendered = pack.try_render_options(ui, &mut self.context.edit);
                         if rendered {
                             // end after we find the element that has to render
                             break;

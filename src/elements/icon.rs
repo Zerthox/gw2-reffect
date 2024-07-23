@@ -2,7 +2,7 @@ use super::{AlignHorizontal, IconSource, RenderState, TextDecoration};
 use crate::{
     colors::{self, with_alpha},
     component_wise::ComponentWise,
-    context::Context,
+    context::{Context, EditState},
     render_util::{draw_spinner_bg, draw_text_bg, Rect},
     traits::RenderOptions,
     trigger::{ProgressTrigger, Trigger},
@@ -172,9 +172,9 @@ impl Icon {
 }
 
 impl RenderOptions for Icon {
-    fn render_options(&mut self, ui: &Ui) {
+    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
         ui.spacing();
-        self.progress.render_options(ui);
+        self.progress.render_options(ui, state);
 
         ui.spacing();
         self.source.render_select(ui);

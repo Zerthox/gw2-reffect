@@ -1,4 +1,5 @@
 use crate::{
+    context::EditState,
     render_util::{enum_combo, helper, input_u32},
     traits::RenderOptions,
 };
@@ -62,7 +63,7 @@ impl ProgressThreshold {
 }
 
 impl RenderOptions for ProgressThreshold {
-    fn render_options(&mut self, ui: &Ui) {
+    fn render_options(&mut self, ui: &Ui, _state: &mut EditState) {
         ui.group(|| {
             enum_combo(ui, "Threshold", self, ComboBoxFlags::empty());
             helper(ui, || ui.text("When to display"));

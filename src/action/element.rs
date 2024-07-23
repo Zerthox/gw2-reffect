@@ -28,7 +28,7 @@ impl ElementAction {
         }
     }
 
-    pub fn perform(self, edit: &mut EditState, children: &mut Vec<Element>, index: usize) {
+    pub fn perform(self, children: &mut Vec<Element>, index: usize, edit: &mut EditState) {
         match self {
             Self::None => {}
             Self::Cut => {
@@ -99,8 +99,8 @@ impl ChildElementAction {
         }
     }
 
-    pub fn perform(self, edit: &mut EditState, children: &mut Vec<Element>) {
-        self.kind.perform(edit, children, self.index)
+    pub fn perform(self, children: &mut Vec<Element>, edit: &mut EditState) {
+        self.kind.perform(children, self.index, edit)
     }
 }
 

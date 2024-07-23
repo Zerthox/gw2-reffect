@@ -4,7 +4,7 @@ use crate::{
     bounds::Bounds,
     colors::{self, with_alpha_factor},
     component_wise::ComponentWise,
-    context::Context,
+    context::{Context, EditState},
     render_util::{
         enum_combo, helper, helper_slider, input_float_with_format, input_size, input_u32, Rect,
     },
@@ -101,8 +101,8 @@ impl Bounds for Bar {
 }
 
 impl RenderOptions for Bar {
-    fn render_options(&mut self, ui: &Ui) {
-        self.progress_trigger.render_options(ui);
+    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
+        self.progress_trigger.render_options(ui, state);
 
         ui.spacing();
 

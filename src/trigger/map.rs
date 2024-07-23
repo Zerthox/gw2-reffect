@@ -1,7 +1,7 @@
 use super::Trigger;
 use crate::{
     action::Action,
-    context::{Context, MapCategory},
+    context::{Context, EditState, MapCategory},
     render_util::{enum_combo, helper, impl_static_variants, input_u32},
     traits::RenderOptions,
 };
@@ -30,7 +30,7 @@ impl Trigger for MapTrigger {
 }
 
 impl RenderOptions<bool> for MapTrigger {
-    fn render_options(&mut self, ui: &Ui) -> bool {
+    fn render_options(&mut self, ui: &Ui, _state: &mut EditState) -> bool {
         let mut changed = enum_combo(ui, "Map", self, ComboBoxFlags::empty()).is_some();
 
         match self {

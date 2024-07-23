@@ -6,7 +6,7 @@ pub use self::{active::*, source::*, threshold::*};
 
 use super::Trigger;
 use crate::{
-    context::{Context, ContextUpdate},
+    context::{Context, ContextUpdate, EditState},
     elements::RenderState,
     traits::RenderOptions,
 };
@@ -64,10 +64,10 @@ impl ProgressTrigger {
 }
 
 impl RenderOptions for ProgressTrigger {
-    fn render_options(&mut self, ui: &Ui) {
-        self.source.render_options(ui);
+    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
+        self.source.render_options(ui, state);
         if !self.source.always() {
-            self.threshold.render_options(ui);
+            self.threshold.render_options(ui, state);
             // TODO: we rely on interval refreshing the memo, render options might want context for updates
         }
     }

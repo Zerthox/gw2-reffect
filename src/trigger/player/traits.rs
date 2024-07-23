@@ -1,7 +1,7 @@
 use super::Trigger;
 use crate::{
     action::Action,
-    context::{Context, ContextUpdate},
+    context::{Context, ContextUpdate, EditState},
     internal::Traits,
     render_util::{helper, input_trait_id},
     traits::RenderOptions,
@@ -38,7 +38,7 @@ impl Trigger for TraitTrigger {
 }
 
 impl RenderOptions for TraitTrigger {
-    fn render_options(&mut self, ui: &Ui) {
+    fn render_options(&mut self, ui: &Ui, _state: &mut EditState) {
         let mut action = Action::new();
         for (i, req) in self.traits.iter_mut().enumerate() {
             let _id = ui.push_id(i as i32);

@@ -1,7 +1,7 @@
 use super::{Element, RenderState};
 use crate::{
     bounds::Bounds,
-    context::Context,
+    context::{Context, EditState},
     render_util::Rect,
     traits::{Render, RenderOptions},
     tree::TreeNode,
@@ -36,5 +36,5 @@ impl Bounds for Group {
 }
 
 impl RenderOptions for Group {
-    fn render_options(&mut self, _ui: &Ui) {}
+    fn render_options(&mut self, _ui: &Ui, _state: &mut EditState) {}
 }

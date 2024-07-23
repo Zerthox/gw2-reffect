@@ -1,19 +1,20 @@
 use super::{Direction, Layout, ListIcon, RenderState};
 use crate::{
-    action::Action,
+    action::IconAction,
     bounds::Bounds,
     colors,
     component_wise::ComponentWise,
-    context::Context,
+    context::{Context, EditState},
     render_util::{
         collapsing_header_same_line_end, delete_confirm_modal, enum_combo, input_float_with_format,
-        input_size, style_disabled_if, Rect,
+        input_size, item_context_menu, style_disabled_if, Rect,
     },
     traits::{Render, RenderOptions},
     tree::TreeLeaf,
 };
 use nexus::imgui::{
-    self as ig, CollapsingHeader, ComboBoxFlags, InputTextFlags, StyleColor, TreeNodeFlags, Ui,
+    self as ig, CollapsingHeader, ComboBoxFlags, InputTextFlags, MenuItem, StyleColor,
+    TreeNodeFlags, Ui,
 };
 use serde::{Deserialize, Serialize};
 
@@ -75,7 +76,7 @@ impl Bounds for IconList {
 }
 
 impl RenderOptions for IconList {
-    fn render_options(&mut self, ui: &Ui) {
+    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
         enum_combo(ui, "Layout", &mut self.layout, ComboBoxFlags::empty());
 
         enum_combo(ui, "Direction", &mut self.direction, ComboBoxFlags::empty());
@@ -95,7 +96,7 @@ impl RenderOptions for IconList {
         ui.spacing();
         ui.text_disabled("Icons");
 
-        let mut action = Action::new();
+        let mut action = IconAction::new();
         for (i, icon) in self.icons.iter_mut().enumerate() {
             let _id = ui.push_id(i as i32);
 
@@ -107,19 +108,45 @@ impl RenderOptions for IconList {
 
             let size_x = ui.frame_height();
             let [spacing_x, _] = ui.clone_style().item_spacing;
-            let button_color = ui.push_style_color(StyleColor::Button, colors::TRANSPARENT);
             collapsing_header_same_line_end(ui, 3.0 * size_x + 2.0 * spacing_x);
 
-            if ui.arrow_button("up", ig::Direction::Up) {
-                action = Action::Up(i);
-            }
+            item_context_menu("##listiconctx", || {
+                if MenuItem::new("Cut").build(ui) {
+                    action = IconAction::Cut(i);
+                }
+                if MenuItem::new("Copy").build(ui) {
+                    state.set_clipboard(icon.clone().into_element(self.size))
+                }
 
-            ui.same_line();
-            if ui.arrow_button("down", ig::Direction::Down) {
-                action = Action::Down(i);
-            }
+                if MenuItem::new("Paste")
+                    .enabled(state.has_icon_clipboard())
+                    .build(ui)
+                {
+                    action = IconAction::Paste(i)
+                }
 
-            button_color.end();
+                if MenuItem::new("Move Up").build(ui) {
+                    action = IconAction::Up(i);
+                }
+                if MenuItem::new("Move Down").build(ui) {
+                    action = IconAction::Down(i);
+                }
+                if MenuItem::new("Delete").build(ui) {
+                    remains = false;
+                }
+            });
+
+            {
+                let _style = ui.push_style_color(StyleColor::Button, colors::TRANSPARENT);
+                if ui.arrow_button("up", ig::Direction::Up) {
+                    action = IconAction::Up(i);
+                }
+
+                ui.same_line();
+                if ui.arrow_button("down", ig::Direction::Down) {
+                    action = IconAction::Down(i);
+                }
+            }
 
             let title = format!("Confirm Delete##reffectlisticon{i}");
             if !remains {
@@ -128,13 +155,13 @@ impl RenderOptions for IconList {
             if delete_confirm_modal(ui, &title, || {
                 ui.text(format!("Delete Icon {}?", icon.name))
             }) {
-                action = Action::Delete(i);
+                action = IconAction::Delete(i);
             }
 
             drop(style);
             if open {
                 // TODO: apply option to all context menu option
-                icon.render_options(ui);
+                icon.render_options(ui, state);
                 ui.spacing();
             }
         }
@@ -142,7 +169,7 @@ impl RenderOptions for IconList {
             self.icons.push(ListIcon::default());
         }
 
-        action.perform(&mut self.icons);
+        action.perform(&mut self.icons, self.size, state);
     }
 }
 

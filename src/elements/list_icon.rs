@@ -1,5 +1,9 @@
-use super::{Icon, RenderState};
-use crate::{context::Context, render_util::Rect, traits::RenderOptions};
+use super::{Common, Element, ElementType, Icon, IconElement, RenderState};
+use crate::{
+    context::{Context, EditState},
+    render_util::Rect,
+    traits::RenderOptions,
+};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
@@ -25,15 +29,38 @@ impl ListIcon {
     pub fn bounds(&self, pos: [f32; 2], size: [f32; 2]) -> Rect {
         Icon::bounds(pos, size)
     }
+
+    pub fn into_element(self, size: [f32; 2]) -> Element {
+        Element {
+            common: Common {
+                enabled: self.enabled,
+                name: self.name.clone(),
+                ..Common::default()
+            },
+            kind: ElementType::Icon(IconElement {
+                icon: self.inner.clone(),
+                size,
+            }),
+            ..Element::default()
+        }
+    }
+
+    pub fn from_element(common: Common, element: IconElement) -> Self {
+        Self {
+            enabled: common.enabled,
+            name: common.name,
+            inner: element.icon,
+        }
+    }
 }
 
 impl RenderOptions for ListIcon {
-    fn render_options(&mut self, ui: &Ui) {
+    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
         ui.checkbox("Enabled", &mut self.enabled);
 
         ui.input_text("Name", &mut self.name).build();
 
-        self.inner.render_options(ui);
+        self.inner.render_options(ui, state);
     }
 }
 

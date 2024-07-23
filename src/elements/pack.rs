@@ -118,10 +118,10 @@ impl Pack {
 
     /// Attempts to render options if selected.
     /// Returns `true` if the pack or a child rendered.
-    pub fn try_render_options(&mut self, ui: &Ui, state: &EditState) -> bool {
+    pub fn try_render_options(&mut self, ui: &Ui, state: &mut EditState) -> bool {
         let id = self.common.id;
         if state.is_selected(id) {
-            self.render_options(ui);
+            self.render_options(ui, state);
             return true;
         } else if state.is_selected_parent(id) {
             for child in &mut self.elements {
@@ -134,10 +134,10 @@ impl Pack {
     }
 
     /// Renders the pack options.
-    fn render_options(&mut self, ui: &Ui) {
+    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
         if let Some(_token) = ui.tab_bar(self.common.id_string()) {
             if let Some(_token) = ui.tab_item("Pack") {
-                self.common.render_options(ui);
+                self.common.render_options(ui, state);
 
                 enum_combo(ui, "Anchor", &mut self.anchor, ComboBoxFlags::empty());
 

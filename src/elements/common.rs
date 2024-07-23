@@ -32,7 +32,7 @@ pub struct Common {
     pub opacity: f32,
 
     #[serde(skip)]
-    dragging: bool,
+    pub dragging: bool,
 }
 
 impl Common {
@@ -147,7 +147,7 @@ impl Common {
                 selected = true;
             }
         }
-        action.perform(state, children);
+        action.perform(children, state);
         selected
     }
 
@@ -187,7 +187,7 @@ impl Common {
 }
 
 impl RenderOptions for Common {
-    fn render_options(&mut self, ui: &Ui) {
+    fn render_options(&mut self, ui: &Ui, _state: &mut EditState) {
         ui.checkbox("Enabled", &mut self.enabled);
 
         ui.input_text("Name", &mut self.name).build();

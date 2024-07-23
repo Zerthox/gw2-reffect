@@ -1,4 +1,8 @@
-use crate::{colors::Color, context::Context, elements::RenderState};
+use crate::{
+    colors::Color,
+    context::{Context, EditState},
+    elements::RenderState,
+};
 use nexus::imgui::Ui;
 
 /// Render UI element.
@@ -10,7 +14,7 @@ pub trait Render<T = ()> {
 /// Render options UI.
 pub trait RenderOptions<T = ()> {
     /// Renders options for the type.
-    fn render_options(&mut self, ui: &Ui) -> T;
+    fn render_options(&mut self, ui: &Ui, state: &mut EditState) -> T;
 }
 
 /// Associated color.

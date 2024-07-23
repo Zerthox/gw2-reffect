@@ -33,7 +33,7 @@ pub struct Element {
     pub kind: ElementType,
 
     #[serde(skip)]
-    confirm_delete: bool,
+    pub confirm_delete: bool,
 }
 
 impl Element {
@@ -136,10 +136,10 @@ impl Element {
 
     /// Attempts to render options if selected.
     /// Returns `true` if the element or a child rendered.
-    pub fn try_render_options(&mut self, ui: &Ui, state: &EditState) -> bool {
+    pub fn try_render_options(&mut self, ui: &Ui, state: &mut EditState) -> bool {
         let id = self.common.id;
         if state.is_selected(id) {
-            self.render_options(ui);
+            self.render_options(ui, state);
             return true;
         } else if let (true, Some(children)) = (state.is_selected_parent(id), self.children()) {
             for child in children {
@@ -152,15 +152,15 @@ impl Element {
     }
 
     /// Renders the element options.
-    fn render_options(&mut self, ui: &Ui) {
+    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
         if let Some(_token) = ui.tab_bar(self.common.id_string()) {
             if let Some(_token) = ui.tab_item(&self.kind) {
-                self.common.render_options(ui);
-                self.kind.render_options(ui);
+                self.common.render_options(ui, state);
+                self.kind.render_options(ui, state);
             }
 
             if let Some(_token) = ui.tab_item("Filter") {
-                self.filter.render_options(ui);
+                self.filter.render_options(ui, state);
             }
 
             if let Some(_token) = ui.tab_item("Animation") {
@@ -173,7 +173,7 @@ impl Element {
                 }
 
                 if let Some(animation) = &mut self.animation {
-                    animation.render_options(ui);
+                    animation.render_options(ui, state);
                 }
             }
 

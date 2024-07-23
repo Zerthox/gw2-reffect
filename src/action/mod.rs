@@ -1,9 +1,10 @@
 mod element;
+mod icon;
 
 use crate::render_util::{button_size_with_spacing, close_button};
 use nexus::imgui::{Direction, Ui};
 
-pub use self::element::*;
+pub use self::{element::*, icon::*};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[must_use]

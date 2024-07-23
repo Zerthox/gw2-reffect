@@ -1,7 +1,7 @@
 use super::ProgressActive;
 use crate::{
     action::Action,
-    context::Context,
+    context::{Context, EditState},
     internal::Resource,
     render_util::{enum_combo, helper, impl_static_variants, input_skill_id},
     traits::RenderOptions,
@@ -113,7 +113,7 @@ impl ProgressSource {
 }
 
 impl RenderOptions for ProgressSource {
-    fn render_options(&mut self, ui: &Ui) {
+    fn render_options(&mut self, ui: &Ui, _state: &mut EditState) {
         ui.group(|| {
             if let Some(prev) = enum_combo(ui, "Trigger", self, ComboBoxFlags::empty()) {
                 match self {

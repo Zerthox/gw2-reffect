@@ -1,5 +1,8 @@
 use super::UiContext;
-use crate::{elements::Element, id::Id};
+use crate::{
+    elements::{Element, ElementType},
+    id::Id,
+};
 use nexus::imgui::Ui;
 
 #[derive(Debug, Clone)]
@@ -92,6 +95,16 @@ impl EditState {
 
     pub fn has_clipboard(&mut self) -> bool {
         self.clipboard.is_some()
+    }
+
+    pub fn has_icon_clipboard(&mut self) -> bool {
+        matches!(
+            self.clipboard,
+            Some(Element {
+                kind: ElementType::Icon(_),
+                ..
+            }),
+        )
     }
 
     pub fn take_clipboard(&mut self) -> Option<Element> {
