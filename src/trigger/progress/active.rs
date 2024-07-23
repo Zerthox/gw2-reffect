@@ -1,4 +1,4 @@
-use crate::internal::Resource;
+use crate::internal::{Buff, Resource};
 
 #[derive(Debug, Clone)]
 pub enum ProgressActive {
@@ -98,5 +98,21 @@ impl ProgressActive {
 
     fn format_seconds(time: u32) -> String {
         format!("{:.1}", time as f32 / 1000.0)
+    }
+}
+
+impl From<&Buff> for ProgressActive {
+    fn from(buff: &Buff) -> Self {
+        Self::Buff {
+            stacks: buff.stacks,
+            apply: buff.apply_time,
+            runout: buff.runout_time,
+        }
+    }
+}
+
+impl From<Resource> for ProgressActive {
+    fn from(resource: Resource) -> Self {
+        Self::Resource(resource)
     }
 }

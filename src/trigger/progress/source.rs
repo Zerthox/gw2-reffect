@@ -50,34 +50,31 @@ impl ProgressSource {
         matches!(self, Self::None)
     }
 
-    pub fn progress(&self, ctx: &Context) -> ProgressActive {
+    pub fn progress(&self, ctx: &Context) -> Option<ProgressActive> {
         match self {
-            Self::None => ProgressActive::Resource(Resource { current: 1, max: 1 }),
-            Self::Buff(id) => {
-                let stacks = ctx.stacks_of(*id).unwrap_or(0);
-                let (apply, runout) = ctx.time_range(*id).unwrap_or((0, 0));
-                ProgressActive::Buff {
-                    stacks,
-                    apply,
-                    runout,
-                }
-            }
+            Self::None => Some(Resource { current: 1, max: 1 }.into()),
+            Self::Buff(id) => ctx.buff(*id).map(Into::into),
             Self::AnyBuff(ids) => {
-                let stacks = ids.iter().filter_map(|id| ctx.stacks_of(*id)).sum(); // sum of all stacks
-                let (apply, runout) = ids
-                    .iter()
-                    .find_map(|id| ctx.time_range(*id))
-                    .unwrap_or((0, 0)); // times of first match, TODO: max of apply and max of runout
-                ProgressActive::Buff {
+                let mut stacks = 0;
+                let mut apply = 0;
+                let mut runout = 0;
+                for id in ids {
+                    if let Some(buff) = ctx.buff(*id) {
+                        stacks += buff.stacks;
+                        apply = apply.max(buff.apply_time);
+                        runout = runout.max(buff.runout_time);
+                    }
+                }
+                (stacks > 0).then_some(ProgressActive::Buff {
                     stacks,
                     apply,
                     runout,
-                }
+                })
             }
-            Self::Health => ProgressActive::Resource(ctx.resources.health.clone()),
-            Self::Barrier => ProgressActive::Resource(ctx.resources.barrier.clone()),
-            Self::PrimaryResource => ProgressActive::Resource(ctx.resources.primary.clone()),
-            Self::SecondaryResource => ProgressActive::Resource(ctx.resources.secondary.clone()),
+            Self::Health => ctx.resources().map(|res| res.health.clone().into()),
+            Self::Barrier => ctx.resources().map(|res| res.barrier.clone().into()),
+            Self::PrimaryResource => ctx.resources().map(|res| res.primary.clone().into()),
+            Self::SecondaryResource => ctx.resources().map(|res| res.secondary.clone().into()),
         }
     }
 

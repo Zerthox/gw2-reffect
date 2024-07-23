@@ -44,17 +44,16 @@ impl Addon {
 
                 ui.text("Own resources:");
                 ui.same_line();
-                match ctx.resources_error {
-                    None => {
+                match &ctx.resources {
+                    Ok(Resources {
+                        health,
+                        barrier,
+                        primary,
+                        secondary,
+                    }) => {
                         ui.text_colored(GREEN, "available");
                         if ui.is_item_hovered() {
                             ui.tooltip(|| {
-                                let Resources {
-                                    health,
-                                    barrier,
-                                    primary,
-                                    secondary,
-                                } = &ctx.resources;
                                 ui.text(format!("Health: {}/{}", health.current, health.max));
                                 ui.text(format!("Barrier: {}/{}", barrier.current, barrier.max));
                                 ui.text(format!("Primary: {}/{}", primary.current, primary.max));
@@ -65,7 +64,7 @@ impl Addon {
                             });
                         }
                     }
-                    Some(err) => {
+                    Err(err) => {
                         ui.text_colored(RED, "unavailable");
                         if ui.is_item_hovered() {
                             ui.tooltip_text(err.to_string());
@@ -75,12 +74,12 @@ impl Addon {
 
                 ui.text("Own buffs:");
                 ui.same_line();
-                match ctx.own_buffs_error {
-                    None => {
+                match &ctx.own_buffs {
+                    Ok(buffs) => {
                         ui.text_colored(GREEN, "available");
                         if ui.is_item_hovered() {
                             ui.tooltip(|| {
-                                for (id, buff) in &ctx.own_buffs {
+                                for (id, buff) in buffs {
                                     ui.text(format!("{}x {id} {:?}", buff.stacks, buff.category));
                                     if let Some(remain) = ctx.time_until(buff.runout_time) {
                                         let full = buff.runout_time - buff.apply_time;
@@ -97,7 +96,7 @@ impl Addon {
                             });
                         }
                     }
-                    Some(err) => {
+                    Err(err) => {
                         ui.text_colored(RED, "unavailable");
                         if ui.is_item_hovered() {
                             ui.tooltip_text(err.to_string());

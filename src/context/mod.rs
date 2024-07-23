@@ -41,16 +41,10 @@ pub struct Context {
     pub player: PlayerContext,
 
     /// Current own buffs by id.
-    pub own_buffs: BTreeMap<u32, Buff>,
-
-    /// Current own buffs error.
-    pub own_buffs_error: Option<Error>,
+    pub own_buffs: Result<BTreeMap<u32, Buff>, Error>,
 
     /// Current own resources.
-    pub resources: Resources,
-
-    /// Current own resources error.
-    pub resources_error: Option<Error>,
+    pub resources: Result<Resources, Error>,
 
     pub links: Links,
 
@@ -78,6 +72,8 @@ impl Context {
             self.player.update_fast(mumble);
 
             if self.player_interval.triggered(self.now) {
+                self.updates.insert(ContextUpdate::Player);
+
                 self.player.update_slow(mumble, internal);
                 let map_changed = self.map.update(mumble);
                 if map_changed {
@@ -85,28 +81,16 @@ impl Context {
                     log::debug!("Updating slow triggers for map id {}", self.map.id);
                 }
             }
-
-            self.updates.insert(ContextUpdate::Player);
         }
     }
 
     fn update_own_character(&mut self, internal: &Internal) {
-        self.own_buffs.clear();
-
-        let (buffs, resources) = internal.update_self();
-        self.own_buffs_error = buffs
-            .map(|buffs| {
-                self.own_buffs
-                    .extend(buffs.iter().map(|buff| (buff.id, buff.clone())));
-            })
-            .err();
-
-        (self.resources, self.resources_error) = match resources {
-            Ok(resources) => (resources, None),
-            Err(err) => (Resources::empty(), Some(err)),
-        };
-
         self.updates.insert(ContextUpdate::OwnCharacter);
+        let (buffs, resources) = internal.update_self();
+
+        self.own_buffs =
+            buffs.map(|buffs| buffs.iter().map(|buff| (buff.id, buff.clone())).collect());
+        self.resources = resources;
     }
 
     /// Whether the given update has happened.
@@ -125,32 +109,15 @@ impl Context {
         self.player_interval.frequency = PLAYER_INTERVAL;
     }
 
-    /// Returns whether own character state is available.
-    pub fn is_self_ok(&self) -> bool {
-        self.own_buffs_error.is_none()
-    }
-
     /// Returns the [`Buff`] for a given buff id, if present.
     pub fn buff(&self, id: u32) -> Option<&Buff> {
-        self.own_buffs
-            .get(&id)
-            .filter(|buff| buff.runout_time > self.now)
+        let buffs = self.own_buffs.as_ref().ok()?;
+        buffs.get(&id).filter(|buff| buff.runout_time > self.now)
     }
 
-    /// Checks whether a given buff id is present.
-    pub fn has_buff(&self, id: u32) -> bool {
-        self.buff(id).is_some()
-    }
-
-    /// Returns the number of stacks for a given buff id, if present.
-    pub fn stacks_of(&self, id: u32) -> Option<u32> {
-        self.buff(id).map(|entry| entry.stacks)
-    }
-
-    /// Returns the apply and runout time for a given buff id, if present.
-    pub fn time_range(&self, id: u32) -> Option<(u32, u32)> {
-        self.buff(id)
-            .map(|entry| (entry.apply_time, entry.runout_time))
+    /// Returns the [`Resources`] for the own character, if present.
+    pub fn resources(&self) -> Option<&Resources> {
+        self.resources.as_ref().ok()
     }
 
     /// Returns the duration passed since a given timestamp.
@@ -181,10 +148,8 @@ impl Default for Context {
             ui: UiContext::empty(),
             player: PlayerContext::empty(),
             map: MapContext::empty(),
-            own_buffs_error: None,
-            own_buffs: BTreeMap::new(),
-            resources_error: None,
-            resources: Resources::empty(),
+            own_buffs: Err(Error::default()),
+            resources: Err(Error::default()),
             links: Links::load(),
             own_interval: Interval::new(OWN_INTERVAL),
             player_interval: Interval::new(PLAYER_INTERVAL),

@@ -37,10 +37,10 @@ impl Trigger for ProgressTrigger {
 
 impl ProgressTrigger {
     fn force_update(&mut self, ctx: &Context) {
-        let progress = self.source.progress(ctx);
-        let active =
-            self.source.always() || ctx.is_self_ok() && self.threshold.is_met(progress.intensity());
-        self.active_memo = active.then_some(progress);
+        self.active_memo = self
+            .source
+            .progress(ctx)
+            .filter(|active| self.source.always() || self.threshold.is_met(active.intensity()));
     }
 
     pub fn active(&mut self, ctx: &Context) -> Option<&ProgressActive> {
