@@ -2,9 +2,8 @@ use super::shared::Error as InternalError;
 use std::fmt;
 use thiserror::Error;
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Error)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Error)]
 pub enum Error {
-    #[default]
     #[error("Failed to extract internal")]
     Extract,
 
@@ -13,6 +12,12 @@ pub enum Error {
 
     #[error("{0}")]
     Internal(InternalError),
+}
+
+impl Default for Error {
+    fn default() -> Self {
+        Self::Internal(InternalError::None)
+    }
 }
 
 impl From<InternalError> for Error {
