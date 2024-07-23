@@ -1,7 +1,6 @@
 mod active;
 mod source;
 mod threshold;
-
 pub use self::{active::*, source::*, threshold::*};
 
 use super::Trigger;
@@ -12,7 +11,6 @@ use crate::{
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
-
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct ProgressTrigger {
@@ -40,7 +38,7 @@ impl ProgressTrigger {
         self.active_memo = self
             .source
             .progress(ctx)
-            .filter(|active| self.source.always() || self.threshold.is_met(active.intensity()));
+            .filter(|active| self.source.always() || self.threshold.is_met(active, ctx));
     }
 
     pub fn active(&mut self, ctx: &Context) -> Option<&ProgressActive> {
