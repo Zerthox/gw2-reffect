@@ -21,23 +21,14 @@ impl ProgressActive {
 
     /// Returns the current progress between `0.0` and `1.0`.
     pub fn progress(&self, now: u32) -> Option<f32> {
-        let current = self.current(now)?;
-        let max = self.max();
-        (max != 0).then(|| current as f32 / max as f32)
+        Some(self.current(now)? as f32 / self.max() as f32)
     }
 
     /// Returns the current progress between `0.0` and `1.0`.
     pub fn progress_or_default(&self, now: u32) -> f32 {
-        if let Some(current) = self.current(now) {
-            let max = self.max();
-            if max != 0 {
-                current as f32 / max as f32
-            } else {
-                0.0 // default to 0 for no max
-            }
-        } else {
-            1.0 // default to 1 for no current
-        }
+        self.current(now)
+            .map(|current| current as f32 / self.max() as f32)
+            .unwrap_or(1.0)
     }
 
     /// Returns the current amount in its native unit.
@@ -54,20 +45,14 @@ impl ProgressActive {
             Self::Buff { runout, .. } => Self::time_between_checked(now, *runout)
                 .map(Self::format_seconds)
                 .unwrap_or_else(|| "?".into()),
-            Self::Resource(res) => {
-                if res.max != 0 {
-                    res.current.to_string()
-                } else {
-                    "?".into()
-                }
-            }
+            Self::Resource(resource) => resource.current.to_string(),
         }
     }
 
     /// Returns the maximum amount in its native unit.
     pub fn max(&self) -> u32 {
         match self {
-            Self::Buff { apply, runout, .. } => runout.saturating_sub(*apply),
+            Self::Buff { apply, runout, .. } => Self::time_between(*runout, *apply),
             Self::Resource(resource) => resource.max,
         }
     }
@@ -78,13 +63,7 @@ impl ProgressActive {
             Self::Buff { apply, runout, .. } => Self::time_between_checked(*apply, *runout)
                 .map(Self::format_seconds)
                 .unwrap_or_else(|| "?".into()),
-            Self::Resource(resource) => {
-                if resource.max != 0 {
-                    resource.max.to_string()
-                } else {
-                    "?".into()
-                }
-            }
+            Self::Resource(resource) => resource.max.to_string(),
         }
     }
 
