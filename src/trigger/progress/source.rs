@@ -53,24 +53,33 @@ impl ProgressSource {
     pub fn progress(&self, ctx: &Context) -> Option<ProgressActive> {
         match self {
             Self::None => Some(ProgressActive::Resource(Resource { current: 1, max: 1 })),
-            Self::Buff(id) => ctx.buff(*id).map(Into::into),
-            Self::AnyBuff(ids) => {
+            Self::Buff(id) => ctx.own_buffs().map(|buffs| {
+                buffs
+                    .buff(*id, ctx.now)
+                    .map(Into::into)
+                    .unwrap_or(ProgressActive::Buff {
+                        stacks: 0,
+                        apply: 0,
+                        runout: 0,
+                    })
+            }),
+            Self::AnyBuff(ids) => ctx.own_buffs().map(|buffs| {
                 let mut stacks = 0;
                 let mut apply = 0;
                 let mut runout = 0;
-                for id in ids {
-                    if let Some(buff) = ctx.buff(*id) {
+                for id in ids.into_iter() {
+                    if let Some(buff) = buffs.buff(*id, ctx.now) {
                         stacks += buff.stacks;
                         apply = apply.max(buff.apply_time);
                         runout = runout.max(buff.runout_time);
                     }
                 }
-                (stacks > 0).then_some(ProgressActive::Buff {
+                ProgressActive::Buff {
                     stacks,
                     apply,
                     runout,
-                })
-            }
+                }
+            }),
             Self::Health => ctx.resources()?.health.clone().try_into().ok(),
             Self::Barrier => ctx.resources()?.barrier.clone().try_into().ok(),
             Self::PrimaryResource => ctx.resources()?.primary.clone().try_into().ok(),

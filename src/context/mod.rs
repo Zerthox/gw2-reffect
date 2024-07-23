@@ -1,3 +1,4 @@
+mod buffs;
 mod edit_state;
 mod links;
 mod map;
@@ -8,12 +9,12 @@ mod ui;
 pub use self::{edit_state::*, links::*, map::*, player::*, settings::*, ui::*};
 
 use crate::{
-    internal::{Buff, Error, Internal, Resources},
+    internal::{Error, Internal, Resources},
     interval::Interval,
     render_util::Font,
 };
+use buffs::Buffs;
 use enumflags2::{bitflags, BitFlags};
-use std::collections::BTreeMap;
 use windows::Win32::Media::timeGetTime;
 
 const OWN_INTERVAL: u32 = 100;
@@ -41,7 +42,7 @@ pub struct Context {
     pub player: PlayerContext,
 
     /// Current own buffs by id.
-    pub own_buffs: Result<BTreeMap<u32, Buff>, Error>,
+    pub own_buffs: Result<Buffs, Error>,
 
     /// Current own resources.
     pub resources: Result<Resources, Error>,
@@ -87,9 +88,7 @@ impl Context {
     fn update_own_character(&mut self, internal: &Internal) {
         self.updates.insert(ContextUpdate::OwnCharacter);
         let (buffs, resources) = internal.update_self();
-
-        self.own_buffs =
-            buffs.map(|buffs| buffs.iter().map(|buff| (buff.id, buff.clone())).collect());
+        self.own_buffs = buffs.map(|buffs| buffs.iter().cloned().collect());
         self.resources = resources;
     }
 
@@ -109,10 +108,8 @@ impl Context {
         self.player_interval.frequency = PLAYER_INTERVAL;
     }
 
-    /// Returns the [`Buff`] for a given buff id, if present.
-    pub fn buff(&self, id: u32) -> Option<&Buff> {
-        let buffs = self.own_buffs.as_ref().ok()?;
-        buffs.get(&id).filter(|buff| buff.runout_time > self.now)
+    pub fn own_buffs(&self) -> Option<&Buffs> {
+        self.own_buffs.as_ref().ok()
     }
 
     /// Returns the [`Resources`] for the own character, if present.
