@@ -41,6 +41,15 @@ impl ProgressThreshold {
     }
 }
 
+impl From<ThresholdType> for ProgressThreshold {
+    fn from(threshold_type: ThresholdType) -> Self {
+        Self {
+            threshold_type,
+            amount_type: AmountType::Intensity,
+        }
+    }
+}
+
 impl RenderOptions for ProgressThreshold {
     fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
         ui.group(|| {
