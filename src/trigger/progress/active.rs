@@ -51,7 +51,7 @@ impl ProgressActive {
     /// Returns the maximum amount in its native unit.
     pub fn max(&self) -> u32 {
         match self {
-            Self::Buff { apply, runout, .. } => Self::time_between(*runout, *apply),
+            Self::Buff { apply, runout, .. } => Self::time_between(*apply, *runout),
             Self::Resource(resource) => resource.max,
         }
     }
