@@ -1,7 +1,7 @@
 use serde::{Deserialize, Deserializer, Serialize};
 use std::{marker::PhantomData, ops};
 
-/// Helper to migrate dta from an old serde format via `deserialize_with`.
+/// Helper to migrate data from an old serde format via `deserialize_with`.
 pub fn migrate<'de, D, T, P>(deserializer: D) -> Result<T, D::Error>
 where
     D: Deserializer<'de>,
