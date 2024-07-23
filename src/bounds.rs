@@ -23,6 +23,6 @@ pub trait Bounds {
                 let ([b1, b2], [b3, b4]) = b;
                 ([a1.min(b1), a2.min(b2)], [a3.max(b3), a4.max(b4)])
             })
-            .unwrap_or_else(|| (pos, pos))
+            .unwrap_or((pos, pos))
     }
 }
