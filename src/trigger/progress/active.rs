@@ -111,8 +111,14 @@ impl From<&Buff> for ProgressActive {
     }
 }
 
-impl From<Resource> for ProgressActive {
-    fn from(resource: Resource) -> Self {
-        Self::Resource(resource)
+impl TryFrom<Resource> for ProgressActive {
+    type Error = ();
+
+    fn try_from(resource: Resource) -> Result<Self, Self::Error> {
+        if resource.max != 0 {
+            Ok(Self::Resource(resource))
+        } else {
+            Err(())
+        }
     }
 }
