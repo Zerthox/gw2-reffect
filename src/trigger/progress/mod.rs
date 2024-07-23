@@ -7,10 +7,12 @@ use super::Trigger;
 use crate::{
     context::{Context, ContextUpdate, EditState},
     elements::RenderState,
+    serde_migrate::migrate,
     traits::RenderOptions,
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
+
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct ProgressTrigger {
@@ -20,6 +22,7 @@ pub struct ProgressTrigger {
 
     /// Threshold requirement.
     #[serde(alias = "stacks")]
+    #[serde(deserialize_with = "migrate::<_, _, ThresholdType>")]
     pub threshold: ProgressThreshold,
 
     /// Memoized active progress.

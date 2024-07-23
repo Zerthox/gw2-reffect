@@ -1,53 +1,48 @@
-pub mod amount_type;
+mod amount_type;
 mod threshold_type;
+
+pub use self::{amount_type::*, threshold_type::*};
 
 use super::ProgressActive;
 use crate::{
-    context::Context,
-    context::EditState,
-    render_util::{enum_combo, helper, input_u32},
+    context::{Context, EditState},
+    render_util::{enum_combo, helper, input_seconds, input_u32},
     traits::RenderOptions,
 };
-use amount_type::AmountType;
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
-use threshold_type::ThresholdType;
+
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[serde(default)]
 pub struct ProgressThreshold {
     /// Threshold type.
     pub threshold_type: ThresholdType,
 
     /// Amount type.
-    #[serde(default)]
     pub amount_type: AmountType,
 }
 
 impl ProgressThreshold {
     pub fn is_met(&self, progress_active: &ProgressActive, ctx: &Context) -> bool {
         let progress = match self.amount_type {
-            AmountType::Intensity => progress_active.intensity() as f32,
-            AmountType::Duration => {
-                Self::format_seconds(progress_active.current(ctx.now).unwrap_or_default())
-            }
+            AmountType::Intensity => progress_active.intensity(),
+            AmountType::Duration => progress_active.current(ctx.now).unwrap_or(0),
         };
 
         match self.threshold_type {
             ThresholdType::Always => true,
-            ThresholdType::Present => progress > 0.0,
-            ThresholdType::Missing => progress == 0.0,
-            ThresholdType::Min(required) => progress >= required as f32,
-            ThresholdType::Max(required) => progress <= required as f32,
-            ThresholdType::Exact(required) => progress == required as f32,
-            ThresholdType::Between(min, max) => (min as f32..=max as f32).contains(&progress),
+            ThresholdType::Present => progress > 0,
+            ThresholdType::Missing => progress == 0,
+            ThresholdType::Min(required) => progress >= required,
+            ThresholdType::Max(required) => progress <= required,
+            ThresholdType::Exact(required) => progress == required,
+            ThresholdType::Between(min, max) => (min..=max).contains(&progress),
         }
-    }
-    fn format_seconds(value: u32) -> f32 {
-        value as f32 / 1000.0
     }
 }
 
 impl RenderOptions for ProgressThreshold {
-    fn render_options(&mut self, ui: &Ui, _state: &mut EditState) {
+    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
         ui.group(|| {
             enum_combo(
                 ui,
@@ -57,57 +52,29 @@ impl RenderOptions for ProgressThreshold {
             );
             helper(ui, || ui.text("When to display"));
 
-            let (input_label, input_helper);
-            match self.amount_type {
-                AmountType::Intensity => {
-                    input_label = "Intensity";
-                    input_helper = "Intensity of the effect";
-                }
-                AmountType::Duration => {
-                    input_label = "Duration";
-                    input_helper = "Duration in seconds";
-                }
-            }
-
-            match self.threshold_type {
+            match &mut self.threshold_type {
                 ThresholdType::Always | ThresholdType::Present | ThresholdType::Missing => {}
-                ThresholdType::Min(ref mut required)
-                | ThresholdType::Max(ref mut required)
-                | ThresholdType::Exact(ref mut required) => {
-                    enum_combo(
-                        ui,
-                        "Amount type",
-                        &mut self.amount_type,
-                        ComboBoxFlags::empty(),
-                    );
-                    helper(ui, || ui.text("Type of the amount to filter"));
-                    input_u32(ui, input_label, required, 1, 10);
-                    helper(ui, || ui.text(input_helper));
+                ThresholdType::Min(required)
+                | ThresholdType::Max(required)
+                | ThresholdType::Exact(required) => {
+                    self.amount_type.render_options(ui, state);
+                    match self.amount_type {
+                        AmountType::Intensity => input_u32(ui, "Intensity", required, 1, 10),
+                        AmountType::Duration => input_seconds("Duration", required),
+                    };
                 }
-                ThresholdType::Between(ref mut min, ref mut max) => {
-                    enum_combo(
-                        ui,
-                        "Amount type",
-                        &mut self.amount_type,
-                        ComboBoxFlags::empty(),
-                    );
-                    helper(ui, || ui.text("Type of the amount to filter"));
-                    input_u32(
-                        ui,
-                        format!("Min {}", input_label.to_lowercase()),
-                        min,
-                        1,
-                        10,
-                    );
-                    helper(ui, || ui.text(input_helper));
-                    input_u32(
-                        ui,
-                        format!("Max {}", input_label.to_lowercase()),
-                        max,
-                        1,
-                        10,
-                    );
-                    helper(ui, || ui.text(input_helper));
+                ThresholdType::Between(min, max) => {
+                    self.amount_type.render_options(ui, state);
+                    match self.amount_type {
+                        AmountType::Intensity => {
+                            input_u32(ui, "Min intensity", min, 1, 10);
+                            input_u32(ui, "Max intensity", max, 1, 10);
+                        }
+                        AmountType::Duration => {
+                            input_seconds("Min duration", min);
+                            input_seconds("Max duration", max);
+                        }
+                    };
                 }
             }
         })
