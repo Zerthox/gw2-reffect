@@ -21,14 +21,13 @@ impl ProgressActive {
 
     /// Returns the current progress between `0.0` and `1.0`.
     pub fn progress(&self, now: u32) -> Option<f32> {
-        Some(self.current(now)? as f32 / self.max() as f32)
+        self.current(now)
+            .map(|current| current as f32 / self.max() as f32)
     }
 
     /// Returns the current progress between `0.0` and `1.0`.
     pub fn progress_or_default(&self, now: u32) -> f32 {
-        self.current(now)
-            .map(|current| current as f32 / self.max() as f32)
-            .unwrap_or(1.0)
+        self.progress(now).unwrap_or(1.0)
     }
 
     /// Returns the current amount in its native unit.
