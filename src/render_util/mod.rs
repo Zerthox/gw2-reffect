@@ -5,14 +5,15 @@ mod helper;
 mod input;
 mod input_text;
 mod popup;
+mod slider;
 mod spinner;
 mod style;
 mod text;
 mod tree;
 
 pub use self::{
-    button::*, combo::*, font::*, helper::*, input::*, input_text::*, popup::*, spinner::*,
-    style::*, text::*, tree::*,
+    button::*, combo::*, font::*, helper::*, input::*, input_text::*, popup::*, slider::*,
+    spinner::*, style::*, text::*, tree::*,
 };
 
 use nexus::imgui::{sys, Ui};

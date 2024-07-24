@@ -6,15 +6,14 @@ use crate::{
     component_wise::ComponentWise,
     context::{Context, EditState},
     render_util::{
-        enum_combo, helper, helper_slider, input_float_with_format, input_size, input_u32, Rect,
+        enum_combo, helper, helper_slider, input_float_with_format, input_size, input_u32,
+        slider_percent, Rect,
     },
     traits::{Render, RenderOptions},
     tree::TreeLeaf,
     trigger::ProgressTrigger,
 };
-use nexus::imgui::{
-    ColorEdit, ColorPreview, ComboBoxFlags, InputTextFlags, Slider, SliderFlags, Ui,
-};
+use nexus::imgui::{ColorEdit, ColorPreview, ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -26,6 +25,7 @@ pub struct Bar {
     #[serde(alias = "progress")]
     pub progress_kind: Progress,
     pub max: u32,
+    pub cap: f32,
 
     pub size: [f32; 2],
     pub align: Align,
@@ -43,6 +43,12 @@ pub struct Bar {
     pub ticks: Vec<f32>,
 }
 
+impl Bar {
+    fn cap(&self, value: f32) -> f32 {
+        (value / self.cap).min(1.0)
+    }
+}
+
 impl TreeLeaf for Bar {}
 
 impl Render for Bar {
@@ -51,7 +57,7 @@ impl Render for Bar {
             let alpha = ui.clone_style().alpha;
 
             let (start, end) = self.bounding_box(ui, ctx, state.pos);
-            let progress = self.progress_kind.calc(ctx, active, self.max);
+            let progress = self.cap(self.progress_kind.calc(ctx, active, self.max));
             let (offset_start, offset_end) =
                 self.direction.progress_rect_offset(self.size, progress);
             let fill_start = start.add(offset_start);
@@ -76,7 +82,8 @@ impl Render for Bar {
             let end_offset = self.direction.tick_end_offset(self.size);
             let max = active.max();
             for tick in &self.ticks {
-                if let Some(tick_progress) = self.tick_unit.calc_progress(*tick, max) {
+                let tick = self.cap(*tick);
+                if let Some(tick_progress) = self.tick_unit.calc_progress(tick, max) {
                     let offset = self
                         .direction
                         .progress_value_offset(self.size, tick_progress);
@@ -117,6 +124,9 @@ impl RenderOptions for Bar {
             input_u32(ui, "Max", &mut self.max, 1, 10);
             helper(ui, || ui.text("Maximum progress value"));
         }
+
+        slider_percent(ui, "Cap", &mut self.cap);
+        helper(ui, || ui.text("Bar cap in percent"));
 
         enum_combo(ui, "Direction", &mut self.direction, ComboBoxFlags::empty());
         helper(ui, || ui.text("Progress fill direction"));
@@ -189,26 +199,16 @@ impl RenderOptions for Bar {
         for (i, tick) in self.ticks.iter_mut().enumerate() {
             let _id = ui.push_id(i as i32);
             action.input_with_buttons(ui, i, || match self.tick_unit {
-                Unit::Absolute => {
-                    input_float_with_format(
-                        "##tick",
-                        tick,
-                        0.0,
-                        0.0,
-                        "%.1f",
-                        InputTextFlags::empty(),
-                    );
-                }
-                Unit::Percent => {
-                    let mut value = 100.0 * *tick;
-                    if Slider::new("##tick", 0.0, 100.0)
-                        .flags(SliderFlags::ALWAYS_CLAMP)
-                        .display_format("%.1f")
-                        .build(ui, &mut value)
-                    {
-                        *tick = value / 100.0;
-                    }
-                }
+                Unit::Absolute => input_float_with_format(
+                    "##tick",
+                    tick,
+                    0.0,
+                    0.0,
+                    "%.1f",
+                    InputTextFlags::empty(),
+                ),
+
+                Unit::Percent => slider_percent(ui, "##tick", tick),
             });
             ui.same_line();
             ui.text(format!("Tick {}", i + 1));
@@ -232,6 +232,7 @@ impl Default for Bar {
             progress_trigger: ProgressTrigger::default(),
             progress_kind: Progress::default(),
             max: 25,
+            cap: 1.0,
             align: Align::Center,
             size: [128.0, 12.0],
             direction: Direction::Right,
