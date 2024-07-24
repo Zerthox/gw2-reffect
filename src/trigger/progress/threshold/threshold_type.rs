@@ -15,19 +15,19 @@ pub enum ThresholdType {
 
     /// Minimum amount.
     #[strum(serialize = "Min amount")]
-    Min(u32),
+    Min(f32),
 
     /// Maximum amount.
     #[strum(serialize = "Max amount")]
-    Max(u32),
+    Max(f32),
 
     /// Exact amount.
     #[strum(serialize = "Exact amount")]
-    Exact(u32),
+    Exact(f32),
 
     /// Range of amounts.
     #[strum(serialize = "Amount between")]
-    Between(u32, u32),
+    Between(f32, f32),
 }
 
 impl VariantArray for ThresholdType {
@@ -35,9 +35,9 @@ impl VariantArray for ThresholdType {
         Self::Always,
         Self::Present,
         Self::Missing,
-        Self::Min(1),
-        Self::Max(1),
-        Self::Exact(1),
-        Self::Between(0, 1),
+        Self::Min(1.0),
+        Self::Max(1.0),
+        Self::Exact(1.0),
+        Self::Between(0.0, 1.0),
     ];
 }
