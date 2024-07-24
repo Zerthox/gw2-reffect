@@ -83,7 +83,7 @@ impl Render for Bar {
                     let start = start.add(offset);
                     let end = start.add(end_offset);
                     draw_list
-                        .add_line(start, end, self.tick_color)
+                        .add_line(start, end, with_alpha_factor(self.tick_color, alpha))
                         .thickness(self.tick_size)
                         .build();
                 }
