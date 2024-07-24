@@ -34,7 +34,7 @@ impl<'a> IntoIterator for &'a Buffs {
     type IntoIter = <&'a BTreeMap<u32, Buff> as IntoIterator>::IntoIter;
 
     fn into_iter(self) -> Self::IntoIter {
-        (&self.map).into_iter()
+        self.map.iter()
     }
 }
 

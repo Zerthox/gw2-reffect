@@ -67,7 +67,7 @@ impl ProgressSource {
                 let mut stacks = 0;
                 let mut apply = 0;
                 let mut runout = 0;
-                for id in ids.into_iter() {
+                for id in ids {
                     if let Some(buff) = buffs.buff(*id, ctx.now) {
                         stacks += buff.stacks;
                         apply = apply.max(buff.apply_time);
