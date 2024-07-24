@@ -9,7 +9,21 @@ use crate::{
 };
 
 #[derive(
-    Debug, Default, Clone, AsRefStr, IntoStaticStr, EnumIter, Serialize, Deserialize, VariantArray,
+    Debug,
+    Default,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    AsRefStr,
+    IntoStaticStr,
+    EnumIter,
+    Serialize,
+    Deserialize,
+    VariantArray,
 )]
 pub enum AmountType {
     // Intensity.
@@ -20,9 +34,10 @@ pub enum AmountType {
     Duration,
 }
 
-impl RenderOptions for AmountType {
-    fn render_options(&mut self, ui: &Ui, _state: &mut EditState) {
-        enum_combo(ui, "Amount type", self, ComboBoxFlags::empty());
+impl RenderOptions<Option<Self>> for AmountType {
+    fn render_options(&mut self, ui: &Ui, _state: &mut EditState) -> Option<Self> {
+        let result = enum_combo(ui, "Amount type", self, ComboBoxFlags::empty());
         helper(ui, || ui.text("Type of amount to check"));
+        result
     }
 }

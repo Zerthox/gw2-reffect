@@ -56,7 +56,7 @@ pub fn input_size(x: &mut f32, y: &mut f32) {
 
 pub fn input_seconds(label: impl Into<String>, ms: &mut u32) -> bool {
     let mut secs = *ms as f32 / 1000.0;
-    if input_float_with_format(label, &mut secs, 0.5, 1.0, "%.1f", InputTextFlags::empty()) {
+    if input_float_with_format(label, &mut secs, 0.5, 1.0, "%.3f", InputTextFlags::empty()) {
         *ms = (secs * 1000.0) as u32;
         true
     } else {
