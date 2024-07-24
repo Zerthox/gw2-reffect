@@ -1,6 +1,6 @@
 use crate::{
     context::EditState,
-    render_util::{cycle_progress, enum_combo, input_u32, push_alpha_change},
+    render_util::{cycle_progress, enum_combo, helper, input_seconds, push_alpha_change},
     traits::RenderOptions,
     util::non_zero_u32,
 };
@@ -31,9 +31,10 @@ impl RenderOptions for Animation {
         enum_combo(ui, "Animation", &mut self.kind, ComboBoxFlags::empty());
 
         let mut period = self.period.get();
-        if input_u32(ui, "Period", &mut period, 100, 1000) {
+        if input_seconds("Period", &mut period) {
             self.period = NonZero::new(period).unwrap_or(non_zero_u32!(1));
         }
+        helper(ui, || ui.text("Animation loop duration in seconds"));
     }
 }
 
