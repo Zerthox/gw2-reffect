@@ -35,7 +35,12 @@ impl<'a> Schema<'a> {
         let reader = BufReader::new(file);
         let schema = serde_json::from_reader::<_, Self>(reader)
             .inspect_err(|err| {
-                log::warn!("Failed to parse pack file \"{}\": {err}", file_name(path))
+                log::warn!(
+                    "Failed to parse pack file \"{}\": {err} (line {}, column {})",
+                    file_name(path),
+                    err.line(),
+                    err.column(),
+                )
             })
             .ok()?;
         log::info!(
