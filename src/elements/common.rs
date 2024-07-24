@@ -1,6 +1,7 @@
 use super::{Element, ElementType, RenderState};
 use crate::{
     action::ChildElementAction,
+    colors,
     component_wise::ComponentWise,
     context::{Context, EditState},
     id::{Id, IdGen},
@@ -68,8 +69,8 @@ impl Common {
     pub fn render_edit_indicators(&mut self, ui: &Ui, anchor: [f32; 2], bounds: Rect) {
         const ANCHOR_SIZE: f32 = 5.0;
         const ANCHOR_OFFSET: [f32; 2] = [0.5 * ANCHOR_SIZE, 0.5 * ANCHOR_SIZE];
-        const COLOR: [f32; 4] = [1.0, 0.0, 0.0, 0.8];
-        const COLOR_DRAG: [f32; 4] = [1.0, 1.0, 0.0, 0.8];
+        const COLOR: [f32; 4] = colors::WHITE;
+        const COLOR_DRAG: [f32; 4] = colors::YELLOW;
 
         let (bound_min, bound_max) = bounds;
         let window_pos = bound_min;
