@@ -13,12 +13,12 @@ use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
-#[serde(default)]
 pub struct ProgressThreshold {
     /// Threshold type.
     pub threshold_type: ThresholdType,
 
     /// Amount type.
+    #[serde(default)] // TODO: move up after migration period
     pub amount_type: AmountType,
 }
 
@@ -70,5 +70,21 @@ impl RenderOptions for ProgressThreshold {
                 self.amount_type.render_input(ui, "Max", max);
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::serde_migrate::Migrate;
+
+    #[test]
+    fn migrate() {
+        let old_json = "{ \"Between\": [1, 23] }";
+
+        let result = serde_json::from_str::<Migrate<ProgressThreshold, ThresholdType>>(&old_json);
+        assert!(result.is_ok());
+        let threshold = result.unwrap().inner;
+        assert_eq!(threshold.threshold_type, ThresholdType::Between(1.0, 23.0));
     }
 }

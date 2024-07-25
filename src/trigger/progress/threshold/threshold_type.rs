@@ -1,7 +1,9 @@
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, IntoStaticStr, VariantArray};
 
-#[derive(Debug, Default, Clone, AsRefStr, IntoStaticStr, EnumIter, Serialize, Deserialize)]
+#[derive(
+    Debug, Default, Clone, PartialEq, AsRefStr, IntoStaticStr, EnumIter, Serialize, Deserialize,
+)]
 pub enum ThresholdType {
     /// Always met.
     Always,
