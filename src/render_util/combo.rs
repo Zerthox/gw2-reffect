@@ -44,7 +44,7 @@ where
     T: Clone + AsRef<str> + EnumStaticVariants + 'static,
 {
     let mut replaced = None;
-    if let Some(_token) = ui.begin_combo_with_flags(label, &current, flags) {
+    if let Some(_token) = ui.begin_combo_with_flags(label, current.as_ref(), flags) {
         T::with_variants(|variants| {
             for entry in variants {
                 // distinguish only discriminants

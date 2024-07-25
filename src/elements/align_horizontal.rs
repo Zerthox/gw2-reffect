@@ -42,7 +42,7 @@ impl AlignHorizontal {
     }
 
     pub fn render_combo(&mut self, ui: &Ui) {
-        if let Some(_token) = ui.begin_combo("Align", &self) {
+        if let Some(_token) = ui.begin_combo("Align", self.as_ref()) {
             for entry in Self::iter() {
                 let selected = entry == *self;
                 if Selectable::new(&entry).selected(selected).build(ui) {

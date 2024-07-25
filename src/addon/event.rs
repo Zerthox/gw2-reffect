@@ -67,7 +67,7 @@ impl Addon {
                 });
 
                 for file in files {
-                    if let Some(pack) = Pack::load_from_file(&file.path()) {
+                    if let Some(pack) = Pack::load_from_file(file.path()) {
                         self.add_pack(pack);
                     }
                 }
