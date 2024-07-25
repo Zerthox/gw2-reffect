@@ -1,3 +1,5 @@
+use std::ops::Sub;
+
 use super::{Align, Direction, Progress, RenderState, Unit};
 use crate::{
     action::Action,
@@ -6,8 +8,8 @@ use crate::{
     component_wise::ComponentWise,
     context::{Context, EditState},
     render_util::{
-        enum_combo, helper, helper_slider, input_float_with_format, input_size, input_u32,
-        slider_percent, Rect,
+        enum_combo, helper, helper_slider, input_float_with_format, input_percent, input_size,
+        input_u32, slider_percent, Rect,
     },
     traits::{Render, RenderOptions},
     tree::TreeLeaf,
@@ -25,7 +27,9 @@ pub struct Bar {
     #[serde(alias = "progress")]
     pub progress_kind: Progress,
     pub max: u32,
-    pub cap: f32,
+
+    pub lower_bound: f32,
+    pub progress_factor: f32,
 
     pub size: [f32; 2],
     pub align: Align,
@@ -44,8 +48,10 @@ pub struct Bar {
 }
 
 impl Bar {
-    fn cap(&self, value: f32) -> f32 {
-        (value / self.cap).min(1.0)
+    fn process_value(&self, value: f32) -> f32 {
+        (value * self.progress_factor)
+            .sub(self.lower_bound)
+            .clamp(0.0, 1.0)
     }
 }
 
@@ -57,7 +63,7 @@ impl Render for Bar {
             let alpha = ui.clone_style().alpha;
 
             let (start, end) = self.bounding_box(ui, ctx, state.pos);
-            let progress = self.cap(self.progress_kind.calc(ctx, active, self.max));
+            let progress = self.process_value(self.progress_kind.calc(ctx, active, self.max));
             let (offset_start, offset_end) =
                 self.direction.progress_rect_offset(self.size, progress);
             let fill_start = start.add(offset_start);
@@ -82,7 +88,7 @@ impl Render for Bar {
             let end_offset = self.direction.tick_end_offset(self.size);
             let max = active.max();
             for tick in &self.ticks {
-                let tick = self.cap(*tick);
+                let tick = self.process_value(*tick);
                 if let Some(tick_progress) = self.tick_unit.calc_progress(tick, max) {
                     let offset = self
                         .direction
@@ -125,11 +131,19 @@ impl RenderOptions for Bar {
             helper(ui, || ui.text("Maximum progress value"));
         }
 
-        slider_percent(ui, "Cap", &mut self.cap);
-        helper(ui, || ui.text("Bar cap in percent"));
+        input_percent("Lower bound", &mut self.lower_bound);
+        helper(ui, || ui.text("Lower bound for progress in percent"));
+
+        let mut upper_bound = 1.0 / self.progress_factor; // keep as factor to avoid divisions outside of edit
+        if input_percent("Upper bound", &mut upper_bound) {
+            self.progress_factor = 1.0 / upper_bound.max(0.0);
+        }
+        helper(ui, || ui.text("Upper bound for progress in percent"));
 
         enum_combo(ui, "Direction", &mut self.direction, ComboBoxFlags::empty());
         helper(ui, || ui.text("Progress fill direction"));
+
+        ui.spacing();
 
         enum_combo(ui, "Align", &mut self.align, ComboBoxFlags::empty());
 
@@ -232,7 +246,8 @@ impl Default for Bar {
             progress_trigger: ProgressTrigger::default(),
             progress_kind: Progress::default(),
             max: 25,
-            cap: 1.0,
+            lower_bound: 0.0,
+            progress_factor: 1.0,
             align: Align::Center,
             size: [128.0, 12.0],
             direction: Direction::Right,

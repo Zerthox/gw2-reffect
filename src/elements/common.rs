@@ -6,13 +6,12 @@ use crate::{
     context::{Context, EditState},
     id::{Id, IdGen},
     render_util::{
-        helper_slider, input_float_with_format, push_alpha_change, EnumStaticVariants, Rect,
+        helper_slider, input_float_with_format, push_alpha_change, slider_percent,
+        EnumStaticVariants, Rect,
     },
     traits::RenderOptions,
 };
-use nexus::imgui::{
-    Condition, InputTextFlags, MenuItem, MouseButton, Slider, SliderFlags, StyleVar, Ui, Window,
-};
+use nexus::imgui::{Condition, InputTextFlags, MenuItem, MouseButton, StyleVar, Ui, Window};
 use serde::{Deserialize, Serialize};
 
 // FIXME: common default is called twice when deserializing element/pack, generating unused ids
@@ -197,14 +196,7 @@ impl RenderOptions for Common {
         input_float_with_format("Position x", x, 1.0, 10.0, "%.2f", InputTextFlags::empty());
         input_float_with_format("Position y", y, 1.0, 10.0, "%.2f", InputTextFlags::empty());
 
-        let mut opacity = 100.0 * self.opacity;
-        if Slider::new("Opacity", 0.0, 100.0)
-            .flags(SliderFlags::ALWAYS_CLAMP)
-            .display_format("%.2f")
-            .build(ui, &mut opacity)
-        {
-            self.opacity = opacity / 100.0;
-        }
+        slider_percent(ui, "Opacity", &mut self.opacity);
         helper_slider(ui);
 
         ui.spacing();

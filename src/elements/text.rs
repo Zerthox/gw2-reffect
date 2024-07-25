@@ -4,8 +4,7 @@ use crate::{
     component_wise::ComponentWise,
     context::{Context, ContextUpdate, EditState},
     render_util::{
-        draw_text_bg, font_select, helper, input_float_with_format, input_text_multi_with_menu,
-        Font, Rect,
+        draw_text_bg, font_select, helper, input_percent, input_text_multi_with_menu, Font, Rect,
     },
     traits::{Render, RenderOptions},
     tree::TreeLeaf,
@@ -24,7 +23,9 @@ pub struct Text {
 
     #[serde(rename = "font")]
     pub font_name: Option<String>,
-    pub size: f32,
+
+    #[serde(alias = "size")]
+    pub scale: f32,
     pub align: AlignHorizontal,
     pub color: [f32; 4],
     pub decoration: TextDecoration,
@@ -89,7 +90,7 @@ impl Text {
     }
 
     fn calc_pos(&self, ui: &Ui, pos: [f32; 2], text: &str) -> [f32; 2] {
-        let offset = self.align.text_offset(ui, text, self.size);
+        let offset = self.align.text_offset(ui, text, self.scale);
         pos.add(offset)
     }
 
@@ -106,7 +107,7 @@ impl Render for Text {
 
         if let Some(text) = &self.text_memo {
             let _font = self.loaded_font.map(|font| font.push());
-            let font_scale = self.size;
+            let font_scale = self.scale;
             let pos = self.calc_pos(ui, state.pos, text);
             let [r, g, b, a] = self.color;
             let alpha = a * ui.clone_style().alpha;
@@ -126,7 +127,7 @@ impl Bounds for Text {
             .map(|text| {
                 let pos = self.calc_pos(ui, pos, text);
                 let size = ui.calc_text_size(text);
-                (pos, pos.add(size.mul_scalar(self.size)))
+                (pos, pos.add(size.mul_scalar(self.scale)))
             })
             .unwrap_or_default()
     }
@@ -159,17 +160,7 @@ impl RenderOptions for Text {
             ui.text("%% for % sign");
         });
 
-        let mut size = 100.0 * self.size;
-        if input_float_with_format(
-            "Size",
-            &mut size,
-            10.0,
-            100.0,
-            "%.2f",
-            InputTextFlags::empty(),
-        ) {
-            self.size = size / 100.0;
-        }
+        input_percent("Scale", &mut self.scale);
 
         if font_select(ui, "Font", &mut self.loaded_font) {
             self.font_name = self.loaded_font.map(|font| font.name_owned());
@@ -191,7 +182,7 @@ impl Default for Text {
             text: String::new(),
             progress: ProgressTrigger::default(),
             align: AlignHorizontal::Center,
-            size: 1.0,
+            scale: 1.0,
             font_name: None,
             color: [1.0, 1.0, 1.0, 1.0],
             decoration: TextDecoration::default(),

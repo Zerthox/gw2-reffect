@@ -53,6 +53,22 @@ pub fn input_size(x: &mut f32, y: &mut f32) {
     input_float_with_format("Size x", x, 1.0, 10.0, "%.2f", InputTextFlags::empty());
     input_float_with_format("Size y", y, 1.0, 10.0, "%.2f", InputTextFlags::empty());
 }
+pub fn input_percent(label: impl Into<String>, value: &mut f32) -> bool {
+    let mut percent = *value * 100.0;
+    if input_float_with_format(
+        label,
+        &mut percent,
+        10.0,
+        100.0,
+        "%.2f",
+        InputTextFlags::empty(),
+    ) {
+        *value = percent / 100.0;
+        true
+    } else {
+        false
+    }
+}
 
 pub fn input_seconds(label: impl Into<String>, ms: &mut u32) -> bool {
     let mut secs = *ms as f32 / 1000.0;
