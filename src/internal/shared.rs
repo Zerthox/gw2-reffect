@@ -167,7 +167,7 @@ impl Resources {
 #[repr(C)]
 pub struct Resource {
     /// Current amount.
-    pub current: u32,
+    pub current: u32, // TODO: as f32?
 
     /// Maximum amount.
     pub max: u32,

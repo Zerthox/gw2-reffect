@@ -17,7 +17,7 @@ use serde::{Deserialize, Serialize};
 #[serde(default)]
 pub struct Icon {
     #[serde(alias = "buff")]
-    pub progress: ProgressTrigger,
+    pub progress: ProgressTrigger, // TODO: move to element/list icon, allow inherit
 
     #[serde(rename = "icon")]
     pub source: IconSource,

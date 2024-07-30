@@ -3,6 +3,7 @@ use crate::{component_wise::ComponentWise, context::Context};
 
 // TODO: as visitor?
 // TODO: add tint + opacity as color, scale, use instead of imgui globals?
+// TODO: add screen anchor, pos only relative, apply scale before final render?
 
 /// Current render state.
 ///

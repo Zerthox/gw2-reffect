@@ -1,4 +1,8 @@
-use crate::{addon::Addon, assets::MONSTER_ICON, elements::IconSource};
+use crate::{
+    addon::Addon,
+    assets::{MONSTER_ICON, TEMP_ICON},
+    elements::IconSource,
+};
 use nexus::{
     imgui::TextureId,
     texture::{
@@ -20,14 +24,18 @@ static TEXTURE_MANAGER: OnceLock<Mutex<TextureManager>> = OnceLock::new();
 #[derive(Debug)]
 pub struct TextureManager {
     loader: Option<TextureLoader>,
+    error: Option<TextureId>,
     pending: HashMap<String, IconSource>,
     loaded: HashMap<IconSource, TextureId>,
 }
 
 impl TextureManager {
+    const ERROR_ID: &'static str = "REFFECT_ICON_ERROR";
+
     fn new() -> Self {
         Self {
             loader: TextureLoader::spawn(Self::loader_thread),
+            error: None,
             pending: HashMap::new(),
             loaded: HashMap::new(),
         }
@@ -65,16 +73,20 @@ impl TextureManager {
     }
 
     fn with_defaults(mut self) -> Self {
+        self.try_load_from_mem(Self::ERROR_ID, TEMP_ICON);
+        self.try_load_from_mem(IconSource::UNKNOWN_ID, MONSTER_ICON);
+        self
+    }
+
+    fn try_load_from_mem(&mut self, id: impl AsRef<str>, data: impl AsRef<[u8]>) {
         // check for the texture ourself to avoid recursive locking
-        let id = IconSource::UNKNOWN_ID;
+        let id = id.as_ref();
         if let Some(texture) = get_texture(id) {
             self.loaded.insert(IconSource::Unknown, texture.id());
         } else {
             self.pending.insert(id.into(), IconSource::Unknown);
-            load_texture_from_memory(id, MONSTER_ICON, Some(Self::RECEIVE_TEXTURE));
+            load_texture_from_memory(id, data, Some(Self::RECEIVE_TEXTURE));
         };
-
-        self
     }
 
     pub fn load() -> &'static Mutex<TextureManager> {
@@ -153,11 +165,19 @@ impl TextureManager {
     }
 
     fn add_loaded(&mut self, pending_id: &str, texture_id: Option<TextureId>) {
-        if let Some(source) = self.pending.remove(pending_id) {
+        if pending_id == Self::ERROR_ID {
+            self.error = texture_id;
+            if self.error.is_none() {
+                log::error!("Failed to error icon source");
+            }
+        } else if let Some(source) = self.pending.remove(pending_id) {
             if let Some(texture_id) = texture_id {
                 self.loaded.insert(source, texture_id);
             } else {
                 log::warn!("Failed to load icon source {}", source.pretty_print());
+                if let Some(texture_id) = self.error {
+                    self.loaded.insert(source, texture_id);
+                }
             }
         } else {
             log::warn!("Received load for non-pending texture \"{}\"", pending_id);
