@@ -39,7 +39,7 @@ impl Text {
         if ctx.has_update_or_edit(ContextUpdate::OwnCharacter) {
             self.text_memo = state
                 .trigger_active()
-                .map(|active| Self::process_text(&self.text, &active, ctx, state));
+                .map(|active| Self::process_text(&self.text, active, ctx, state));
         }
     }
 
