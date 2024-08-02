@@ -55,7 +55,7 @@ impl Render for Bar {
             let alpha = ui.clone_style().alpha;
 
             let (start, end) = self.bounding_box(ui, ctx, state.pos);
-            let progress = self.process_value(self.progress_kind.calc(ctx, &active, self.max));
+            let progress = self.process_value(self.progress_kind.calc(ctx, active, self.max));
             let (offset_start, offset_end) =
                 self.direction.progress_rect_offset(self.size, progress);
             let fill_start = start.add(offset_start);
