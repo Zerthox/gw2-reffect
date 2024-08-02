@@ -11,6 +11,10 @@ pub enum ProgressActive {
 }
 
 impl ProgressActive {
+    pub fn dummy() -> Self {
+        Self::Resource(Resource { current: 1, max: 1 })
+    }
+
     /// Returns the intensity (alternative progress).
     pub fn intensity(&self) -> u32 {
         match self {

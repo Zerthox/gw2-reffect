@@ -5,7 +5,6 @@ use crate::{
     context::{Context, EditState},
     render_util::{draw_spinner_bg, draw_text_bg, Rect},
     traits::RenderOptions,
-    trigger::{ProgressTrigger, Trigger},
 };
 use nexus::imgui::{ColorEdit, ColorPreview, Ui};
 use serde::{Deserialize, Serialize};
@@ -16,9 +15,6 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Icon {
-    #[serde(alias = "buff")]
-    pub progress: ProgressTrigger, // TODO: move to element/list icon, allow inherit
-
     #[serde(rename = "icon")]
     pub source: IconSource,
 
@@ -43,13 +39,12 @@ impl Icon {
         [r, g, b, a * ui.clone_style().alpha]
     }
 
-    pub fn is_visible(&mut self, ctx: &Context, state: &RenderState) -> bool {
-        self.progress.is_active_or_edit(ctx, state)
+    pub fn is_visible(&mut self, _ctx: &Context, state: &RenderState) -> bool {
+        state.trigger_active().is_some()
     }
 
     pub fn rel_bounds(size: [f32; 2]) -> Rect {
         let [half_x, half_y] = size.mul_scalar(0.5);
-
         ([-half_x, -half_y], [half_x, half_y])
     }
 
@@ -76,7 +71,7 @@ impl Icon {
 
             // render duration bar
             if self.duration_bar {
-                if let Some(active) = self.progress.active_or_edit(ctx, state) {
+                if let Some(active) = state.trigger_active() {
                     if let Some(progress) = active.progress(ctx.now) {
                         // TODO: customization
                         const HEIGHT: f32 = 2.0;
@@ -101,7 +96,7 @@ impl Icon {
 
             // render stack count
             if self.stacks_text {
-                if let Some(active) = self.progress.active_or_edit(ctx, state) {
+                if let Some(active) = state.trigger_active() {
                     let stacks = active.intensity();
                     let text = if stacks > 99 {
                         "!"
@@ -128,7 +123,7 @@ impl Icon {
 
             // render duration text
             if self.duration_text {
-                if let Some(active) = self.progress.active_or_edit(ctx, state) {
+                if let Some(active) = state.trigger_active() {
                     if let Some(remain) = active.current(ctx.now) {
                         // TODO: customization
                         const MIN_REMAIN: u32 = 5000; // show from 5s remaining
@@ -172,11 +167,7 @@ impl Icon {
 }
 
 impl RenderOptions for Icon {
-    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
-        ui.spacing();
-        self.progress.render_options(ui, state);
-
-        ui.spacing();
+    fn render_options(&mut self, ui: &Ui, _state: &mut EditState) {
         self.source.render_select(ui);
 
         ColorEdit::new("Tint", &mut self.tint)
@@ -196,7 +187,6 @@ impl RenderOptions for Icon {
 impl Default for Icon {
     fn default() -> Self {
         Self {
-            progress: ProgressTrigger::default(),
             source: IconSource::Unknown,
             duration_bar: false,
             duration_text: false,

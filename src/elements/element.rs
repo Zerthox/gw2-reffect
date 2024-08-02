@@ -24,7 +24,6 @@ pub struct Element {
     pub common: Common,
 
     // TODO: move filter, animation to common to allow on pack? need to figure out pack render conditions, debug tab
-    #[serde(alias = "trigger")]
     pub filter: FilterTrigger,
 
     pub animation: Option<Animation>,
@@ -52,7 +51,7 @@ impl Element {
 
     /// Renders the element.
     pub fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
-        self.common.render(ui, ctx, state, |state| {
+        self.common.render_child(ui, ctx, state, |state| {
             if self.filter.is_active_or_edit(ctx, &state) {
                 let mut body = || self.kind.render(ui, ctx, &state);
                 if let Some(animation) = &mut self.animation {

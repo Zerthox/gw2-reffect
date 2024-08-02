@@ -1,5 +1,3 @@
-use std::ops::Sub;
-
 use super::{Align, Direction, Progress, RenderState, Unit};
 use crate::{
     action::Action,
@@ -13,7 +11,6 @@ use crate::{
     },
     traits::{Render, RenderOptions},
     tree::TreeLeaf,
-    trigger::ProgressTrigger,
 };
 use nexus::imgui::{ColorEdit, ColorPreview, ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
@@ -21,9 +18,6 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Bar {
-    #[serde(alias = "buff")]
-    pub progress_trigger: ProgressTrigger,
-
     #[serde(alias = "progress")]
     pub progress_kind: Progress,
     pub max: u32,
@@ -49,9 +43,7 @@ pub struct Bar {
 
 impl Bar {
     fn process_value(&self, value: f32) -> f32 {
-        (value * self.progress_factor)
-            .sub(self.lower_bound)
-            .clamp(0.0, 1.0)
+        ((value * self.progress_factor) - self.lower_bound).clamp(0.0, 1.0)
     }
 }
 
@@ -59,11 +51,11 @@ impl TreeLeaf for Bar {}
 
 impl Render for Bar {
     fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
-        if let Some(active) = &self.progress_trigger.active_or_edit(ctx, state) {
+        if let Some(active) = state.trigger_active() {
             let alpha = ui.clone_style().alpha;
 
             let (start, end) = self.bounding_box(ui, ctx, state.pos);
-            let progress = self.process_value(self.progress_kind.calc(ctx, active, self.max));
+            let progress = self.process_value(self.progress_kind.calc(ctx, &active, self.max));
             let (offset_start, offset_end) =
                 self.direction.progress_rect_offset(self.size, progress);
             let fill_start = start.add(offset_start);
@@ -114,11 +106,7 @@ impl Bounds for Bar {
 }
 
 impl RenderOptions for Bar {
-    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
-        self.progress_trigger.render_options(ui, state);
-
-        ui.spacing();
-
+    fn render_options(&mut self, ui: &Ui, _state: &mut EditState) {
         enum_combo(
             ui,
             "Progress",
@@ -243,7 +231,6 @@ impl RenderOptions for Bar {
 impl Default for Bar {
     fn default() -> Self {
         Self {
-            progress_trigger: ProgressTrigger::default(),
             progress_kind: Progress::default(),
             max: 25,
             lower_bound: 0.0,

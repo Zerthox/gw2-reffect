@@ -1,5 +1,5 @@
 use super::Common;
-use crate::{component_wise::ComponentWise, context::Context};
+use crate::{component_wise::ComponentWise, context::Context, trigger::ProgressActive};
 
 // TODO: as visitor?
 // TODO: add tint + opacity as color, scale, use instead of imgui globals?
@@ -21,11 +21,18 @@ pub struct RenderState<'a> {
 }
 
 impl<'a> RenderState<'a> {
-    pub fn new(edit: bool, pos: [f32; 2], common: &'a Common) -> Self {
-        Self { edit, pos, common }
+    pub fn initial(edit: bool, pos: [f32; 2], common: &'a Common) -> Self {
+        Self {
+            edit,
+            pos: pos.add(common.pos),
+            common,
+        }
     }
 
-    pub fn for_element<'b>(&'a self, common: &'b Common, ctx: &Context) -> RenderState<'b> {
+    pub fn for_child<'b>(&'a self, ctx: &Context, common: &'b Common) -> RenderState<'b>
+    where
+        'a: 'b,
+    {
         RenderState {
             edit: self.edit || ctx.edit.is_edited(common.id),
             pos: common.pos(self),
@@ -44,5 +51,9 @@ impl<'a> RenderState<'a> {
 
     pub fn is_edit(&self, ctx: &Context) -> bool {
         self.edit || ctx.edit.is_edited_parent(self.common.id)
+    }
+
+    pub fn trigger_active(&self) -> Option<&ProgressActive> {
+        self.common.trigger.active()
     }
 }

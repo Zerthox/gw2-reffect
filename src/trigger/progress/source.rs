@@ -12,8 +12,11 @@ use strum::{AsRefStr, EnumIter, IntoStaticStr};
 
 #[derive(Debug, Default, Clone, AsRefStr, IntoStaticStr, EnumIter, Serialize, Deserialize)]
 pub enum ProgressSource {
-    /// Always active, no associated progress.
+    /// Inherit from above.
     #[default]
+    Inherit,
+
+    /// Always active, no associated progress.
     #[serde(alias = "Always")]
     None,
 
@@ -46,12 +49,17 @@ pub enum ProgressSource {
 impl_static_variants!(ProgressSource);
 
 impl ProgressSource {
-    pub fn always(&self) -> bool {
+    pub fn no_threshold(&self) -> bool {
         matches!(self, Self::None)
     }
 
-    pub fn progress(&self, ctx: &Context) -> Option<ProgressActive> {
+    pub fn progress(
+        &self,
+        ctx: &Context,
+        parent: Option<&ProgressActive>,
+    ) -> Option<ProgressActive> {
         match self {
+            Self::Inherit => parent.cloned(),
             Self::None => Some(ProgressActive::Resource(Resource { current: 1, max: 1 })),
             Self::Buff(id) => ctx.own_buffs().map(|buffs| {
                 buffs
@@ -87,9 +95,10 @@ impl ProgressSource {
         }
     }
 
-    pub fn progress_edit(&self, ctx: &Context) -> ProgressActive {
+    pub fn progress_edit(&self, ctx: &Context, parent: Option<&ProgressActive>) -> ProgressActive {
         match self {
-            Self::None => ProgressActive::Resource(Resource { current: 1, max: 1 }),
+            Self::Inherit => parent.cloned().unwrap_or(ProgressActive::dummy()),
+            Self::None => ProgressActive::dummy(),
             Self::Buff(_) | Self::AnyBuff(_) => {
                 let apply = ctx.now - (ctx.now % 5000);
                 ProgressActive::Buff {

@@ -4,17 +4,15 @@ mod threshold;
 
 pub use self::{active::*, source::*, threshold::*};
 
-use super::Trigger;
 use crate::{
     context::{Context, ContextUpdate, EditState},
-    elements::RenderState,
     serde_migrate::migrate,
     traits::RenderOptions,
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct ProgressTrigger {
     /// Progress source.
@@ -31,46 +29,53 @@ pub struct ProgressTrigger {
     active_memo: Option<ProgressActive>,
 }
 
-impl Trigger for ProgressTrigger {
-    fn is_active(&mut self, ctx: &Context) -> bool {
-        self.active(ctx).is_some()
-    }
-}
-
 impl ProgressTrigger {
-    fn force_update(&mut self, ctx: &Context) {
-        self.active_memo = self
-            .source
-            .progress(ctx)
-            .filter(|active| self.source.always() || self.threshold.is_met(active, ctx));
-    }
-
-    pub fn active(&mut self, ctx: &Context) -> Option<&ProgressActive> {
+    pub fn update(&mut self, ctx: &Context, edited: bool, parent: Option<&ProgressActive>) {
         if ctx.has_update_or_edit(ContextUpdate::OwnCharacter) {
-            self.force_update(ctx);
+            self.active_memo = self.active_updated(ctx, edited, parent);
         }
-        self.active_memo.as_ref()
     }
 
-    pub fn active_or_edit(&mut self, ctx: &Context, state: &RenderState) -> Option<ProgressActive> {
+    fn active_updated(
+        &mut self,
+        ctx: &Context,
+        edited: bool,
+        parent: Option<&ProgressActive>,
+    ) -> Option<ProgressActive> {
         if ctx.edit.is_editing() {
-            if state.is_edit(ctx) {
-                Some(self.source.progress_edit(ctx))
+            if edited {
+                Some(self.source.progress_edit(ctx, parent))
             } else {
                 None
             }
         } else {
-            self.active(ctx).cloned()
+            self.source
+                .progress(ctx, parent)
+                .filter(|active| !self.source.no_threshold() || self.threshold.is_met(active, ctx))
         }
+    }
+
+    pub fn active(&self) -> Option<&ProgressActive> {
+        self.active_memo.as_ref()
     }
 }
 
 impl RenderOptions for ProgressTrigger {
     fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
         self.source.render_options(ui, state);
-        if !self.source.always() {
+        if !self.source.no_threshold() {
             self.threshold.render_options(ui, state);
             // TODO: we rely on interval refreshing the memo, render options might want context for updates
+        }
+    }
+}
+
+impl Clone for ProgressTrigger {
+    fn clone(&self) -> Self {
+        Self {
+            source: self.source.clone(),
+            threshold: self.threshold.clone(),
+            active_memo: None, // dont clone the memo
         }
     }
 }

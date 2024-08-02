@@ -1,6 +1,7 @@
-use super::{Common, Element, RenderState, ScreenAnchor};
+use super::{Common, Element, ScreenAnchor};
 use crate::{
     bounds::Bounds,
+    component_wise::ComponentWise,
     context::{Context, EditState},
     render_util::{
         delete_confirm_modal, enum_combo, item_context_menu, style_disabled, style_disabled_if,
@@ -60,16 +61,16 @@ impl Pack {
     /// Renders the pack.
     pub fn render(&mut self, ui: &Ui, ctx: &Context) {
         let edit = ctx.edit.show_all && ctx.edit.is_edited_or_parent(self.common.id);
-        let anchor = self.anchor.calc_pos(ui);
-        let state = RenderState::new(edit, anchor, &self.common);
-        self.common.render(ui, ctx, &state, |state| {
-            for element in &mut self.elements {
-                element.render(ui, ctx, &state);
-            }
-        });
+        let anchor_pos = self.anchor.calc_pos(ui);
+        self.common
+            .render_initial(ui, ctx, edit, anchor_pos, |state| {
+                for element in &mut self.elements {
+                    element.render(ui, ctx, &state);
+                }
+            });
 
         if ctx.edit.is_edited(self.common.id) {
-            let pos = self.common.pos(&state);
+            let pos = anchor_pos.add(self.common.pos);
             let bounds = Bounds::combined_bounds(self.elements.iter(), ui, ctx, pos);
             self.common.render_edit_indicators(ui, pos, bounds)
         }

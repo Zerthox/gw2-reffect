@@ -10,6 +10,7 @@ use crate::{
         EnumStaticVariants, Rect,
     },
     traits::RenderOptions,
+    trigger::ProgressTrigger,
 };
 use nexus::imgui::{Condition, InputTextFlags, MenuItem, MouseButton, StyleVar, Ui, Window};
 use serde::{Deserialize, Serialize};
@@ -31,6 +32,11 @@ pub struct Common {
 
     pub opacity: f32,
 
+    #[serde(alias = "buff")]
+    #[serde(alias = "progress")]
+    #[serde(alias = "progress_trigger")]
+    pub trigger: ProgressTrigger,
+
     #[serde(skip)]
     pub dragging: bool,
 }
@@ -48,16 +54,37 @@ impl Common {
         state.pos.add(self.pos)
     }
 
-    pub fn render(
-        &self,
+    pub fn render_initial(
+        &mut self,
         ui: &Ui,
         ctx: &Context,
-        state: &RenderState,
+        edit: bool,
+        pos: [f32; 2],
         contents: impl FnOnce(RenderState),
     ) {
         if self.visible(ctx) {
-            let state = state.for_element(self, ctx);
+            self.trigger.update(ctx, edit, None);
+
             let _style = push_alpha_change(ui, self.opacity);
+            let state = RenderState::initial(edit, pos, self);
+            contents(state);
+        }
+    }
+
+    pub fn render_child(
+        &mut self,
+        ui: &Ui,
+        ctx: &Context,
+        parent: &RenderState,
+        contents: impl FnOnce(RenderState),
+    ) {
+        if self.visible(ctx) {
+            let edit = parent.is_edit(ctx) || ctx.edit.is_edited(self.id);
+            let parent_active = parent.common.trigger.active();
+            self.trigger.update(ctx, edit, parent_active);
+
+            let _style = push_alpha_change(ui, self.opacity);
+            let state = parent.for_child(ctx, self);
             contents(state);
         }
     }
@@ -187,7 +214,7 @@ impl Common {
 }
 
 impl RenderOptions for Common {
-    fn render_options(&mut self, ui: &Ui, _state: &mut EditState) {
+    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
         ui.checkbox("Enabled", &mut self.enabled);
 
         ui.input_text("Name", &mut self.name).build();
@@ -198,6 +225,10 @@ impl RenderOptions for Common {
 
         slider_percent(ui, "Opacity", &mut self.opacity);
         helper_slider(ui);
+
+        ui.spacing();
+
+        self.trigger.render_options(ui, state);
 
         ui.spacing();
     }
@@ -211,6 +242,7 @@ impl Default for Common {
             name: "Unnamed".into(),
             pos: [0.0, 0.0],
             opacity: 1.0,
+            trigger: ProgressTrigger::default(),
             dragging: false,
         }
     }
@@ -224,6 +256,7 @@ impl Clone for Common {
             name: self.name.clone(),
             pos: self.pos,
             opacity: self.opacity,
+            trigger: self.trigger.clone(),
             dragging: false,
         }
     }

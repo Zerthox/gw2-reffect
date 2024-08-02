@@ -6,10 +6,10 @@ use strum::{AsRefStr, EnumIter, IntoStaticStr, VariantArray};
 )]
 pub enum ThresholdType {
     /// Always met.
+    #[default]
     Always,
 
     /// Must be present.
-    #[default]
     Present,
 
     /// Must be missing.

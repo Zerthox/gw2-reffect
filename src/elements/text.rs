@@ -8,17 +8,14 @@ use crate::{
     },
     traits::{Render, RenderOptions},
     tree::TreeLeaf,
-    trigger::{ProgressActive, ProgressTrigger},
+    trigger::ProgressActive,
 };
 use nexus::imgui::{ColorEdit, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Text {
-    #[serde(alias = "buff")]
-    pub progress: ProgressTrigger,
-
     pub text: String,
 
     #[serde(rename = "font")]
@@ -40,9 +37,8 @@ pub struct Text {
 impl Text {
     pub fn update_text(&mut self, ctx: &Context, state: &RenderState) {
         if ctx.has_update_or_edit(ContextUpdate::OwnCharacter) {
-            self.text_memo = self
-                .progress
-                .active_or_edit(ctx, state)
+            self.text_memo = state
+                .trigger_active()
                 .map(|active| Self::process_text(&self.text, &active, ctx, state));
         }
     }
@@ -134,10 +130,8 @@ impl Bounds for Text {
 }
 
 impl RenderOptions for Text {
-    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
+    fn render_options(&mut self, ui: &Ui, _state: &mut EditState) {
         // TODO: we rely on buffs interval refreshing the text memo
-
-        self.progress.render_options(ui, state);
 
         ui.spacing();
 
@@ -180,7 +174,6 @@ impl Default for Text {
     fn default() -> Self {
         Self {
             text: String::new(),
-            progress: ProgressTrigger::default(),
             align: AlignHorizontal::Center,
             scale: 1.0,
             font_name: None,
@@ -188,6 +181,21 @@ impl Default for Text {
             decoration: TextDecoration::default(),
             loaded_font: None,
             text_memo: None,
+        }
+    }
+}
+
+impl Clone for Text {
+    fn clone(&self) -> Self {
+        Self {
+            text: self.text.clone(),
+            align: self.align,
+            scale: self.scale,
+            font_name: self.font_name.clone(),
+            color: self.color,
+            decoration: self.decoration,
+            loaded_font: self.loaded_font,
+            text_memo: None, // dont clone the memo
         }
     }
 }
