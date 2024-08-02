@@ -30,6 +30,17 @@ pub struct ProgressTrigger {
 }
 
 impl ProgressTrigger {
+    pub fn effect() -> Self {
+        Self {
+            source: ProgressSource::Buff(0),
+            threshold: ProgressThreshold {
+                threshold_type: ThresholdType::Present,
+                amount_type: AmountType::default(),
+            },
+            active_memo: None,
+        }
+    }
+
     pub fn update(&mut self, ctx: &Context, edited: bool, parent: Option<&ProgressActive>) {
         if ctx.has_update_or_edit(ContextUpdate::OwnCharacter) {
             // TODO: end of edit causes memo to "flash", maybe flag to end edit mode?

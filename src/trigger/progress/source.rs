@@ -17,8 +17,8 @@ pub enum ProgressSource {
     Inherit,
 
     /// Always active, no associated progress.
-    #[serde(alias = "Always")]
-    None,
+    #[serde(alias = "None")]
+    Always,
 
     /// Single buff id.
     #[serde(alias = "Single")]
@@ -50,7 +50,7 @@ impl_static_variants!(ProgressSource);
 
 impl ProgressSource {
     pub fn no_threshold(&self) -> bool {
-        matches!(self, Self::None)
+        matches!(self, Self::Always)
     }
 
     pub fn progress(
@@ -60,7 +60,7 @@ impl ProgressSource {
     ) -> Option<ProgressActive> {
         match self {
             Self::Inherit => parent.cloned(),
-            Self::None => Some(ProgressActive::Resource(Resource { current: 1, max: 1 })),
+            Self::Always => Some(ProgressActive::Resource(Resource { current: 1, max: 1 })),
             Self::Buff(id) => ctx.own_buffs().map(|buffs| {
                 buffs
                     .buff(*id, ctx.now)
@@ -98,7 +98,7 @@ impl ProgressSource {
     pub fn progress_edit(&self, ctx: &Context, parent: Option<&ProgressActive>) -> ProgressActive {
         match self {
             Self::Inherit => parent.cloned().unwrap_or(ProgressActive::dummy()),
-            Self::None => ProgressActive::dummy(),
+            Self::Always => ProgressActive::dummy(),
             Self::Buff(_) | Self::AnyBuff(_) => {
                 let apply = ctx.now - (ctx.now % 5000);
                 ProgressActive::Buff {
@@ -132,47 +132,45 @@ impl ProgressSource {
 
 impl RenderOptions for ProgressSource {
     fn render_options(&mut self, ui: &Ui, _state: &mut EditState) {
-        ui.group(|| {
-            if let Some(prev) = enum_combo(ui, "Trigger", self, ComboBoxFlags::empty()) {
-                match self {
-                    Self::Buff(id) => {
-                        if let Some(first) = prev.into_ids().first() {
-                            *id = *first;
-                        }
-                    }
-                    Self::AnyBuff(ids) => *ids = prev.into_ids(),
-                    _ => {}
-                }
-            }
-            helper(ui, || ui.text("Source of information"));
-
+        if let Some(prev) = enum_combo(ui, "Trigger", self, ComboBoxFlags::empty()) {
             match self {
                 Self::Buff(id) => {
-                    input_skill_id(ui, "Effect Id", id, InputTextFlags::empty());
-                    Self::helper(ui);
-                }
-                Self::AnyBuff(ids) => {
-                    let mut action = Action::new();
-                    for (i, id) in ids.iter_mut().enumerate() {
-                        let _id = ui.push_id(i as i32);
-                        action.input_with_buttons(ui, i, || {
-                            input_skill_id(ui, "##id", id, InputTextFlags::empty())
-                        });
-
-                        ui.same_line();
-                        ui.text(format!("Effect Id {}", i + 1));
-                        if i == 0 {
-                            Self::helper(ui);
-                        }
+                    if let Some(first) = prev.into_ids().first() {
+                        *id = *first;
                     }
-                    if ui.button("Add Effect") {
-                        ids.push(0);
-                    }
-
-                    action.perform(ids);
                 }
+                Self::AnyBuff(ids) => *ids = prev.into_ids(),
                 _ => {}
             }
-        })
+        }
+        helper(ui, || ui.text("Source of information"));
+
+        match self {
+            Self::Buff(id) => {
+                input_skill_id(ui, "Effect Id", id, InputTextFlags::empty());
+                Self::helper(ui);
+            }
+            Self::AnyBuff(ids) => {
+                let mut action = Action::new();
+                for (i, id) in ids.iter_mut().enumerate() {
+                    let _id = ui.push_id(i as i32);
+                    action.input_with_buttons(ui, i, || {
+                        input_skill_id(ui, "##id", id, InputTextFlags::empty())
+                    });
+
+                    ui.same_line();
+                    ui.text(format!("Effect Id {}", i + 1));
+                    if i == 0 {
+                        Self::helper(ui);
+                    }
+                }
+                if ui.button("Add Effect") {
+                    ids.push(0);
+                }
+
+                action.perform(ids);
+            }
+            _ => {}
+        }
     }
 }

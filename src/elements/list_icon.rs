@@ -85,7 +85,7 @@ impl Default for ListIcon {
         Self {
             enabled: true,
             name: "Unnamed".into(),
-            trigger: ProgressTrigger::default(),
+            trigger: ProgressTrigger::effect(),
             inner: Icon::default(),
         }
     }
