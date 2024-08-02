@@ -3,6 +3,7 @@ use crate::{
     context::{Context, EditState},
     render_util::Rect,
     traits::RenderOptions,
+    trigger::ProgressTrigger,
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
@@ -12,6 +13,11 @@ use serde::{Deserialize, Serialize};
 pub struct ListIcon {
     pub enabled: bool,
     pub name: String,
+
+    #[serde(alias = "buff")]
+    #[serde(alias = "progress")]
+    #[serde(alias = "progress_active")]
+    pub trigger: ProgressTrigger,
 
     #[serde(flatten)]
     pub inner: Icon,
@@ -34,11 +40,12 @@ impl ListIcon {
         Element {
             common: Common {
                 enabled: self.enabled,
-                name: self.name.clone(),
+                name: self.name,
+                trigger: self.trigger,
                 ..Common::default()
             },
             kind: ElementType::Icon(IconElement {
-                icon: self.inner.clone(),
+                icon: self.inner,
                 size,
             }),
             ..Element::default()
@@ -49,6 +56,7 @@ impl ListIcon {
         Self {
             enabled: common.enabled,
             name: common.name,
+            trigger: common.trigger,
             inner: element.icon,
         }
     }
@@ -57,8 +65,13 @@ impl ListIcon {
 impl RenderOptions for ListIcon {
     fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
         ui.checkbox("Enabled", &mut self.enabled);
-
         ui.input_text("Name", &mut self.name).build();
+
+        ui.spacing();
+
+        self.trigger.render_options(ui, state);
+
+        ui.spacing();
 
         self.inner.render_options(ui, state);
     }
@@ -69,6 +82,7 @@ impl Default for ListIcon {
         Self {
             enabled: true,
             name: "Unnamed".into(),
+            trigger: ProgressTrigger::default(),
             inner: Icon::default(),
         }
     }
