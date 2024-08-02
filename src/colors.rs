@@ -63,6 +63,18 @@ pub const LIGHT_GREY: Color = rgb(0.75, 0.75, 0.75);
 
 pub const GREY: Color = rgb(0.5, 0.5, 0.5);
 
+pub const GUILD_WARS_2: Color = rgb(0.98, 0.03, 0.0);
+
+pub const HEART_OF_THORNS: Color = rgb(0.0, 0.68, 0.09);
+
+pub const PATH_OF_FIRE: Color = rgb(0.68, 0.0, 0.52);
+
+pub const ICEBROOD_SAGA: Color = rgb(0.04, 0.65, 1.0);
+
+pub const END_OF_DRAGONS: Color = rgb(0.05, 0.93, 0.83);
+
+pub const SECRETS_OF_THE_OBSCURE: Color = rgb(0.95, 0.70, 0.07);
+
 pub const GUARDIAN: Color = rgb(0.45, 0.76, 0.85);
 
 pub const WARRIOR: Color = rgb(1.00, 0.82, 0.40);

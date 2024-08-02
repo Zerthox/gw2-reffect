@@ -168,6 +168,14 @@ impl RenderOptions for IconList {
         if ui.button("Add Icon") {
             self.icons.push(ListIcon::default());
         }
+        item_context_menu("##addiconctx", || {
+            if MenuItem::new("Paste")
+                .enabled(state.has_icon_clipboard())
+                .build(ui)
+            {
+                action = IconAction::Paste(self.icons.len());
+            }
+        });
 
         action.perform(&mut self.icons, self.size, state);
     }

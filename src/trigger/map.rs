@@ -2,7 +2,9 @@ use super::Trigger;
 use crate::{
     action::Action,
     context::{Context, EditState, MapCategory},
-    render_util::{enum_combo, helper, impl_static_variants, input_u32},
+    render_util::{
+        enum_combo, helper, impl_static_variants, input_u32, item_context_menu, map_select,
+    },
     traits::RenderOptions,
 };
 use nexus::imgui::{ComboBoxFlags, Ui};
@@ -58,6 +60,12 @@ impl RenderOptions<bool> for MapTrigger {
                     ids.push(0);
                     changed = true;
                 }
+                item_context_menu("addctx", || {
+                    if let Some(maps) = map_select(ui) {
+                        ids.extend(maps.iter().map(|map| map.id));
+                    }
+                });
+                helper(ui, || ui.text("Right click to insert commonly used maps"));
 
                 changed |= action.perform(ids);
             }

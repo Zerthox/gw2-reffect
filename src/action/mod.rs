@@ -6,6 +6,8 @@ use nexus::imgui::{Direction, Ui};
 
 pub use self::{element::*, icon::*};
 
+// TODO: action clear entire vec?
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[must_use]
 pub enum Action {
