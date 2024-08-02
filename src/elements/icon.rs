@@ -1,12 +1,13 @@
-use super::{AlignHorizontal, IconSource, RenderState, TextDecoration};
+use super::{AlignHorizontal, IconSource, RenderState};
 use crate::{
-    colors::{self, with_alpha},
+    colors::{self, with_alpha, with_alpha_factor},
     component_wise::ComponentWise,
     context::{Context, EditState},
-    render_util::{draw_spinner_bg, draw_text_bg, Rect},
+    render_util::{draw_spinner_bg, draw_text_bg, input_color_alpha, Rect},
+    settings::icon::{DurationBarSettings, DurationTextSettings, StackTextSettings},
     traits::RenderOptions,
 };
-use nexus::imgui::{ColorEdit, ColorPreview, Ui};
+use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
 // TODO: vec with conditions as enum with members
@@ -73,21 +74,19 @@ impl Icon {
             if self.duration_bar {
                 if let Some(active) = state.trigger_active() {
                     if let Some(progress) = active.progress(ctx.now) {
-                        // TODO: customization
-                        const HEIGHT: f32 = 2.0;
-                        const PAD_X: f32 = 0.0;
+                        let DurationBarSettings { height, color } = ctx.icon_settings.duration_bar;
 
                         let [start_x, _] = start;
                         let [end_x, end_y] = end;
 
-                        let x1 = start_x + PAD_X;
-                        let x2 = end_x - PAD_X;
+                        let x1 = start_x;
+                        let x2 = end_x;
                         let x_mid = x1 + progress * (x2 - x1);
-                        let y1 = end_y - HEIGHT;
+                        let y1 = end_y - height;
                         let y2 = end_y;
 
                         ui.get_background_draw_list()
-                            .add_rect([x1, y1], [x_mid, y2], [0.0, 1.0, 0.0, alpha])
+                            .add_rect([x1, y1], [x_mid, y2], with_alpha_factor(color, alpha))
                             .filled(true)
                             .build();
                     }
@@ -97,6 +96,13 @@ impl Icon {
             // render stack count
             if self.stacks_text {
                 if let Some(active) = state.trigger_active() {
+                    let StackTextSettings {
+                        scale,
+                        offset,
+                        color: color @ [_, _, _, alpha],
+                        decoration,
+                    } = ctx.icon_settings.stack_text;
+
                     let stacks = active.intensity();
                     let text = if stacks > 99 {
                         "!"
@@ -105,18 +111,14 @@ impl Icon {
                     };
 
                     let [width, height] = size;
-                    let font_size = 0.5 * width.min(height);
+                    let font_size = scale * width.min(height);
                     let font_scale = font_size / ui.current_font_size();
                     let [x_offset, _] = AlignHorizontal::Right.text_offset(ui, text, font_scale);
-                    let pad = [1.0, 1.0];
                     let line_height = font_scale * ui.text_line_height();
-                    let text_pos = end.add([x_offset, -line_height]).sub(pad);
+                    let text_pos = end.add([x_offset, -line_height]).sub(offset);
 
-                    let alpha = 0.8; // FIXME: animation alpha ignored
-                    let color = with_alpha(colors::WHITE, alpha);
-                    let shadow_color = with_alpha(colors::BLACK, alpha);
-
-                    TextDecoration::Shadow.render(ui, text, text_pos, font_scale, shadow_color);
+                    let decoration_color = with_alpha(colors::BLACK, alpha);
+                    decoration.render(ui, text, text_pos, font_scale, decoration_color);
                     draw_text_bg(ui, text, text_pos, font_scale, color);
                 }
             }
@@ -125,29 +127,24 @@ impl Icon {
             if self.duration_text {
                 if let Some(active) = state.trigger_active() {
                     if let Some(remain) = active.current(ctx.now) {
-                        // TODO: customization
-                        const MIN_REMAIN: u32 = 5000; // show from 5s remaining
+                        let DurationTextSettings {
+                            min_remain,
+                            scale,
+                            color: color @ [_, _, _, alpha],
+                            decoration,
+                        } = ctx.icon_settings.duration_text;
 
-                        if remain < MIN_REMAIN {
+                        if remain < min_remain {
                             let text = active.current_text(ctx.now);
 
                             let [width, height] = size;
-                            let font_size = 0.5 * width.min(height);
+                            let font_size = scale * width.min(height);
                             let font_scale = font_size / ui.current_font_size();
                             let offset = AlignHorizontal::Center.text_offset(ui, &text, font_scale);
                             let text_pos = state.pos.add(offset);
 
-                            let alpha = 1.0; // FIXME: animation alpha ignored
-                            let color = with_alpha(colors::WHITE, alpha);
-                            let shadow_color = with_alpha(colors::BLACK, alpha);
-
-                            TextDecoration::Outline.render(
-                                ui,
-                                &text,
-                                text_pos,
-                                font_scale,
-                                shadow_color,
-                            );
+                            let decoration_color = with_alpha(colors::BLACK, alpha);
+                            decoration.render(ui, &text, text_pos, font_scale, decoration_color);
                             draw_text_bg(ui, &text, text_pos, font_scale, color);
                         }
                     }
@@ -170,10 +167,7 @@ impl RenderOptions for Icon {
     fn render_options(&mut self, ui: &Ui, _state: &mut EditState) {
         self.source.render_select(ui);
 
-        ColorEdit::new("Tint", &mut self.tint)
-            .preview(ColorPreview::Alpha)
-            .alpha_bar(true)
-            .build(ui);
+        input_color_alpha(ui, "Tint", &mut self.tint);
 
         // TODO: duration customizations
         ui.checkbox("Show Duration Bar", &mut self.duration_bar);

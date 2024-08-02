@@ -1,9 +1,10 @@
 use super::Addon;
 use crate::{
-    elements::TextDecoration,
     render_util::{
-        enum_combo, font_select, helper, input_float_with_format, input_u32, style_disabled,
+        enum_combo, font_select, helper, input_color_alpha, input_float_with_format, input_percent,
+        input_pos, input_seconds, input_u32,
     },
+    settings::icon::{DurationBarSettings, DurationTextSettings, StackTextSettings},
 };
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, TreeNodeFlags, Ui};
 
@@ -29,90 +30,66 @@ impl Addon {
 
                 font_select(ui, "Font", &mut self.context.font);
 
+                ui.spacing();
                 if ui.collapsing_header(
-                    "Stacks Text (soon)",
+                    "Stacks Text",
                     TreeNodeFlags::SPAN_AVAIL_WIDTH | TreeNodeFlags::DEFAULT_OPEN,
                 ) {
-                    let _style = style_disabled(ui); // TODO: stacks settings
+                    let StackTextSettings {
+                        scale,
+                        offset,
+                        color,
+                        decoration,
+                    } = &mut self.context.icon_settings.stack_text;
 
                     let _id = ui.push_id("stackstext");
-                    enum_combo(
-                        ui,
-                        "Decoration",
-                        &mut TextDecoration::Shadow,
-                        ComboBoxFlags::empty(),
-                    );
-
-                    input_float_with_format(
-                        "Size",
-                        &mut 100.0,
-                        1.0,
-                        10.0,
-                        "%.2f",
-                        InputTextFlags::READ_ONLY,
-                    );
-
-                    input_float_with_format(
-                        "Position x",
-                        &mut 0.0,
-                        10.0,
-                        100.0,
-                        "%.2f",
-                        InputTextFlags::READ_ONLY,
-                    );
-                    input_float_with_format(
-                        "Position y",
-                        &mut 0.0,
-                        10.0,
-                        100.0,
-                        "%.2f",
-                        InputTextFlags::READ_ONLY,
-                    );
+                    input_percent("Scale", scale);
+                    input_pos(offset);
+                    enum_combo(ui, "Decoration", decoration, ComboBoxFlags::empty());
+                    input_color_alpha(ui, "Color", color);
                 }
 
+                ui.spacing();
                 if ui.collapsing_header(
-                    "Duration Text (soon)",
+                    "Duration Text",
                     TreeNodeFlags::SPAN_AVAIL_WIDTH | TreeNodeFlags::DEFAULT_OPEN,
                 ) {
-                    let _style = style_disabled(ui); // TODO: duration text settings
+                    let DurationTextSettings {
+                        min_remain,
+                        scale,
+                        color,
+                        decoration,
+                    } = &mut self.context.icon_settings.duration_text;
 
                     let _id = ui.push_id("duratext");
-                    enum_combo(
-                        ui,
-                        "Decoration",
-                        &mut TextDecoration::Outline,
-                        ComboBoxFlags::empty(),
-                    );
+                    input_seconds("Min remaining", min_remain);
+                    helper(ui, || ui.text("Minimum time remaining in seconds"));
+                    input_percent("Scale", scale);
+                    enum_combo(ui, "Decoration", decoration, ComboBoxFlags::empty());
+                    input_color_alpha(ui, "Color", color);
+                }
 
+                ui.spacing();
+                if ui.collapsing_header(
+                    "Duration Bar",
+                    TreeNodeFlags::SPAN_AVAIL_WIDTH | TreeNodeFlags::DEFAULT_OPEN,
+                ) {
+                    let DurationBarSettings { height, color } =
+                        &mut self.context.icon_settings.duration_bar;
+
+                    let _id = ui.push_id("durabar");
                     input_float_with_format(
-                        "Size",
-                        &mut 100.0,
+                        "Height",
+                        height,
                         1.0,
                         10.0,
                         "%.2f",
-                        InputTextFlags::READ_ONLY,
+                        InputTextFlags::empty(),
                     );
-
-                    input_float_with_format(
-                        "Position x",
-                        &mut 0.0,
-                        10.0,
-                        100.0,
-                        "%.2f",
-                        InputTextFlags::READ_ONLY,
-                    );
-                    input_float_with_format(
-                        "Position y",
-                        &mut 0.0,
-                        10.0,
-                        100.0,
-                        "%.2f",
-                        InputTextFlags::READ_ONLY,
-                    );
+                    input_color_alpha(ui, "Color", color);
                 }
 
-                // TODO: duration bar settings
-
+                ui.spacing();
                 if ui.collapsing_header("Advanced", TreeNodeFlags::SPAN_AVAIL_WIDTH) {
                     if input_u32(
                         ui,

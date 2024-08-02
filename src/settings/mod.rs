@@ -1,3 +1,5 @@
+pub mod icon;
+
 use super::Addon;
 use crate::context::{Context, ContextSettings};
 use serde::{Deserialize, Serialize};

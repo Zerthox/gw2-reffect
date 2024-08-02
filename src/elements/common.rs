@@ -6,13 +6,12 @@ use crate::{
     context::{Context, EditState},
     id::{Id, IdGen},
     render_util::{
-        helper_slider, input_float_with_format, push_alpha_change, slider_percent,
-        EnumStaticVariants, Rect,
+        helper_slider, input_pos, push_alpha_change, slider_percent, EnumStaticVariants, Rect,
     },
     traits::RenderOptions,
     trigger::ProgressTrigger,
 };
-use nexus::imgui::{Condition, InputTextFlags, MenuItem, MouseButton, StyleVar, Ui, Window};
+use nexus::imgui::{Condition, MenuItem, MouseButton, StyleVar, Ui, Window};
 use serde::{Deserialize, Serialize};
 
 // FIXME: common default is called twice when deserializing element/pack, generating unused ids
@@ -219,9 +218,7 @@ impl RenderOptions for Common {
 
         ui.input_text("Name", &mut self.name).build();
 
-        let [x, y] = &mut self.pos;
-        input_float_with_format("Position x", x, 1.0, 10.0, "%.2f", InputTextFlags::empty());
-        input_float_with_format("Position y", y, 1.0, 10.0, "%.2f", InputTextFlags::empty());
+        input_pos(&mut self.pos);
 
         slider_percent(ui, "Opacity", &mut self.opacity);
         helper_slider(ui);

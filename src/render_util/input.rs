@@ -49,10 +49,16 @@ pub fn input_float_with_format(
     }
 }
 
-pub fn input_size(x: &mut f32, y: &mut f32) {
+pub fn input_pos([x, y]: &mut [f32; 2]) {
+    input_float_with_format("Position x", x, 1.0, 10.0, "%.2f", InputTextFlags::empty());
+    input_float_with_format("Position y", y, 1.0, 10.0, "%.2f", InputTextFlags::empty());
+}
+
+pub fn input_size([x, y]: &mut [f32; 2]) {
     input_float_with_format("Size x", x, 1.0, 10.0, "%.2f", InputTextFlags::empty());
     input_float_with_format("Size y", y, 1.0, 10.0, "%.2f", InputTextFlags::empty());
 }
+
 pub fn input_percent(label: impl Into<String>, value: &mut f32) -> bool {
     let mut percent = *value * 100.0;
     if input_float_with_format(

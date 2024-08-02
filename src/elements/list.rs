@@ -81,8 +81,7 @@ impl RenderOptions for IconList {
 
         enum_combo(ui, "Direction", &mut self.direction, ComboBoxFlags::empty());
 
-        let [x, y] = &mut self.size;
-        input_size(x, y);
+        input_size(&mut self.size);
 
         input_float_with_format(
             "Spacing",

@@ -35,8 +35,7 @@ impl Bounds for IconElement {
 
 impl RenderOptions for IconElement {
     fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
-        let [x, y] = &mut self.size;
-        input_size(x, y);
+        input_size(&mut self.size);
 
         self.icon.render_options(ui, state);
     }

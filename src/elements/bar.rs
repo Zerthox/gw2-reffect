@@ -6,13 +6,13 @@ use crate::{
     component_wise::ComponentWise,
     context::{Context, EditState},
     render_util::{
-        enum_combo, helper, helper_slider, input_float_with_format, input_percent, input_size,
-        input_u32, slider_percent, Rect,
+        enum_combo, helper, helper_slider, input_color_alpha, input_float_with_format,
+        input_percent, input_size, input_u32, slider_percent, Rect,
     },
     traits::{Render, RenderOptions},
     tree::TreeLeaf,
 };
-use nexus::imgui::{ColorEdit, ColorPreview, ComboBoxFlags, InputTextFlags, Ui};
+use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -135,18 +135,11 @@ impl RenderOptions for Bar {
 
         enum_combo(ui, "Align", &mut self.align, ComboBoxFlags::empty());
 
-        let [x, y] = &mut self.size;
-        input_size(x, y);
+        input_size(&mut self.size);
 
-        ColorEdit::new("Fill", &mut self.fill)
-            .preview(ColorPreview::Alpha)
-            .alpha_bar(true)
-            .build(ui);
+        input_color_alpha(ui, "Fill", &mut self.fill);
 
-        ColorEdit::new("Background", &mut self.background)
-            .preview(ColorPreview::Alpha)
-            .alpha_bar(true)
-            .build(ui);
+        input_color_alpha(ui, "Background", &mut self.background);
 
         ui.checkbox("Border", &mut self.border);
         if self.border {
@@ -161,10 +154,7 @@ impl RenderOptions for Bar {
                 self.border_size = self.border_size.max(0.0);
             }
 
-            ColorEdit::new("Border color", &mut self.border_color)
-                .preview(ColorPreview::Alpha)
-                .alpha_bar(true)
-                .build(ui);
+            input_color_alpha(ui, "Border color", &mut self.border_color);
         }
 
         ui.spacing();
@@ -180,10 +170,7 @@ impl RenderOptions for Bar {
             self.tick_size = self.tick_size.max(0.0);
         }
 
-        ColorEdit::new("Tick color", &mut self.tick_color)
-            .preview(ColorPreview::Alpha)
-            .alpha_bar(true)
-            .build(ui);
+        input_color_alpha(ui, "Tick color", &mut self.tick_color);
 
         if let Some(prev) = enum_combo(ui, "Tick unit", &mut self.tick_unit, ComboBoxFlags::empty())
         {

@@ -12,6 +12,7 @@ use crate::{
     internal::{Error, Internal, Resources},
     interval::Interval,
     render_util::Font,
+    settings::icon::IconSettings,
 };
 use buffs::Buffs;
 use enumflags2::{bitflags, BitFlags};
@@ -54,6 +55,8 @@ pub struct Context {
     pub player_interval: Interval,
 
     pub font: Option<Font>,
+
+    pub icon_settings: IconSettings,
 }
 
 impl Context {
@@ -151,6 +154,7 @@ impl Default for Context {
             own_interval: Interval::new(OWN_INTERVAL),
             player_interval: Interval::new(PLAYER_INTERVAL),
             font: None,
+            icon_settings: IconSettings::default(),
         }
     }
 }

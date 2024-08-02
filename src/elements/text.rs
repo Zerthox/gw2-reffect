@@ -4,13 +4,14 @@ use crate::{
     component_wise::ComponentWise,
     context::{Context, ContextUpdate, EditState},
     render_util::{
-        draw_text_bg, font_select, helper, input_percent, input_text_multi_with_menu, Font, Rect,
+        draw_text_bg, font_select, helper, input_color_alpha, input_percent,
+        input_text_multi_with_menu, Font, Rect,
     },
     traits::{Render, RenderOptions},
     tree::TreeLeaf,
     trigger::ProgressActive,
 };
-use nexus::imgui::{ColorEdit, InputTextFlags, Ui};
+use nexus::imgui::{InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -162,9 +163,7 @@ impl RenderOptions for Text {
 
         self.align.render_combo(ui);
 
-        ColorEdit::new("Color", &mut self.color)
-            .alpha(false)
-            .build(ui);
+        input_color_alpha(ui, "Color", &mut self.color);
 
         self.decoration.render_select(ui);
     }
