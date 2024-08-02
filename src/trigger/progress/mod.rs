@@ -32,6 +32,7 @@ pub struct ProgressTrigger {
 impl ProgressTrigger {
     pub fn update(&mut self, ctx: &Context, edited: bool, parent: Option<&ProgressActive>) {
         if ctx.has_update_or_edit(ContextUpdate::OwnCharacter) {
+            // TODO: end of edit causes memo to "flash", maybe flag to end edit mode?
             self.active_memo = self.active_updated(ctx, edited, parent);
         }
     }
@@ -51,7 +52,7 @@ impl ProgressTrigger {
         } else {
             self.source
                 .progress(ctx, parent)
-                .filter(|active| !self.source.no_threshold() || self.threshold.is_met(active, ctx))
+                .filter(|active| self.source.no_threshold() || self.threshold.is_met(active, ctx))
         }
     }
 

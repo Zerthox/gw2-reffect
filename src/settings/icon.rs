@@ -35,7 +35,7 @@ impl Default for StackTextSettings {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct DurationTextSettings {
-    pub min_remain: u32,
+    pub max_remain: u32,
     pub scale: f32,
     pub color: [f32; 4],
     pub decoration: TextDecoration,
@@ -44,7 +44,7 @@ pub struct DurationTextSettings {
 impl Default for DurationTextSettings {
     fn default() -> Self {
         Self {
-            min_remain: 5000,
+            max_remain: 5000,
             scale: 0.5,
             color: colors::WHITE,
             decoration: TextDecoration::Outline,

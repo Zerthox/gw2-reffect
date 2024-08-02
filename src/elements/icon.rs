@@ -6,6 +6,7 @@ use crate::{
     render_util::{draw_spinner_bg, draw_text_bg, input_color_alpha, Rect},
     settings::icon::{DurationBarSettings, DurationTextSettings, StackTextSettings},
     traits::RenderOptions,
+    trigger::ProgressActive,
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
@@ -40,10 +41,6 @@ impl Icon {
         [r, g, b, a * ui.clone_style().alpha]
     }
 
-    pub fn is_visible(&mut self, _ctx: &Context, state: &RenderState) -> bool {
-        state.trigger_active().is_some()
-    }
-
     pub fn rel_bounds(size: [f32; 2]) -> Rect {
         let [half_x, half_y] = size.mul_scalar(0.5);
         ([-half_x, -half_y], [half_x, half_y])
@@ -56,23 +53,30 @@ impl Icon {
         (start, end)
     }
 
-    pub fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState, size: [f32; 2]) {
-        let texture = self.source.get_texture();
-        if self.source.is_empty() || texture.is_some() {
-            let (start, end) = Self::bounds(state.pos, size);
-            let color @ [_, _, _, alpha] = self.texture_color(ui);
+    pub fn render(
+        &mut self,
+        ui: &Ui,
+        ctx: &Context,
+        state: &RenderState,
+        active: Option<&ProgressActive>,
+        size: [f32; 2],
+    ) {
+        if let Some(active) = active {
+            let texture = self.source.get_texture();
+            if self.source.is_empty() || texture.is_some() {
+                let (start, end) = Self::bounds(state.pos, size);
+                let color @ [_, _, _, alpha] = self.texture_color(ui);
 
-            // render icon
-            if let Some(texture) = texture {
-                ui.get_background_draw_list()
-                    .add_image(texture, start, end)
-                    .col(color)
-                    .build();
-            }
+                // render icon
+                if let Some(texture) = texture {
+                    ui.get_background_draw_list()
+                        .add_image(texture, start, end)
+                        .col(color)
+                        .build();
+                }
 
-            // render duration bar
-            if self.duration_bar {
-                if let Some(active) = state.trigger_active() {
+                // render duration bar
+                if self.duration_bar {
                     if let Some(progress) = active.progress(ctx.now) {
                         let DurationBarSettings { height, color } = ctx.icon_settings.duration_bar;
 
@@ -91,11 +95,9 @@ impl Icon {
                             .build();
                     }
                 }
-            }
 
-            // render stack count
-            if self.stacks_text {
-                if let Some(active) = state.trigger_active() {
+                // render stack count
+                if self.stacks_text {
                     let StackTextSettings {
                         scale,
                         offset,
@@ -121,20 +123,18 @@ impl Icon {
                     decoration.render(ui, text, text_pos, font_scale, decoration_color);
                     draw_text_bg(ui, text, text_pos, font_scale, color);
                 }
-            }
 
-            // render duration text
-            if self.duration_text {
-                if let Some(active) = state.trigger_active() {
+                // render duration text
+                if self.duration_text {
                     if let Some(remain) = active.current(ctx.now) {
                         let DurationTextSettings {
-                            min_remain,
+                            max_remain,
                             scale,
                             color: color @ [_, _, _, alpha],
                             decoration,
                         } = ctx.icon_settings.duration_text;
 
-                        if remain < min_remain {
+                        if remain < max_remain {
                             let text = active.current_text(ctx.now);
 
                             let [width, height] = size;
@@ -149,16 +149,16 @@ impl Icon {
                         }
                     }
                 }
+            } else {
+                let [x, _] = size;
+                draw_spinner_bg(
+                    ui,
+                    state.pos,
+                    0.4 * x,
+                    colors::WHITE,
+                    with_alpha(colors::WHITE, 0.3),
+                )
             }
-        } else {
-            let [x, _] = size;
-            draw_spinner_bg(
-                ui,
-                state.pos,
-                0.4 * x,
-                colors::WHITE,
-                with_alpha(colors::WHITE, 0.3),
-            )
         }
     }
 }

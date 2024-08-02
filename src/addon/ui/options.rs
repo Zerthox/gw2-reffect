@@ -55,15 +55,15 @@ impl Addon {
                     TreeNodeFlags::SPAN_AVAIL_WIDTH | TreeNodeFlags::DEFAULT_OPEN,
                 ) {
                     let DurationTextSettings {
-                        min_remain,
+                        max_remain: min_remain,
                         scale,
                         color,
                         decoration,
                     } = &mut self.context.icon_settings.duration_text;
 
                     let _id = ui.push_id("duratext");
-                    input_seconds("Min remaining", min_remain);
-                    helper(ui, || ui.text("Minimum time remaining in seconds"));
+                    input_seconds("Remaining", min_remain);
+                    helper(ui, || ui.text("Maximum time remaining in seconds"));
                     input_percent("Scale", scale);
                     enum_combo(ui, "Decoration", decoration, ComboBoxFlags::empty());
                     input_color_alpha(ui, "Color", color);

@@ -25,11 +25,14 @@ pub struct ListIcon {
 
 impl ListIcon {
     pub fn is_visible(&mut self, ctx: &Context, state: &RenderState) -> bool {
-        self.enabled && self.inner.is_visible(ctx, state)
+        let parent = state.common.trigger.active();
+        self.trigger.update(ctx, state.is_edit(ctx), parent);
+        self.enabled && self.trigger.active().is_some()
     }
 
     pub fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState, size: [f32; 2]) {
-        self.inner.render(ui, ctx, state, size)
+        self.inner
+            .render(ui, ctx, state, self.trigger.active(), size)
     }
 
     pub fn bounds(&self, pos: [f32; 2], size: [f32; 2]) -> Rect {

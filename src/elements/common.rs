@@ -62,6 +62,7 @@ impl Common {
         contents: impl FnOnce(RenderState),
     ) {
         if self.visible(ctx) {
+            let edit = edit || ctx.edit.is_edited(self.id);
             self.trigger.update(ctx, edit, None);
 
             let _style = push_alpha_change(ui, self.opacity);
