@@ -15,9 +15,6 @@ use strum::AsRefStr;
 pub enum Schema<'a> {
     #[serde(alias = "1")]
     V1(Cow<'a, Pack>), // enable borrowed serialization
-
-    #[serde(untagged)]
-    Unknown(Pack),
 }
 
 impl<'a> Schema<'a> {
@@ -80,17 +77,12 @@ impl<'a> Schema<'a> {
     pub fn into_pack(self) -> Pack {
         match self {
             Self::V1(pack) => pack.into_owned(),
-            Self::Unknown(pack) => {
-                log::info!("Converting unknown pack schema to v1");
-                pack
-            }
         }
     }
 
     pub fn name(&self) -> &str {
         match self {
             Self::V1(v1) => &v1.common.name,
-            Self::Unknown(v1) => &v1.common.name,
         }
     }
 }
