@@ -1,5 +1,6 @@
 mod filter;
 mod map;
+mod map_old;
 mod memo;
 mod player;
 mod progress;
@@ -7,6 +8,7 @@ mod progress;
 pub use self::{filter::*, map::*, player::*, progress::*};
 
 use crate::{context::Context, elements::RenderState};
+use enumflags2::{BitFlag, BitFlags};
 
 // TODO: parametric return type?
 pub trait Trigger {
@@ -15,4 +17,20 @@ pub trait Trigger {
     }
 
     fn is_active(&mut self, ctx: &Context) -> bool;
+}
+
+pub fn check_bitflags<T>(flags: BitFlags<T>, value: T) -> bool
+where
+    T: Copy + BitFlag,
+{
+    flags.is_empty() || flags.contains(value)
+}
+
+pub fn check_bitflags_optional<T>(flags: BitFlags<T>, value: Option<T>) -> bool
+where
+    T: Copy + BitFlag,
+{
+    value
+        .map(|value| check_bitflags(flags, value))
+        .unwrap_or(true)
 }

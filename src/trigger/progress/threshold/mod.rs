@@ -80,9 +80,8 @@ mod tests {
 
     #[test]
     fn migrate() {
-        let old_json = "{ \"Between\": [1, 23] }";
-
-        let result = serde_json::from_str::<Migrate<ProgressThreshold, ThresholdType>>(&old_json);
+        let json = r#"{ "Between": [1, 23] }"#;
+        let result = serde_json::from_str::<Migrate<ProgressThreshold, ThresholdType>>(&json);
         assert!(result.is_ok());
         let threshold = result.unwrap().inner;
         assert_eq!(threshold.threshold_type, ThresholdType::Between(1.0, 23.0));

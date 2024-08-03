@@ -1,6 +1,7 @@
-use super::{memo::Memo, MapTrigger, PlayerTrigger, Trigger};
+use super::{map_old::MapTriggerOld, memo::Memo, MapTrigger, PlayerTrigger, Trigger};
 use crate::{
     context::{Context, ContextUpdate, EditState},
+    serde_migrate::migrate,
     traits::RenderOptions,
 };
 use nexus::imgui::Ui;
@@ -10,6 +11,8 @@ use serde::{Deserialize, Serialize};
 #[serde(default)]
 pub struct FilterTrigger {
     pub player: PlayerTrigger, // player not memoized due to combat & mount
+
+    #[serde(deserialize_with = "migrate::<_, _, MapTriggerOld>")]
     pub map: Memo<MapTrigger>, // memoize map
 }
 

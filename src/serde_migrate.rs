@@ -1,5 +1,5 @@
-use serde::{Deserialize, Deserializer, Serialize};
-use std::{marker::PhantomData, ops};
+use serde::{de, Deserialize, Deserializer, Serialize};
+use std::{any::type_name, marker::PhantomData, ops};
 
 /// Helper to migrate data from an old serde format via `deserialize_with`.
 pub fn migrate<'de, D, T, P>(deserializer: D) -> Result<T, D::Error>
@@ -15,10 +15,17 @@ where
         Previous(P),
     }
 
-    Value::<T, P>::deserialize(deserializer).map(|value| match value {
-        Value::Current(inner) => inner,
-        Value::Previous(prev) => prev.into(),
-    })
+    Value::<T, P>::deserialize(deserializer)
+        .map(|value| match value {
+            Value::Current(inner) => inner,
+            Value::Previous(prev) => {
+                log::debug!("Migrating {} to {}", type_name::<P>(), type_name::<T>());
+                prev.into()
+            }
+        })
+        .map_err(|_| {
+            <D::Error as de::Error>::custom(format!("failed to migrate {}", type_name::<T>()))
+        })
 }
 
 /// Wrapper type to migrate data from an old serde format.

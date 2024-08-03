@@ -3,14 +3,14 @@ mod traits;
 
 pub use self::{combat::*, traits::*};
 
-use super::Trigger;
+use super::{check_bitflags_optional, Trigger};
 use crate::{
     context::{Context, EditState, Mount, Profession, Specialization},
     render_util::enum_combo_bitflags,
     serde_bitflags,
     traits::RenderOptions,
 };
-use enumflags2::{BitFlag, BitFlags};
+use enumflags2::BitFlags;
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 
@@ -72,22 +72,6 @@ impl RenderOptions for PlayerTrigger {
 
         enum_combo_bitflags(ui, "Mount", &mut self.mounts, ComboBoxFlags::HEIGHT_LARGE);
     }
-}
-
-fn check_bitflags<T>(flags: BitFlags<T>, value: T) -> bool
-where
-    T: Copy + BitFlag,
-{
-    flags.is_empty() || flags.contains(value)
-}
-
-fn check_bitflags_optional<T>(flags: BitFlags<T>, value: Option<T>) -> bool
-where
-    T: Copy + BitFlag,
-{
-    value
-        .map(|value| check_bitflags(flags, value))
-        .unwrap_or(true)
 }
 
 #[cfg(test)]
