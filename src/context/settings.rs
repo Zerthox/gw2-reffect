@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct ContextSettings {
+    pub save_on_unload: bool,
     pub edit_during_combat: bool,
     pub edit_show_all: bool,
     pub font: Option<String>,
@@ -20,6 +21,7 @@ pub struct ContextSettings {
 impl Default for ContextSettings {
     fn default() -> Self {
         Self {
+            save_on_unload: true,
             edit_during_combat: false,
             edit_show_all: false,
             font: None,
@@ -33,6 +35,7 @@ impl Default for ContextSettings {
 impl Context {
     pub fn settings(&self) -> ContextSettings {
         ContextSettings {
+            save_on_unload: self.save_on_unload,
             edit_during_combat: self.edit.during_combat,
             edit_show_all: self.edit.show_all,
             font: self.font.map(|font| font.name_owned()),
@@ -44,6 +47,7 @@ impl Context {
 
     pub fn load(&mut self, settings: ContextSettings) {
         let ContextSettings {
+            save_on_unload: save_unload,
             edit_during_combat,
             edit_show_all,
             font,
@@ -51,6 +55,7 @@ impl Context {
             player_interval,
             icon,
         } = settings;
+        self.save_on_unload = save_unload;
         self.edit.during_combat = edit_during_combat;
         self.edit.show_all = edit_show_all;
         self.font = font.and_then(Font::from_name_or_warn);

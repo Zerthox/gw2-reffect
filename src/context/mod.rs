@@ -54,6 +54,8 @@ pub struct Context {
 
     pub player_interval: Interval,
 
+    pub save_on_unload: bool,
+
     pub font: Option<Font>,
 
     pub icon_settings: IconSettings,
@@ -153,6 +155,7 @@ impl Default for Context {
             links: Links::load(),
             own_interval: Interval::new(OWN_INTERVAL),
             player_interval: Interval::new(PLAYER_INTERVAL),
+            save_on_unload: true,
             font: None,
             icon_settings: IconSettings::default(),
         }

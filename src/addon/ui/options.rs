@@ -19,6 +19,11 @@ impl Addon {
 
             if let Some(_token) = ui.tab_item("Settings") {
                 ui.checkbox(
+                    "Save pack changes on addon unload",
+                    &mut self.context.save_on_unload,
+                );
+
+                ui.checkbox(
                     "Allow edit mode in combat",
                     &mut self.context.edit.during_combat,
                 );
