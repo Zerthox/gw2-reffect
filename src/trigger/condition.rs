@@ -70,7 +70,7 @@ impl Default for ConditionTrigger {
 }
 
 impl RenderOptions for ConditionTrigger {
-    fn render_options(&mut self, ui: &Ui, state: &mut EditState) -> () {
+    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
         enum_combo(ui, "Condition", self, ComboBoxFlags::empty());
 
         match self {
