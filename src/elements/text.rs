@@ -28,41 +28,52 @@ pub struct Text {
     loaded_font: Option<Font>,
 
     #[serde(skip)]
+    frequent: bool,
+
+    #[serde(skip)]
     text_memo: Option<String>,
 }
 
 impl Text {
     pub fn update(&mut self, ctx: &Context, state: &RenderState) {
-        if ctx.has_update_or_edit(ContextUpdate::OwnCharacter) {
+        let has_update = ctx.has_update_or_edit(ContextUpdate::OwnCharacter);
+        if has_update || self.frequent {
             let active = state.trigger_active();
-            self.props.update(ctx, active);
-            self.text_memo =
-                active.map(|active| Self::process_text(&self.text, active, ctx, state));
+            self.text_memo = active.map(|active| self.process_text(active, ctx, state));
+        }
+        if has_update {
+            self.props.update(ctx, state.trigger_active());
         }
     }
 
     fn process_text(
-        text: &str,
+        &mut self,
         active: &ProgressActive,
         ctx: &Context,
         state: &RenderState,
     ) -> String {
         const PREFIX: char = '%';
 
-        let mut result = String::with_capacity(text.len()); // always same or larger size
+        self.frequent = false;
+        let mut result = String::with_capacity(self.text.len()); // always same or larger size
 
         let mut prefix = false;
-        for el in text.chars() {
+        let is_timed = active.is_timed();
+        for el in self.text.chars() {
             if prefix {
                 prefix = false;
                 match el {
                     'n' => result.push_str(&state.common.name),
                     's' => result.push_str(&active.intensity().to_string()),
-                    'r' => result.push_str(&active.current_text(ctx.now)),
+                    'r' => {
+                        result.push_str(&active.current_text(ctx.now));
+                        self.frequent = is_timed;
+                    }
                     'f' => result.push_str(&active.max_text()),
                     'p' => {
                         let progress = active.progress_or_default(ctx.now);
                         result.push_str(&format!("{:.1}", (100.0 * progress)));
+                        self.frequent = is_timed;
                     }
                     PREFIX => result.push(PREFIX),
                     other => {
@@ -171,6 +182,7 @@ impl Default for Text {
             props: Props::default(),
             font_name: None,
             loaded_font: None,
+            frequent: false,
             text_memo: None,
         }
     }
@@ -184,6 +196,7 @@ impl Clone for Text {
             props: self.props.clone(),
             font_name: self.font_name.clone(),
             loaded_font: self.loaded_font,
+            frequent: self.frequent,
             text_memo: None, // dont clone the memo
         }
     }

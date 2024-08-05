@@ -15,6 +15,11 @@ impl ProgressActive {
         Self::Resource(Resource { current: 1, max: 1 })
     }
 
+    /// Whether the progress uses timestamps.
+    pub fn is_timed(&self) -> bool {
+        matches!(self, Self::Buff { .. })
+    }
+
     /// Returns the intensity (alternative progress).
     pub fn intensity(&self) -> u32 {
         match self {
