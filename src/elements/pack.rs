@@ -140,6 +140,8 @@ impl Pack {
             if let Some(_token) = ui.tab_item("Pack") {
                 self.common.render_options(ui, state);
 
+                ui.spacing();
+
                 enum_combo(ui, "Anchor", &mut self.anchor, ComboBoxFlags::empty());
 
                 {

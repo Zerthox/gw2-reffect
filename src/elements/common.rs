@@ -227,8 +227,6 @@ impl RenderOptions for Common {
         ui.spacing();
 
         self.trigger.render_options(ui, state);
-
-        ui.spacing();
     }
 }
 

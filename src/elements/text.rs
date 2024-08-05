@@ -1,12 +1,9 @@
-use super::{AlignHorizontal, RenderState, TextDecoration};
+use super::{AlignHorizontal, Props, RenderState, TextProps};
 use crate::{
     bounds::Bounds,
     component_wise::ComponentWise,
     context::{Context, ContextUpdate, EditState},
-    render_util::{
-        draw_text_bg, font_select, helper, input_color_alpha, input_percent,
-        input_text_multi_with_menu, Font, Rect,
-    },
+    render_util::{draw_text_bg, font_select, helper, input_text_multi_with_menu, Font, Rect},
     traits::{Render, RenderOptions},
     tree::TreeLeaf,
     trigger::ProgressActive,
@@ -22,11 +19,10 @@ pub struct Text {
     #[serde(rename = "font")]
     pub font_name: Option<String>,
 
-    #[serde(alias = "size")]
-    pub scale: f32,
     pub align: AlignHorizontal,
-    pub color: [f32; 4],
-    pub decoration: TextDecoration,
+
+    #[serde(flatten)]
+    pub props: Props<TextProps>,
 
     #[serde(skip)]
     loaded_font: Option<Font>,
@@ -36,11 +32,12 @@ pub struct Text {
 }
 
 impl Text {
-    pub fn update_text(&mut self, ctx: &Context, state: &RenderState) {
+    pub fn update(&mut self, ctx: &Context, state: &RenderState) {
         if ctx.has_update_or_edit(ContextUpdate::OwnCharacter) {
-            self.text_memo = state
-                .trigger_active()
-                .map(|active| Self::process_text(&self.text, active, ctx, state));
+            let active = state.trigger_active();
+            self.props.update(ctx, active);
+            self.text_memo =
+                active.map(|active| Self::process_text(&self.text, active, ctx, state));
         }
     }
 
@@ -87,7 +84,7 @@ impl Text {
     }
 
     fn calc_pos(&self, ui: &Ui, pos: [f32; 2], text: &str) -> [f32; 2] {
-        let offset = self.align.text_offset(ui, text, self.scale);
+        let offset = self.align.text_offset(ui, text, self.props.scale);
         pos.add(offset)
     }
 
@@ -100,17 +97,18 @@ impl TreeLeaf for Text {}
 
 impl Render for Text {
     fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
-        self.update_text(ctx, state);
+        self.update(ctx, state);
 
         if let Some(text) = &self.text_memo {
             let _font = self.loaded_font.map(|font| font.push());
-            let font_scale = self.scale;
+            let font_scale = self.props.scale;
             let pos = self.calc_pos(ui, state.pos, text);
-            let [r, g, b, a] = self.color;
+            let [r, g, b, a] = self.props.color;
             let alpha = a * ui.clone_style().alpha;
             let color = [r, g, b, alpha];
 
-            self.decoration
+            self.props
+                .decoration
                 .render(ui, text, pos, font_scale, [0.0, 0.0, 0.0, alpha]);
             draw_text_bg(ui, text, pos, font_scale, color);
         }
@@ -124,18 +122,14 @@ impl Bounds for Text {
             .map(|text| {
                 let pos = self.calc_pos(ui, pos, text);
                 let size = ui.calc_text_size(text);
-                (pos, pos.add(size.mul_scalar(self.scale)))
+                (pos, pos.add(size.mul_scalar(self.props.scale)))
             })
             .unwrap_or_default()
     }
 }
 
 impl RenderOptions for Text {
-    fn render_options(&mut self, ui: &Ui, _state: &mut EditState) {
-        // TODO: we rely on buffs interval refreshing the text memo
-
-        ui.spacing();
-
+    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
         input_text_multi_with_menu(
             ui,
             "##text",
@@ -155,17 +149,17 @@ impl RenderOptions for Text {
             ui.text("%% for % sign");
         });
 
-        input_percent("Scale", &mut self.scale);
+        self.align.render_combo(ui);
 
         if font_select(ui, "Font", &mut self.loaded_font) {
             self.font_name = self.loaded_font.map(|font| font.name_owned());
         }
 
-        self.align.render_combo(ui);
+        self.props.render_options(ui, state);
+    }
 
-        input_color_alpha(ui, "Color", &mut self.color);
-
-        self.decoration.render_select(ui);
+    fn render_tabs(&mut self, ui: &Ui, state: &mut EditState) {
+        self.props.render_tabs(ui, state);
     }
 }
 
@@ -174,10 +168,8 @@ impl Default for Text {
         Self {
             text: String::new(),
             align: AlignHorizontal::Center,
-            scale: 1.0,
+            props: Props::default(),
             font_name: None,
-            color: [1.0, 1.0, 1.0, 1.0],
-            decoration: TextDecoration::default(),
             loaded_font: None,
             text_memo: None,
         }
@@ -189,10 +181,8 @@ impl Clone for Text {
         Self {
             text: self.text.clone(),
             align: self.align,
-            scale: self.scale,
+            props: self.props.clone(),
             font_name: self.font_name.clone(),
-            color: self.color,
-            decoration: self.decoration,
             loaded_font: self.loaded_font,
             text_memo: None, // dont clone the memo
         }

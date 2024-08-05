@@ -155,8 +155,11 @@ impl Element {
         if let Some(_token) = ui.tab_bar(self.common.id_string()) {
             if let Some(_token) = ui.tab_item(&self.kind) {
                 self.common.render_options(ui, state);
+                ui.spacing();
                 self.kind.render_options(ui, state);
             }
+
+            self.kind.render_tabs(ui, state);
 
             if let Some(_token) = ui.tab_item("Filter") {
                 self.filter.render_options(ui, state);

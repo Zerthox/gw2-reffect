@@ -15,6 +15,9 @@ pub trait Render<T = ()> {
 pub trait RenderOptions<T = ()> {
     /// Renders options for the type.
     fn render_options(&mut self, ui: &Ui, state: &mut EditState) -> T;
+
+    /// Renders special option tabs for the type.
+    fn render_tabs(&mut self, _ui: &Ui, _state: &mut EditState) {}
 }
 
 /// Associated color.

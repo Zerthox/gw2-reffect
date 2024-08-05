@@ -74,6 +74,16 @@ impl RenderOptions for ElementType {
             Self::Bar(bar) => bar.render_options(ui, state),
         }
     }
+
+    fn render_tabs(&mut self, ui: &Ui, state: &mut EditState) {
+        match self {
+            Self::Group(group) => group.render_tabs(ui, state),
+            Self::Icon(icon) => icon.render_tabs(ui, state),
+            Self::IconList(list) => list.render_tabs(ui, state),
+            Self::Text(text) => text.render_tabs(ui, state),
+            Self::Bar(bar) => bar.render_tabs(ui, state),
+        }
+    }
 }
 
 impl Default for ElementType {
