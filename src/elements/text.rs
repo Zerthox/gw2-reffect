@@ -39,6 +39,7 @@ impl Text {
         let has_update = ctx.has_update_or_edit(ContextUpdate::OwnCharacter);
         if has_update || self.frequent {
             let active = state.trigger_active();
+            self.frequent = false; // reset frequent, only enable while active
             self.text_memo = active.map(|active| self.process_text(active, ctx, state));
         }
         if has_update {
@@ -54,7 +55,6 @@ impl Text {
     ) -> String {
         const PREFIX: char = '%';
 
-        self.frequent = false;
         let mut result = String::with_capacity(self.text.len()); // always same or larger size
 
         let mut prefix = false;
