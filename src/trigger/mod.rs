@@ -1,3 +1,4 @@
+mod condition;
 mod filter;
 mod map;
 mod map_old;
@@ -5,7 +6,7 @@ mod memo;
 mod player;
 mod progress;
 
-pub use self::{filter::*, map::*, player::*, progress::*};
+pub use self::{condition::*, filter::*, map::*, player::*, progress::*};
 
 use crate::{context::Context, elements::RenderState};
 use enumflags2::{BitFlag, BitFlags};

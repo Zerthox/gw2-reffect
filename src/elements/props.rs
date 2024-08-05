@@ -4,7 +4,7 @@ use crate::{
     context::{Context, EditState},
     render_util::{collapsing_header_same_line_end, delete_confirm_modal},
     traits::RenderOptions,
-    trigger::{ProgressActive, ProgressThreshold},
+    trigger::{Condition, ProgressActive},
 };
 use fields::{AllFields, Fields};
 use nexus::imgui::{
@@ -12,10 +12,6 @@ use nexus::imgui::{
 };
 use serde::{Deserialize, Serialize};
 use std::{fmt, mem};
-
-// TODO: multiple conditions with 1 threshold? use props struct with all optional fields instead of enum?
-
-pub type Condition<T> = (ProgressThreshold, <T as Fields>::Field);
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(default)]
@@ -41,10 +37,8 @@ where
     pub fn update(&mut self, ctx: &Context, active: Option<&ProgressActive>) {
         self.current = self.base.clone();
         if let Some(active) = active {
-            for (threshold, prop) in &self.conditions {
-                if threshold.is_met(active, ctx) {
-                    self.current.set(prop.clone());
-                }
+            for condition in &mut self.conditions {
+                condition.process(&mut self.current, ctx, active);
             }
         }
     }
@@ -80,13 +74,14 @@ where
     fn render_tabs(&mut self, ui: &Ui, state: &mut EditState) {
         if let Some(_token) = ui.tab_item("Condition") {
             let mut action = Action::new();
-            for (i, (threshold, prop)) in self.conditions.iter_mut().enumerate() {
+            for (i, condition) in self.conditions.iter_mut().enumerate() {
                 let _id = ui.push_id(i as i32);
 
                 let mut remains = true;
-                let name = prop.as_ref();
+                let prop_name = condition.property.as_ref();
+                let cond_name = condition.trigger.as_ref();
 
-                let open = CollapsingHeader::new(format!("Condition {}: {name}###cond{i}", i + 1))
+                let open = CollapsingHeader::new(format!("{cond_name}: {prop_name}###cond{i}"))
                     .flags(TreeNodeFlags::ALLOW_ITEM_OVERLAP)
                     .begin_with_close_button(ui, &mut remains);
 
@@ -110,21 +105,25 @@ where
                 if !remains {
                     ui.open_popup(&title);
                 }
-                if delete_confirm_modal(ui, &title, || ui.text(format!("Delete Condition {name}?")))
-                {
+                if delete_confirm_modal(ui, &title, || {
+                    ui.text(format!("Delete Condition {prop_name}?"))
+                }) {
                     action = Action::Delete(i);
                 }
 
                 if open {
-                    threshold.render_options(ui, state);
+                    condition.trigger.render_options(ui, state);
+
+                    ui.spacing();
 
                     if let Some(_token) =
-                        ui.begin_combo_with_flags("Property", prop.as_ref(), ComboBoxFlags::empty())
+                        ui.begin_combo_with_flags("Property", prop_name, ComboBoxFlags::empty())
                     {
-                        for entry in self.base.all() {
-                            let selected = mem::discriminant(&entry) == mem::discriminant(prop);
-                            if Selectable::new(&entry).selected(selected).build(ui) {
-                                *prop = entry;
+                        for prop in self.base.all() {
+                            let selected =
+                                mem::discriminant(&prop) == mem::discriminant(&condition.property);
+                            if Selectable::new(&prop).selected(selected).build(ui) {
+                                condition.property = prop;
                             }
 
                             // handle focus
@@ -134,7 +133,7 @@ where
                         }
                     }
 
-                    prop.render_options(ui, state);
+                    condition.property.render_options(ui, state);
 
                     ui.spacing();
                 }
@@ -142,11 +141,7 @@ where
             action.perform(&mut self.conditions);
 
             if ui.button("Add Condition") {
-                let new = (
-                    ProgressThreshold::default(),
-                    <T as Fields>::Field::default(),
-                );
-                self.conditions.push(new);
+                self.conditions.push(Condition::default());
             }
         }
     }

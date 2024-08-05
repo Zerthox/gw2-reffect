@@ -54,7 +54,7 @@ impl RenderOptions for ProgressThreshold {
             &mut self.threshold_type,
             ComboBoxFlags::empty(),
         );
-        helper(ui, || ui.text("When to display"));
+        helper(ui, || ui.text("Threshold required to be met"));
 
         match &mut self.threshold_type {
             ThresholdType::Always | ThresholdType::Present | ThresholdType::Missing => {}
