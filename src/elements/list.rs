@@ -9,7 +9,7 @@ use crate::{
         collapsing_header_same_line_end, delete_confirm_modal, enum_combo, input_float_with_format,
         input_size, item_context_menu, style_disabled_if, Rect,
     },
-    traits::{Render, RenderOptions},
+    traits::{Render, RenderDebug, RenderOptions},
     tree::TreeLeaf,
 };
 use nexus::imgui::{
@@ -177,6 +177,16 @@ impl RenderOptions for IconList {
         });
 
         action.perform(&mut self.icons, self.size, state);
+    }
+}
+
+impl RenderDebug for IconList {
+    fn render_debug(&mut self, ui: &Ui) {
+        ui.text(format!("Icons: {}", self.icons.len()));
+        for icon in &mut self.icons {
+            ui.spacing();
+            icon.render_debug(ui);
+        }
     }
 }
 

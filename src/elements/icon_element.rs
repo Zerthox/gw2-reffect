@@ -3,7 +3,7 @@ use crate::{
     bounds::Bounds,
     context::{Context, EditState},
     render_util::{input_size, Rect},
-    traits::{Render, RenderOptions},
+    traits::{Render, RenderDebug, RenderOptions},
     tree::TreeLeaf,
 };
 use nexus::imgui::Ui;
@@ -37,6 +37,12 @@ impl RenderOptions for IconElement {
         input_size(&mut self.size);
 
         self.icon.render_options(ui, state);
+    }
+}
+
+impl RenderDebug for IconElement {
+    fn render_debug(&mut self, ui: &Ui) {
+        self.icon.render_debug(ui)
     }
 }
 

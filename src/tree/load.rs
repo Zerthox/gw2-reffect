@@ -10,7 +10,7 @@ pub struct Loader;
 impl VisitMut for Loader {
     fn visit_icon_list(&mut self, el: &mut IconList) {
         for icon in &mut el.icons {
-            icon.inner.load();
+            icon.icon.load();
         }
     }
 

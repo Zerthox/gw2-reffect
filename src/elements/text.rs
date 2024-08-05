@@ -4,7 +4,7 @@ use crate::{
     component_wise::ComponentWise,
     context::{Context, ContextUpdate, EditState},
     render_util::{draw_text_bg, font_select, helper, input_text_multi_with_menu, Font, Rect},
-    traits::{Render, RenderOptions},
+    traits::{Render, RenderDebug, RenderOptions},
     tree::TreeLeaf,
     trigger::ProgressActive,
 };
@@ -171,6 +171,13 @@ impl RenderOptions for Text {
 
     fn render_tabs(&mut self, ui: &Ui, state: &mut EditState) {
         self.props.render_tabs(ui, state);
+    }
+}
+
+impl RenderDebug for Text {
+    fn render_debug(&mut self, ui: &Ui) {
+        ui.text(format!("Font: {:x?}", self.loaded_font));
+        ui.text(format!("Frequent: {}", self.frequent));
     }
 }
 

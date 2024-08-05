@@ -8,7 +8,7 @@ use crate::{
         tree_select_empty,
     },
     schema::Schema,
-    traits::RenderOptions,
+    traits::{RenderDebug, RenderOptions},
     tree::{Loader, TreeNode, VisitMut},
 };
 use nexus::imgui::{ComboBoxFlags, MenuItem, Ui};
@@ -155,15 +155,23 @@ impl Pack {
                 }
             }
             if let Some(_token) = ui.tab_item("?") {
-                self.common.render_debug(ui);
-
-                ui.text("File:");
-                if let Some(file) = self.file.file_name().and_then(|file| file.to_str()) {
-                    ui.same_line();
-                    ui.text_disabled(file);
-                }
+                self.render_debug(ui);
             }
         }
+    }
+}
+
+impl RenderDebug for Pack {
+    fn render_debug(&mut self, ui: &Ui) {
+        self.common.render_debug(ui);
+
+        ui.text("File:");
+        if let Some(file) = self.file.file_name().and_then(|file| file.to_str()) {
+            ui.same_line();
+            ui.text(file);
+        }
+
+        ui.text(format!("Children: {}", self.elements.len()));
     }
 }
 

@@ -2,7 +2,7 @@ use super::{Common, Element, ElementType, Icon, IconElement, RenderState};
 use crate::{
     context::{Context, EditState},
     render_util::Rect,
-    traits::RenderOptions,
+    traits::{RenderDebug, RenderOptions},
     trigger::ProgressTrigger,
 };
 use nexus::imgui::Ui;
@@ -20,7 +20,7 @@ pub struct ListIcon {
     pub trigger: ProgressTrigger,
 
     #[serde(flatten)]
-    pub inner: Icon,
+    pub icon: Icon,
 }
 
 impl ListIcon {
@@ -31,7 +31,7 @@ impl ListIcon {
     }
 
     pub fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState, size: [f32; 2]) {
-        self.inner
+        self.icon
             .render(ui, ctx, state, self.trigger.active(), size)
     }
 
@@ -48,7 +48,7 @@ impl ListIcon {
                 ..Common::default()
             },
             kind: ElementType::Icon(IconElement {
-                icon: self.inner,
+                icon: self.icon,
                 size,
             }),
             ..Element::default()
@@ -60,7 +60,7 @@ impl ListIcon {
             enabled: common.enabled,
             name: common.name,
             trigger: common.trigger,
-            inner: element.icon,
+            icon: element.icon,
         }
     }
 }
@@ -76,7 +76,13 @@ impl RenderOptions for ListIcon {
 
         ui.spacing();
 
-        self.inner.render_options(ui, state);
+        self.icon.render_options(ui, state);
+    }
+}
+
+impl RenderDebug for ListIcon {
+    fn render_debug(&mut self, ui: &Ui) {
+        self.icon.render_debug(ui)
     }
 }
 
@@ -86,7 +92,7 @@ impl Default for ListIcon {
             enabled: true,
             name: "Unnamed".into(),
             trigger: ProgressTrigger::effect(),
-            inner: Icon::default(),
+            icon: Icon::default(),
         }
     }
 }

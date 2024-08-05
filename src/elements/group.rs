@@ -3,7 +3,7 @@ use crate::{
     bounds::Bounds,
     context::{Context, EditState},
     render_util::Rect,
-    traits::{Render, RenderOptions},
+    traits::{Render, RenderDebug, RenderOptions},
     tree::TreeNode,
 };
 use nexus::imgui::Ui;
@@ -37,4 +37,10 @@ impl Bounds for Group {
 
 impl RenderOptions for Group {
     fn render_options(&mut self, _ui: &Ui, _state: &mut EditState) {}
+}
+
+impl RenderDebug for Group {
+    fn render_debug(&mut self, ui: &Ui) {
+        ui.text(format!("Members: {}", self.members.len()));
+    }
 }

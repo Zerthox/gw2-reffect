@@ -20,6 +20,12 @@ pub trait RenderOptions<T = ()> {
     fn render_tabs(&mut self, _ui: &Ui, _state: &mut EditState) {}
 }
 
+/// Render debug UI.
+pub trait RenderDebug {
+    /// Renders debug info for the type.
+    fn render_debug(&mut self, ui: &Ui);
+}
+
 /// Associated color.
 pub trait Colored {
     /// Returns the color.

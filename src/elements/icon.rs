@@ -5,7 +5,7 @@ use crate::{
     context::{Context, EditState},
     render_util::{draw_spinner_bg, draw_text_bg, input_color_alpha, Rect},
     settings::icon::{DurationBarSettings, DurationTextSettings, StackTextSettings},
-    traits::RenderOptions,
+    traits::{RenderDebug, RenderOptions},
     trigger::ProgressActive,
 };
 use nexus::imgui::Ui;
@@ -175,6 +175,12 @@ impl RenderOptions for Icon {
 
         // TODO: stacks customizations
         ui.checkbox("Show Stacks", &mut self.stacks_text);
+    }
+}
+
+impl RenderDebug for Icon {
+    fn render_debug(&mut self, ui: &Ui) {
+        ui.text(format!("Texture: {:x?}", self.source.get_texture()));
     }
 }
 

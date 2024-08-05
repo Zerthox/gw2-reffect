@@ -8,7 +8,7 @@ use crate::{
     render_util::{
         helper_slider, input_pos, push_alpha_change, slider_percent, EnumStaticVariants, Rect,
     },
-    traits::RenderOptions,
+    traits::{RenderDebug, RenderOptions},
     trigger::ProgressTrigger,
 };
 use nexus::imgui::{Condition, MenuItem, MouseButton, StyleVar, Ui, Window};
@@ -205,12 +205,6 @@ impl Common {
             }
         }
     }
-
-    pub fn render_debug(&mut self, ui: &Ui) {
-        ui.text("Id:");
-        ui.same_line();
-        ui.text_disabled(self.id_string());
-    }
 }
 
 impl RenderOptions for Common {
@@ -227,6 +221,14 @@ impl RenderOptions for Common {
         ui.spacing();
 
         self.trigger.render_options(ui, state);
+    }
+}
+
+impl RenderDebug for Common {
+    fn render_debug(&mut self, ui: &Ui) {
+        ui.text("Id:");
+        ui.same_line();
+        ui.text(self.id_string());
     }
 }
 

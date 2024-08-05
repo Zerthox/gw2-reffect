@@ -3,7 +3,7 @@ use crate::{
     bounds::Bounds,
     context::{Context, EditState},
     render_util::{impl_static_variants, Rect},
-    traits::{Render, RenderOptions},
+    traits::{Render, RenderDebug, RenderOptions},
     tree::TreeNode,
 };
 use nexus::imgui::Ui;
@@ -82,6 +82,18 @@ impl RenderOptions for ElementType {
             Self::IconList(list) => list.render_tabs(ui, state),
             Self::Text(text) => text.render_tabs(ui, state),
             Self::Bar(bar) => bar.render_tabs(ui, state),
+        }
+    }
+}
+
+impl RenderDebug for ElementType {
+    fn render_debug(&mut self, ui: &Ui) {
+        match self {
+            Self::Group(group) => group.render_debug(ui),
+            Self::Icon(icon) => icon.render_debug(ui),
+            Self::IconList(list) => list.render_debug(ui),
+            Self::Text(text) => text.render_debug(ui),
+            Self::Bar(bar) => bar.render_debug(ui),
         }
     }
 }

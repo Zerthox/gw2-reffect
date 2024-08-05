@@ -9,7 +9,7 @@ use crate::{
         enum_combo, helper, helper_slider, input_color_alpha, input_float_with_format,
         input_percent, input_size, input_u32, slider_percent, Rect,
     },
-    traits::{Render, RenderOptions},
+    traits::{Render, RenderDebug, RenderOptions},
     tree::TreeLeaf,
 };
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
@@ -212,6 +212,12 @@ impl RenderOptions for Bar {
                 Unit::Absolute => 1.0,
             });
         }
+    }
+}
+
+impl RenderDebug for Bar {
+    fn render_debug(&mut self, ui: &Ui) {
+        ui.text(format!("Progress factor: {}", self.progress_factor));
     }
 }
 
