@@ -1,6 +1,8 @@
 mod amount_type;
 mod threshold_type;
 
+use std::fmt;
+
 pub use self::{amount_type::*, threshold_type::*};
 
 use super::ProgressActive;
@@ -42,6 +44,16 @@ impl From<ThresholdType> for ProgressThreshold {
         Self {
             threshold_type,
             amount_type: AmountType::Intensity,
+        }
+    }
+}
+
+impl fmt::Display for ProgressThreshold {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        if self.threshold_type.no_amount() {
+            self.threshold_type.fmt(f)
+        } else {
+            write!(f, "{} {}", self.amount_type, self.threshold_type)
         }
     }
 }

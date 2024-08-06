@@ -69,6 +69,14 @@ impl Default for ConditionTrigger {
     }
 }
 
+impl fmt::Display for ConditionTrigger {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::ProgressThreshold(threshold) => threshold.fmt(f),
+        }
+    }
+}
+
 impl RenderOptions for ConditionTrigger {
     fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
         enum_combo(ui, "Condition", self, ComboBoxFlags::empty());

@@ -1,3 +1,5 @@
+use std::fmt;
+
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, IntoStaticStr, VariantArray};
 
@@ -16,20 +18,22 @@ pub enum ThresholdType {
     Missing,
 
     /// Minimum amount.
-    #[strum(serialize = "Min amount")]
     Min(f32),
 
     /// Maximum amount.
-    #[strum(serialize = "Max amount")]
     Max(f32),
 
     /// Exact amount.
-    #[strum(serialize = "Exact amount")]
     Exact(f32),
 
     /// Range of amounts.
-    #[strum(serialize = "Amount between")]
     Between(f32, f32),
+}
+
+impl ThresholdType {
+    pub fn no_amount(&self) -> bool {
+        matches!(self, Self::Always | Self::Present | Self::Missing)
+    }
 }
 
 impl VariantArray for ThresholdType {
@@ -42,4 +46,18 @@ impl VariantArray for ThresholdType {
         Self::Exact(1.0),
         Self::Between(0.0, 1.0),
     ];
+}
+
+impl fmt::Display for ThresholdType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::Always => write!(f, "Always"),
+            Self::Present => write!(f, "Present"),
+            Self::Missing => write!(f, "Missing"),
+            Self::Min(value) => write!(f, ">= {value}"),
+            Self::Max(value) => write!(f, "<= {value}"),
+            Self::Exact(value) => write!(f, "= {value}"),
+            Self::Between(min, max) => write!(f, "{min} - {max}"),
+        }
+    }
 }

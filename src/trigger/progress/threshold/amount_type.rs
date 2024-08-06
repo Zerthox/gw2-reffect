@@ -6,7 +6,7 @@ use crate::{
 };
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
-use strum::{AsRefStr, EnumIter, IntoStaticStr, VariantArray};
+use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
 
 #[derive(
     Debug,
@@ -18,6 +18,7 @@ use strum::{AsRefStr, EnumIter, IntoStaticStr, VariantArray};
     PartialOrd,
     Ord,
     Hash,
+    Display,
     AsRefStr,
     IntoStaticStr,
     EnumIter,
@@ -26,13 +27,14 @@ use strum::{AsRefStr, EnumIter, IntoStaticStr, VariantArray};
     VariantArray,
 )]
 pub enum AmountType {
-    // Intensity.
+    /// Intensity.
     #[default]
     Intensity,
 
-    // Duration.
+    /// Duration.
     Duration,
 
+    /// Progress percent.
     #[strum(serialize = "Progress %")]
     Percent,
 }

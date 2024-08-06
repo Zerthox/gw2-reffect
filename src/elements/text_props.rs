@@ -1,4 +1,4 @@
-use super::{PartialOptions, TextDecoration};
+use super::{PartialProps, TextDecoration};
 use crate::{
     context::EditState,
     render_util::{input_color_alpha, input_optional, input_percent},
@@ -36,7 +36,7 @@ impl RenderOptions for TextProps {
     }
 }
 
-impl PartialOptions<TextProps> for Partial<TextProps> {
+impl PartialProps<TextProps> for Partial<TextProps> {
     fn render_options(&mut self, ui: &Ui, base: &TextProps) {
         let Self {
             scale,
@@ -51,7 +51,6 @@ impl PartialOptions<TextProps> for Partial<TextProps> {
             || base.scale,
             |scale| input_percent("Scale", scale),
         );
-
         input_optional(
             ui,
             "Color",
@@ -59,7 +58,6 @@ impl PartialOptions<TextProps> for Partial<TextProps> {
             || base.color,
             |color| input_color_alpha(ui, "Color", color),
         );
-
         input_optional(
             ui,
             "Decoration",

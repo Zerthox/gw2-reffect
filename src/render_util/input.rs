@@ -155,7 +155,7 @@ pub fn input_optional<T, R>(
             Some(input(value))
         }
         None => {
-            ui.text(label);
+            ui.text_disabled(label);
             None
         }
     }

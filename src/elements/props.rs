@@ -57,7 +57,7 @@ where
 impl<T> RenderOptions for Props<T>
 where
     T: Clone + IntoPartial + RenderOptions,
-    T::Partial: Clone + fmt::Debug + Serialize + for<'d> Deserialize<'d> + PartialOptions<T>,
+    T::Partial: Clone + fmt::Debug + Serialize + for<'d> Deserialize<'d> + PartialProps<T>,
 {
     fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
         self.base.render_options(ui, state)
@@ -70,9 +70,8 @@ where
                 let _id = ui.push_id(i as i32);
 
                 let mut remains = true;
-                let cond_name = condition.trigger.as_ref();
 
-                let open = CollapsingHeader::new(format!("{cond_name}###cond{i}"))
+                let open = CollapsingHeader::new(format!("{}###cond{i}", condition.trigger))
                     .flags(TreeNodeFlags::ALLOW_ITEM_OVERLAP)
                     .begin_with_close_button(ui, &mut remains);
 
@@ -97,7 +96,7 @@ where
                     ui.open_popup(&title);
                 }
                 if delete_confirm_modal(ui, &title, || {
-                    ui.text(format!("Delete {cond_name} Condition?"))
+                    ui.text(format!("Delete {} Condition?", condition.trigger))
                 }) {
                     action = Action::Delete(i);
                 }
@@ -118,7 +117,7 @@ where
     }
 }
 
-pub trait PartialOptions<T>
+pub trait PartialProps<T>
 where
     T: IntoPartial<Partial = Self>,
 {
