@@ -4,7 +4,7 @@ use crate::{
     traits::RenderOptions,
     trigger::ProgressActive,
 };
-use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
+use nexus::imgui::{ComboBoxFlags, InputTextFlags, Slider, SliderFlags, Ui};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
 
@@ -47,11 +47,16 @@ impl AmountType {
                 .current(ctx.now)
                 .map(|current| current as f32 / 1000.0)
                 .unwrap_or(0.0),
-            Self::Percent => active.progress_or_default(ctx.now),
+            Self::Percent => 100.0 * active.progress_or_default(ctx.now),
         }
     }
 
-    pub fn render_input(&self, ui: &Ui, label: impl Into<String>, value: &mut f32) -> bool {
+    pub fn render_input(
+        &self,
+        ui: &Ui,
+        label: impl Into<String> + AsRef<str>,
+        value: &mut f32,
+    ) -> bool {
         match self {
             Self::Intensity => {
                 let changed = input_float_with_format(
@@ -77,19 +82,18 @@ impl AmountType {
                     "%.3f",
                     InputTextFlags::empty(),
                 );
-                helper(ui, || ui.text("Intensity in stacks or resource units"));
+                helper(ui, || ui.text("Duration in seconds"));
                 changed
             }
             Self::Percent => {
-                let changed = input_float_with_format(
-                    label,
-                    value,
-                    1.0,
-                    10.0,
-                    "%.2f",
-                    InputTextFlags::empty(),
-                );
-                helper(ui, || ui.text("Intensity in stacks or resource units"));
+                let changed = Slider::new(label, 0.0, 100.0)
+                    .flags(SliderFlags::ALWAYS_CLAMP)
+                    .display_format("%.2f")
+                    .build(ui, value);
+                helper(ui, || {
+                    ui.text("Progress/duration in percent");
+                    ui.text("Ctrl+click to type a number");
+                });
                 changed
             }
         }
