@@ -5,44 +5,44 @@ use crate::{
     traits::RenderOptions,
     trigger::ProgressThreshold,
 };
-use fields::Fields;
 use nexus::imgui::{ComboBoxFlags, Ui};
+use partial::{IntoPartial, Partial, PartialOps};
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use strum::{AsRefStr, EnumIter, IntoStaticStr};
 
-// TODO: multiple conditions with 1 threshold? use props struct with all optional fields instead of enum?
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
 pub struct Condition<T>
 where
-    T: Fields,
-    T::Field: Clone + fmt::Debug + Serialize + for<'d> Deserialize<'d>,
+    T: IntoPartial,
+    T::Partial: Clone + fmt::Debug + Serialize + for<'d> Deserialize<'d>,
 {
     pub trigger: ConditionTrigger,
-    pub property: <T as Fields>::Field,
+    pub properties: Partial<T>,
 }
 
 impl<T> Condition<T>
 where
-    T: Fields,
-    T::Field: Clone + fmt::Debug + Serialize + for<'d> Deserialize<'d>,
+    T: IntoPartial,
+    T::Partial: Clone + fmt::Debug + Serialize + for<'d> Deserialize<'d>,
 {
     pub fn process(&mut self, value: &mut T, ctx: &Context, active: &ProgressActive) {
         if self.trigger.is_active(ctx, active) {
-            value.set(self.property.clone());
+            value.set(self.properties.clone());
         }
     }
 }
+
 impl<T> Default for Condition<T>
 where
-    T: Fields,
-    T::Field: Default + Clone + fmt::Debug + Serialize + for<'d> Deserialize<'d>,
+    T: IntoPartial,
+    T::Partial: Clone + fmt::Debug + Serialize + for<'d> Deserialize<'d>,
 {
     fn default() -> Self {
         Self {
             trigger: ConditionTrigger::default(),
-            property: T::Field::default(),
+            properties: T::Partial::empty(),
         }
     }
 }

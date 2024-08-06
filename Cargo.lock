@@ -180,26 +180,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5443807d6dff69373d433ab9ef5378ad8df50ca6298caf15de6e52e24aaf54d5"
 
 [[package]]
-name = "fields"
-version = "0.1.0"
-source = "git+https://github.com/zerthox/fields-rs#097bd194196d82a709d30a5d21237fb13f213e78"
-dependencies = [
- "fields_macros",
-]
-
-[[package]]
-name = "fields_macros"
-version = "0.1.0"
-source = "git+https://github.com/zerthox/fields-rs#097bd194196d82a709d30a5d21237fb13f213e78"
-dependencies = [
- "attribute-derive",
- "heck",
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
 name = "form_urlencoded"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -495,6 +475,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "partial"
+version = "0.1.0"
+source = "git+https://github.com/zerthox/partial-rs#bac0420e30965d53e9a75ad660586476e7ffe19a"
+dependencies = [
+ "partial_macros",
+]
+
+[[package]]
+name = "partial_macros"
+version = "0.1.0"
+source = "git+https://github.com/zerthox/partial-rs#bac0420e30965d53e9a75ad660586476e7ffe19a"
+dependencies = [
+ "attribute-derive",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "paste"
 version = "1.0.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -595,11 +594,11 @@ dependencies = [
  "base64",
  "dlopen2",
  "enumflags2",
- "fields",
  "log",
  "nexus",
  "num_enum",
  "open",
+ "partial",
  "rfd",
  "semver",
  "serde",

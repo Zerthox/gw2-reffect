@@ -6,19 +6,17 @@ use crate::{
     traits::RenderOptions,
     trigger::{Condition, ProgressActive},
 };
-use fields::{AllFields, Fields};
-use nexus::imgui::{
-    CollapsingHeader, ComboBoxFlags, Direction, Selectable, StyleColor, TreeNodeFlags, Ui,
-};
+use nexus::imgui::{CollapsingHeader, Direction, StyleColor, TreeNodeFlags, Ui};
+use partial::IntoPartial;
 use serde::{Deserialize, Serialize};
-use std::{fmt, mem};
+use std::fmt;
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Props<T>
 where
-    T: Clone + Fields,
-    <T as Fields>::Field: Clone + fmt::Debug + Serialize + for<'d> Deserialize<'d>,
+    T: Clone + IntoPartial,
+    T::Partial: Clone + fmt::Debug + Serialize + for<'d> Deserialize<'d>,
 {
     #[serde(flatten)]
     pub base: T,
@@ -31,8 +29,8 @@ where
 
 impl<T> Props<T>
 where
-    T: Clone + Fields,
-    <T as Fields>::Field: Clone + fmt::Debug + Serialize + for<'de> Deserialize<'de>,
+    T: Clone + IntoPartial,
+    T::Partial: Clone + fmt::Debug + Serialize + for<'de> Deserialize<'de>,
 {
     pub fn update(&mut self, ctx: &Context, active: Option<&ProgressActive>) {
         self.current = self.base.clone();
@@ -46,8 +44,8 @@ where
 
 impl<T> std::ops::Deref for Props<T>
 where
-    T: Clone + Fields,
-    <T as Fields>::Field: Clone + fmt::Debug + Serialize + for<'de> Deserialize<'de>,
+    T: Clone + IntoPartial,
+    T::Partial: Clone + fmt::Debug + Serialize + for<'de> Deserialize<'de>,
 {
     type Target = T;
 
@@ -58,14 +56,8 @@ where
 
 impl<T> RenderOptions for Props<T>
 where
-    T: Clone + Fields + AllFields + RenderOptions,
-    <T as Fields>::Field: Default
-        + Clone
-        + fmt::Debug
-        + AsRef<str>
-        + RenderOptions
-        + Serialize
-        + for<'d> Deserialize<'d>,
+    T: Clone + IntoPartial + RenderOptions,
+    T::Partial: Clone + fmt::Debug + Serialize + for<'d> Deserialize<'d> + PartialOptions<T>,
 {
     fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
         self.base.render_options(ui, state)
@@ -78,10 +70,9 @@ where
                 let _id = ui.push_id(i as i32);
 
                 let mut remains = true;
-                let prop_name = condition.property.as_ref();
                 let cond_name = condition.trigger.as_ref();
 
-                let open = CollapsingHeader::new(format!("{cond_name}: {prop_name}###cond{i}"))
+                let open = CollapsingHeader::new(format!("{cond_name}###cond{i}"))
                     .flags(TreeNodeFlags::ALLOW_ITEM_OVERLAP)
                     .begin_with_close_button(ui, &mut remains);
 
@@ -106,35 +97,15 @@ where
                     ui.open_popup(&title);
                 }
                 if delete_confirm_modal(ui, &title, || {
-                    ui.text(format!("Delete Condition {prop_name}?"))
+                    ui.text(format!("Delete {cond_name} Condition?"))
                 }) {
                     action = Action::Delete(i);
                 }
 
                 if open {
                     condition.trigger.render_options(ui, state);
-
                     ui.spacing();
-
-                    if let Some(_token) =
-                        ui.begin_combo_with_flags("Property", prop_name, ComboBoxFlags::empty())
-                    {
-                        for prop in self.base.all() {
-                            let selected =
-                                mem::discriminant(&prop) == mem::discriminant(&condition.property);
-                            if Selectable::new(&prop).selected(selected).build(ui) {
-                                condition.property = prop;
-                            }
-
-                            // handle focus
-                            if selected {
-                                ui.set_item_default_focus();
-                            }
-                        }
-                    }
-
-                    condition.property.render_options(ui, state);
-
+                    condition.properties.render_options(ui, &self.base);
                     ui.spacing();
                 }
             }
@@ -145,4 +116,11 @@ where
             }
         }
     }
+}
+
+pub trait PartialOptions<T>
+where
+    T: IntoPartial<Partial = Self>,
+{
+    fn render_options(&mut self, ui: &Ui, base: &T);
 }

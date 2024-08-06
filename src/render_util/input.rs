@@ -127,3 +127,36 @@ pub fn input_trait_id(
 ) -> bool {
     input_chatcode(ui, label, id, flags, decode_trait)
 }
+
+pub fn input_optional<T, R>(
+    ui: &Ui,
+    label: impl AsRef<str>,
+    value: &mut Option<T>,
+    default: impl FnOnce() -> T,
+    input: impl FnOnce(&mut T) -> R,
+) -> Option<R> {
+    let label = label.as_ref();
+    let [start, _] = ui.cursor_pos();
+    let width = ui.calc_item_width();
+
+    let mut is_some = value.is_some();
+    if ui.checkbox(format!("##{label}"), &mut is_some) {
+        *value = is_some.then(default);
+    }
+
+    ui.same_line();
+    match value {
+        Some(value) => {
+            let [end, _] = ui.cursor_pos();
+            let moved = end - start;
+            let width = width - moved;
+
+            ui.set_next_item_width(width);
+            Some(input(value))
+        }
+        None => {
+            ui.text(label);
+            None
+        }
+    }
+}

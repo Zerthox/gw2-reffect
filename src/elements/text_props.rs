@@ -1,17 +1,15 @@
+use super::{PartialOptions, TextDecoration};
 use crate::{
     context::EditState,
-    render_util::{input_color_alpha, input_percent},
+    render_util::{input_color_alpha, input_optional, input_percent},
     traits::RenderOptions,
 };
-
-use super::TextDecoration;
-use fields::{AllFields, Field, Fields};
 use nexus::imgui::Ui;
+use partial::Partial;
 use serde::{Deserialize, Serialize};
-use strum::AsRefStr;
 
-#[derive(Debug, Clone, Fields, AllFields, Serialize, Deserialize)]
-#[fields(derive(Debug, Clone, AsRefStr, Serialize, Deserialize))]
+#[derive(Debug, Clone, Partial, Serialize, Deserialize)]
+#[partial(derive(Debug, Clone, Serialize, Deserialize))]
 #[serde(default)]
 pub struct TextProps {
     #[serde(alias = "size")]
@@ -38,24 +36,36 @@ impl RenderOptions for TextProps {
     }
 }
 
-impl Default for Field<TextProps> {
-    fn default() -> Self {
-        Self::Scale(1.0)
-    }
-}
+impl PartialOptions<TextProps> for Partial<TextProps> {
+    fn render_options(&mut self, ui: &Ui, base: &TextProps) {
+        let Self {
+            scale,
+            color,
+            decoration,
+        } = self;
 
-impl RenderOptions for Field<TextProps> {
-    fn render_options(&mut self, ui: &Ui, _state: &mut EditState) {
-        match self {
-            Self::Scale(scale) => {
-                input_percent("Scale", scale);
-            }
-            Self::Color(color) => {
-                input_color_alpha(ui, "Color", color);
-            }
-            Self::Decoration(decoration) => {
-                decoration.render_select(ui);
-            }
-        }
+        input_optional(
+            ui,
+            "Scale",
+            scale,
+            || base.scale,
+            |scale| input_percent("Scale", scale),
+        );
+
+        input_optional(
+            ui,
+            "Color",
+            color,
+            || base.color,
+            |color| input_color_alpha(ui, "Color", color),
+        );
+
+        input_optional(
+            ui,
+            "Decoration",
+            decoration,
+            || base.decoration,
+            |decoration| decoration.render_select(ui),
+        );
     }
 }
