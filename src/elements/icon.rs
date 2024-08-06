@@ -3,7 +3,7 @@ use crate::{
     colors::{self, with_alpha, with_alpha_factor},
     component_wise::ComponentWise,
     context::{Context, EditState},
-    render_util::{draw_spinner_bg, draw_text_bg, input_color_alpha, Rect},
+    render_util::{debug_optional, draw_spinner_bg, draw_text_bg, input_color_alpha, Rect},
     settings::icon::{DurationBarSettings, DurationTextSettings, StackTextSettings},
     traits::{RenderDebug, RenderOptions},
     trigger::ProgressActive,
@@ -180,7 +180,13 @@ impl RenderOptions for Icon {
 
 impl RenderDebug for Icon {
     fn render_debug(&mut self, ui: &Ui) {
-        ui.text(format!("Texture: {:x?}", self.source.get_texture()));
+        debug_optional(
+            ui,
+            "Texture",
+            self.source
+                .get_texture()
+                .map(|texture| texture.id() as *mut ()),
+        );
     }
 }
 

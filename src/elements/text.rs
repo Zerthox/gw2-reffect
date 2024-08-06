@@ -3,7 +3,9 @@ use crate::{
     bounds::Bounds,
     component_wise::ComponentWise,
     context::{Context, ContextUpdate, EditState},
-    render_util::{draw_text_bg, font_select, helper, input_text_multi_with_menu, Font, Rect},
+    render_util::{
+        debug_optional, draw_text_bg, font_select, helper, input_text_multi_with_menu, Font, Rect,
+    },
     traits::{Render, RenderDebug, RenderOptions},
     tree::TreeLeaf,
     trigger::ProgressActive,
@@ -176,7 +178,11 @@ impl RenderOptions for Text {
 
 impl RenderDebug for Text {
     fn render_debug(&mut self, ui: &Ui) {
-        ui.text(format!("Font: {:x?}", self.loaded_font));
+        debug_optional(
+            ui,
+            "Font",
+            self.loaded_font.as_ref().map(|font| font.as_ptr()),
+        );
         ui.text(format!("Frequent: {}", self.frequent));
     }
 }

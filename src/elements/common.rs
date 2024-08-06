@@ -6,7 +6,8 @@ use crate::{
     context::{Context, EditState},
     id::{Id, IdGen},
     render_util::{
-        helper_slider, input_pos, push_alpha_change, slider_percent, EnumStaticVariants, Rect,
+        debug_optional, helper_slider, input_pos, push_alpha_change, slider_percent,
+        EnumStaticVariants, Rect,
     },
     traits::{RenderDebug, RenderOptions},
     trigger::ProgressTrigger,
@@ -226,9 +227,9 @@ impl RenderOptions for Common {
 
 impl RenderDebug for Common {
     fn render_debug(&mut self, ui: &Ui) {
-        ui.text("Id:");
-        ui.same_line();
-        ui.text(self.id_string());
+        ui.text(format!("Id: {}", self.id));
+
+        debug_optional(ui, "Trigger", self.trigger.active());
     }
 }
 

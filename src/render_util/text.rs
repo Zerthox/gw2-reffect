@@ -1,5 +1,5 @@
 use nexus::imgui::{sys, ImColor32, Ui};
-use std::ptr;
+use std::{fmt, ptr};
 
 pub fn draw_text_bg(
     ui: &Ui,
@@ -28,4 +28,11 @@ pub fn draw_text_bg(
             ptr::null_mut(),
         );
     }
+}
+
+pub fn debug_optional(ui: &Ui, label: impl fmt::Display, value: Option<impl fmt::Debug>) {
+    ui.text(match value {
+        Some(value) => format!("{label}: {value:?}"),
+        None => format!("{label}: None"),
+    })
 }
