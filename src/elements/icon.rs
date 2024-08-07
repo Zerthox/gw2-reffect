@@ -1,4 +1,4 @@
-use super::{AlignHorizontal, IconSource, RenderState};
+use super::{AlignHorizontal, IconProps, IconSource, Props, RenderState};
 use crate::{
     colors::{self, with_alpha, with_alpha_factor},
     component_wise::ComponentWise,
@@ -11,14 +11,14 @@ use crate::{
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
-// TODO: vec with conditions as enum with members
-// on element field with properties changeable by conditions, go through conditions & update when update flag set (memo between updates)
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Icon {
     #[serde(rename = "icon")]
     pub source: IconSource,
+
+    #[serde(flatten)]
+    pub props: Props<IconProps>,
 
     #[serde(alias = "duration")]
     pub duration_bar: bool,
@@ -26,9 +26,6 @@ pub struct Icon {
 
     #[serde(alias = "stacks")]
     pub stacks_text: bool,
-
-    #[serde(alias = "color")]
-    pub tint: [f32; 4],
 }
 
 impl Icon {
@@ -37,7 +34,7 @@ impl Icon {
     }
 
     fn texture_color(&self, ui: &Ui) -> [f32; 4] {
-        let [r, g, b, a] = self.tint;
+        let [r, g, b, a] = self.props.tint;
         [r, g, b, a * ui.clone_style().alpha]
     }
 
@@ -61,6 +58,8 @@ impl Icon {
         active: Option<&ProgressActive>,
         size: [f32; 2],
     ) {
+        self.props.update(ctx, active);
+
         if let Some(active) = active {
             let texture = self.source.get_texture();
             if self.source.is_empty() || texture.is_some() {
@@ -167,7 +166,7 @@ impl RenderOptions for Icon {
     fn render_options(&mut self, ui: &Ui, _state: &mut EditState) {
         self.source.render_select(ui);
 
-        input_color_alpha(ui, "Tint", &mut self.tint);
+        input_color_alpha(ui, "Tint", &mut self.props.base.tint);
 
         // TODO: duration customizations
         ui.checkbox("Show Duration Bar", &mut self.duration_bar);
@@ -175,6 +174,12 @@ impl RenderOptions for Icon {
 
         // TODO: stacks customizations
         ui.checkbox("Show Stacks", &mut self.stacks_text);
+    }
+
+    fn render_tabs(&mut self, ui: &Ui, state: &mut EditState) {
+        if let Some(_token) = ui.tab_item("Condition") {
+            self.props.render_condition_options(ui, state);
+        }
     }
 }
 
@@ -194,10 +199,10 @@ impl Default for Icon {
     fn default() -> Self {
         Self {
             source: IconSource::Unknown,
+            props: Props::default(),
             duration_bar: false,
             duration_text: false,
             stacks_text: false,
-            tint: [1.0, 1.0, 1.0, 1.0],
         }
     }
 }

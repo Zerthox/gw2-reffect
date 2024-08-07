@@ -1,7 +1,5 @@
 #![allow(unused)]
 
-use nexus::imgui::ImColor32;
-
 pub type Color = [f32; 4];
 
 /// Creates a color from RGB values.
@@ -41,72 +39,90 @@ pub fn lerp(a: Color, b: Color, t: f32) -> Color {
     ]
 }
 
-pub const TRANSPARENT: Color = rgba(0.0, 0.0, 0.0, 0.0);
+mod base {
+    use super::*;
 
-pub const BLACK: Color = rgb(0.0, 0.0, 0.0);
+    pub const TRANSPARENT: Color = rgba(0.0, 0.0, 0.0, 0.0);
 
-pub const WHITE: Color = rgb(1.0, 1.0, 1.0);
+    pub const BLACK: Color = rgb(0.0, 0.0, 0.0);
 
-pub const RED: Color = rgb(1.0, 0.0, 0.0);
+    pub const WHITE: Color = rgb(1.0, 1.0, 1.0);
 
-pub const GREEN: Color = rgb(0.0, 1.0, 0.0);
+    pub const RED: Color = rgb(1.0, 0.0, 0.0);
 
-pub const BLUE: Color = rgb(0.0, 1.0, 0.0);
+    pub const GREEN: Color = rgb(0.0, 1.0, 0.0);
 
-pub const YELLOW: Color = rgb(1.0, 1.0, 0.0);
+    pub const BLUE: Color = rgb(0.0, 1.0, 0.0);
 
-pub const CYAN: Color = rgb(0.0, 1.0, 1.0);
+    pub const YELLOW: Color = rgb(1.0, 1.0, 0.0);
 
-pub const MAGENTA: Color = rgb(1.0, 0.0, 1.0);
+    pub const CYAN: Color = rgb(0.0, 1.0, 1.0);
 
-pub const LIGHT_GREY: Color = rgb(0.75, 0.75, 0.75);
+    pub const MAGENTA: Color = rgb(1.0, 0.0, 1.0);
 
-pub const GREY: Color = rgb(0.5, 0.5, 0.5);
+    pub const LIGHT_GREY: Color = rgb(0.75, 0.75, 0.75);
 
-pub const GUILD_WARS_2: Color = rgb(0.98, 0.03, 0.0);
+    pub const GREY: Color = rgb(0.5, 0.5, 0.5);
+}
 
-pub const HEART_OF_THORNS: Color = rgb(0.0, 0.68, 0.09);
+mod expansion {
+    use super::*;
 
-pub const PATH_OF_FIRE: Color = rgb(0.68, 0.0, 0.52);
+    pub const GUILD_WARS_2: Color = rgb(0.98, 0.03, 0.0);
 
-pub const ICEBROOD_SAGA: Color = rgb(0.04, 0.65, 1.0);
+    pub const HEART_OF_THORNS: Color = rgb(0.0, 0.68, 0.09);
 
-pub const END_OF_DRAGONS: Color = rgb(0.05, 0.93, 0.83);
+    pub const PATH_OF_FIRE: Color = rgb(0.68, 0.0, 0.52);
 
-pub const SECRETS_OF_THE_OBSCURE: Color = rgb(0.95, 0.70, 0.07);
+    pub const ICEBROOD_SAGA: Color = rgb(0.04, 0.65, 1.0);
 
-pub const GUARDIAN: Color = rgb(0.45, 0.76, 0.85);
+    pub const END_OF_DRAGONS: Color = rgb(0.05, 0.93, 0.83);
 
-pub const WARRIOR: Color = rgb(1.00, 0.82, 0.40);
+    pub const SECRETS_OF_THE_OBSCURE: Color = rgb(0.95, 0.70, 0.07);
+}
 
-pub const REVENANT: Color = rgb(0.82, 0.43, 0.35);
+mod profession {
+    use super::*;
 
-pub const ENGINEER: Color = rgb(0.82, 0.61, 0.35);
+    pub const GUARDIAN: Color = rgb(0.45, 0.76, 0.85);
 
-pub const RANGER: Color = rgb(0.55, 0.86, 0.51);
+    pub const WARRIOR: Color = rgb(1.00, 0.82, 0.40);
 
-pub const THIEF: Color = rgb(0.75, 0.56, 0.58);
+    pub const REVENANT: Color = rgb(0.82, 0.43, 0.35);
 
-pub const ELEMENTALIST: Color = rgb(0.97, 0.54, 0.53);
+    pub const ENGINEER: Color = rgb(0.82, 0.61, 0.35);
 
-pub const MESMER: Color = rgb(0.71, 0.48, 0.84);
+    pub const RANGER: Color = rgb(0.55, 0.86, 0.51);
 
-pub const NECROMANCER: Color = rgb(0.32, 0.66, 0.44);
+    pub const THIEF: Color = rgb(0.75, 0.56, 0.58);
 
-pub const RAPTOR: Color = rgb(0.95, 0.43, 0.40);
+    pub const ELEMENTALIST: Color = rgb(0.97, 0.54, 0.53);
 
-pub const SPRINGER: Color = rgb(0.96, 0.84, 0.32);
+    pub const MESMER: Color = rgb(0.71, 0.48, 0.84);
 
-pub const SKIMMER: Color = rgb(0.46, 0.54, 0.90);
+    pub const NECROMANCER: Color = rgb(0.32, 0.66, 0.44);
+}
 
-pub const JACKAL: Color = rgb(0.42, 0.67, 0.71);
+mod mount {
+    use super::*;
 
-pub const GRIFFON: Color = rgb(0.56, 0.48, 0.93);
+    pub const RAPTOR: Color = rgb(0.95, 0.43, 0.40);
 
-pub const ROLLER_BEETLE: Color = rgb(0.85, 0.56, 0.28);
+    pub const SPRINGER: Color = rgb(0.96, 0.84, 0.32);
 
-pub const WARCLAW: Color = rgb(0.50, 0.75, 0.72);
+    pub const SKIMMER: Color = rgb(0.46, 0.54, 0.90);
 
-pub const SKYSCALE: Color = rgb(0.69, 0.43, 0.78);
+    pub const JACKAL: Color = rgb(0.42, 0.67, 0.71);
 
-pub const SIEGE_TURTLE: Color = rgb(0.00, 0.67, 0.30);
+    pub const GRIFFON: Color = rgb(0.56, 0.48, 0.93);
+
+    pub const ROLLER_BEETLE: Color = rgb(0.85, 0.56, 0.28);
+
+    pub const WARCLAW: Color = rgb(0.50, 0.75, 0.72);
+
+    pub const SKYSCALE: Color = rgb(0.69, 0.43, 0.78);
+
+    pub const SIEGE_TURTLE: Color = rgb(0.00, 0.67, 0.30);
+}
+
+pub use self::{base::*, expansion::*, mount::*, profession::*};

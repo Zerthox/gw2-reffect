@@ -1,7 +1,7 @@
 use crate::{
     action::Action,
     colors,
-    context::{Context, EditState},
+    context::{Context, ContextUpdate, EditState},
     render_util::{collapsing_header_same_line_end, delete_confirm_modal},
     traits::RenderOptions,
     trigger::{Condition, ProgressActive},
@@ -9,7 +9,7 @@ use crate::{
 use nexus::imgui::{CollapsingHeader, Direction, StyleColor, TreeNodeFlags, Ui};
 use partial::IntoPartial;
 use serde::{Deserialize, Serialize};
-use std::fmt;
+use std::{fmt, ops};
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(default)]
@@ -33,16 +33,18 @@ where
     T::Partial: Clone + fmt::Debug + Serialize + for<'de> Deserialize<'de>,
 {
     pub fn update(&mut self, ctx: &Context, active: Option<&ProgressActive>) {
-        self.current = self.base.clone();
-        if let Some(active) = active {
-            for condition in &mut self.conditions {
-                condition.process(&mut self.current, ctx, active);
+        if ctx.has_update_or_edit(ContextUpdate::OwnCharacter) {
+            self.current = self.base.clone();
+            if let Some(active) = active {
+                for condition in &mut self.conditions {
+                    condition.process(&mut self.current, ctx, active);
+                }
             }
         }
     }
 }
 
-impl<T> std::ops::Deref for Props<T>
+impl<T> ops::Deref for Props<T>
 where
     T: Clone + IntoPartial,
     T::Partial: Clone + fmt::Debug + Serialize + for<'de> Deserialize<'de>,
@@ -54,65 +56,59 @@ where
     }
 }
 
-impl<T> RenderOptions for Props<T>
+impl<T> Props<T>
 where
-    T: Clone + IntoPartial + RenderOptions,
+    T: Clone + IntoPartial,
     T::Partial: Clone + fmt::Debug + Serialize + for<'d> Deserialize<'d> + PartialProps<T>,
 {
-    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
-        self.base.render_options(ui, state)
-    }
+    pub fn render_condition_options(&mut self, ui: &Ui, state: &mut EditState) {
+        let mut action = Action::new();
+        for (i, condition) in self.conditions.iter_mut().enumerate() {
+            let _id = ui.push_id(i as i32);
 
-    fn render_tabs(&mut self, ui: &Ui, state: &mut EditState) {
-        if let Some(_token) = ui.tab_item("Condition") {
-            let mut action = Action::new();
-            for (i, condition) in self.conditions.iter_mut().enumerate() {
-                let _id = ui.push_id(i as i32);
+            let mut remains = true;
 
-                let mut remains = true;
+            let open = CollapsingHeader::new(format!("{}###cond{i}", condition.trigger))
+                .flags(TreeNodeFlags::ALLOW_ITEM_OVERLAP)
+                .begin_with_close_button(ui, &mut remains);
 
-                let open = CollapsingHeader::new(format!("{}###cond{i}", condition.trigger))
-                    .flags(TreeNodeFlags::ALLOW_ITEM_OVERLAP)
-                    .begin_with_close_button(ui, &mut remains);
+            {
+                let size_x = ui.frame_height();
+                let [spacing_x, _] = ui.clone_style().item_spacing;
+                collapsing_header_same_line_end(ui, 3.0 * size_x + 2.0 * spacing_x);
 
-                {
-                    let size_x = ui.frame_height();
-                    let [spacing_x, _] = ui.clone_style().item_spacing;
-                    collapsing_header_same_line_end(ui, 3.0 * size_x + 2.0 * spacing_x);
-
-                    let _style = ui.push_style_color(StyleColor::Button, colors::TRANSPARENT);
-                    if ui.arrow_button("up", Direction::Up) {
-                        action = Action::Up(i);
-                    }
-
-                    ui.same_line();
-                    if ui.arrow_button("down", Direction::Down) {
-                        action = Action::Down(i);
-                    }
+                let _style = ui.push_style_color(StyleColor::Button, colors::TRANSPARENT);
+                if ui.arrow_button("up", Direction::Up) {
+                    action = Action::Up(i);
                 }
 
-                let title = format!("Confirm Delete##reffectcond{i}");
-                if !remains {
-                    ui.open_popup(&title);
-                }
-                if delete_confirm_modal(ui, &title, || {
-                    ui.text(format!("Delete {} Condition?", condition.trigger))
-                }) {
-                    action = Action::Delete(i);
-                }
-
-                if open {
-                    condition.trigger.render_options(ui, state);
-                    ui.spacing();
-                    condition.properties.render_options(ui, &self.base);
-                    ui.spacing();
+                ui.same_line();
+                if ui.arrow_button("down", Direction::Down) {
+                    action = Action::Down(i);
                 }
             }
-            action.perform(&mut self.conditions);
 
-            if ui.button("Add Condition") {
-                self.conditions.push(Condition::default());
+            let title = format!("Confirm Delete##reffectcond{i}");
+            if !remains {
+                ui.open_popup(&title);
             }
+            if delete_confirm_modal(ui, &title, || {
+                ui.text(format!("Delete Condition {}?", condition.trigger))
+            }) {
+                action = Action::Delete(i);
+            }
+
+            if open {
+                condition.trigger.render_options(ui, state);
+                ui.spacing();
+                condition.properties.render_options(ui, &self.base);
+                ui.spacing();
+            }
+        }
+        action.perform(&mut self.conditions);
+
+        if ui.button("Add Condition") {
+            self.conditions.push(Condition::default());
         }
     }
 }

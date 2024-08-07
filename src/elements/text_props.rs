@@ -1,5 +1,6 @@
 use super::{PartialProps, TextDecoration};
 use crate::{
+    colors,
     context::EditState,
     render_util::{input_color_alpha, input_optional, input_percent},
     traits::RenderOptions,
@@ -22,7 +23,7 @@ impl Default for TextProps {
     fn default() -> Self {
         Self {
             scale: 1.0,
-            color: [1.0, 1.0, 1.0, 1.0],
+            color: colors::WHITE,
             decoration: TextDecoration::default(),
         }
     }
@@ -30,9 +31,14 @@ impl Default for TextProps {
 
 impl RenderOptions for TextProps {
     fn render_options(&mut self, ui: &Ui, _state: &mut EditState) {
-        input_percent("Scale", &mut self.scale);
-        input_color_alpha(ui, "Color", &mut self.color);
-        self.decoration.render_select(ui);
+        let Self {
+            scale,
+            color,
+            decoration,
+        } = self;
+        input_percent("Scale", scale);
+        input_color_alpha(ui, "Color", color);
+        decoration.render_select(ui);
     }
 }
 
@@ -43,7 +49,6 @@ impl PartialProps<TextProps> for Partial<TextProps> {
             color,
             decoration,
         } = self;
-
         input_optional(
             ui,
             "Scale",

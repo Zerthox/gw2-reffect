@@ -97,13 +97,13 @@ impl Context {
         self.resources = resources;
     }
 
-    /// Whether the given update has happened.
-    pub fn has_update(&self, update: ContextUpdate) -> bool {
+    /// Checks whether the given updates have happened.
+    pub fn has_update(&self, update: impl Into<BitFlags<ContextUpdate>>) -> bool {
         self.updates.contains(update)
     }
 
-    /// Whether the given update has happened or edit mode is active.
-    pub fn has_update_or_edit(&self, update: ContextUpdate) -> bool {
+    /// Checks whether the given updates have happened or edit mode is active.
+    pub fn has_update_or_edit(&self, update: impl Into<BitFlags<ContextUpdate>>) -> bool {
         self.edit.is_editing() || self.has_update(update)
     }
 

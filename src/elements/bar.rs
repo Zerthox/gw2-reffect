@@ -1,13 +1,14 @@
-use super::{Align, Direction, Progress, RenderState, Unit};
+use super::{Align, BarProps, Direction, Progress, Props, RenderState, Unit};
 use crate::{
     action::Action,
     bounds::Bounds,
-    colors::{self, with_alpha_factor},
+    colors::with_alpha_factor,
     component_wise::ComponentWise,
     context::{Context, EditState},
     render_util::{
         enum_combo, helper, helper_slider, input_color_alpha, input_float_with_format,
-        input_percent, input_size, input_u32, slider_percent, Rect,
+        input_percent, input_percent_inverse, input_positive_with_format, input_size, input_u32,
+        slider_percent, Rect,
     },
     traits::{Render, RenderDebug, RenderOptions},
     tree::TreeLeaf,
@@ -22,28 +23,20 @@ pub struct Bar {
     pub progress_kind: Progress,
     pub max: u32,
 
-    pub lower_bound: f32,
-    pub progress_factor: f32,
+    #[serde(flatten)]
+    pub props: Props<BarProps>,
 
     pub size: [f32; 2],
     pub align: Align,
     pub direction: Direction,
-    pub fill: [f32; 4],
-    pub background: [f32; 4],
 
-    pub border: bool,
-    pub border_size: f32,
-    pub border_color: [f32; 4],
-
-    pub tick_size: f32,
-    pub tick_color: [f32; 4],
     pub tick_unit: Unit,
     pub ticks: Vec<f32>,
 }
 
 impl Bar {
     fn process_value(&self, value: f32) -> f32 {
-        ((value * self.progress_factor) - self.lower_bound).clamp(0.0, 1.0)
+        ((value * self.props.progress_factor) - self.props.lower_bound).clamp(0.0, 1.0)
     }
 }
 
@@ -51,7 +44,10 @@ impl TreeLeaf for Bar {}
 
 impl Render for Bar {
     fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
-        if let Some(active) = state.trigger_active() {
+        let active = state.trigger_active();
+        self.props.update(ctx, active);
+
+        if let Some(active) = active {
             let alpha = ui.clone_style().alpha;
 
             let (start, end) = self.bounding_box(ui, ctx, state.pos);
@@ -63,17 +59,25 @@ impl Render for Bar {
 
             let draw_list = ui.get_background_draw_list();
             draw_list
-                .add_rect(start, end, with_alpha_factor(self.background, alpha))
+                .add_rect(start, end, with_alpha_factor(self.props.background, alpha))
                 .filled(true)
                 .build();
             draw_list
-                .add_rect(fill_start, fill_end, with_alpha_factor(self.fill, alpha))
+                .add_rect(
+                    fill_start,
+                    fill_end,
+                    with_alpha_factor(self.props.fill, alpha),
+                )
                 .filled(true)
                 .build();
-            if self.border {
+            if self.props.border_size > 0.0 {
                 draw_list
-                    .add_rect(start, end, with_alpha_factor(self.border_color, alpha))
-                    .thickness(self.border_size)
+                    .add_rect(
+                        start,
+                        end,
+                        with_alpha_factor(self.props.border_color, alpha),
+                    )
+                    .thickness(self.props.border_size)
                     .build();
             }
 
@@ -88,8 +92,8 @@ impl Render for Bar {
                     let start = start.add(offset);
                     let end = start.add(end_offset);
                     draw_list
-                        .add_line(start, end, with_alpha_factor(self.tick_color, alpha))
-                        .thickness(self.tick_size)
+                        .add_line(start, end, with_alpha_factor(self.props.tick_color, alpha))
+                        .thickness(self.props.tick_size)
                         .build();
                 }
             }
@@ -119,13 +123,10 @@ impl RenderOptions for Bar {
             helper(ui, || ui.text("Maximum progress value"));
         }
 
-        input_percent("Lower bound", &mut self.lower_bound);
+        input_percent("Lower bound", &mut self.props.base.lower_bound);
         helper(ui, || ui.text("Lower bound for progress in percent"));
 
-        let mut upper_bound = 1.0 / self.progress_factor; // keep as factor to avoid divisions outside of edit
-        if input_percent("Upper bound", &mut upper_bound) {
-            self.progress_factor = 1.0 / upper_bound.max(0.0);
-        }
+        input_percent_inverse("Upper bound", &mut self.props.base.progress_factor); // keep as factor to avoid divisions outside of edit
         helper(ui, || ui.text("Upper bound for progress in percent"));
 
         enum_combo(ui, "Direction", &mut self.direction, ComboBoxFlags::empty());
@@ -137,40 +138,32 @@ impl RenderOptions for Bar {
 
         input_size(&mut self.size);
 
-        input_color_alpha(ui, "Fill", &mut self.fill);
+        input_color_alpha(ui, "Fill", &mut self.props.base.fill);
 
-        input_color_alpha(ui, "Background", &mut self.background);
+        input_color_alpha(ui, "Background", &mut self.props.base.background);
 
-        ui.checkbox("Border", &mut self.border);
-        if self.border {
-            if input_float_with_format(
-                "Border size",
-                &mut self.border_size,
-                1.0,
-                10.0,
-                "%.1f",
-                InputTextFlags::empty(),
-            ) {
-                self.border_size = self.border_size.max(0.0);
-            }
-
-            input_color_alpha(ui, "Border color", &mut self.border_color);
-        }
-
-        ui.spacing();
-
-        if input_float_with_format(
-            "Tick size",
-            &mut self.tick_size,
+        input_positive_with_format(
+            "Border size",
+            &mut self.props.base.border_size,
             1.0,
             10.0,
             "%.1f",
             InputTextFlags::empty(),
-        ) {
-            self.tick_size = self.tick_size.max(0.0);
-        }
+        );
+        input_color_alpha(ui, "Border color", &mut self.props.base.border_color);
 
-        input_color_alpha(ui, "Tick color", &mut self.tick_color);
+        ui.spacing();
+
+        input_positive_with_format(
+            "Tick size",
+            &mut self.props.base.tick_size,
+            1.0,
+            10.0,
+            "%.1f",
+            InputTextFlags::empty(),
+        );
+
+        input_color_alpha(ui, "Tick color", &mut self.props.base.tick_color);
 
         if let Some(prev) = enum_combo(ui, "Tick unit", &mut self.tick_unit, ComboBoxFlags::empty())
         {
@@ -213,11 +206,20 @@ impl RenderOptions for Bar {
             });
         }
     }
+
+    fn render_tabs(&mut self, ui: &Ui, state: &mut EditState) {
+        if let Some(_token) = ui.tab_item("Condition") {
+            self.props.render_condition_options(ui, state);
+        }
+    }
 }
 
 impl RenderDebug for Bar {
     fn render_debug(&mut self, ui: &Ui) {
-        ui.text(format!("Progress factor: {}", self.progress_factor));
+        ui.text(format!(
+            "Progress factor: {}",
+            self.props.base.progress_factor
+        ));
     }
 }
 
@@ -226,18 +228,10 @@ impl Default for Bar {
         Self {
             progress_kind: Progress::default(),
             max: 25,
-            lower_bound: 0.0,
-            progress_factor: 1.0,
+            props: Props::default(),
             align: Align::Center,
             size: [128.0, 12.0],
             direction: Direction::Right,
-            fill: colors::GREEN,
-            background: colors::TRANSPARENT,
-            border: true,
-            border_size: 1.0,
-            border_color: colors::BLACK,
-            tick_size: 1.0,
-            tick_color: colors::BLACK,
             tick_unit: Unit::default(),
             ticks: Vec::new(),
         }

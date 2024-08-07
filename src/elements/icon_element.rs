@@ -38,6 +38,10 @@ impl RenderOptions for IconElement {
 
         self.icon.render_options(ui, state);
     }
+
+    fn render_tabs(&mut self, ui: &Ui, state: &mut EditState) {
+        self.icon.render_tabs(ui, state);
+    }
 }
 
 impl RenderDebug for IconElement {

@@ -49,19 +49,35 @@ pub fn input_float_with_format(
     }
 }
 
+pub fn input_positive_with_format(
+    label: impl Into<String>,
+    value: &mut f32,
+    step: f32,
+    step_fast: f32,
+    format: impl Into<String>,
+    flags: InputTextFlags,
+) -> bool {
+    if input_float_with_format(label, value, step, step_fast, format, flags) {
+        *value = value.max(0.0);
+        true
+    } else {
+        false
+    }
+}
+
 pub fn input_pos([x, y]: &mut [f32; 2]) {
     input_float_with_format("Position x", x, 1.0, 10.0, "%.2f", InputTextFlags::empty());
     input_float_with_format("Position y", y, 1.0, 10.0, "%.2f", InputTextFlags::empty());
 }
 
 pub fn input_size([x, y]: &mut [f32; 2]) {
-    input_float_with_format("Size x", x, 1.0, 10.0, "%.2f", InputTextFlags::empty());
-    input_float_with_format("Size y", y, 1.0, 10.0, "%.2f", InputTextFlags::empty());
+    input_positive_with_format("Size x", x, 1.0, 10.0, "%.2f", InputTextFlags::empty());
+    input_positive_with_format("Size y", y, 1.0, 10.0, "%.2f", InputTextFlags::empty());
 }
 
 pub fn input_percent(label: impl Into<String>, value: &mut f32) -> bool {
     let mut percent = *value * 100.0;
-    if input_float_with_format(
+    if input_positive_with_format(
         label,
         &mut percent,
         10.0,
@@ -76,9 +92,19 @@ pub fn input_percent(label: impl Into<String>, value: &mut f32) -> bool {
     }
 }
 
+pub fn input_percent_inverse(label: impl Into<String>, value: &mut f32) -> bool {
+    let mut inverse = if *value == 0.0 { 0.0 } else { 1.0 / *value };
+    if input_percent(label, &mut inverse) {
+        *value = if inverse == 0.0 { 0.0 } else { 1.0 / inverse };
+        true
+    } else {
+        false
+    }
+}
+
 pub fn input_seconds(label: impl Into<String>, ms: &mut u32) -> bool {
     let mut secs = *ms as f32 / 1000.0;
-    if input_float_with_format(label, &mut secs, 0.5, 1.0, "%.3f", InputTextFlags::empty()) {
+    if input_positive_with_format(label, &mut secs, 0.5, 1.0, "%.3f", InputTextFlags::empty()) {
         *ms = (secs * 1000.0) as u32;
         true
     } else {

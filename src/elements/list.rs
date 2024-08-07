@@ -178,6 +178,26 @@ impl RenderOptions for IconList {
 
         action.perform(&mut self.icons, self.size, state);
     }
+
+    fn render_tabs(&mut self, ui: &Ui, state: &mut EditState) {
+        if let Some(_token) = ui.tab_item("Condition") {
+            const INDENT: f32 = 10.0;
+
+            for (i, icon) in self.icons.iter_mut().enumerate() {
+                let _id = ui.push_id(i as i32);
+
+                let open = CollapsingHeader::new(format!("{}###icon{i}", icon.name))
+                    .flags(TreeNodeFlags::ALLOW_ITEM_OVERLAP)
+                    .begin(ui);
+
+                if open {
+                    ui.indent_by(INDENT);
+                    icon.icon.props.render_condition_options(ui, state);
+                    ui.unindent_by(INDENT);
+                }
+            }
+        }
+    }
 }
 
 impl RenderDebug for IconList {
