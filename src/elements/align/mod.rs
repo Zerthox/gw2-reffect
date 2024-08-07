@@ -1,3 +1,7 @@
+mod horizontal;
+
+pub use self::horizontal::*;
+
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, VariantArray};
 

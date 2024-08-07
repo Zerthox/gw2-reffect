@@ -1,6 +1,6 @@
 use crate::{
     colors::{self, with_alpha},
-    elements::TextDecoration,
+    elements::text::TextDecoration,
 };
 use serde::{Deserialize, Serialize};
 

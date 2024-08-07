@@ -1,7 +1,8 @@
-use super::{PartialProps, TextDecoration};
+use super::TextDecoration;
 use crate::{
     colors,
     context::EditState,
+    elements::PartialProps,
     render_util::{input_color_alpha, input_optional, input_percent},
     traits::RenderOptions,
 };

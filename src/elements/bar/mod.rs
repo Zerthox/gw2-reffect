@@ -1,4 +1,9 @@
-use super::{Align, BarProps, Direction, Progress, Props, RenderState, Unit};
+mod progress;
+mod props;
+
+pub use self::{progress::*, props::*};
+
+use super::{align::Align, Direction, Props, RenderState, Unit};
 use crate::{
     action::Action,
     bounds::Bounds,

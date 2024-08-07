@@ -1,4 +1,10 @@
-use super::{AlignHorizontal, IconProps, IconSource, Props, RenderState};
+mod element;
+mod props;
+mod source;
+
+pub use self::{element::*, props::*, source::*};
+
+use super::{align::AlignHorizontal, Props, RenderState};
 use crate::{
     colors::{self, with_alpha, with_alpha_factor},
     component_wise::ComponentWise,

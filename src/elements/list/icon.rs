@@ -1,6 +1,6 @@
-use super::{Common, Element, ElementType, Icon, IconElement, RenderState};
 use crate::{
     context::{Context, EditState},
+    elements::{Common, Element, ElementType, Icon, IconElement, RenderState},
     render_util::Rect,
     traits::{RenderDebug, RenderOptions},
     trigger::ProgressTrigger,

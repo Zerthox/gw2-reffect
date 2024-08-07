@@ -1,7 +1,7 @@
-use super::PartialProps;
 use crate::{
     colors,
     context::EditState,
+    elements::PartialProps,
     render_util::{
         input_color_alpha, input_optional, input_percent, input_percent_inverse,
         input_positive_with_format,

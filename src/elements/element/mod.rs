@@ -1,4 +1,8 @@
-use super::{Animation, Common, ElementType, RenderState};
+mod kind;
+
+pub use self::kind::*;
+
+use super::{Animation, Common, RenderState};
 use crate::{
     action::ElementAction,
     bounds::Bounds,
@@ -14,7 +18,6 @@ use crate::{
 use nexus::imgui::{MenuItem, Ui};
 use serde::{Deserialize, Serialize};
 
-// TODO: conditions, e.g. lower opacity out of combat, color change based on stack threshold
 // TODO: anchor to parent vs screen
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]

@@ -1,6 +1,7 @@
+use super::ListIcon;
 use crate::{
     context::EditState,
-    elements::{Element, ElementType, ListIcon},
+    elements::{Element, ElementType},
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]

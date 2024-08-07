@@ -1,7 +1,7 @@
 use crate::{
     addon::Addon,
     assets::{MONSTER_ICON, TEMP_ICON},
-    elements::IconSource,
+    elements::icon::IconSource,
 };
 use nexus::{
     imgui::TextureId,

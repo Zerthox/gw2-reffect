@@ -1,4 +1,9 @@
-use super::{AlignHorizontal, Props, RenderState, TextProps};
+mod decoration;
+mod props;
+
+pub use self::{decoration::*, props::*};
+
+use super::{align::AlignHorizontal, Props, RenderState};
 use crate::{
     bounds::Bounds,
     component_wise::ComponentWise,

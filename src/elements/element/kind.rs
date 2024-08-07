@@ -1,7 +1,7 @@
-use super::{Bar, Element, Group, IconElement, IconList, RenderState, Text};
 use crate::{
     bounds::Bounds,
     context::{Context, EditState},
+    elements::{Bar, Group, IconElement, IconList, RenderState, Text},
     render_util::{impl_static_variants, Rect},
     traits::{Render, RenderDebug, RenderOptions},
     tree::TreeNode,
@@ -9,6 +9,8 @@ use crate::{
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, IntoStaticStr};
+
+use super::Element;
 
 #[derive(Debug, Clone, EnumIter, AsRefStr, IntoStaticStr, Serialize, Deserialize)]
 #[serde(tag = "type")]
