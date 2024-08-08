@@ -131,7 +131,7 @@ impl RenderOptions for Bar {
         input_percent("Lower bound", &mut self.props.base.lower_bound);
         helper(ui, || ui.text("Lower bound for progress in percent"));
 
-        input_percent_inverse("Upper bound", &mut self.props.base.progress_factor); // keep as factor to avoid divisions outside of edit
+        input_percent_inverse("Upper bound", &mut self.props.base.progress_factor);
         helper(ui, || ui.text("Upper bound for progress in percent"));
 
         enum_combo(ui, "Direction", &mut self.direction, ComboBoxFlags::empty());

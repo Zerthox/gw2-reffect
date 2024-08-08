@@ -9,7 +9,7 @@ use crate::{
     colors::{self, with_alpha, with_alpha_factor},
     component_wise::ComponentWise,
     context::{Context, EditState},
-    render_util::{debug_optional, draw_spinner_bg, draw_text_bg, input_color_alpha, Rect},
+    render_util::{debug_optional, draw_spinner_bg, draw_text_bg, Rect},
     settings::icon::{DurationBarSettings, DurationTextSettings, StackTextSettings},
     traits::{RenderDebug, RenderOptions},
     trigger::ProgressActive,
@@ -67,15 +67,24 @@ impl Icon {
         self.props.update(ctx, active);
 
         if let Some(active) = active {
+            let [width, height] = size;
+            let small_size = width.min(height);
             let texture = self.source.get_texture();
+
             if self.source.is_empty() || texture.is_some() {
                 let (start, end) = Self::bounds(state.pos, size);
                 let color @ [_, _, _, alpha] = self.texture_color(ui);
 
                 // render icon
                 if let Some(texture) = texture {
+                    let round = self.props.round * small_size;
+                    let uv_change = 0.5 * (1.0 - self.props.zoom);
+                    let uv_min = [uv_change, uv_change];
+                    let uv_max = [1.0, 1.0].sub_scalar(uv_change);
                     ui.get_background_draw_list()
-                        .add_image(texture, start, end)
+                        .add_image_rounded(texture, start, end, round)
+                        .uv_min(uv_min)
+                        .uv_max(uv_max)
                         .col(color)
                         .build();
                 }
@@ -117,8 +126,7 @@ impl Icon {
                         &stacks.to_string()
                     };
 
-                    let [width, height] = size;
-                    let font_size = scale * width.min(height);
+                    let font_size = scale * small_size;
                     let font_scale = font_size / ui.current_font_size();
                     let [x_offset, _] = AlignHorizontal::Right.text_offset(ui, text, font_scale);
                     let line_height = font_scale * ui.text_line_height();
@@ -142,8 +150,7 @@ impl Icon {
                         if remain < max_remain {
                             let text = active.current_text(ctx.now);
 
-                            let [width, height] = size;
-                            let font_size = scale * width.min(height);
+                            let font_size = scale * small_size;
                             let font_scale = font_size / ui.current_font_size();
                             let offset = AlignHorizontal::Center.text_offset(ui, &text, font_scale);
                             let text_pos = state.pos.add(offset);
@@ -155,11 +162,10 @@ impl Icon {
                     }
                 }
             } else {
-                let [x, _] = size;
                 draw_spinner_bg(
                     ui,
                     state.pos,
-                    0.4 * x,
+                    0.4 * small_size,
                     colors::WHITE,
                     with_alpha(colors::WHITE, 0.3),
                 )
@@ -169,16 +175,15 @@ impl Icon {
 }
 
 impl RenderOptions for Icon {
-    fn render_options(&mut self, ui: &Ui, _state: &mut EditState) {
+    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
         self.source.render_select(ui);
 
-        input_color_alpha(ui, "Tint", &mut self.props.base.tint);
+        ui.spacing();
 
-        // TODO: duration customizations
+        self.props.base.render_options(ui, state);
+
         ui.checkbox("Show Duration Bar", &mut self.duration_bar);
         ui.checkbox("Show Duration Text", &mut self.duration_text);
-
-        // TODO: stacks customizations
         ui.checkbox("Show Stacks", &mut self.stacks_text);
     }
 

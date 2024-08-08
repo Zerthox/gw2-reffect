@@ -17,7 +17,7 @@ use serde::{Deserialize, Serialize};
 #[serde(default)]
 pub struct BarProps {
     pub lower_bound: f32,
-    pub progress_factor: f32,
+    pub progress_factor: f32, // keep as factor to avoid divisions
 
     pub fill: [f32; 4],
     pub background: [f32; 4],

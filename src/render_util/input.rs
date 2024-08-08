@@ -80,8 +80,8 @@ pub fn input_percent(label: impl Into<String>, value: &mut f32) -> bool {
     if input_positive_with_format(
         label,
         &mut percent,
+        1.0,
         10.0,
-        100.0,
         "%.2f",
         InputTextFlags::empty(),
     ) {
