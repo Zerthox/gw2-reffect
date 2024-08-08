@@ -1,6 +1,6 @@
 [package]
 name = "reffect"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Zerthox"]
 edition = "2021"
 description = "Customizable effect & resource displays"
@@ -44,3 +44,5 @@ OriginalFilename = "reffect.dll"
 
 [profile.release]
 lto = "thin"
+debug = "limited"
+split-debuginfo = "packed"
