@@ -192,6 +192,7 @@ impl Element {
 impl RenderDebug for Element {
     fn render_debug(&mut self, ui: &Ui) {
         self.common.render_debug(ui);
+        self.filter.render_debug(ui);
         self.kind.render_debug(ui);
     }
 }

@@ -1,8 +1,9 @@
 use super::{map_old::MapTriggerOld, memo::Memo, MapTrigger, PlayerTrigger, Trigger};
 use crate::{
     context::{Context, ContextUpdate, EditState},
+    render_util::debug_optional,
     serde_migrate::migrate,
-    traits::RenderOptions,
+    traits::{RenderDebug, RenderOptions},
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
@@ -42,5 +43,12 @@ impl RenderOptions for FilterTrigger {
             // map trigger changed, ensure fresh state next access
             self.map.clear();
         }
+    }
+}
+
+impl RenderDebug for FilterTrigger {
+    fn render_debug(&mut self, ui: &Ui) {
+        ui.text(format!("Trait filter: {}", self.player.traits.memo()));
+        debug_optional(ui, "Map filter:", self.map.get());
     }
 }

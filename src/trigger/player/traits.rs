@@ -26,6 +26,10 @@ impl TraitTrigger {
             false
         };
     }
+
+    pub fn memo(&self) -> bool {
+        self.memo
+    }
 }
 
 impl Trigger for TraitTrigger {

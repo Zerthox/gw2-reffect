@@ -43,14 +43,22 @@ impl PlayerTrigger {
             }
         }
     }
+
+    pub fn specs_active(&self, ctx: &Context) -> bool {
+        check_bitflags_optional(self.specs, ctx.player.spec.ok())
+    }
+
+    pub fn mounts_active(&self, ctx: &Context) -> bool {
+        check_bitflags_optional(self.mounts, ctx.player.mount.ok())
+    }
 }
 
 impl Trigger for PlayerTrigger {
     fn is_active(&mut self, ctx: &Context) -> bool {
         self.traits.is_active(ctx)
             && self.combat.is_active(ctx)
-            && check_bitflags_optional(self.specs, ctx.player.spec.ok())
-            && check_bitflags_optional(self.mounts, ctx.player.mount.ok())
+            && self.specs_active(ctx)
+            && self.mounts_active(ctx)
     }
 }
 

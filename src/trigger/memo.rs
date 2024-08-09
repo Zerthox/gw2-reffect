@@ -38,6 +38,11 @@ where
         }
     }
 
+    /// Retrieves the memoized state, if initialized.
+    pub fn get(&self) -> Option<bool> {
+        self.cache
+    }
+
     /// Clears the memoized state.
     pub fn clear(&mut self) {
         self.cache = None;
