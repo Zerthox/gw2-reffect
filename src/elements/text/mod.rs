@@ -9,7 +9,8 @@ use crate::{
     component_wise::ComponentWise,
     context::{Context, ContextUpdate, EditState},
     render_util::{
-        debug_optional, draw_text_bg, font_select, helper, input_text_multi_with_menu, Font, Rect,
+        debug_optional, draw_text_bg, font_select, helper, helper_warn, input_text_multi_with_menu,
+        Font, Rect,
     },
     traits::{Render, RenderDebug, RenderOptions},
     tree::TreeLeaf,
@@ -168,6 +169,9 @@ impl RenderOptions for Text {
 
         if font_select(ui, "Font", &mut self.loaded_font) {
             self.font_name = self.loaded_font.map(|font| font.name_owned());
+        }
+        if self.font_name.is_some() && self.loaded_font.is_none() {
+            helper_warn(ui, || ui.text("Failed to find font"));
         }
 
         self.props.base.render_options(ui, state);
