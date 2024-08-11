@@ -22,7 +22,7 @@ impl Addon {
 
     pub fn render_displays(&mut self, ui: &Ui) {
         if self.context.ui.should_show() || self.context.edit.is_editing() {
-            let _font = self.context.font.map(|font| font.push());
+            let _font = self.context.font.and_then(|font| font.push());
             for pack in &mut self.packs {
                 pack.render(ui, &self.context);
             }

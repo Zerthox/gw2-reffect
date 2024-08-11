@@ -116,7 +116,7 @@ impl Render for Text {
         self.update(ctx, state);
 
         if let Some(text) = &self.text_memo {
-            let _font = self.loaded_font.map(|font| font.push());
+            let _font = self.loaded_font.and_then(|font| font.push());
             let font_scale = self.props.scale;
             let pos = self.calc_pos(ui, state.pos, text);
             let [r, g, b, a] = self.props.color;

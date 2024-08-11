@@ -1,7 +1,7 @@
 use nexus::imgui::{sys, ComboBoxFlags, Selectable, SelectableFlags, Ui};
 use std::{
     borrow::Cow,
-    ffi::{c_char, CStr, CString},
+    ffi::{CStr, CString},
     ptr::NonNull,
     slice,
 };
@@ -38,29 +38,27 @@ impl Font {
         result
     }
 
-    pub unsafe fn name_ptr(&self) -> *const [c_char] {
-        let font = self.0.as_ref();
-        let config = font.ConfigData.as_ref().expect("font config is null");
-        config.Name.as_slice() as *const _
+    pub fn as_ptr(&self) -> *mut sys::ImFont {
+        self.0.as_ptr()
+    }
+
+    pub fn is_loaded(&self) -> bool {
+        unsafe { sys::ImFont_IsLoaded(self.as_ptr()) }
     }
 
     pub unsafe fn name_raw<'a>(&self) -> &'a CStr {
-        let name = self.name_ptr();
-        let bytes = (name as *const [u8]).as_ref().expect("font name is null");
-        CStr::from_bytes_until_nul(bytes).expect("font name without nul terminator")
+        CStr::from_ptr(sys::ImFont_GetDebugName(self.as_ptr()))
     }
 
     pub fn name_owned(&self) -> String {
         unsafe { self.name_raw() }.to_string_lossy().into_owned()
     }
 
-    pub fn as_ptr(&self) -> *mut sys::ImFont {
-        self.0.as_ptr()
-    }
-
-    pub fn push(&self) -> FontToken {
-        unsafe { sys::igPushFont(self.as_ptr()) }
-        FontToken
+    pub fn push(&self) -> Option<FontToken> {
+        self.is_loaded().then(|| {
+            unsafe { sys::igPushFont(self.as_ptr()) };
+            FontToken
+        })
     }
 }
 
@@ -93,7 +91,7 @@ pub fn font_select(ui: &Ui, label: impl AsRef<str>, current: &mut Option<Font>) 
             let is_selected = Some(font) == *current;
             if unsafe {
                 sys::igSelectable_Bool(
-                    font.name_ptr().cast(),
+                    font.name_raw().as_ptr(),
                     is_selected,
                     SelectableFlags::empty().bits() as i32,
                     [0.0, 0.0].into(),
