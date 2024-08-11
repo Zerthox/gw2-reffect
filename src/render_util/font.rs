@@ -1,7 +1,7 @@
 use nexus::imgui::{sys, ComboBoxFlags, Selectable, SelectableFlags, Ui};
 use std::{
     borrow::Cow,
-    ffi::{CStr, CString},
+    ffi::{c_char, CStr, CString},
     ptr::NonNull,
     slice,
 };
@@ -38,12 +38,16 @@ impl Font {
         result
     }
 
+    pub unsafe fn name_ptr(&self) -> *const [c_char] {
+        let font = self.0.as_ref();
+        let config = font.ConfigData.as_ref().expect("font config is null");
+        config.Name.as_slice() as *const _
+    }
+
     pub unsafe fn name_raw<'a>(&self) -> &'a CStr {
-        unsafe {
-            let config = (*self.as_ptr()).ConfigData;
-            let name = (*config).Name.as_ptr();
-            CStr::from_ptr(name)
-        }
+        let name = self.name_ptr();
+        let bytes = (name as *const [u8]).as_ref().expect("font name is null");
+        CStr::from_bytes_until_nul(bytes).expect("font name without nul terminator")
     }
 
     pub fn name_owned(&self) -> String {
@@ -74,13 +78,9 @@ pub fn font_select(ui: &Ui, label: impl AsRef<str>, current: &mut Option<Font>) 
     const INHERIT: &str = "Inherit";
 
     let mut changed = false;
-    let preview = match *current {
-        Some(font) => {
-            let name = unsafe { font.name_raw() };
-            name.to_string_lossy()
-        }
-        None => Cow::Borrowed(INHERIT),
-    };
+    let preview = current
+        .map(|current| unsafe { current.name_raw() }.to_string_lossy())
+        .unwrap_or(Cow::Borrowed(INHERIT));
 
     if let Some(_token) = ui.begin_combo_with_flags(label, preview, ComboBoxFlags::HEIGHT_LARGE) {
         if Selectable::new(INHERIT).build(ui) {
@@ -93,7 +93,7 @@ pub fn font_select(ui: &Ui, label: impl AsRef<str>, current: &mut Option<Font>) 
             let is_selected = Some(font) == *current;
             if unsafe {
                 sys::igSelectable_Bool(
-                    font.name_raw().as_ptr(),
+                    font.name_ptr().cast(),
                     is_selected,
                     SelectableFlags::empty().bits() as i32,
                     [0.0, 0.0].into(),
