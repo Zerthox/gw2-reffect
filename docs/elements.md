@@ -46,10 +46,10 @@ This can be used as a fully customizable alternative to the simple stacks/durati
 
 The following text replacements are supported:
 - `%n` for the name of the element
-- `%s` for the current number of effect stacks
-- `%r` for the remaining effect duration
-- `%f` for the initial full effect duration
-- `%p` for the effect duration progress (remaining effect duration in percent)
+- `%s` for the current number of effect stacks or current resource amount
+- `%r` for the remaining effect duration or current resource amount
+- `%f` for the initial full effect duration or max resource amount
+- `%p` for the remaining effect duration or current resource amount in percent
 - `%%` for a simple % sign
 
 ![Text](./img/text.png)
@@ -63,10 +63,22 @@ They are a fully customizable alternative to the simple progress bar built into 
 
 # Additional element options
 
+## Trigger
+Triggers can be inherited from parent elements or set on the element itself.
+A variety of information sources is supported: your character's effects, health, barrier and profession resources.
+
+## Condition
+Conditions allow dynamically changing element properties based on custom thresholds.
+
+![Conditions](./img/condition.png)
+
 ## Filter
 Filters allow restricting the visibility of elements.
 For example elements can be limited to in or out of combat, one or multiple specializations or specific maps.
 This is especially useful for elements that are not tied to an effect.
+
+Commonly used map ids can be inserted by right-clicking the "Add Map Id" button.
+The trait id input supports pasting chat links.
 
 ![Filters](./img/filter.png)
 
@@ -74,3 +86,4 @@ This is especially useful for elements that are not tied to an effect.
 Optionally an animation can be added to an element to further highlight its presence on screen.
 
 ![Animation](./img/animation.png)
+ 
