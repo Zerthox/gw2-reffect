@@ -59,17 +59,18 @@ impl RenderOptions for TraitTrigger {
                 input_trait_id(ui, "##id", &mut req.id, InputTextFlags::empty());
             });
             ui.same_line();
-            ui.text(format!("Trait {}", i + 1));
+            ui.text(format!("Trait Id {}", i + 1));
 
             if i == 0 {
                 helper(ui, || {
-                    ui.text("Id can be found on the wiki");
+                    ui.text("Can be found on the wiki, same as in GW2 API");
+                    ui.text("Supports pasting chat links");
                     ui.text("Checkbox controls present or missing");
                 });
             }
         }
         action.perform(&mut self.traits);
-        if ui.button("Add Trait") {
+        if ui.button("Add Trait Id") {
             self.traits.push(TraitRequirement::default());
         }
     }

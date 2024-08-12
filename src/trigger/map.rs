@@ -61,8 +61,7 @@ impl RenderOptions<bool> for MapTrigger {
 
             if i == 0 {
                 helper(ui, || {
-                    ui.text("Same as in GW2 API");
-                    ui.text("Can be found on the wiki");
+                    ui.text("Can be found on the wiki, same as in GW2 API")
                 });
             }
         }

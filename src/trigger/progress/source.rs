@@ -122,10 +122,10 @@ impl ProgressSource {
         }
     }
 
-    fn helper(ui: &Ui) {
+    fn buff_helper(ui: &Ui) {
         helper(ui, || {
             ui.text("Can be found on the wiki");
-            ui.text("Type the id or paste the chat link");
+            ui.text("Supports pasting chat links");
         });
     }
 }
@@ -148,7 +148,7 @@ impl RenderOptions for ProgressSource {
         match self {
             Self::Buff(id) => {
                 input_skill_id(ui, "Effect Id", id, InputTextFlags::empty());
-                Self::helper(ui);
+                Self::buff_helper(ui);
             }
             Self::AnyBuff(ids) => {
                 let mut action = Action::new();
@@ -161,7 +161,7 @@ impl RenderOptions for ProgressSource {
                     ui.same_line();
                     ui.text(format!("Effect Id {}", i + 1));
                     if i == 0 {
-                        Self::helper(ui);
+                        Self::buff_helper(ui);
                     }
                 }
                 if ui.button("Add Effect") {
