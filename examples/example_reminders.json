@@ -4,6 +4,13 @@
     "name": "Reminders",
     "pos": [500.0, 300.0],
     "opacity": 1.0,
+    "trigger": {
+        "source": "Inherit",
+        "threshold": {
+            "threshold_type": "Always",
+            "amount_type": "Intensity"
+        }
+    },
     "anchor": "TopLeft",
     "layer": 1,
     "elements": [
@@ -12,14 +19,24 @@
             "name": "Instanced",
             "pos": [0.0, 0.0],
             "opacity": 1.0,
+            "trigger": {
+                "source": "Inherit",
+                "threshold": {
+                    "threshold_type": "Always",
+                    "amount_type": "Intensity"
+                }
+            },
             "filter": {
                 "player": {
                     "combat": null,
                     "specs": [],
+                    "traits": [],
                     "mounts": []
                 },
                 "map": {
-                    "Ids": [
+                    "category": [],
+                    "whitelist": true,
+                    "ids": [
                         1155, 1154, 1062, 1149, 1156, 1188, 1264, 1303, 1323, 872, 954, 947, 948,
                         950, 949, 952, 951, 953, 958, 955, 959, 956, 957, 960, 1164, 1177, 1205,
                         1267, 1290, 1309, 1384, 1500, 1538, 1432, 1450, 1451, 1437, 1485, 1515, 1520
@@ -37,13 +54,25 @@
                     "name": "Reminder Icons",
                     "pos": [0.0, 0.0],
                     "opacity": 0.7,
+                    "trigger": {
+                        "source": "Inherit",
+                        "threshold": {
+                            "threshold_type": "Always",
+                            "amount_type": "Intensity"
+                        }
+                    },
                     "filter": {
                         "player": {
                             "combat": null,
                             "specs": [],
+                            "traits": [],
                             "mounts": []
                         },
-                        "map": "Any"
+                        "map": {
+                            "category": [],
+                            "whitelist": true,
+                            "ids": []
+                        }
                     },
                     "animation": null,
                     "type": "IconList",
@@ -55,53 +84,71 @@
                         {
                             "enabled": true,
                             "name": "Malnourished",
-                            "progress": {
+                            "trigger": {
                                 "source": {
                                     "Buff": 46587
                                 },
-                                "threshold": "Present"
+                                "threshold": {
+                                    "threshold_type": "Present",
+                                    "amount_type": "Intensity"
+                                }
                             },
                             "icon": {
                                 "Url": "https://wiki.guildwars2.com/images/6/67/Malnourished.png"
                             },
+                            "tint": [1.0, 1.0, 1.0, 1.0],
+                            "zoom": 1.0,
+                            "round": 0.0,
+                            "conditions": [],
                             "duration_bar": false,
                             "duration_text": false,
-                            "stacks_text": false,
-                            "tint": [1.0, 1.0, 1.0, 1.0]
+                            "stacks_text": false
                         },
                         {
                             "enabled": true,
                             "name": "Diminished",
-                            "progress": {
+                            "trigger": {
                                 "source": {
                                     "Buff": 46668
                                 },
-                                "threshold": "Present"
+                                "threshold": {
+                                    "threshold_type": "Present",
+                                    "amount_type": "Intensity"
+                                }
                             },
                             "icon": {
                                 "Url": "https://wiki.guildwars2.com/images/7/71/Diminished.png"
                             },
+                            "tint": [1.0, 1.0, 1.0, 1.0],
+                            "zoom": 1.0,
+                            "round": 0.0,
+                            "conditions": [],
                             "duration_bar": false,
                             "duration_text": false,
-                            "stacks_text": false,
-                            "tint": [1.0, 1.0, 1.0, 1.0]
+                            "stacks_text": false
                         },
                         {
                             "enabled": true,
                             "name": "Reinforced",
-                            "progress": {
+                            "trigger": {
                                 "source": {
                                     "Buff": 9283
                                 },
-                                "threshold": "Missing"
+                                "threshold": {
+                                    "threshold_type": "Missing",
+                                    "amount_type": "Intensity"
+                                }
                             },
                             "icon": {
                                 "Url": "https://wiki.guildwars2.com/images/8/83/Reinforced_Armor.png"
                             },
+                            "tint": [1.0, 1.0, 1.0, 1.0],
+                            "zoom": 1.0,
+                            "round": 0.0,
+                            "conditions": [],
                             "duration_bar": false,
                             "duration_text": false,
-                            "stacks_text": false,
-                            "tint": [1.0, 1.0, 1.0, 1.0]
+                            "stacks_text": false
                         }
                     ]
                 }

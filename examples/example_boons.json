@@ -4,6 +4,13 @@
     "name": "Important Boons",
     "pos": [0.0, -300.0],
     "opacity": 1.0,
+    "trigger": {
+        "source": "Inherit",
+        "threshold": {
+            "threshold_type": "Always",
+            "amount_type": "Intensity"
+        }
+    },
     "anchor": "BottomCenter",
     "layer": 0,
     "elements": [
@@ -12,13 +19,25 @@
             "name": "Boon Icons",
             "pos": [0.0, 0.0],
             "opacity": 0.8,
+            "trigger": {
+                "source": "Inherit",
+                "threshold": {
+                    "threshold_type": "Always",
+                    "amount_type": "Intensity"
+                }
+            },
             "filter": {
                 "player": {
                     "combat": null,
                     "specs": [],
+                    "traits": [],
                     "mounts": []
                 },
-                "map": "Any"
+                "map": {
+                    "category": [],
+                    "whitelist": true,
+                    "ids": []
+                }
             },
             "animation": null,
             "type": "IconList",
@@ -30,87 +49,117 @@
                 {
                     "enabled": true,
                     "name": "Aegis",
-                    "progress": {
+                    "trigger": {
                         "source": {
                             "Buff": 743
                         },
-                        "threshold": "Present"
+                        "threshold": {
+                            "threshold_type": "Present",
+                            "amount_type": "Intensity"
+                        }
                     },
                     "icon": {
                         "Url": "https://wiki.guildwars2.com/images/e/e5/Aegis.png"
                     },
+                    "tint": [1.0, 1.0, 1.0, 1.0],
+                    "zoom": 1.0,
+                    "round": 0.0,
+                    "conditions": [],
                     "duration_bar": true,
                     "duration_text": false,
-                    "stacks_text": false,
-                    "tint": [1.0, 1.0, 1.0, 1.0]
+                    "stacks_text": false
                 },
                 {
                     "enabled": true,
                     "name": "Might",
-                    "progress": {
+                    "trigger": {
                         "source": {
                             "Buff": 740
                         },
-                        "threshold": "Present"
+                        "threshold": {
+                            "threshold_type": "Present",
+                            "amount_type": "Intensity"
+                        }
                     },
                     "icon": {
                         "Url": "https://wiki.guildwars2.com/images/7/7c/Might.png"
                     },
+                    "tint": [1.0, 1.0, 1.0, 1.0],
+                    "zoom": 1.0,
+                    "round": 0.0,
+                    "conditions": [],
                     "duration_bar": true,
                     "duration_text": false,
-                    "stacks_text": true,
-                    "tint": [1.0, 1.0, 1.0, 1.0]
+                    "stacks_text": true
                 },
                 {
                     "enabled": true,
                     "name": "Quickness",
-                    "progress": {
+                    "trigger": {
                         "source": {
                             "Buff": 1187
                         },
-                        "threshold": "Present"
+                        "threshold": {
+                            "threshold_type": "Present",
+                            "amount_type": "Intensity"
+                        }
                     },
                     "icon": {
                         "Url": "https://wiki.guildwars2.com/images/b/b4/Quickness.png"
                     },
+                    "tint": [1.0, 1.0, 1.0, 1.0],
+                    "zoom": 1.0,
+                    "round": 0.0,
+                    "conditions": [],
                     "duration_bar": true,
                     "duration_text": false,
-                    "stacks_text": false,
-                    "tint": [1.0, 1.0, 1.0, 1.0]
+                    "stacks_text": false
                 },
                 {
                     "enabled": true,
                     "name": "Alacrity",
-                    "progress": {
+                    "trigger": {
                         "source": {
                             "Buff": 30328
                         },
-                        "threshold": "Present"
+                        "threshold": {
+                            "threshold_type": "Present",
+                            "amount_type": "Intensity"
+                        }
                     },
                     "icon": {
                         "Url": "https://wiki.guildwars2.com/images/4/4c/Alacrity.png"
                     },
+                    "tint": [1.0, 1.0, 1.0, 1.0],
+                    "zoom": 1.0,
+                    "round": 0.0,
+                    "conditions": [],
                     "duration_bar": true,
                     "duration_text": false,
-                    "stacks_text": false,
-                    "tint": [1.0, 1.0, 1.0, 1.0]
+                    "stacks_text": false
                 },
                 {
                     "enabled": true,
                     "name": "Stability",
-                    "progress": {
+                    "trigger": {
                         "source": {
                             "Buff": 1122
                         },
-                        "threshold": "Present"
+                        "threshold": {
+                            "threshold_type": "Present",
+                            "amount_type": "Intensity"
+                        }
                     },
                     "icon": {
                         "Url": "https://wiki.guildwars2.com/images/a/ae/Stability.png"
                     },
+                    "tint": [1.0, 1.0, 1.0, 1.0],
+                    "zoom": 1.0,
+                    "round": 0.0,
+                    "conditions": [],
                     "duration_bar": true,
                     "duration_text": false,
-                    "stacks_text": true,
-                    "tint": [1.0, 1.0, 1.0, 1.0]
+                    "stacks_text": true
                 }
             ]
         }
