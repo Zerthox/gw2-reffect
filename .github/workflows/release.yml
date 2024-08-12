@@ -18,8 +18,11 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: reffect
-          path: target/release/reffect.dll
+          path: |
+            target/release/reffect.dll
+            target/release/reffect.pdb
       - uses: softprops/action-gh-release@v1
         with:
           files: |
             target/release/reffect.dll
+            target/release/reffect.pdb
