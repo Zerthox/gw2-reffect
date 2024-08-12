@@ -24,6 +24,21 @@ where
         }
     }
 
+    /// Checks if the memo is empty.
+    pub fn is_empty(&self) -> bool {
+        self.cache.is_none()
+    }
+
+    /// Retrieves the memoized state, if initialized.
+    pub fn get(&self) -> Option<bool> {
+        self.cache
+    }
+
+    /// Clears the memoized state.
+    pub fn clear(&mut self) {
+        self.cache = None;
+    }
+
     /// Updates the memoized state from the [`Context`].
     pub fn update(&mut self, ctx: &Context) -> bool {
         *self.cache.insert(self.trigger.is_active(ctx))
@@ -36,16 +51,6 @@ where
         } else {
             self.update(ctx)
         }
-    }
-
-    /// Retrieves the memoized state, if initialized.
-    pub fn get(&self) -> Option<bool> {
-        self.cache
-    }
-
-    /// Clears the memoized state.
-    pub fn clear(&mut self) {
-        self.cache = None;
     }
 }
 

@@ -1,6 +1,7 @@
 use super::{map_old::MapTriggerOld, memo::Memo, MapTrigger, PlayerTrigger, Trigger};
 use crate::{
     context::{Context, ContextUpdate, EditState},
+    elements::RenderState,
     render_util::debug_optional,
     serde_migrate::migrate,
     traits::{RenderDebug, RenderOptions},
@@ -28,8 +29,16 @@ impl Trigger for FilterTrigger {
         if ctx.has_update(ContextUpdate::Map) {
             self.map.update(ctx);
         }
-
         self.player.is_active(ctx) && self.map.is_active(ctx)
+    }
+
+    fn is_active_or_edit(&mut self, ctx: &Context, state: &RenderState) -> bool {
+        if state.is_edit(ctx) {
+            self.map.update(ctx);
+            true
+        } else {
+            !ctx.edit.is_editing() && self.is_active(ctx)
+        }
     }
 }
 
@@ -49,6 +58,6 @@ impl RenderOptions for FilterTrigger {
 impl RenderDebug for FilterTrigger {
     fn render_debug(&mut self, ui: &Ui) {
         ui.text(format!("Trait filter: {}", self.player.traits.memo()));
-        debug_optional(ui, "Map filter:", self.map.get());
+        debug_optional(ui, "Map filter", self.map.get());
     }
 }
