@@ -55,13 +55,13 @@ impl Render for ElementType {
 }
 
 impl Bounds for ElementType {
-    fn bounding_box(&self, ui: &Ui, ctx: &Context, pos: [f32; 2]) -> Rect {
+    fn bounds(&self, ui: &Ui, ctx: &Context) -> Rect {
         match self {
-            Self::Group(group) => group.bounding_box(ui, ctx, pos),
-            Self::Icon(icon) => icon.bounding_box(ui, ctx, pos),
-            Self::IconList(list) => list.bounding_box(ui, ctx, pos),
-            Self::Text(text) => text.bounding_box(ui, ctx, pos),
-            Self::Bar(bar) => bar.bounding_box(ui, ctx, pos),
+            Self::Group(group) => group.bounds(ui, ctx),
+            Self::Icon(icon) => icon.bounds(ui, ctx),
+            Self::IconList(list) => list.bounds(ui, ctx),
+            Self::Text(text) => text.bounds(ui, ctx),
+            Self::Bar(bar) => bar.bounds(ui, ctx),
         }
     }
 }

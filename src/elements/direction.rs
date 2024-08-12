@@ -1,5 +1,5 @@
 use super::{align::Align, Icon};
-use crate::render_util::Rect;
+use crate::{component_wise::ComponentWise, render_util::Rect};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, VariantArray};
 
@@ -113,7 +113,7 @@ impl Direction {
         let last = total.saturating_sub(1) as f32;
         let offset_x = last * (width + pad);
         let offset_y = last * (height + pad);
-        let (min, max) = match self {
+        let (first, last) = match self {
             Self::Right => ([0.0, 0.0], [offset_x, 0.0]),
             Self::Left => ([-offset_x, 0.0], [0.0, 0.0]),
             Self::Up => ([0.0, -offset_y], [0.0, 0.0]),
@@ -127,8 +127,7 @@ impl Direction {
                 ([0.0, start], [0.0, start + offset_y])
             }
         };
-        let (min, _) = Icon::bounds(min, size);
-        let (_, max) = Icon::bounds(max, size);
-        (min, max)
+        let (bounds_min, bounds_max) = Icon::bounds(size);
+        (first.add(bounds_min), last.add(bounds_max))
     }
 }

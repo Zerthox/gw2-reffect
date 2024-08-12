@@ -44,15 +44,9 @@ impl Icon {
         [r, g, b, a * ui.clone_style().alpha]
     }
 
-    pub fn rel_bounds(size: [f32; 2]) -> Rect {
-        let [half_x, half_y] = size.mul_scalar(0.5);
-        ([-half_x, -half_y], [half_x, half_y])
-    }
-
-    pub fn bounds(pos: [f32; 2], size: [f32; 2]) -> Rect {
-        let half_size = size.mul_scalar(0.5);
-        let start = pos.sub(half_size);
-        let end = pos.add(half_size);
+    pub fn bounds(size: [f32; 2]) -> Rect {
+        let start = size.mul_scalar(-0.5);
+        let end = size.mul_scalar(0.5);
         (start, end)
     }
 
@@ -72,7 +66,9 @@ impl Icon {
             let texture = self.source.get_texture();
 
             if self.source.is_empty() || texture.is_some() {
-                let (start, end) = Self::bounds(state.pos, size);
+                let (start, end) = Self::bounds(size);
+                let start = state.pos.add(start);
+                let end = state.pos.add(end);
                 let color @ [_, _, _, alpha] = self.texture_color(ui);
 
                 // render icon

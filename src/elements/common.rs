@@ -99,9 +99,11 @@ impl Common {
         const COLOR: [f32; 4] = colors::WHITE;
         const COLOR_DRAG: [f32; 4] = colors::YELLOW;
 
-        let (bound_min, bound_max) = bounds;
-        let window_pos = bound_min;
-        let window_size = bound_max.sub(window_pos);
+        let (min, max) = bounds;
+        let min = anchor.add(min);
+        let max = anchor.add(max);
+        let window_pos = min;
+        let window_size = max.sub(window_pos);
         let _style = ui.push_style_var(StyleVar::WindowPadding([0.0, 0.0]));
         Window::new("##reffect-edit")
             .position(
@@ -131,7 +133,7 @@ impl Common {
                 let draw_list = ui.get_foreground_draw_list();
 
                 if hover {
-                    draw_list.add_rect(bound_min, bound_max, color).build();
+                    draw_list.add_rect(min, max, color).build();
                 }
 
                 let start = anchor.sub(ANCHOR_OFFSET);

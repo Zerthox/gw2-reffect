@@ -8,7 +8,6 @@ use super::{Direction, RenderState};
 use crate::{
     bounds::Bounds,
     colors,
-    component_wise::ComponentWise,
     context::{Context, EditState},
     render_util::{
         collapsing_header_same_line_end, delete_confirm_modal, enum_combo, input_float_with_format,
@@ -72,11 +71,10 @@ impl Render for IconList {
 }
 
 impl Bounds for IconList {
-    fn bounding_box(&self, _ui: &Ui, _ctx: &Context, pos: [f32; 2]) -> Rect {
+    fn bounds(&self, _ui: &Ui, _ctx: &Context) -> Rect {
         // calculate with all visible and at least 1 dummy
         let len = self.icons.len().max(1);
-        let (bound_min, bound_max) = self.direction.icon_list_bounds(self.size, self.pad, len);
-        (pos.add(bound_min), pos.add(bound_max))
+        self.direction.icon_list_bounds(self.size, self.pad, len)
     }
 }
 

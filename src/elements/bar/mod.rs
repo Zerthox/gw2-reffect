@@ -55,7 +55,7 @@ impl Render for Bar {
         if let Some(active) = active {
             let alpha = ui.clone_style().alpha;
 
-            let (start, end) = self.bounding_box(ui, ctx, state.pos);
+            let (start, end) = self.bounds_with_offset(ui, ctx, state.pos);
             let progress = self.process_value(self.progress_kind.calc(ctx, active, self.max));
             let (offset_start, offset_end) =
                 self.direction.progress_rect_offset(self.size, progress);
@@ -110,9 +110,8 @@ impl Render for Bar {
 }
 
 impl Bounds for Bar {
-    fn bounding_box(&self, _ui: &Ui, _ctx: &Context, pos: [f32; 2]) -> Rect {
-        let offset = self.align.offset(self.size);
-        let start = pos.add(offset);
+    fn bounds(&self, _ui: &Ui, _ctx: &Context) -> Rect {
+        let start = self.align.offset(self.size);
         (start, start.add(self.size))
     }
 }

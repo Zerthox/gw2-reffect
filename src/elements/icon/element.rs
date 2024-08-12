@@ -27,8 +27,8 @@ impl Render for IconElement {
 }
 
 impl Bounds for IconElement {
-    fn bounding_box(&self, _ui: &Ui, _ctx: &Context, pos: [f32; 2]) -> Rect {
-        Icon::bounds(pos, self.size)
+    fn bounds(&self, _ui: &Ui, _ctx: &Context) -> Rect {
+        Icon::bounds(self.size)
     }
 }
 

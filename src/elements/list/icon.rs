@@ -35,8 +35,8 @@ impl ListIcon {
             .render(ui, ctx, state, self.trigger.active(), size)
     }
 
-    pub fn bounds(&self, pos: [f32; 2], size: [f32; 2]) -> Rect {
-        Icon::bounds(pos, size)
+    pub fn bounds(&self, size: [f32; 2]) -> Rect {
+        Icon::bounds(size)
     }
 
     pub fn into_element(self, size: [f32; 2]) -> Element {

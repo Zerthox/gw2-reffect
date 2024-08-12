@@ -6,7 +6,6 @@ use super::{Animation, Common, RenderState};
 use crate::{
     action::ElementAction,
     bounds::Bounds,
-    component_wise::ComponentWise,
     context::{Context, EditState},
     render_util::{
         delete_confirm_modal, item_context_menu, style_disabled_if, tree_select_empty, Rect,
@@ -67,7 +66,7 @@ impl Element {
 
         if ctx.edit.is_edited(self.common.id) {
             let pos = self.common.pos(state);
-            let bounds = self.kind.bounding_box(ui, ctx, pos);
+            let bounds = self.kind.bounds(ui, ctx);
             self.common.render_edit_indicators(ui, pos, bounds);
         }
     }
@@ -204,8 +203,7 @@ impl TreeNode for Element {
 }
 
 impl Bounds for Element {
-    fn bounding_box(&self, ui: &Ui, ctx: &Context, pos: [f32; 2]) -> Rect {
-        let pos = pos.add(self.common.pos);
-        self.kind.bounding_box(ui, ctx, pos)
+    fn bounds(&self, ui: &Ui, ctx: &Context) -> Rect {
+        self.kind.bounds_with_offset(ui, ctx, self.common.pos)
     }
 }

@@ -10,7 +10,7 @@ use crate::{
     context::{Context, ContextUpdate, EditState},
     render_util::{
         debug_optional, draw_text_bg, font_select, helper, helper_warn, input_text_multi_with_menu,
-        Font, Rect,
+        Font, FontToken, Rect,
     },
     traits::{Render, RenderDebug, RenderOptions},
     tree::TreeLeaf,
@@ -99,9 +99,12 @@ impl Text {
         result
     }
 
-    fn calc_pos(&self, ui: &Ui, pos: [f32; 2], text: &str) -> [f32; 2] {
-        let offset = self.align.text_offset(ui, text, self.props.scale);
-        pos.add(offset)
+    fn calc_offset(&self, ui: &Ui, text: &str) -> [f32; 2] {
+        self.align.text_offset(ui, text, self.props.scale)
+    }
+
+    fn push_font(&self) -> Option<FontToken> {
+        self.loaded_font.and_then(|font| font.push())
     }
 
     pub fn load(&mut self) {
@@ -116,9 +119,10 @@ impl Render for Text {
         self.update(ctx, state);
 
         if let Some(text) = &self.text_memo {
-            let _font = self.loaded_font.and_then(|font| font.push());
+            let _font = self.push_font();
             let font_scale = self.props.scale;
-            let pos = self.calc_pos(ui, state.pos, text);
+            let offset = self.calc_offset(ui, text);
+            let pos = state.pos.add(offset);
             let [r, g, b, a] = self.props.color;
             let alpha = a * ui.clone_style().alpha;
             let color = [r, g, b, alpha];
@@ -132,13 +136,14 @@ impl Render for Text {
 }
 
 impl Bounds for Text {
-    fn bounding_box(&self, ui: &Ui, _ctx: &Context, pos: [f32; 2]) -> Rect {
+    fn bounds(&self, ui: &Ui, _ctx: &Context) -> Rect {
         self.text_memo
             .as_ref()
             .map(|text| {
-                let pos = self.calc_pos(ui, pos, text);
-                let size = ui.calc_text_size(text);
-                (pos, pos.add(size.mul_scalar(self.props.scale)))
+                let _font = self.push_font();
+                let offset = self.calc_offset(ui, text);
+                let size = ui.calc_text_size(text).mul_scalar(self.props.scale);
+                (offset, offset.add(size))
             })
             .unwrap_or_default()
     }

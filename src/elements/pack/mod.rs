@@ -71,7 +71,7 @@ impl Pack {
 
         if ctx.edit.is_edited(self.common.id) {
             let pos = anchor_pos.add(self.common.pos);
-            let bounds = Bounds::combined_bounds(self.elements.iter(), ui, ctx, pos);
+            let bounds = Bounds::combined_bounds(self.elements.iter(), ui, ctx);
             self.common.render_edit_indicators(ui, pos, bounds)
         }
     }

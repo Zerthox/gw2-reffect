@@ -30,8 +30,8 @@ impl Render for Group {
 }
 
 impl Bounds for Group {
-    fn bounding_box(&self, ui: &Ui, ctx: &Context, pos: [f32; 2]) -> Rect {
-        Bounds::combined_bounds(&self.members, ui, ctx, pos)
+    fn bounds(&self, ui: &Ui, ctx: &Context) -> Rect {
+        Bounds::combined_bounds(&self.members, ui, ctx)
     }
 }
 
