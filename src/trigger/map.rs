@@ -42,6 +42,8 @@ impl Trigger for MapTrigger {
 
 impl RenderOptions<bool> for MapTrigger {
     fn render_options(&mut self, ui: &Ui, _state: &mut EditState) -> bool {
+        let _id = ui.push_id("map");
+
         let mut changed = enum_combo_bitflags(
             ui,
             "Map Category",
