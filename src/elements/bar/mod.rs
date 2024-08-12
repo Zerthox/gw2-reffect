@@ -75,6 +75,7 @@ impl Render for Bar {
                 )
                 .filled(true)
                 .build();
+
             if self.props.border_size > 0.0 {
                 draw_list
                     .add_rect(
@@ -86,20 +87,22 @@ impl Render for Bar {
                     .build();
             }
 
-            let end_offset = self.direction.tick_end_offset(self.size);
-            let max = active.max();
-            for tick in &self.ticks {
-                let tick = self.process_value(*tick);
-                if let Some(tick_progress) = self.tick_unit.calc_progress(tick, max) {
-                    let offset = self
-                        .direction
-                        .progress_value_offset(self.size, tick_progress);
-                    let start = start.add(offset);
-                    let end = start.add(end_offset);
-                    draw_list
-                        .add_line(start, end, with_alpha_factor(self.props.tick_color, alpha))
-                        .thickness(self.props.tick_size)
-                        .build();
+            if self.props.tick_size > 0.0 {
+                let end_offset = self.direction.tick_end_offset(self.size);
+                let max = active.max();
+                for tick in &self.ticks {
+                    let tick = self.process_value(*tick);
+                    if let Some(tick_progress) = self.tick_unit.calc_progress(tick, max) {
+                        let offset = self
+                            .direction
+                            .progress_value_offset(self.size, tick_progress);
+                        let start = start.add(offset);
+                        let end = start.add(end_offset);
+                        draw_list
+                            .add_line(start, end, with_alpha_factor(self.props.tick_color, alpha))
+                            .thickness(self.props.tick_size)
+                            .build();
+                    }
                 }
             }
         }

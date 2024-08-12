@@ -33,7 +33,7 @@ pub struct Text {
     pub props: Props<TextProps>,
 
     #[serde(skip)]
-    loaded_font: Option<Font>,
+    loaded_font: Option<Font>, // TODO: update when fonts are added/changed?
 
     #[serde(skip)]
     frequent: bool,
@@ -171,7 +171,11 @@ impl RenderOptions for Text {
             self.font_name = self.loaded_font.map(|font| font.name_owned());
         }
         if self.font_name.is_some() && self.loaded_font.is_none() {
-            helper_warn(ui, || ui.text("Failed to find font"));
+            match self.loaded_font {
+                Some(font) if !font.is_loaded() => helper_warn(ui, || ui.text("Font not loaded")),
+                Some(_) => {}
+                None => helper_warn(ui, || ui.text("Failed to find font")),
+            }
         }
 
         self.props.base.render_options(ui, state);

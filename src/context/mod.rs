@@ -56,7 +56,7 @@ pub struct Context {
 
     pub save_on_unload: bool,
 
-    pub font: Option<Font>,
+    pub font: Option<Font>, // TODO: update when fonts are added/changed?
 
     pub icon_settings: IconSettings,
 }
