@@ -46,7 +46,7 @@ impl AmountType {
             Self::Duration => active
                 .current(ctx.now)
                 .map(|current| current as f32 / 1000.0)
-                .unwrap_or(0.0),
+                .unwrap_or(f32::INFINITY),
             Self::Percent => 100.0 * active.progress_or_default(ctx.now),
         }
     }
