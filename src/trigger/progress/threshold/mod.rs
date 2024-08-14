@@ -31,8 +31,8 @@ impl ProgressThreshold {
             ThresholdType::Always => true,
             ThresholdType::Present => active.intensity() > 0, // we use intensity for present checks
             ThresholdType::Missing => active.intensity() == 0,
-            ThresholdType::Min(required) => amount >= required,
-            ThresholdType::Max(required) => amount <= required,
+            ThresholdType::Below(required) => amount <= required,
+            ThresholdType::Above(required) => amount >= required,
             ThresholdType::Exact(required) => amount == required,
             ThresholdType::Between(min, max) => (min..=max).contains(&amount),
         }
@@ -70,8 +70,8 @@ impl RenderOptions for ProgressThreshold {
 
         match &mut self.threshold_type {
             ThresholdType::Always | ThresholdType::Present | ThresholdType::Missing => {}
-            ThresholdType::Min(required)
-            | ThresholdType::Max(required)
+            ThresholdType::Above(required)
+            | ThresholdType::Below(required)
             | ThresholdType::Exact(required) => {
                 self.amount_type.render_options(ui, state);
                 self.amount_type.render_input(ui, "Amount", required);

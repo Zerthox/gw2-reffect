@@ -17,16 +17,18 @@ pub enum ThresholdType {
     /// Must be missing.
     Missing,
 
-    /// Minimum amount.
-    Min(f32),
+    /// Amount below.
+    #[serde(alias = "Max")]
+    Below(f32),
 
-    /// Maximum amount.
-    Max(f32),
+    /// Amount above.
+    #[serde(alias = "Min")]
+    Above(f32),
 
     /// Exact amount.
     Exact(f32),
 
-    /// Range of amounts.
+    /// Amount in range.
     Between(f32, f32),
 }
 
@@ -41,8 +43,8 @@ impl VariantArray for ThresholdType {
         Self::Always,
         Self::Present,
         Self::Missing,
-        Self::Min(1.0),
-        Self::Max(1.0),
+        Self::Above(1.0),
+        Self::Below(1.0),
         Self::Exact(1.0),
         Self::Between(0.0, 1.0),
     ];
@@ -54,8 +56,8 @@ impl fmt::Display for ThresholdType {
             Self::Always => write!(f, "Always"),
             Self::Present => write!(f, "Present"),
             Self::Missing => write!(f, "Missing"),
-            Self::Min(value) => write!(f, ">= {value}"),
-            Self::Max(value) => write!(f, "<= {value}"),
+            Self::Above(value) => write!(f, ">= {value}"),
+            Self::Below(value) => write!(f, "<= {value}"),
             Self::Exact(value) => write!(f, "= {value}"),
             Self::Between(min, max) => write!(f, "{min} - {max}"),
         }

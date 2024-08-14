@@ -162,6 +162,7 @@ impl Default for Context {
     }
 }
 
+// TODO: update flag for traits?
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[bitflags]
 #[repr(u8)]
