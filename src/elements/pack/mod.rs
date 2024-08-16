@@ -9,7 +9,7 @@ use crate::{
     },
     schema::Schema,
     traits::{RenderDebug, RenderOptions},
-    tree::{Loader, TreeNode, VisitMut},
+    tree::{FontReloader, Loader, TreeNode, VisitMut},
 };
 use nexus::imgui::{ComboBoxFlags, MenuItem, Ui};
 use serde::{Deserialize, Serialize};
@@ -41,7 +41,11 @@ impl Pack {
     }
 
     pub fn load(&mut self) {
-        Loader.visit_elements(&mut self.elements);
+        Loader.visit_pack(self);
+    }
+
+    pub fn reload_fonts(&mut self) {
+        FontReloader.visit_pack(self);
     }
 
     pub fn load_from_file(path: impl Into<PathBuf>) -> Option<Self> {

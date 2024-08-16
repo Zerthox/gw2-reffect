@@ -140,6 +140,14 @@ impl Addon {
         });
     }
 
+    #[allow(unused)] // TODO: call when font atlas rebuilt
+    pub fn reload_fonts() {
+        let mut addon = Self::lock();
+        for pack in &mut addon.packs {
+            pack.reload_fonts();
+        }
+    }
+
     pub fn open_addon_folder(&self) {
         if let Err(err) = open::that_detached(Self::addon_dir()) {
             log::error!("Failed to open addon folder: {err}");

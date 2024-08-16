@@ -1,9 +1,13 @@
 use crate::{
-    elements::{Bar, Element, ElementType, Group, IconElement, IconList, Text},
+    elements::{Bar, Element, ElementType, Group, IconElement, IconList, Pack, Text},
     trigger::FilterTrigger,
 };
 
 pub trait VisitMut {
+    fn visit_pack(&mut self, pack: &mut Pack) {
+        self.visit_elements(&mut pack.elements);
+    }
+
     fn visit_elements(&mut self, elements: &mut [Element]) {
         for element in elements {
             self.visit_element(element);

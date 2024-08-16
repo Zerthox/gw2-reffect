@@ -22,6 +22,10 @@ impl FilterTrigger {
     pub fn load(&mut self) {
         self.player.load();
     }
+
+    fn is_active_no_update(&mut self, ctx: &Context) -> bool {
+        self.player.is_active(ctx) && self.map.is_active(ctx)
+    }
 }
 
 impl Trigger for FilterTrigger {
@@ -29,7 +33,7 @@ impl Trigger for FilterTrigger {
         if ctx.has_update(ContextUpdate::Map) {
             self.map.update(ctx);
         }
-        self.player.is_active(ctx) && self.map.is_active(ctx)
+        self.is_active_no_update(ctx)
     }
 
     fn is_active_or_edit(&mut self, ctx: &Context, state: &RenderState) -> bool {
@@ -37,7 +41,7 @@ impl Trigger for FilterTrigger {
             self.map.update(ctx);
             true
         } else {
-            !ctx.edit.is_editing() && self.is_active(ctx)
+            !ctx.edit.is_editing() && self.is_active_no_update(ctx)
         }
     }
 }

@@ -43,12 +43,8 @@ impl Element {
             kind,
             ..Self::default()
         };
-        element.load();
+        Loader.visit_element(&mut element);
         element
-    }
-
-    pub fn load(&mut self) {
-        Loader.visit_element(self);
     }
 
     /// Renders the element.

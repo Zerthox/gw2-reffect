@@ -1,9 +1,10 @@
+mod font_reload;
 mod load;
 mod visit;
 
-use crate::elements::Element;
+pub use self::{font_reload::*, load::*, visit::*};
 
-pub use self::{load::*, visit::*};
+use crate::elements::Element;
 
 /// [`Element`] tree node.
 pub trait TreeNode {

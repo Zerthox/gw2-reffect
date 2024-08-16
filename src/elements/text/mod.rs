@@ -108,6 +108,10 @@ impl Text {
     }
 
     pub fn load(&mut self) {
+        self.load_font();
+    }
+
+    pub fn load_font(&mut self) {
         self.loaded_font = self.font_name.as_ref().and_then(Font::from_name_or_warn);
     }
 }
@@ -177,7 +181,7 @@ impl RenderOptions for Text {
         }
         if self.font_name.is_some() && self.loaded_font.is_none() {
             match self.loaded_font {
-                Some(font) if !font.is_loaded() => helper_warn(ui, || ui.text("Font not loaded")),
+                Some(font) if !font.is_valid() => helper_warn(ui, || ui.text("Font invalidated")),
                 Some(_) => {}
                 None => helper_warn(ui, || ui.text("Failed to find font")),
             }

@@ -46,6 +46,10 @@ impl Font {
         unsafe { sys::ImFont_IsLoaded(self.as_ptr()) }
     }
 
+    pub fn is_valid(&self) -> bool {
+        unsafe { Self::get_all() }.any(|font| font == *self)
+    }
+
     pub unsafe fn name_raw<'a>(&self) -> &'a CStr {
         CStr::from_ptr(sys::ImFont_GetDebugName(self.as_ptr()))
     }
@@ -55,7 +59,7 @@ impl Font {
     }
 
     pub fn push(&self) -> Option<FontToken> {
-        self.is_loaded().then(|| {
+        self.is_valid().then(|| {
             unsafe { sys::igPushFont(self.as_ptr()) };
             FontToken
         })
