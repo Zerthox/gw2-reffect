@@ -3,54 +3,21 @@ use crate::{
     context::{Context, EditState},
     render_util::{enum_combo, impl_static_variants},
     traits::RenderOptions,
-    trigger::ProgressThreshold,
+    trigger::{MapTrigger, PlayerTrigger, ProgressThreshold, Trigger},
 };
 use nexus::imgui::{ComboBoxFlags, Ui};
-use partial::{IntoPartial, Partial, PartialOps};
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use strum::{AsRefStr, EnumIter, IntoStaticStr};
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(default)]
-pub struct Condition<T>
-where
-    T: IntoPartial,
-    T::Partial: Clone + fmt::Debug + Serialize + for<'d> Deserialize<'d>,
-{
-    pub trigger: ConditionTrigger,
-    pub properties: Partial<T>,
-}
-
-impl<T> Condition<T>
-where
-    T: IntoPartial,
-    T::Partial: Clone + fmt::Debug + Serialize + for<'d> Deserialize<'d>,
-{
-    pub fn process(&mut self, value: &mut T, ctx: &Context, active: &ProgressActive) {
-        if self.trigger.is_active(ctx, active) {
-            value.set(self.properties.clone());
-        }
-    }
-}
-
-impl<T> Default for Condition<T>
-where
-    T: IntoPartial,
-    T::Partial: Clone + fmt::Debug + Serialize + for<'d> Deserialize<'d>,
-{
-    fn default() -> Self {
-        Self {
-            trigger: ConditionTrigger::default(),
-            properties: T::Partial::empty(),
-        }
-    }
-}
 
 #[derive(Debug, Clone, AsRefStr, IntoStaticStr, EnumIter, Serialize, Deserialize)]
 pub enum ConditionTrigger {
     #[strum(serialize = "Progress Threshold")]
     ProgressThreshold(ProgressThreshold),
+
+    Player(PlayerTrigger),
+
+    Map(MapTrigger),
 }
 
 impl_static_variants!(ConditionTrigger);
@@ -59,6 +26,8 @@ impl ConditionTrigger {
     pub fn is_active(&mut self, ctx: &Context, active: &ProgressActive) -> bool {
         match self {
             Self::ProgressThreshold(threshold) => threshold.is_met(active, ctx),
+            Self::Player(player) => player.is_active(ctx),
+            Self::Map(map) => map.is_active(ctx),
         }
     }
 }
@@ -73,6 +42,8 @@ impl fmt::Display for ConditionTrigger {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::ProgressThreshold(threshold) => threshold.fmt(f),
+            Self::Player(_) => write!(f, "Player"),
+            Self::Map(_) => write!(f, "Map"),
         }
     }
 }
@@ -83,6 +54,10 @@ impl RenderOptions for ConditionTrigger {
 
         match self {
             Self::ProgressThreshold(threshold) => threshold.render_options(ui, state),
+            Self::Player(player) => player.render_options(ui, state),
+            Self::Map(map) => {
+                map.render_options(ui, state);
+            }
         }
     }
 }

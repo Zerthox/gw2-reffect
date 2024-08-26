@@ -1,10 +1,10 @@
-use super::Trigger;
 use crate::{
     action::Action,
     context::{Context, ContextUpdate, EditState},
     internal::Traits,
     render_util::{helper, input_trait_id},
     traits::RenderOptions,
+    trigger::memo::MemoizedTrigger,
 };
 use nexus::imgui::{InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
@@ -15,29 +15,23 @@ pub struct TraitTrigger {
     pub traits: Vec<TraitRequirement>,
 
     #[serde(skip)]
-    memo: bool,
+    memo: Option<bool>,
 }
 
-impl TraitTrigger {
-    pub fn update(&mut self, ctx: &Context) {
-        self.memo = if let Ok(traits) = &ctx.player.traits {
-            self.traits.iter().all(|req| req.is_met(traits))
-        } else {
-            false
-        };
+impl MemoizedTrigger for TraitTrigger {
+    fn memo(&mut self) -> &mut Option<bool> {
+        &mut self.memo
     }
 
-    pub fn memo(&self) -> bool {
-        self.memo
+    fn needs_update(&self, ctx: &Context) -> bool {
+        ctx.has_update(ContextUpdate::Player)
     }
-}
 
-impl Trigger for TraitTrigger {
-    fn is_active(&mut self, ctx: &Context) -> bool {
-        if ctx.has_update(ContextUpdate::Player) {
-            self.update(ctx);
-        }
-        self.memo
+    fn is_active_current(&mut self, ctx: &Context) -> bool {
+        ctx.player
+            .traits
+            .map(|traits| self.traits.iter().all(|req| req.is_met(&traits)))
+            .unwrap_or(false)
     }
 }
 

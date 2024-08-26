@@ -1,8 +1,6 @@
 mod amount_type;
 mod threshold_type;
 
-use std::fmt;
-
 pub use self::{amount_type::*, threshold_type::*};
 
 use super::ProgressActive;
@@ -13,6 +11,7 @@ use crate::{
 };
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
+use std::fmt;
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct ProgressThreshold {
