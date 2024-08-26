@@ -30,8 +30,16 @@ script_runner = "@shell"
 script = "cp \"${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/release/${CARGO_MAKE_CRATE_NAME}.dll\" \"${GW2_PATH}/addons/${CARGO_MAKE_CRATE_NAME}.dll.update\""
 script_runner = "@shell"
 
+[tasks.copy-release-pdb]
+script = "cp \"${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/release/${CARGO_MAKE_CRATE_NAME}.pdb\" \"${GW2_PATH}/addons"
+script_runner = "@shell"
+
 [tasks.copy-debug]
 script = "cp \"${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/debug/${CARGO_MAKE_CRATE_NAME}.dll\" \"${GW2_PATH}/addons/${CARGO_MAKE_CRATE_NAME}.dll.update\""
+script_runner = "@shell"
+
+[tasks.copy-debug-pdb]
+script = "cp \"${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/debug/${CARGO_MAKE_CRATE_NAME}.pdb\" \"${GW2_PATH}/addons"
 script_runner = "@shell"
 
 [tasks.remove]
@@ -49,9 +57,9 @@ script_runner = "@shell"
 alias = "remove"
 
 [tasks.dev-release]
-run_task = { name = ["build-release", "copy-release-update"] }
+run_task = { name = ["build-release", "copy-release-update", "copy-release-pdb"] }
 watch = true
 
 [tasks.dev]
-run_task = { name = ["build", "copy-debug"] }
+run_task = { name = ["build", "copy-debug", "copy-debug-pdb"] }
 watch = true
