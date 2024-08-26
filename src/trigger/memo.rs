@@ -1,109 +1,44 @@
 use super::Trigger;
 use crate::context::Context;
-use serde::{Deserialize, Serialize};
-use std::ops;
 
-/// Memoization for a [`Trigger`].
-#[derive(Debug, Default, Clone)]
-pub struct Memo<T>
-where
-    T: Trigger,
-{
-    trigger: T,
-    cache: Option<bool>,
-}
+pub trait MemoizedTrigger {
+    fn memo(&mut self) -> &mut Option<bool>;
 
-impl<T> Memo<T>
-where
-    T: Trigger,
-{
-    pub fn new(trigger: T) -> Self {
-        Self {
-            trigger,
-            cache: None,
-        }
+    fn needs_update(&self, ctx: &Context) -> bool;
+
+    fn is_active_current(&mut self, ctx: &Context) -> bool;
+
+    fn update(&mut self, ctx: &Context) -> bool {
+        let active = self.is_active_current(ctx);
+        *self.memo().insert(active)
     }
 
-    /// Checks if the memo is empty.
-    pub fn is_empty(&self) -> bool {
-        self.cache.is_none()
+    fn get(&mut self) -> Option<bool> {
+        *self.memo()
     }
 
-    /// Retrieves the memoized state, if initialized.
-    pub fn get(&self) -> Option<bool> {
-        self.cache
-    }
-
-    /// Clears the memoized state.
-    pub fn clear(&mut self) {
-        self.cache = None;
-    }
-
-    /// Updates the memoized state from the [`Context`].
-    pub fn update(&mut self, ctx: &Context) -> bool {
-        *self.cache.insert(self.trigger.is_active(ctx))
-    }
-
-    /// Retrieves the memoized state or creates it from the [`Context`].
-    pub fn get_or_update(&mut self, ctx: &Context) -> bool {
-        if let Some(active) = self.cache {
-            active
+    fn is_active_memoized(&mut self, ctx: &Context) -> bool {
+        if let Some(active) = self.get() {
+            if self.needs_update(ctx) {
+                self.update(ctx)
+            } else {
+                active
+            }
         } else {
             self.update(ctx)
         }
     }
-}
 
-impl<T> ops::Deref for Memo<T>
-where
-    T: Trigger,
-{
-    type Target = T;
-
-    fn deref(&self) -> &Self::Target {
-        &self.trigger
+    fn clear(&mut self) {
+        *self.memo() = None;
     }
 }
 
-impl<T> ops::DerefMut for Memo<T>
+impl<T> Trigger for T
 where
-    T: Trigger,
-{
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.trigger
-    }
-}
-
-impl<T> Trigger for Memo<T>
-where
-    T: Trigger,
+    T: MemoizedTrigger,
 {
     fn is_active(&mut self, ctx: &Context) -> bool {
-        self.get_or_update(ctx)
-    }
-}
-
-impl<T> Serialize for Memo<T>
-where
-    T: Trigger + Serialize,
-{
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        self.trigger.serialize(serializer)
-    }
-}
-
-impl<'de, T> Deserialize<'de> for Memo<T>
-where
-    T: Trigger + Deserialize<'de>,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let trigger = T::deserialize(deserializer)?;
-        Ok(Self::new(trigger))
+        self.is_active_memoized(ctx)
     }
 }

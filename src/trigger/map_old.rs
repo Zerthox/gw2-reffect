@@ -1,4 +1,4 @@
-use super::{memo::Memo, MapTrigger};
+use super::MapTrigger;
 use crate::context::MapCategory;
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter};
@@ -25,12 +25,6 @@ impl From<MapTriggerOld> for MapTrigger {
                 ..MapTrigger::default()
             },
         }
-    }
-}
-
-impl From<MapTriggerOld> for Memo<MapTrigger> {
-    fn from(old: MapTriggerOld) -> Self {
-        Memo::new(old.into())
     }
 }
 
