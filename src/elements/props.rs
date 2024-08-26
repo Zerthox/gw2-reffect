@@ -3,7 +3,6 @@ use crate::{
     colors,
     context::{Context, ContextUpdate, EditState},
     render_util::{collapsing_header_same_line_end, delete_confirm_modal},
-    traits::RenderOptions,
     trigger::{Condition, ProgressActive},
 };
 use nexus::imgui::{CollapsingHeader, Direction, StyleColor, TreeNodeFlags, Ui};
@@ -99,10 +98,7 @@ where
             }
 
             if open {
-                condition.trigger.render_options(ui, state);
-                ui.spacing();
-                condition.properties.render_options(ui, &self.base);
-                ui.spacing();
+                condition.render_options(ui, state, &self.base);
             }
         }
         action.perform(&mut self.conditions);

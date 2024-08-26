@@ -66,17 +66,14 @@ impl RenderOptions for PlayerTrigger {
     fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
         self.combat.render_options(ui, state);
 
-        ui.spacing();
-
         enum_combo_bitflags(
             ui,
             "Specialization",
             &mut self.specs,
             ComboBoxFlags::HEIGHT_LARGE,
         );
-        self.traits.render_options(ui, state);
 
-        ui.spacing();
+        self.traits.render_options(ui, state);
 
         enum_combo_bitflags(ui, "Mount", &mut self.mounts, ComboBoxFlags::HEIGHT_LARGE);
     }

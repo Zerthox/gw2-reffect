@@ -1,3 +1,5 @@
+pub mod legacy;
+
 use super::{check_bitflags, memo::MemoizedTrigger};
 use crate::{
     action::Action,

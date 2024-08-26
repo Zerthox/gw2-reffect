@@ -1,4 +1,6 @@
-use super::{map_old::MapTriggerOld, memo::MemoizedTrigger, MapTrigger, PlayerTrigger, Trigger};
+use super::{
+    map::legacy::MapTriggerLegacy, memo::MemoizedTrigger, MapTrigger, PlayerTrigger, Trigger,
+};
 use crate::{
     context::{Context, EditState},
     elements::RenderState,
@@ -14,7 +16,7 @@ use serde::{Deserialize, Serialize};
 pub struct FilterTrigger {
     pub player: PlayerTrigger, // player not memoized due to combat & mount
 
-    #[serde(deserialize_with = "migrate::<_, _, MapTriggerOld>")]
+    #[serde(deserialize_with = "migrate::<_, _, MapTriggerLegacy>")]
     pub map: MapTrigger,
 }
 

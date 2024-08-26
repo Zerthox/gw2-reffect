@@ -3,7 +3,12 @@ mod trigger;
 pub use self::trigger::*;
 
 use super::ProgressActive;
-use crate::context::Context;
+use crate::{
+    context::{Context, EditState},
+    elements::PartialProps,
+    traits::RenderOptions,
+};
+use nexus::imgui::Ui;
 use partial::{IntoPartial, Partial, PartialOps};
 use serde::{Deserialize, Serialize};
 use std::fmt;
@@ -28,6 +33,16 @@ where
         if self.trigger.is_active(ctx, active) {
             value.set(self.properties.clone());
         }
+    }
+
+    pub fn render_options(&mut self, ui: &Ui, state: &mut EditState, base: &T)
+    where
+        Partial<T>: PartialProps<T>,
+    {
+        self.trigger.render_options(ui, state);
+        ui.spacing();
+        self.properties.render_options(ui, base);
+        ui.spacing();
     }
 }
 

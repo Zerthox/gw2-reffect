@@ -1,7 +1,6 @@
 mod condition;
 mod filter;
 mod map;
-mod map_old;
 mod memo;
 mod player;
 mod progress;
