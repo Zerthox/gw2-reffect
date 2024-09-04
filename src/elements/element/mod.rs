@@ -160,6 +160,7 @@ impl Element {
 
             if let Some(_token) = ui.tab_item("Filter") {
                 self.filter.render_options(ui, state);
+                self.kind.render_filters(ui, state);
             }
 
             if let Some(_token) = ui.tab_item("Animation") {

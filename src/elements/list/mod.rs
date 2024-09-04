@@ -195,17 +195,19 @@ impl RenderOptions for IconList {
                 }
             }
         }
+    }
+}
 
-        if let Some(_token) = ui.tab_item("Filter") {
-            ui.spacing();
-            for (i, icon) in self.icons.iter_mut().enumerate() {
-                let _id = ui.push_id(i as i32);
-                let open = CollapsingHeader::new(format!("{}###icon{i}", icon.name))
-                    .flags(TreeNodeFlags::ALLOW_ITEM_OVERLAP)
-                    .begin(ui);
-                if open {
-                    icon.filter.render_options(ui, state);
-                }
+impl IconList {
+    pub fn render_filters(&mut self, ui: &Ui, state: &mut EditState) {
+        ui.spacing();
+        for (i, icon) in self.icons.iter_mut().enumerate() {
+            let _id = ui.push_id(i as i32);
+            let open = CollapsingHeader::new(format!("{}###icon{i}", icon.name))
+                .flags(TreeNodeFlags::ALLOW_ITEM_OVERLAP)
+                .begin(ui);
+            if open {
+                icon.filter.render_options(ui, state);
             }
         }
     }

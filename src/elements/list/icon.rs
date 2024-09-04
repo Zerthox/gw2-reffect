@@ -3,8 +3,7 @@ use crate::{
     elements::{Common, Element, ElementType, Icon, IconElement, RenderState},
     render::{RenderDebug, RenderOptions},
     render_util::Rect,
-    traits::{RenderDebug, RenderOptions},
-    trigger::ProgressTrigger,
+    trigger::{FilterTrigger, ProgressTrigger, Trigger},
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
@@ -20,6 +19,8 @@ pub struct ListIcon {
     #[serde(alias = "progress_active")]
     pub trigger: ProgressTrigger,
 
+    pub filter: FilterTrigger,
+
     #[serde(flatten)]
     pub icon: Icon,
 }
@@ -28,7 +29,7 @@ impl ListIcon {
     pub fn is_visible(&mut self, ctx: &Context, state: &RenderState) -> bool {
         let parent = state.common.trigger.active();
         self.trigger.update(ctx, state.is_edit(ctx), parent);
-        self.enabled && self.trigger.active().is_some()
+        self.enabled && self.trigger.active().is_some() && self.filter.is_active(ctx)
     }
 
     pub fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState, size: [f32; 2]) {
@@ -52,15 +53,17 @@ impl ListIcon {
                 icon: self.icon,
                 size,
             }),
+            filter: self.filter,
             ..Element::default()
         }
     }
 
-    pub fn from_element(common: Common, element: IconElement) -> Self {
+    pub fn from_element(common: Common, element: IconElement, filter: FilterTrigger) -> Self {
         Self {
             enabled: common.enabled,
             name: common.name,
             trigger: common.trigger,
+            filter,
             icon: element.icon,
         }
     }
@@ -93,6 +96,7 @@ impl Default for ListIcon {
             enabled: true,
             name: "Unnamed".into(),
             trigger: ProgressTrigger::effect(),
+            filter: FilterTrigger::default(),
             icon: Icon::default(),
         }
     }

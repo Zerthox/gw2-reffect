@@ -87,6 +87,15 @@ impl RenderOptions for ElementType {
     }
 }
 
+impl ElementType {
+    pub fn render_filters(&mut self, ui: &Ui, state: &mut EditState) {
+        match self {
+            Self::IconList(list) => list.render_filters(ui, state),
+            Self::Group(_) | Self::Icon(_) | Self::Text(_) | Self::Bar(_) => {}
+        }
+    }
+}
+
 impl RenderDebug for ElementType {
     fn render_debug(&mut self, ui: &Ui) {
         match self {
