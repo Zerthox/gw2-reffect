@@ -4,9 +4,9 @@ use super::{
 use crate::{
     context::{Context, EditState},
     elements::RenderState,
+    render::{RenderDebug, RenderOptions},
     render_util::debug_optional,
     serde_migrate::migrate,
-    traits::{RenderDebug, RenderOptions},
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};

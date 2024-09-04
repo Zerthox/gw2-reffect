@@ -1,9 +1,8 @@
 use super::{Element, RenderState};
 use crate::{
-    bounds::Bounds,
     context::{Context, EditState},
+    render::{Bounds, Render, RenderDebug, RenderOptions},
     render_util::Rect,
-    traits::{Render, RenderDebug, RenderOptions},
     tree::TreeNode,
 };
 use nexus::imgui::Ui;

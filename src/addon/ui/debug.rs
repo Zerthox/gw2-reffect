@@ -1,5 +1,5 @@
 use super::Addon;
-use crate::{internal::Resources, traits::Colored};
+use crate::{internal::Resources, render::colors::Colored};
 use nexus::imgui::{StyleColor, Ui, Window};
 use std::fmt;
 

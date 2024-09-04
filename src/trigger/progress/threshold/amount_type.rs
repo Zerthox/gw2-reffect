@@ -1,7 +1,7 @@
 use crate::{
     context::{Context, EditState},
+    render::RenderOptions,
     render_util::{enum_combo, helper, input_float_with_format},
-    traits::RenderOptions,
     trigger::ProgressActive,
 };
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Slider, SliderFlags, Ui};

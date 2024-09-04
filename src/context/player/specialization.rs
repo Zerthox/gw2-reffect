@@ -1,7 +1,7 @@
 use super::Profession;
 use crate::{
-    colors::Color,
-    traits::{Colored, ShortName},
+    render::colors::{Color, Colored},
+    util::ShortName,
 };
 use enumflags2::bitflags;
 use serde::{Deserialize, Serialize};

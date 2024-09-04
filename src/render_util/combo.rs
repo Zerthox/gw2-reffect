@@ -1,4 +1,3 @@
-use crate::traits::{Colored, ShortName};
 use enumflags2::{BitFlag, BitFlags};
 use nexus::imgui::{ComboBoxFlags, Selectable, StyleColor, StyleVar, Ui};
 use std::mem;
@@ -33,6 +32,8 @@ macro_rules! impl_static_variants {
 }
 
 pub(crate) use impl_static_variants;
+
+use crate::{render::colors::Colored, util::ShortName};
 
 pub fn enum_combo<T>(
     ui: &Ui,

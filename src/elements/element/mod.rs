@@ -5,12 +5,11 @@ pub use self::kind::*;
 use super::{Animation, Common, RenderState};
 use crate::{
     action::ElementAction,
-    bounds::Bounds,
     context::{Context, EditState},
+    render::{Bounds, Render, RenderDebug, RenderOptions},
     render_util::{
         delete_confirm_modal, item_context_menu, style_disabled_if, tree_select_empty, Rect,
     },
-    traits::{Render, RenderDebug, RenderOptions},
     tree::{Loader, TreeNode, VisitMut},
     trigger::{FilterTrigger, Trigger},
 };

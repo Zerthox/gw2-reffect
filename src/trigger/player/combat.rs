@@ -1,7 +1,7 @@
 use super::Trigger;
 use crate::{
     context::{Context, EditState},
-    traits::RenderOptions,
+    render::RenderOptions,
 };
 use nexus::imgui::{Selectable, Ui};
 use serde::{Deserialize, Serialize};

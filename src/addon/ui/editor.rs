@@ -1,8 +1,8 @@
 use super::Addon;
 use crate::{
-    colors,
     id::IdGen,
     internal::Error,
+    render::colors,
     render_util::{next_window_size_constraints, small_padding},
 };
 use nexus::imgui::{ChildWindow, StyleVar, Ui};

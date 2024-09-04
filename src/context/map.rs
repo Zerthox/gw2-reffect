@@ -1,6 +1,6 @@
 use crate::{
-    colors::Color,
-    traits::{Colored, ShortName},
+    render::colors::{Color, Colored},
+    util::ShortName,
 };
 use enumflags2::bitflags;
 use nexus::data_link::mumble::{map_type, MumblePtr};

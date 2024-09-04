@@ -1,15 +1,13 @@
 use super::{Element, ElementType, RenderState};
 use crate::{
     action::ChildElementAction,
-    colors,
-    component_wise::ComponentWise,
     context::{Context, EditState},
     id::{Id, IdGen},
+    render::{colors, ComponentWise, RenderDebug, RenderOptions},
     render_util::{
         debug_optional, helper_slider, input_pos, push_alpha_change, slider_percent,
         EnumStaticVariants, Rect,
     },
-    traits::{RenderDebug, RenderOptions},
     trigger::ProgressTrigger,
 };
 use nexus::imgui::{Condition, MenuItem, MouseButton, StyleVar, Ui, Window};

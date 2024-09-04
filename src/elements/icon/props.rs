@@ -1,11 +1,10 @@
 use crate::{
-    colors,
     context::EditState,
     elements::PartialProps,
+    render::{colors, RenderOptions},
     render_util::{
         helper, input_color_alpha, input_optional, input_percent_inverse, slider_percent_capped,
     },
-    traits::RenderOptions,
 };
 use nexus::imgui::Ui;
 use partial::Partial;

@@ -1,5 +1,5 @@
+use super::ComponentWise;
 use crate::{
-    component_wise::ComponentWise,
     context::Context,
     render_util::{Point, Rect},
 };

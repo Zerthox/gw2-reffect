@@ -6,8 +6,8 @@ pub use self::{active::*, source::*, threshold::*};
 
 use crate::{
     context::{Context, ContextUpdate, EditState},
+    render::RenderOptions,
     serde_migrate::migrate,
-    traits::RenderOptions,
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};

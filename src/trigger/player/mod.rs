@@ -6,9 +6,9 @@ pub use self::{combat::*, traits::*};
 use super::{check_bitflags_optional, Trigger};
 use crate::{
     context::{Context, EditState, Mount, Profession, Specialization},
+    render::RenderOptions,
     render_util::enum_combo_bitflags,
     serde_bitflags,
-    traits::RenderOptions,
 };
 use enumflags2::BitFlags;
 use nexus::imgui::{ComboBoxFlags, Ui};

@@ -1,6 +1,12 @@
 use base64::{prelude::BASE64_STANDARD, Engine};
 use std::{borrow::Cow, path::Path};
 
+/// Associated short name.
+pub trait ShortName {
+    /// Returns the short name.
+    fn short_name(&self) -> &'static str;
+}
+
 #[macro_export]
 macro_rules! non_zero_u32 {
     ( $val:literal ) => {{

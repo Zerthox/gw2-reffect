@@ -4,9 +4,9 @@ use super::{check_bitflags, memo::MemoizedTrigger};
 use crate::{
     action::Action,
     context::{Context, ContextUpdate, EditState, MapCategory},
+    render::RenderOptions,
     render_util::{enum_combo_bitflags, helper, input_u32, item_context_menu, map_select},
     serde_bitflags,
-    traits::RenderOptions,
 };
 use enumflags2::BitFlags;
 use nexus::imgui::{ComboBoxFlags, Ui};

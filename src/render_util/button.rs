@@ -1,5 +1,5 @@
 use super::style_disabled;
-use crate::{colors::TRANSPARENT, component_wise::ComponentWise};
+use crate::render::{colors::TRANSPARENT, ComponentWise};
 use nexus::imgui::{StyleColor, Ui};
 
 #[allow(unused)] // TODO: keep around for future use or remove?

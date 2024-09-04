@@ -1,10 +1,9 @@
 use super::{Icon, RenderState};
 use crate::{
-    bounds::Bounds,
     context::{Context, EditState},
+    render::{Bounds, Render, RenderDebug, RenderOptions},
     render_util::{input_size, Rect},
-    traits::{Render, RenderDebug, RenderOptions},
-    tree::TreeLeaf,
+    tree::TreeNode,
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
@@ -17,7 +16,7 @@ pub struct IconElement {
     pub size: [f32; 2],
 }
 
-impl TreeLeaf for IconElement {}
+impl TreeNode for IconElement {}
 
 impl Render for IconElement {
     fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {

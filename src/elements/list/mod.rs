@@ -6,15 +6,13 @@ pub use self::{action::*, icon::*, layout::*};
 
 use super::{Direction, RenderState};
 use crate::{
-    bounds::Bounds,
-    colors,
     context::{Context, EditState},
+    render::{colors, Bounds, Render, RenderDebug, RenderOptions},
     render_util::{
         collapsing_header_same_line_end, delete_confirm_modal, enum_combo, input_float_with_format,
         input_size, item_context_menu, style_disabled_if, Rect,
     },
-    traits::{Render, RenderDebug, RenderOptions},
-    tree::TreeLeaf,
+    tree::TreeNode,
 };
 use nexus::imgui::{
     self as ig, CollapsingHeader, ComboBoxFlags, InputTextFlags, MenuItem, StyleColor,
@@ -35,7 +33,7 @@ pub struct IconList {
 }
 
 // technically there is children, but they are not full elements
-impl TreeLeaf for IconList {}
+impl TreeNode for IconList {}
 
 impl Render for IconList {
     fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
@@ -185,18 +183,28 @@ impl RenderOptions for IconList {
     fn render_tabs(&mut self, ui: &Ui, state: &mut EditState) {
         if let Some(_token) = ui.tab_item("Condition") {
             const INDENT: f32 = 10.0;
-
             for (i, icon) in self.icons.iter_mut().enumerate() {
                 let _id = ui.push_id(i as i32);
-
                 let open = CollapsingHeader::new(format!("{}###icon{i}", icon.name))
                     .flags(TreeNodeFlags::ALLOW_ITEM_OVERLAP)
                     .begin(ui);
-
                 if open {
                     ui.indent_by(INDENT);
                     icon.icon.props.render_condition_options(ui, state);
                     ui.unindent_by(INDENT);
+                }
+            }
+        }
+
+        if let Some(_token) = ui.tab_item("Filter") {
+            ui.spacing();
+            for (i, icon) in self.icons.iter_mut().enumerate() {
+                let _id = ui.push_id(i as i32);
+                let open = CollapsingHeader::new(format!("{}###icon{i}", icon.name))
+                    .flags(TreeNodeFlags::ALLOW_ITEM_OVERLAP)
+                    .begin(ui);
+                if open {
+                    icon.filter.render_options(ui, state);
                 }
             }
         }

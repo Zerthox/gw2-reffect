@@ -1,5 +1,10 @@
+mod bounds;
+pub mod colors;
+mod component_wise;
+
+pub use self::{bounds::*, component_wise::*};
+
 use crate::{
-    colors::Color,
     context::{Context, EditState},
     elements::RenderState,
 };
@@ -24,16 +29,4 @@ pub trait RenderOptions<T = ()> {
 pub trait RenderDebug {
     /// Renders debug info for the type.
     fn render_debug(&mut self, ui: &Ui);
-}
-
-/// Associated color.
-pub trait Colored {
-    /// Returns the color.
-    fn colored(&self) -> Option<Color>;
-}
-
-/// Associated short name.
-pub trait ShortName {
-    /// Returns the short name.
-    fn short_name(&self) -> &'static str;
 }

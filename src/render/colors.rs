@@ -2,6 +2,12 @@
 
 pub type Color = [f32; 4];
 
+/// Associated color.
+pub trait Colored {
+    /// Returns the color.
+    fn colored(&self) -> Option<Color>;
+}
+
 /// Creates a color from RGB values.
 pub const fn rgb(r: f32, g: f32, b: f32) -> Color {
     [r, g, b, 1.0]

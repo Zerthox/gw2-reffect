@@ -6,17 +6,16 @@ pub use self::{progress::*, props::*};
 use super::{align::Align, Direction, Props, RenderState, Unit};
 use crate::{
     action::Action,
-    bounds::Bounds,
-    colors::with_alpha_factor,
-    component_wise::ComponentWise,
     context::{Context, EditState},
+    render::{
+        colors::with_alpha_factor, Bounds, ComponentWise, Render, RenderDebug, RenderOptions,
+    },
     render_util::{
         enum_combo, helper, helper_slider, input_color_alpha, input_float_with_format,
         input_percent, input_percent_inverse, input_positive_with_format, input_size, input_u32,
         slider_percent, Rect,
     },
-    traits::{Render, RenderDebug, RenderOptions},
-    tree::TreeLeaf,
+    tree::TreeNode,
 };
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
@@ -45,7 +44,7 @@ impl Bar {
     }
 }
 
-impl TreeLeaf for Bar {}
+impl TreeNode for Bar {}
 
 impl Render for Bar {
     fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {

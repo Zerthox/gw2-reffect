@@ -1,5 +1,5 @@
 use crate::{
-    component_wise::ComponentWise,
+    render::ComponentWise,
     render_util::{draw_text_bg, enum_combo, helper_warn},
 };
 use nexus::imgui::{ComboBoxFlags, Ui};

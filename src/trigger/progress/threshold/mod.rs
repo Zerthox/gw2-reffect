@@ -6,8 +6,8 @@ pub use self::{amount_type::*, threshold_type::*};
 use super::ProgressActive;
 use crate::{
     context::{Context, EditState},
+    render::RenderOptions,
     render_util::{enum_combo, helper},
-    traits::RenderOptions,
 };
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};

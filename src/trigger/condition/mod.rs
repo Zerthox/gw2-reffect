@@ -6,7 +6,7 @@ use super::ProgressActive;
 use crate::{
     context::{Context, EditState},
     elements::PartialProps,
-    traits::RenderOptions,
+    render::RenderOptions,
 };
 use nexus::imgui::Ui;
 use partial::{IntoPartial, Partial, PartialOps};

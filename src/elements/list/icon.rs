@@ -1,6 +1,7 @@
 use crate::{
     context::{Context, EditState},
     elements::{Common, Element, ElementType, Icon, IconElement, RenderState},
+    render::{RenderDebug, RenderOptions},
     render_util::Rect,
     traits::{RenderDebug, RenderOptions},
     trigger::ProgressTrigger,

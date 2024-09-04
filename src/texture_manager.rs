@@ -180,7 +180,7 @@ impl TextureManager {
                 }
             }
         } else {
-            log::warn!("Received load for non-pending texture \"{}\"", pending_id);
+            log::warn!("Received load for non-pending texture \"{pending_id}\"");
         }
     }
 }

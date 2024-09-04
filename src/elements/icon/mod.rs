@@ -6,12 +6,13 @@ pub use self::{element::*, props::*, source::*};
 
 use super::{align::AlignHorizontal, Props, RenderState};
 use crate::{
-    colors::{self, with_alpha, with_alpha_factor},
-    component_wise::ComponentWise,
     context::{Context, EditState},
+    render::{
+        colors::{self, with_alpha, with_alpha_factor},
+        ComponentWise, RenderDebug, RenderOptions,
+    },
     render_util::{debug_optional, draw_spinner_bg, draw_text_bg, Rect},
     settings::icon::{DurationBarSettings, DurationTextSettings, StackTextSettings},
-    traits::{RenderDebug, RenderOptions},
     trigger::ProgressActive,
 };
 use nexus::imgui::Ui;

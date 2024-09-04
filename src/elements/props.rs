@@ -1,7 +1,7 @@
 use crate::{
     action::Action,
-    colors,
     context::{Context, ContextUpdate, EditState},
+    render::colors,
     render_util::{collapsing_header_same_line_end, delete_confirm_modal},
     trigger::{Condition, ProgressActive},
 };

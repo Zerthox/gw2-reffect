@@ -5,15 +5,13 @@ pub use self::{decoration::*, props::*};
 
 use super::{align::AlignHorizontal, Props, RenderState};
 use crate::{
-    bounds::Bounds,
-    component_wise::ComponentWise,
     context::{Context, ContextUpdate, EditState},
+    render::{Bounds, ComponentWise, Render, RenderDebug, RenderOptions},
     render_util::{
         debug_optional, draw_text_bg, font_select, helper, helper_warn, input_text_multi_with_menu,
         Font, FontToken, Rect,
     },
-    traits::{Render, RenderDebug, RenderOptions},
-    tree::TreeLeaf,
+    tree::TreeNode,
     trigger::ProgressActive,
 };
 use nexus::imgui::{InputTextFlags, Ui};
@@ -116,7 +114,7 @@ impl Text {
     }
 }
 
-impl TreeLeaf for Text {}
+impl TreeNode for Text {}
 
 impl Render for Text {
     fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {

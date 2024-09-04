@@ -3,8 +3,8 @@ use crate::{
     action::Action,
     context::{Context, EditState},
     internal::Resource,
+    render::RenderOptions,
     render_util::{enum_combo, helper, impl_static_variants, input_skill_id},
-    traits::RenderOptions,
 };
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};

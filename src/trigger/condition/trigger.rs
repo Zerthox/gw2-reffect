@@ -1,8 +1,8 @@
 use super::ProgressActive;
 use crate::{
     context::{Context, EditState},
+    render::RenderOptions,
     render_util::{enum_combo, impl_static_variants},
-    traits::RenderOptions,
     trigger::{MapTrigger, PlayerTrigger, ProgressThreshold, Trigger},
 };
 use nexus::imgui::{ComboBoxFlags, Ui};

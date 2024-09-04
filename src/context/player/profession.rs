@@ -1,6 +1,6 @@
 use crate::{
-    colors::{self, Color},
-    traits::{Colored, ShortName},
+    render::colors::{self, Color, Colored},
+    util::ShortName,
 };
 use enumflags2::{bitflags, BitFlags};
 use serde::{Deserialize, Serialize};

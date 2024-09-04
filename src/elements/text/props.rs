@@ -1,10 +1,9 @@
 use super::TextDecoration;
 use crate::{
-    colors,
     context::EditState,
     elements::PartialProps,
+    render::{colors, RenderOptions},
     render_util::{input_color_alpha, input_optional, input_percent},
-    traits::RenderOptions,
 };
 use nexus::imgui::Ui;
 use partial::Partial;
