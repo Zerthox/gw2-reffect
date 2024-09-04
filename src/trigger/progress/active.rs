@@ -30,8 +30,13 @@ impl ProgressActive {
 
     /// Returns the current progress between `0.0` and `1.0`.
     pub fn progress(&self, now: u32) -> Option<f32> {
-        self.current(now)
-            .map(|current| current as f32 / self.max() as f32)
+        self.current(now).map(|current| {
+            match (current, self.max()) {
+                (0, 0) => 0.0, // treat 0/0 as 0% progress
+                (_, 0) => 1.0, // treat x/0 as 100% progress
+                (current, max) => current as f32 / max as f32,
+            }
+        })
     }
 
     /// Returns the current progress between `0.0` and `1.0`.
