@@ -9,9 +9,9 @@ impl<T> Pretty<T> {
 
     const MEGA: f32 = 1_000_000.0;
 
-    const KILO_MIN: f32 = 10.0 * Self::KILO;
+    const KILO_MIN: f32 = 10_000.0;
 
-    const MEGA_MIN: f32 = 10.0 * Self::MEGA;
+    const MEGA_MIN: f32 = 1_000_000.0;
 
     pub fn string_if(value: T, pretty: bool) -> String
     where
@@ -61,7 +61,7 @@ mod tests {
         assert_eq!(Pretty(123).to_string(), "123");
         assert_eq!(Pretty(10_000).to_string(), "10.0k");
         assert_eq!(Pretty(76_590).to_string(), "76.6k");
-        assert_eq!(Pretty(12_390_000).to_string(), "12.4M");
+        assert_eq!(Pretty(1_390_000).to_string(), "1.4M");
     }
 
     #[test]
@@ -70,6 +70,6 @@ mod tests {
         assert_eq!(Pretty(123.49).to_string(), "123.5");
         assert_eq!(Pretty(10_000.0).to_string(), "10.0k");
         assert_eq!(Pretty(76_590.0).to_string(), "76.6k");
-        assert_eq!(Pretty(12_390_000.0).to_string(), "12.4M");
+        assert_eq!(Pretty(1_390_000.0).to_string(), "1.4M");
     }
 }
