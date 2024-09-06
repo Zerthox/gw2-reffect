@@ -1,5 +1,5 @@
 use super::input_text_simple_menu;
-use crate::util::{decode_skill, decode_trait};
+use crate::chat_code::{decode_skill, decode_trait};
 use nexus::imgui::{sys, InputTextFlags, Ui};
 use std::ffi::CString;
 

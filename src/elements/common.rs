@@ -1,8 +1,8 @@
-use super::{Element, ElementType, RenderState};
+use super::{Element, ElementType, RenderState, ELEMENT_ID};
 use crate::{
     action::ChildElementAction,
     context::{Context, EditState},
-    id::{Id, IdGen},
+    id::Id,
     render::{colors, ComponentWise, RenderDebug, RenderOptions},
     render_util::{
         debug_optional, helper_slider, input_pos, push_alpha_change, slider_percent,
@@ -236,7 +236,7 @@ impl Default for Common {
     fn default() -> Self {
         Self {
             enabled: true,
-            id: IdGen::generate(),
+            id: ELEMENT_ID.generate(),
             name: "Unnamed".into(),
             pos: [0.0, 0.0],
             opacity: 1.0,
@@ -250,7 +250,7 @@ impl Clone for Common {
     fn clone(&self) -> Self {
         Self {
             enabled: self.enabled,
-            id: IdGen::generate(), // we want a fresh id for the clone
+            id: ELEMENT_ID.generate(), // we want a fresh id for the clone
             name: self.name.clone(),
             pos: self.pos,
             opacity: self.opacity,

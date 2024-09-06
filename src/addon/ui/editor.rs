@@ -1,6 +1,6 @@
 use super::Addon;
 use crate::{
-    id::IdGen,
+    elements::ELEMENT_ID,
     internal::Error,
     render::colors,
     render_util::{next_window_size_constraints, small_padding},
@@ -12,7 +12,7 @@ impl Addon {
         if ui.button("Reload packs") {
             self.packs.clear();
             self.context.edit = Default::default();
-            IdGen::reset();
+            ELEMENT_ID.reset();
             self.load_packs();
         }
         if ui.is_item_hovered() {

@@ -33,3 +33,7 @@ pub use self::{
     text::Text,
     unit::*,
 };
+
+use crate::id::IdGen;
+
+pub static ELEMENT_ID: IdGen = IdGen::new();

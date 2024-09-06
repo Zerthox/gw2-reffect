@@ -1,6 +1,7 @@
 mod action;
 mod addon;
 mod assets;
+mod chat_code;
 mod context;
 mod elements;
 mod id;
