@@ -45,12 +45,14 @@ Custom text can be displayed, optionally tied to one or multiple effects.
 This can be used as a fully customizable alternative to the simple stacks/duration  text built into icons.
 
 The following text replacements are supported:
-- `%n` for the name of the element
-- `%s` for the current number of effect stacks or current resource amount
-- `%r` for the remaining effect duration or current resource amount
-- `%f` for the initial full effect duration or max resource amount
-- `%p` for the remaining effect duration or current resource amount in percent
+- `%n` for the name of the element as set by the user
+- `%i` or `%I` for the current intensity = number of effect stacks or current resource amount
+- `%c` or `%C` for the current progress amount = remaining effect duration or current resource amount
+- `%f` or `%F` for the full/maximum progress amount = initial full effect duration or maximum resource amount
+- `%p` for the current progress in percent = remaining effect duration or current resource amount in percent
 - `%%` for a simple % sign
+
+Uppercase text replacements use pretty formatting with units, for example `10.3k` instead of `10287`.
 
 ![Text](./img/text.png)
 

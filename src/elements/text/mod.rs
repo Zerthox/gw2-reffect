@@ -6,6 +6,7 @@ pub use self::{decoration::*, props::*};
 use super::{align::AlignHorizontal, Props, RenderState};
 use crate::{
     context::{Context, ContextUpdate, EditState},
+    fmt::Pretty,
     render::{Bounds, ComponentWise, Render, RenderDebug, RenderOptions},
     render_util::{
         debug_optional, draw_text_bg, font_select, helper, helper_warn, input_text_multi_with_menu,
@@ -67,13 +68,19 @@ impl Text {
                 prefix = false;
                 match el {
                     'n' => result.push_str(&state.common.name),
-                    's' => result.push_str(&active.intensity().to_string()),
-                    'r' => {
-                        result.push_str(&active.current_text(ctx.now));
+                    'i' | 's' => result.push_str(&active.intensity().to_string()),
+                    'I' => result.push_str(&Pretty(active.intensity()).to_string()),
+                    'c' | 'r' => {
+                        result.push_str(&active.current_text(ctx.now, false));
                         self.frequent = is_timed;
                     }
-                    'f' => result.push_str(&active.max_text()),
-                    'p' => {
+                    'C' => {
+                        result.push_str(&active.current_text(ctx.now, true));
+                        self.frequent = is_timed;
+                    }
+                    'f' => result.push_str(&active.max_text(false)),
+                    'F' => result.push_str(&active.max_text(true)),
+                    'p' | 'P' => {
                         let progress = active.progress_or_default(ctx.now);
                         result.push_str(&format!("{:.1}", (100.0 * progress)));
                         self.frequent = is_timed;
@@ -164,10 +171,11 @@ impl RenderOptions for Text {
         ui.same_line();
         ui.text("Text"); // own label to fix helper position
         helper(ui, || {
+            ui.text("Uppercase for pretty format");
             ui.text("%n for name");
-            ui.text("%s for stacks");
-            ui.text("%r for progress remaining");
-            ui.text("%f for progress full");
+            ui.text("%i for intensity");
+            ui.text("%c for current amount");
+            ui.text("%f for full/max amount");
             ui.text("%p for progress percent");
             ui.text("%% for % sign");
         });

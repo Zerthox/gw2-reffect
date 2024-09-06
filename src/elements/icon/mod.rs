@@ -145,7 +145,7 @@ impl Icon {
                         } = ctx.icon_settings.duration_text;
 
                         if remain < max_remain {
-                            let text = active.current_text(ctx.now);
+                            let text = active.current_text(ctx.now, false);
 
                             let font_size = scale * small_size;
                             let font_scale = font_size / ui.current_font_size();

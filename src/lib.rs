@@ -4,6 +4,7 @@ mod assets;
 mod chat_code;
 mod context;
 mod elements;
+mod fmt;
 mod id;
 mod internal;
 mod interval;

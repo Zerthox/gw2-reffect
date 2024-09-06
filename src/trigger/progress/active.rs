@@ -1,4 +1,7 @@
-use crate::internal::{Buff, Resource};
+use crate::{
+    fmt::Pretty,
+    internal::{Buff, Resource},
+};
 
 #[derive(Debug, Clone)]
 pub enum ProgressActive {
@@ -53,12 +56,12 @@ impl ProgressActive {
     }
 
     /// Returns the current amount as text.
-    pub fn current_text(&self, now: u32) -> String {
+    pub fn current_text(&self, now: u32, pretty: bool) -> String {
         match self {
             Self::Buff { runout, .. } => Self::time_between_checked(now, *runout)
                 .map(Self::format_seconds)
                 .unwrap_or_else(|| "?".into()),
-            Self::Resource(resource) => resource.current.to_string(),
+            Self::Resource(resource) => Pretty::string_if(resource.current, pretty),
         }
     }
 
@@ -71,12 +74,12 @@ impl ProgressActive {
     }
 
     /// Returns the maximum amount as text.
-    pub fn max_text(&self) -> String {
+    pub fn max_text(&self, pretty: bool) -> String {
         match self {
             Self::Buff { apply, runout, .. } => Self::time_between_checked(*apply, *runout)
                 .map(Self::format_seconds)
                 .unwrap_or_else(|| "?".into()),
-            Self::Resource(resource) => resource.max.to_string(),
+            Self::Resource(resource) => Pretty::string_if(resource.max, pretty),
         }
     }
 
