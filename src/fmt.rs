@@ -30,7 +30,7 @@ impl fmt::Display for Pretty<f32> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let value = self.0;
         match value {
-            Self::MEGA_MIN.. => write!(f, "{:.1}M", value / Self::MEGA),
+            Self::MEGA_MIN.. => write!(f, "{:.2}M", value / Self::MEGA),
             Self::KILO_MIN.. => write!(f, "{:.1}k", value / Self::KILO),
             _ => write!(f, "{value:.1}"),
         }
@@ -44,7 +44,7 @@ impl fmt::Display for Pretty<u32> {
 
         let value = self.0;
         match value {
-            MEGA_MIN.. => write!(f, "{:.1}M", value as f32 / Self::MEGA),
+            MEGA_MIN.. => write!(f, "{:.2}M", value as f32 / Self::MEGA),
             KILO_MIN.. => write!(f, "{:.1}k", value as f32 / Self::KILO),
             _ => write!(f, "{value}"),
         }
@@ -61,7 +61,7 @@ mod tests {
         assert_eq!(Pretty(123).to_string(), "123");
         assert_eq!(Pretty(10_000).to_string(), "10.0k");
         assert_eq!(Pretty(76_590).to_string(), "76.6k");
-        assert_eq!(Pretty(1_390_000).to_string(), "1.4M");
+        assert_eq!(Pretty(1_239_000).to_string(), "1.24M");
     }
 
     #[test]
@@ -70,6 +70,6 @@ mod tests {
         assert_eq!(Pretty(123.49).to_string(), "123.5");
         assert_eq!(Pretty(10_000.0).to_string(), "10.0k");
         assert_eq!(Pretty(76_590.0).to_string(), "76.6k");
-        assert_eq!(Pretty(1_390_000.0).to_string(), "1.4M");
+        assert_eq!(Pretty(1_239_000.0).to_string(), "1.24M");
     }
 }
