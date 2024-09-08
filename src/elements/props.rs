@@ -1,6 +1,6 @@
 use crate::{
     action::Action,
-    context::{Context, ContextUpdate, EditState},
+    context::{Context, EditState},
     render::colors,
     render_util::{collapsing_header_same_line_end, delete_confirm_modal},
     trigger::{Condition, ProgressActive},
@@ -32,7 +32,7 @@ where
     T::Partial: Clone + fmt::Debug + Serialize + for<'de> Deserialize<'de>,
 {
     pub fn update(&mut self, ctx: &Context, active: Option<&ProgressActive>) {
-        if ctx.has_update_or_edit(ContextUpdate::OwnCharacter) {
+        if ctx.has_any_update_or_edit() {
             self.current = self.base.clone();
             if let Some(active) = active {
                 for condition in &mut self.conditions {
