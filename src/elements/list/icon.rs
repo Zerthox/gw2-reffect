@@ -29,7 +29,7 @@ impl ListIcon {
     pub fn is_visible(&mut self, ctx: &Context, state: &RenderState) -> bool {
         let parent = state.common.trigger.active();
         self.trigger.update(ctx, state.is_edit(ctx), parent);
-        self.enabled && self.trigger.active().is_some() && self.filter.is_active(ctx)
+        self.enabled && self.trigger.active().is_some() && self.filter.is_active_or_edit(ctx, state)
     }
 
     pub fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState, size: [f32; 2]) {
