@@ -4,16 +4,17 @@ use std::mem::MaybeUninit;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(u8)]
 pub enum Error {
-    None = 0,
-    Outdated = 1,
-    NoMumble = 2,
-    CompetitiveMode = 3,
-    ContextNotFound = 4,
-    NoCharacter = 5,
-    CharacterState = 6,
-    BuffsNotFound = 7,
-    HealthNotFound = 8,
-    SpecNotFound = 9,
+    None,
+    Disabled,
+    NoMumble,
+    CompetitiveMode,
+    ContextNotFound,
+    NoCharacter,
+    CharacterState,
+    BuffsNotFound,
+    HealthNotFound,
+    EnduranceNotFound,
+    SpecNotFound,
     Windows = u8::MAX,
 }
 
@@ -142,6 +143,9 @@ pub struct Resources {
     /// Barrier.
     pub barrier: Resource,
 
+    /// Endurance.
+    pub endurance: Resource,
+
     /// Primary profession resource.
     // TODO: separate error state for profession resources?
     pub primary: Resource,
@@ -156,6 +160,7 @@ impl Resources {
         Self {
             health: Resource::empty(),
             barrier: Resource::empty(),
+            endurance: Resource::empty(),
             primary: Resource::empty(),
             secondary: Resource::empty(),
         }

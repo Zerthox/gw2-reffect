@@ -48,6 +48,7 @@ impl Addon {
                     Ok(Resources {
                         health,
                         barrier,
+                        endurance,
                         primary,
                         secondary,
                     }) => {
@@ -56,6 +57,10 @@ impl Addon {
                             ui.tooltip(|| {
                                 ui.text(format!("Health: {}/{}", health.current, health.max));
                                 ui.text(format!("Barrier: {}/{}", barrier.current, barrier.max));
+                                ui.text(format!(
+                                    "Endurance: {}/{}",
+                                    endurance.current, endurance.max
+                                ));
                                 ui.text(format!("Primary: {}/{}", primary.current, primary.max));
                                 ui.text(format!(
                                     "Secondary: {}/{}",

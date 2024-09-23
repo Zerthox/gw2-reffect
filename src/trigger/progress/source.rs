@@ -37,6 +37,9 @@ pub enum ProgressSource {
     /// Barrier.
     Barrier,
 
+    /// Endurance.
+    Endurance,
+
     /// Primary profession resource.
     #[strum(serialize = "Primary Resource")]
     PrimaryResource,
@@ -90,6 +93,7 @@ impl ProgressSource {
             }),
             Self::Health => ctx.resources()?.health.clone().try_into().ok(),
             Self::Barrier => ctx.resources()?.barrier.clone().try_into().ok(),
+            Self::Endurance => ctx.resources()?.endurance.clone().try_into().ok(),
             Self::PrimaryResource => ctx.resources()?.primary.clone().try_into().ok(),
             Self::SecondaryResource => ctx.resources()?.secondary.clone().try_into().ok(),
         }
@@ -107,7 +111,11 @@ impl ProgressSource {
                     runout: apply + 5000,
                 }
             }
-            Self::Health | Self::Barrier | Self::PrimaryResource | Self::SecondaryResource => {
+            Self::Health
+            | Self::Barrier
+            | Self::Endurance
+            | Self::PrimaryResource
+            | Self::SecondaryResource => {
                 let current = (ctx.now % 5000) / 100;
                 ProgressActive::Resource(Resource { current, max: 50 })
             }
@@ -132,7 +140,7 @@ impl ProgressSource {
 
 impl RenderOptions for ProgressSource {
     fn render_options(&mut self, ui: &Ui, _state: &mut EditState) {
-        if let Some(prev) = enum_combo(ui, "Trigger", self, ComboBoxFlags::empty()) {
+        if let Some(prev) = enum_combo(ui, "Trigger", self, ComboBoxFlags::HEIGHT_LARGE) {
             match self {
                 Self::Buff(id) => {
                     if let Some(first) = prev.into_ids().first() {

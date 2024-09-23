@@ -30,7 +30,7 @@ impl fmt::Display for InternalError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::None => write!(f, "None"),
-            Self::Outdated => write!(f, "Outdated"),
+            Self::Disabled => write!(f, "Disabled"),
             Self::NoMumble => write!(f, "No mumble"),
             Self::CompetitiveMode => write!(f, "Unavailable in competitive modes"),
             Self::ContextNotFound => write!(f, "Context not found"),
@@ -38,6 +38,7 @@ impl fmt::Display for InternalError {
             Self::CharacterState => write!(f, "Unavailable for current character state"),
             Self::BuffsNotFound => write!(f, "Failed go get character effects"),
             Self::HealthNotFound => write!(f, "Failed go get character health"),
+            Self::EnduranceNotFound => write!(f, "Failed go get character endurance"),
             Self::SpecNotFound => write!(f, "Failed go get character specs"),
             Self::Windows => write!(f, "Windows error"),
         }
