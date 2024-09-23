@@ -41,7 +41,7 @@ pub struct Bar {
 impl Bar {
     fn process_value(&self, value: f32) -> Option<f32> {
         let value = (value * self.props.progress_factor) - self.props.lower_bound;
-        (value > 0.0 && value < 1.0).then_some(value)
+        (value > 0.0 && value <= 1.0).then_some(value)
     }
 }
 
