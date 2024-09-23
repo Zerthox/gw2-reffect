@@ -14,8 +14,17 @@ pub enum ProgressActive {
 }
 
 impl ProgressActive {
+    /// Creates a dummy active progress.
     pub fn dummy() -> Self {
         Self::Resource(Resource { current: 1, max: 1 })
+    }
+
+    /// Creates a new resource progress from percent & maximum.
+    pub fn from_percent(progress: f32, max: u32) -> Self {
+        Self::Resource(Resource {
+            current: (progress * max as f32) as u32,
+            max,
+        })
     }
 
     /// Whether the progress uses timestamps.

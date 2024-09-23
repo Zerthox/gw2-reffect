@@ -100,24 +100,26 @@ impl ProgressSource {
     }
 
     pub fn progress_edit(&self, ctx: &Context, parent: Option<&ProgressActive>) -> ProgressActive {
+        const CYCLE: u32 = 5000;
+
+        let passed = ctx.now % CYCLE;
+        let progress = passed as f32 / CYCLE as f32;
         match self {
             Self::Inherit => parent.cloned().unwrap_or(ProgressActive::dummy()),
             Self::Always => ProgressActive::dummy(),
             Self::Buff(_) | Self::AnyBuff(_) => {
-                let apply = ctx.now - (ctx.now % 5000);
+                let apply = ctx.now - passed;
                 ProgressActive::Buff {
-                    stacks: 1,
+                    stacks: (progress * 25.0) as u32,
                     apply,
-                    runout: apply + 5000,
+                    runout: apply + CYCLE,
                 }
             }
-            Self::Health
-            | Self::Barrier
-            | Self::Endurance
-            | Self::PrimaryResource
-            | Self::SecondaryResource => {
-                let current = (ctx.now % 5000) / 100;
-                ProgressActive::Resource(Resource { current, max: 50 })
+            Self::Health => ProgressActive::from_percent(progress, 15_000),
+            Self::Barrier => ProgressActive::from_percent(0.5 * progress, 15_000),
+            Self::Endurance => ProgressActive::from_percent(progress, 100),
+            Self::PrimaryResource | Self::SecondaryResource => {
+                ProgressActive::from_percent(progress, 30)
             }
         }
     }
