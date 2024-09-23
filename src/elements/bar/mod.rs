@@ -55,7 +55,8 @@ impl Render for Bar {
             let alpha = ui.clone_style().alpha;
 
             let (start, end) = self.bounds_with_offset(ui, ctx, state.pos);
-            let progress = self.process_value(self.progress_kind.calc(ctx, active, self.max));
+            let progress =
+                self.process_value(self.progress_kind.calc_progress(ctx, active, self.max));
             let (offset_start, offset_end) =
                 self.direction.progress_rect_offset(self.size, progress);
             let fill_start = start.add(offset_start);
@@ -88,13 +89,11 @@ impl Render for Bar {
 
             if self.props.tick_size > 0.0 {
                 let end_offset = self.direction.tick_end_offset(self.size);
-                let max = active.max();
+                let max = self.progress_kind.progress_max(active, self.max);
                 for tick in &self.ticks {
-                    let tick = self.process_value(*tick);
-                    if let Some(tick_progress) = self.tick_unit.calc_progress(tick, max) {
-                        let offset = self
-                            .direction
-                            .progress_value_offset(self.size, tick_progress);
+                    if let Some(progress) = self.tick_unit.calc_progress(*tick, max) {
+                        let progress = self.process_value(progress);
+                        let offset = self.direction.progress_value_offset(self.size, progress);
                         let start = start.add(offset);
                         let end = start.add(end_offset);
                         draw_list
