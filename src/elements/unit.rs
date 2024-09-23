@@ -25,15 +25,15 @@ pub enum Unit {
 
 impl Unit {
     pub fn calc_progress(&self, value: f32, max: u32) -> Option<f32> {
-        let progress = match self {
-            Self::Percent => value,
+        match self {
+            Self::Percent => Some(value),
             Self::Absolute => {
                 if max == 0 {
-                    return None;
+                    None
+                } else {
+                    Some(value / max as f32)
                 }
-                value / max as f32
             }
-        };
-        (0.0 < progress && progress < 1.0).then_some(progress)
+        }
     }
 }

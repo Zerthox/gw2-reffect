@@ -39,8 +39,9 @@ pub struct Bar {
 }
 
 impl Bar {
-    fn process_value(&self, value: f32) -> f32 {
-        ((value * self.props.progress_factor) - self.props.lower_bound).clamp(0.0, 1.0)
+    fn process_value(&self, value: f32) -> Option<f32> {
+        let value = (value * self.props.progress_factor) - self.props.lower_bound;
+        (value > 0.0 && value < 1.0).then_some(value)
     }
 }
 
@@ -54,27 +55,30 @@ impl Render for Bar {
         if let Some(active) = active {
             let alpha = ui.clone_style().alpha;
 
-            let (start, end) = self.bounds_with_offset(ui, ctx, state.pos);
-            let progress =
-                self.process_value(self.progress_kind.calc_progress(ctx, active, self.max));
-            let (offset_start, offset_end) =
-                self.direction.progress_rect_offset(self.size, progress);
-            let fill_start = start.add(offset_start);
-            let fill_end = start.add(offset_end);
-
             let draw_list = ui.get_background_draw_list();
+            let (start, end) = self.bounds_with_offset(ui, ctx, state.pos);
             draw_list
                 .add_rect(start, end, with_alpha_factor(self.props.background, alpha))
                 .filled(true)
                 .build();
-            draw_list
-                .add_rect(
-                    fill_start,
-                    fill_end,
-                    with_alpha_factor(self.props.fill, alpha),
-                )
-                .filled(true)
-                .build();
+
+            if let Some(progress) =
+                self.process_value(self.progress_kind.calc_progress(ctx, active, self.max))
+            {
+                let (offset_start, offset_end) =
+                    self.direction.progress_rect_offset(self.size, progress);
+                let fill_start = start.add(offset_start);
+                let fill_end = start.add(offset_end);
+
+                draw_list
+                    .add_rect(
+                        fill_start,
+                        fill_end,
+                        with_alpha_factor(self.props.fill, alpha),
+                    )
+                    .filled(true)
+                    .build();
+            }
 
             if self.props.border_size > 0.0 {
                 draw_list
@@ -91,8 +95,11 @@ impl Render for Bar {
                 let end_offset = self.direction.tick_end_offset(self.size);
                 let max = self.progress_kind.progress_max(active, self.max);
                 for tick in &self.ticks {
-                    if let Some(progress) = self.tick_unit.calc_progress(*tick, max) {
-                        let progress = self.process_value(progress);
+                    if let Some(progress) = self
+                        .tick_unit
+                        .calc_progress(*tick, max)
+                        .and_then(|progress| self.process_value(progress))
+                    {
                         let offset = self.direction.progress_value_offset(self.size, progress);
                         let start = start.add(offset);
                         let end = start.add(end_offset);
