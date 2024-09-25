@@ -1,6 +1,6 @@
 [package]
 name = "reffect"
-version = "0.3.4"
+version = "0.3.5"
 authors = ["Zerthox"]
 edition = "2021"
 description = "Customizable effect & resource displays"
@@ -16,7 +16,7 @@ nexus = { git = "https://github.com/zerthox/nexus-rs", features = ["log", "mumbl
 num_enum = "0.7.1"
 open = "5.1.2"
 partial = { git = "https://github.com/zerthox/partial-rs" }
-rfd = { version = "0.14.1", default-features = false }
+rfd = { version = "0.15.0", default-features = false }
 semver = { version = "1.0.17", features = ["serde"] }
 serde = { version = "1.0.163", features = ["derive"] }
 serde_json = "1.0.115"
