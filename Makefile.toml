@@ -14,6 +14,11 @@ end
 """
 ]
 
+[env]
+CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = true
+CARGO_MAKE_WORKSPACE_INCLUDE_MEMBERS = ["reffect"]
+INSTALL_PATH = "${GW2_PATH}/addons"
+
 [tasks.build]
 command = "cargo"
 args = ["build"]
@@ -23,34 +28,34 @@ command = "cargo"
 args = ["build", "--release"]
 
 [tasks.copy-release]
-script = "cp \"${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/release/${CARGO_MAKE_CRATE_NAME}.dll\" \"${GW2_PATH}/addons\""
+script = "cp \"${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/release/${CARGO_MAKE_CRATE_NAME}.dll\" \"${INSTALL_PATH}\""
 script_runner = "@shell"
 
 [tasks.copy-release-update]
-script = "cp \"${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/release/${CARGO_MAKE_CRATE_NAME}.dll\" \"${GW2_PATH}/addons/${CARGO_MAKE_CRATE_NAME}.dll.update\""
+script = "cp \"${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/release/${CARGO_MAKE_CRATE_NAME}.dll\" \"${INSTALL_PATH}/${CARGO_MAKE_CRATE_NAME}.dll.update\""
 script_runner = "@shell"
 
 [tasks.copy-release-pdb]
-script = "cp \"${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/release/${CARGO_MAKE_CRATE_NAME}.pdb\" \"${GW2_PATH}/addons"
+script = "cp \"${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/release/${CARGO_MAKE_CRATE_NAME}.pdb\" \"${INSTALL_PATH}"
 script_runner = "@shell"
 
 [tasks.copy-debug]
-script = "cp \"${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/debug/${CARGO_MAKE_CRATE_NAME}.dll\" \"${GW2_PATH}/addons/${CARGO_MAKE_CRATE_NAME}.dll.update\""
+script = "cp \"${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/debug/${CARGO_MAKE_CRATE_NAME}.dll\" \"${INSTALL_PATH}/${CARGO_MAKE_CRATE_NAME}.dll.update\""
 script_runner = "@shell"
 
 [tasks.copy-debug-pdb]
-script = "cp \"${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/debug/${CARGO_MAKE_CRATE_NAME}.pdb\" \"${GW2_PATH}/addons"
+script = "cp \"${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/debug/${CARGO_MAKE_CRATE_NAME}.pdb\" \"${INSTALL_PATH}"
 script_runner = "@shell"
 
 [tasks.remove]
-script = "rm \"${GW2_PATH}/addons/${CARGO_MAKE_CRATE_NAME}.dll\""
+script = "rm \"${INSTALL_PATH}/${CARGO_MAKE_CRATE_NAME}.dll\""
 script_runner = "@shell"
 
 [tasks.install]
 run_task = { name = ["build-release", "copy-release"] }
 
 [tasks.install-examples]
-script = "cp \"${CARGO_MAKE_CURRENT_TASK_INITIAL_MAKEFILE_DIRECTORY}/examples/*\" \"${GW2_PATH}/addons/reffect/packs\""
+script = "cp \"${CARGO_MAKE_CURRENT_TASK_INITIAL_MAKEFILE_DIRECTORY}/examples/*\" \"${INSTALL_PATH}/reffect/packs\""
 script_runner = "@shell"
 
 [tasks.uninstall]

@@ -5,7 +5,7 @@ mod specialization;
 
 pub use self::{mount::*, profession::*, race::*, specialization::*};
 
-use crate::internal::{Error, Internal, Traits};
+use crate::api::{Internal, Error, Interface, Traits};
 use nexus::data_link::mumble::MumblePtr;
 
 #[derive(Debug, Clone)]
@@ -32,8 +32,8 @@ impl PlayerContext {
         self.mount = (mumble.read_mount_index() as u8).try_into();
     }
 
-    pub fn update_slow(&mut self, mumble: MumblePtr, internal: &Internal) {
-        // only attempt parse after first tick
+    pub fn update_slow(&mut self, mumble: MumblePtr) {
+        // only attempt update after first tick
         if mumble.read_ui_tick() > 0 {
             match mumble.parse_identity() {
                 Ok(identity) => {
@@ -41,7 +41,9 @@ impl PlayerContext {
                     self.prof = Profession::try_from(identity.profession as u8);
                     self.spec = Specialization::try_from(self.prof.ok(), identity.spec)
                         .ok_or(identity.spec);
-                    self.traits = internal.get_traits();
+
+                    let player_info = Internal::get_player_info();
+                    self.traits = player_info.map(|info| info.traits);
                 }
                 Err(err) => log::error!("Failed to parse mumble identity: {err}"),
             }

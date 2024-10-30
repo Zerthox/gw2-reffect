@@ -1,0 +1,11 @@
+[package]
+name = "reffect_api"
+version = "0.1.0"
+authors = ["Zerthox"]
+edition = "2021"
+repository = "https://github.com/zerthox/gw2-reffect"
+rust-version = "1.76.0"
+
+[dependencies]
+thiserror = "1.0.65"
+windows = { workspace = true }

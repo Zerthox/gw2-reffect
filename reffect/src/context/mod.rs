@@ -9,7 +9,7 @@ mod ui;
 pub use self::{edit_state::*, links::*, map::*, player::*, settings::*, ui::*};
 
 use crate::{
-    internal::{Error, Internal, Resources},
+    api::{Internal, Error, Interface, Resources},
     interval::Interval,
     render_util::Font,
     settings::icon::IconSettings,
@@ -63,7 +63,7 @@ pub struct Context {
 
 impl Context {
     /// Updates the context.
-    pub fn update(&mut self, internal: &Internal) {
+    pub fn update(&mut self) {
         self.updates = BitFlags::empty();
 
         self.now = unsafe { timeGetTime() };
@@ -71,7 +71,7 @@ impl Context {
         self.ui.update(&self.links);
 
         if self.own_interval.triggered(self.now) {
-            self.update_own_character(internal);
+            self.update_state();
         }
 
         if let Some(mumble) = self.links.mumble() {
@@ -80,7 +80,7 @@ impl Context {
             if self.player_interval.triggered(self.now) {
                 self.updates.insert(ContextUpdate::Player);
 
-                self.player.update_slow(mumble, internal);
+                self.player.update_slow(mumble);
                 let map_changed = self.map.update(mumble);
                 if map_changed {
                     self.updates.insert(ContextUpdate::Map);
@@ -90,11 +90,15 @@ impl Context {
         }
     }
 
-    fn update_own_character(&mut self, internal: &Internal) {
+    fn update_state(&mut self) {
         self.updates.insert(ContextUpdate::OwnCharacter);
-        let (buffs, resources) = internal.update_self();
-        self.own_buffs = buffs.map(|buffs| buffs.iter().cloned().collect());
-        self.resources = resources;
+        let state = Internal::update_state();
+        self.own_buffs = state
+            .own_buffs
+            .as_ref()
+            .map_err(|err| err.clone())
+            .map(|buffs| buffs.iter().cloned().collect());
+        self.resources = state.own_resources.clone();
     }
 
     /// Checks whether any updates have happened.

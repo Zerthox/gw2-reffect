@@ -1,7 +1,7 @@
 use crate::{
     action::Action,
+    api::Traits,
     context::{Context, ContextUpdate, EditState},
-    internal::Traits,
     render::RenderOptions,
     render_util::{helper, input_trait_id},
     trigger::memo::MemoizedTrigger,
@@ -30,6 +30,7 @@ impl MemoizedTrigger for TraitTrigger {
     fn is_active_current(&mut self, ctx: &Context) -> bool {
         ctx.player
             .traits
+            .as_ref()
             .map(|traits| self.traits.iter().all(|req| req.is_met(&traits)))
             .unwrap_or(false)
     }

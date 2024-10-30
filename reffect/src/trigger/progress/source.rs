@@ -1,8 +1,8 @@
 use super::ProgressActive;
 use crate::{
     action::Action,
+    api::Resource,
     context::{Context, EditState},
-    internal::Resource,
     render::RenderOptions,
     render_util::{enum_combo, helper, impl_static_variants, input_skill_id},
 };

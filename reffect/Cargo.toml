@@ -1,0 +1,37 @@
+[package]
+name = "reffect"
+version = "0.4.0"
+authors = ["Zerthox"]
+edition = "2021"
+description = "Customizable effect & resource displays"
+repository = "https://github.com/zerthox/gw2-reffect"
+rust-version = "1.76.0"
+
+[dependencies]
+base64 = "0.22.1"
+dlopen2 = "0.7.0"
+enumflags2 = "0.7.9"
+log = { version = "0.4.18", features = ["release_max_level_debug"] }
+nexus = { git = "https://github.com/zerthox/nexus-rs", features = ["log", "mumble_json"] }
+num_enum = "0.7.1"
+open = "5.1.2"
+partial = { git = "https://github.com/zerthox/partial-rs" }
+reffect_internal = { git = "https://github.com/zerthox/gw2-reffect" }
+rfd = { version = "0.15.0", default-features = false }
+semver = { version = "1.0.17", features = ["serde"] }
+serde = { version = "1.0.163", features = ["derive"] }
+serde_json = "1.0.115"
+strum = { version = "0.26.1", features = ["derive"] }
+thiserror = "1.0.62"
+url = "2.5.0"
+windows = { workspace = true, features = ["Win32_Media"] }
+
+[build-dependencies]
+winresource = "0.1.17"
+
+[lib]
+crate-type = ["cdylib"]
+
+[package.metadata.winresource]
+ProductName = "Reffect"
+OriginalFilename = "reffect.dll"

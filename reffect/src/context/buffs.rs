@@ -1,4 +1,4 @@
-use crate::internal::Buff;
+use crate::api::Buff;
 use std::collections::BTreeMap;
 
 #[derive(Debug, Clone)]

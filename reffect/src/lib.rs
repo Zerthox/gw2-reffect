@@ -1,12 +1,12 @@
 mod action;
 mod addon;
+mod api;
 mod assets;
 mod chat_code;
 mod context;
 mod elements;
 mod fmt;
 mod id;
-mod internal;
 mod interval;
 mod lockbox;
 mod render;

@@ -1,7 +1,7 @@
 mod event;
 mod ui;
 
-use crate::{context::Context, elements::Pack, internal::Internal};
+use crate::{context::Context, elements::Pack};
 use nexus::paths::get_addon_dir;
 use std::{
     path::PathBuf,
@@ -12,7 +12,6 @@ static ADDON: OnceLock<Mutex<Addon>> = OnceLock::new();
 
 #[derive(Debug)]
 pub struct Addon {
-    internal: Internal,
     debug: bool,
     create_error: bool,
     packs: Vec<Pack>,
@@ -22,7 +21,6 @@ pub struct Addon {
 impl Addon {
     pub fn new() -> Self {
         Self {
-            internal: Internal::load(),
             debug: false,
             create_error: false,
             packs: Vec::new(),

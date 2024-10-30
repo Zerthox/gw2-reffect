@@ -1,5 +1,11 @@
 use super::Addon;
-use crate::{elements::Pack, settings::Settings, texture_manager::TextureManager, util::file_name};
+use crate::{
+    api::{Interface, Internal},
+    elements::Pack,
+    settings::Settings,
+    texture_manager::TextureManager,
+    util::file_name,
+};
 use nexus::gui::{register_render, RenderType};
 use rfd::FileDialog;
 use std::{fs, thread};
@@ -25,6 +31,8 @@ impl Addon {
         )
         .revert_on_unload();
 
+        Internal::init();
+
         Self::create_dirs();
 
         let mut plugin = Self::lock();
@@ -38,12 +46,11 @@ impl Addon {
         log::info!("Reffect v{VERSION} unload");
 
         {
-            let mut plugin = Self::lock();
+            let plugin = Self::lock();
             Settings::new(&plugin.context).save();
             if plugin.context.save_on_unload {
                 plugin.save_packs();
             }
-            plugin.internal.unload();
         }
 
         TextureManager::unload();

@@ -1,5 +1,5 @@
 use super::Addon;
-use crate::{internal::Resources, render::colors::Colored};
+use crate::{api::Resources, render::colors::Colored};
 use nexus::imgui::{StyleColor, Ui, Window};
 use std::fmt;
 
@@ -19,7 +19,7 @@ impl Addon {
 
                 ui.text("Own traits:");
                 ui.same_line();
-                match ctx.player.traits {
+                match &ctx.player.traits {
                     Ok(traits) => {
                         ui.text_colored(GREEN, "available");
                         if ui.is_item_hovered() {

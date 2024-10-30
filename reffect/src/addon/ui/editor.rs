@@ -1,7 +1,7 @@
 use super::Addon;
 use crate::{
+    api::Error,
     elements::ELEMENT_ID,
-    internal::Error,
     render::colors,
     render_util::{next_window_size_constraints, small_padding},
 };
