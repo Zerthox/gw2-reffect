@@ -15,7 +15,7 @@ impl Interface for Dummy {
 
     #[inline]
     fn update_state() -> MutexGuard<'static, State> {
-        static STATE: Mutex<State> = Mutex::new(State::new());
+        static STATE: Mutex<State> = Mutex::new(State::disabled());
 
         STATE.lock().unwrap()
     }
