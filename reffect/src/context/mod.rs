@@ -9,7 +9,7 @@ mod ui;
 pub use self::{edit_state::*, links::*, map::*, player::*, settings::*, ui::*};
 
 use crate::{
-    api::{Internal, Error, Interface, Resources},
+    api::{Error, Interface, Internal, Resources},
     interval::Interval,
     render_util::Font,
     settings::icon::IconSettings,
