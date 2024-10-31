@@ -6,13 +6,15 @@ on:
     branches:
       - main
     paths:
-      - src/**
-      - build.rs
+      - reffect/**
+      - reffect_api/**
+      - reffect_internal/**
       - Cargo.toml
   pull_request:
     paths:
-      - src/**
-      - build.rs
+      - reffect/**
+      - reffect_api/**
+      - reffect_internal/**
       - Cargo.toml
 
 jobs:
