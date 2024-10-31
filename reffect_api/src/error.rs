@@ -25,6 +25,9 @@ pub enum Error {
     #[error("Failed to get character buffs")]
     BuffsNotFound,
 
+    #[error("Failed to get character skills")]
+    SkillsNotFound,
+
     #[error("Failed to get character health")]
     HealthNotFound,
 
@@ -36,6 +39,12 @@ pub enum Error {
 
     #[error("Failed to get character specializations")]
     SpecNotFound,
+
+    #[error("Failed to get character target")]
+    TargetNotFound,
+
+    #[error("Unavailable for target state")]
+    TargetState,
 
     #[error("Windows error: {0}")]
     Windows(windows::core::Error),

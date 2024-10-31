@@ -97,13 +97,15 @@ impl Addon {
         render_errors(
             ui,
             [
-                ("Buffs", self.context.own_buffs.as_ref().err()),
                 ("Resources", self.context.resources.as_ref().err()),
+                ("Own Buffs", self.context.own_buffs.as_ref().err()),
+                ("Target Buffs", self.context.target_buffs.as_ref().err()),
                 ("Player", self.context.player.info.as_ref().err()),
             ],
         );
     }
 }
+
 fn render_errors<'a, 'b>(ui: &Ui, errors: impl IntoIterator<Item = (&'a str, Option<&'b Error>)>) {
     let [_, max_y] = ui.window_content_region_max();
     for (i, (name, err)) in errors

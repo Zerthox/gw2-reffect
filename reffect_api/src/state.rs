@@ -8,14 +8,18 @@ pub struct State {
 
     /// Own resources.
     pub own_resources: Result<Resources, Error>,
+
+    /// Target buffs.
+    pub target_buffs: Result<Vec<Buff>, Error>,
 }
 
 impl State {
     #[inline]
-    pub const fn new() -> Self {
+    pub const fn disabled() -> Self {
         Self {
             own_buffs: Err(Error::Disabled),
             own_resources: Err(Error::Disabled),
+            target_buffs: Err(Error::Disabled),
         }
     }
 
@@ -23,7 +27,8 @@ impl State {
     pub fn with_err(err: Error) -> Self {
         Self {
             own_buffs: Err(err.clone()),
-            own_resources: Err(err),
+            own_resources: Err(err.clone()),
+            target_buffs: Err(err),
         }
     }
 

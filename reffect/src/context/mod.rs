@@ -42,11 +42,14 @@ pub struct Context {
     /// Information about player character.
     pub player: PlayerContext,
 
+    /// Current own resources.
+    pub resources: Result<Resources, Error>,
+
     /// Current own buffs by id.
     pub own_buffs: Result<Buffs, Error>,
 
-    /// Current own resources.
-    pub resources: Result<Resources, Error>,
+    /// Current target buffs by id.
+    pub target_buffs: Result<Buffs, Error>,
 
     pub links: Links,
 
@@ -93,12 +96,17 @@ impl Context {
     fn update_state(&mut self) {
         self.updates.insert(ContextUpdate::OwnCharacter);
         let state = Internal::update_state();
+        self.resources = state.own_resources.clone();
         self.own_buffs = state
             .own_buffs
             .as_ref()
             .map_err(|err| err.clone())
             .map(|buffs| buffs.iter().cloned().collect());
-        self.resources = state.own_resources.clone();
+        self.target_buffs = state
+            .target_buffs
+            .as_ref()
+            .map_err(|err| err.clone())
+            .map(|buffs| buffs.iter().cloned().collect());
     }
 
     /// Checks whether any updates have happened.
@@ -164,8 +172,9 @@ impl Default for Context {
             ui: UiContext::empty(),
             player: PlayerContext::empty(),
             map: MapContext::empty(),
-            own_buffs: Err(Error::default()),
             resources: Err(Error::default()),
+            own_buffs: Err(Error::default()),
+            target_buffs: Err(Error::default()),
             links: Links::load(),
             own_interval: Interval::new(OWN_INTERVAL),
             player_interval: Interval::new(PLAYER_INTERVAL),

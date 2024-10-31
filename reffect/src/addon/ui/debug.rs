@@ -25,7 +25,7 @@ impl Addon {
                         if ui.is_item_hovered() {
                             ui.tooltip(|| {
                                 for weapon in info.weapons.iter() {
-                                    ui.text(weapon.to_string());
+                                    ui.text(weapon);
                                 }
                             });
                         }
@@ -102,6 +102,38 @@ impl Addon {
                 ui.text("Own buffs:");
                 ui.same_line();
                 match &ctx.own_buffs {
+                    Ok(buffs) => {
+                        ui.text_colored(GREEN, "available");
+                        if ui.is_item_hovered() {
+                            ui.tooltip(|| {
+                                for (id, buff) in buffs {
+                                    ui.text(format!("{}x {id} {:?}", buff.stacks, buff.category));
+                                    if let Some(remain) = ctx.time_until(buff.runout_time) {
+                                        let full = buff.runout_time - buff.apply_time;
+                                        let progress = remain as f32 / full as f32;
+                                        ui.same_line();
+                                        ui.text(format!(
+                                            "{:.1}/{:.1}s {:.1}%",
+                                            remain as f32 / 1000.0,
+                                            full as f32 / 1000.0,
+                                            progress * 100.0,
+                                        ));
+                                    }
+                                }
+                            });
+                        }
+                    }
+                    Err(err) => {
+                        ui.text_colored(RED, "unavailable");
+                        if ui.is_item_hovered() {
+                            ui.tooltip_text(err.to_string());
+                        }
+                    }
+                }
+
+                ui.text("Target buffs:");
+                ui.same_line();
+                match &ctx.target_buffs {
                     Ok(buffs) => {
                         ui.text_colored(GREEN, "available");
                         if ui.is_item_hovered() {
