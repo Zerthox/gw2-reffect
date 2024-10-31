@@ -19,14 +19,14 @@ pub trait Trigger {
     fn is_active(&mut self, ctx: &Context) -> bool;
 }
 
-pub fn check_bitflags<T>(flags: BitFlags<T>, value: T) -> bool
+pub fn check_bitflags<T>(flags: BitFlags<T>, value: impl Into<BitFlags<T>>) -> bool
 where
     T: Copy + BitFlag,
 {
-    flags.is_empty() || flags.contains(value)
+    flags.is_empty() || flags.intersects(value)
 }
 
-pub fn check_bitflags_optional<T>(flags: BitFlags<T>, value: Option<T>) -> bool
+pub fn check_bitflags_optional<T>(flags: BitFlags<T>, value: Option<impl Into<BitFlags<T>>>) -> bool
 where
     T: Copy + BitFlag,
 {

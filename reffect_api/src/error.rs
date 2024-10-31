@@ -31,7 +31,10 @@ pub enum Error {
     #[error("Failed to get character endurance")]
     EnduranceNotFound,
 
-    #[error("Failed to get characters specs")]
+    #[error("Failed to get character gear")]
+    GearNotFound,
+
+    #[error("Failed to get character specializations")]
     SpecNotFound,
 
     #[error("Windows error: {0}")]

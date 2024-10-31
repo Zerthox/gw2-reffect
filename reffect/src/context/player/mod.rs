@@ -2,18 +2,20 @@ mod mount;
 mod profession;
 mod race;
 mod specialization;
+mod weapon;
 
 pub use self::{mount::*, profession::*, race::*, specialization::*};
 
-use crate::api::{Internal, Error, Interface, Traits};
+use crate::api::{Error, Interface, Internal};
 use nexus::data_link::mumble::MumblePtr;
+use reffect_internal::{PlayerInfo, Traits, Weapons};
 
 #[derive(Debug, Clone)]
 pub struct PlayerContext {
     pub race: Result<Race, u8>,
     pub prof: Result<Profession, u8>,
     pub spec: Result<Specialization, u32>,
-    pub traits: Result<Traits, Error>,
+    pub info: Result<PlayerInfo, Error>,
     pub mount: Result<Mount, u8>,
 }
 
@@ -23,9 +25,17 @@ impl PlayerContext {
             prof: Err(0),
             spec: Err(0),
             race: Err(0),
-            traits: Err(Error::default()),
+            info: Err(Error::default()),
             mount: Err(0),
         }
+    }
+
+    pub fn weapons(&self) -> Option<Weapons> {
+        self.info.as_ref().ok().map(|info| info.weapons)
+    }
+
+    pub fn traits(&self) -> Option<&Traits> {
+        self.info.as_ref().ok().map(|info| &info.traits)
     }
 
     pub fn update_fast(&mut self, mumble: MumblePtr) {
@@ -41,9 +51,7 @@ impl PlayerContext {
                     self.prof = Profession::try_from(identity.profession as u8);
                     self.spec = Specialization::try_from(self.prof.ok(), identity.spec)
                         .ok_or(identity.spec);
-
-                    let player_info = Internal::get_player_info();
-                    self.traits = player_info.map(|info| info.traits);
+                    self.info = Internal::get_player_info();
                 }
                 Err(err) => log::error!("Failed to parse mumble identity: {err}"),
             }

@@ -29,8 +29,7 @@ impl MemoizedTrigger for TraitTrigger {
 
     fn is_active_current(&mut self, ctx: &Context) -> bool {
         ctx.player
-            .traits
-            .as_ref()
+            .traits()
             .map(|traits| self.traits.iter().all(|req| req.is_met(&traits)))
             .unwrap_or(false)
     }

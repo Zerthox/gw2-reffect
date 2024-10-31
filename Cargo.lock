@@ -703,6 +703,9 @@ dependencies = [
 name = "reffect_api"
 version = "0.1.0"
 dependencies = [
+ "enumflags2",
+ "serde",
+ "strum",
  "thiserror",
  "windows",
 ]

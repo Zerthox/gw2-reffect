@@ -17,13 +17,35 @@ impl Addon {
 
                 ui.text(format!("Show elements: {}", ctx.ui.should_show()));
 
-                ui.text("Own traits:");
+                ui.text("Own weapons:");
                 ui.same_line();
-                match &ctx.player.traits {
-                    Ok(traits) => {
+                match &ctx.player.info {
+                    Ok(info) => {
                         ui.text_colored(GREEN, "available");
                         if ui.is_item_hovered() {
                             ui.tooltip(|| {
+                                for weapon in info.weapons.iter() {
+                                    ui.text(weapon.to_string());
+                                }
+                            });
+                        }
+                    }
+                    Err(err) => {
+                        ui.text_colored(RED, "unavailable");
+                        if ui.is_item_hovered() {
+                            ui.tooltip_text(err.to_string());
+                        }
+                    }
+                }
+
+                ui.text("Own traits:");
+                ui.same_line();
+                match &ctx.player.info {
+                    Ok(info) => {
+                        ui.text_colored(GREEN, "available");
+                        if ui.is_item_hovered() {
+                            ui.tooltip(|| {
+                                let traits = &info.traits;
                                 for [a, b, c] in [
                                     [traits[0], traits[1], traits[2]],
                                     [traits[3], traits[4], traits[5]],

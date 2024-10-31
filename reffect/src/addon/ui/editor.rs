@@ -99,7 +99,7 @@ impl Addon {
             [
                 ("Buffs", self.context.own_buffs.as_ref().err()),
                 ("Resources", self.context.resources.as_ref().err()),
-                ("Traits", self.context.player.traits.as_ref().err()),
+                ("Player", self.context.player.info.as_ref().err()),
             ],
         );
     }

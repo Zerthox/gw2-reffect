@@ -12,6 +12,7 @@ use crate::{
 };
 use enumflags2::BitFlags;
 use nexus::imgui::{ComboBoxFlags, Ui};
+use reffect_internal::Weapon;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
@@ -25,6 +26,9 @@ pub struct PlayerTrigger {
 
     #[serde(with = "serde_bitflags")]
     pub specs: BitFlags<Specialization>,
+
+    #[serde(with = "serde_bitflags")]
+    pub weapons: BitFlags<Weapon>,
 
     #[serde(flatten)]
     pub traits: TraitTrigger,
@@ -48,6 +52,10 @@ impl PlayerTrigger {
         check_bitflags_optional(self.specs, ctx.player.spec.ok())
     }
 
+    pub fn weapons_active(&self, ctx: &Context) -> bool {
+        check_bitflags_optional(self.weapons, ctx.player.weapons())
+    }
+
     pub fn mounts_active(&self, ctx: &Context) -> bool {
         check_bitflags_optional(self.mounts, ctx.player.mount.ok())
     }
@@ -58,6 +66,7 @@ impl Trigger for PlayerTrigger {
         self.traits.is_active(ctx)
             && self.combat.is_active(ctx)
             && self.specs_active(ctx)
+            && self.weapons_active(ctx)
             && self.mounts_active(ctx)
     }
 }
@@ -70,6 +79,13 @@ impl RenderOptions for PlayerTrigger {
             ui,
             "Specialization",
             &mut self.specs,
+            ComboBoxFlags::HEIGHT_LARGE,
+        );
+
+        enum_combo_bitflags(
+            ui,
+            "Weapons",
+            &mut self.weapons,
             ComboBoxFlags::HEIGHT_LARGE,
         );
 
