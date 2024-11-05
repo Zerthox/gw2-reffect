@@ -6,7 +6,10 @@ use crate::{
     texture_manager::TextureManager,
     util::file_name,
 };
-use nexus::gui::{register_render, RenderType};
+use nexus::{
+    font::{font_receive, get_font},
+    gui::{register_render, RenderType},
+};
 use rfd::FileDialog;
 use std::{fs, thread};
 
@@ -30,6 +33,9 @@ impl Addon {
             nexus::gui::render!(|ui| Addon::lock().render_options(ui)),
         )
         .revert_on_unload();
+
+        // subscribe to default font to get notified when atlas rebuilds
+        get_font("FONT_DEFAULT", font_receive!(|_, _| Addon::reload_fonts())).revert_on_unload();
 
         Internal::init();
 
@@ -147,8 +153,8 @@ impl Addon {
         });
     }
 
-    #[allow(unused)] // TODO: call when font atlas rebuilt
     pub fn reload_fonts() {
+        log::debug!("Reloading fonts");
         let mut addon = Self::lock();
         for pack in &mut addon.packs {
             pack.reload_fonts();
