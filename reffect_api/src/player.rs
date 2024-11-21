@@ -5,11 +5,36 @@ use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
 /// Player information.
 #[derive(Debug, Clone)]
 pub struct PlayerInfo {
+    pub group: Group,
+
     /// Current equipped weapons.
     pub weapons: Weapons,
 
     /// Current selected traits.
     pub traits: Traits,
+}
+
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    AsRefStr,
+    IntoStaticStr,
+    Display,
+    EnumIter,
+    VariantArray,
+    Serialize,
+    Deserialize,
+)]
+pub enum Group {
+    Solo,
+    Party,
+    Squad,
 }
 
 /// Player weapon sets.

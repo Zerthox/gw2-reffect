@@ -16,6 +16,9 @@ pub enum Error {
     #[error("Context not found")]
     ContextNotFound,
 
+    #[error("Failed to get user")]
+    UserNotFound,
+
     #[error("No character")]
     NoCharacter,
 

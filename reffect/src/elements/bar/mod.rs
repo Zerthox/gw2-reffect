@@ -97,6 +97,7 @@ impl Render for Bar {
                         .map(|value| self.process_value(value))
                         .filter(|value| *value > 0.0 && *value < 1.0)
                     {
+                        // TODO: multiple ticks for horizontal/vertical?
                         let offset = self.direction.progress_value_offset(self.size, progress);
                         let start = start.add(offset);
                         let end = start.add(end_offset);

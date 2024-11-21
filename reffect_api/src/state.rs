@@ -11,6 +11,9 @@ pub struct State {
 
     /// Target buffs.
     pub target_buffs: Result<Vec<Buff>, Error>,
+
+    /// Group buffs.
+    pub group_buffs: Result<[Vec<Buff>; 4], Error>,
 }
 
 impl State {
@@ -20,6 +23,7 @@ impl State {
             own_buffs: Err(Error::Disabled),
             own_resources: Err(Error::Disabled),
             target_buffs: Err(Error::Disabled),
+            group_buffs: Err(Error::Disabled),
         }
     }
 
@@ -28,7 +32,8 @@ impl State {
         Self {
             own_buffs: Err(err.clone()),
             own_resources: Err(err.clone()),
-            target_buffs: Err(err),
+            target_buffs: Err(err.clone()),
+            group_buffs: Err(err),
         }
     }
 
