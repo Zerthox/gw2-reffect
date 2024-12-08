@@ -17,13 +17,13 @@ impl Interface for Dummy {
     }
 
     #[inline]
-    fn get_player_info() -> Result<PlayerInfo, Error> {
+    fn get_player_info() -> Result<PlayerInfo> {
         Err(Error::Disabled)
     }
 
     #[inline]
-    fn get_buff_info() -> &'static Result<BuffInfoMap, Error> {
-        static BUFF_INFOS: OnceLock<Result<BuffInfoMap, Error>> = OnceLock::new();
+    fn get_buff_info() -> &'static Result<BuffInfoMap> {
+        static BUFF_INFOS: OnceLock<Result<BuffInfoMap>> = OnceLock::new();
 
         BUFF_INFOS.get_or_insert(|| Err(Error::Disabled))
     }
