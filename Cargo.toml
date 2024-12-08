@@ -8,7 +8,7 @@ default-members = ["reffect"]
 resolver = "2"
 
 [workspace.dependencies]
-windows = "0.57.0"
+windows = "0.58.0"
 
 [patch."https://github.com/zerthox/gw2-reffect"]
 reffect_internal = { path = "reffect_internal" }

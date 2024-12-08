@@ -104,6 +104,7 @@ pub const RAIDS: MapGroup = MapGroup::new(
         Map::new("Hall of Chains", raid::HALL_OF_CHAINS),
         Map::new("Mythwright Gambit", raid::MYTHWRIGHT_GAMBIT),
         Map::new("Key of Ahdashim", raid::KEY_OF_AHDASHIM),
+        Map::new("Mount Balrior", raid::MOUNT_BALRIOR),
     ],
 );
 
