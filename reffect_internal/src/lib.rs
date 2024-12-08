@@ -24,7 +24,7 @@ impl Interface for Dummy {
 
     #[inline]
     fn get_buff_infos() -> &'static Result<BuffInfoMap> {
-        static BUFF_INFOS: Result<BuffInfoMap> = Err(Err::Disabled);
+        static BUFF_INFOS: Result<BuffInfoMap> = Err(Error::Disabled);
         &BUFF_INFOS
     }
 }
