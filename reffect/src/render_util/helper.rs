@@ -11,6 +11,14 @@ pub fn helper(ui: &Ui, contents: impl FnOnce()) {
 
 pub fn helper_warn(ui: &Ui, tooltip: impl FnOnce()) {
     ui.same_line();
+    ui.text_colored(colors::YELLOW, "(!)");
+    if ui.is_item_hovered() {
+        ui.tooltip(tooltip);
+    }
+}
+
+pub fn helper_error(ui: &Ui, tooltip: impl FnOnce()) {
+    ui.same_line();
     ui.text_colored(colors::RED, "(!)");
     if ui.is_item_hovered() {
         ui.tooltip(tooltip);

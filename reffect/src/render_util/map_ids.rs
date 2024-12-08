@@ -45,6 +45,8 @@ pub fn map_select(ui: &Ui) -> Option<&'static [Map]> {
     selected
 }
 
+// TODO: use map ids from api instead?
+
 pub const GENERAL: MapGroup = MapGroup::new(
     "General",
     &[

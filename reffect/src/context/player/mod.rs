@@ -6,9 +6,8 @@ mod weapon;
 
 pub use self::{mount::*, profession::*, race::*, specialization::*};
 
-use crate::api::{Error, Interface, Internal};
+use crate::internal::{Error, Interface, Internal, PlayerInfo, Traits, Weapons};
 use nexus::data_link::mumble::MumblePtr;
-use reffect_internal::{PlayerInfo, Traits, Weapons};
 
 #[derive(Debug, Clone)]
 pub struct PlayerContext {

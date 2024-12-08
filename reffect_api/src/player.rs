@@ -5,6 +5,7 @@ use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
 /// Player information.
 #[derive(Debug, Clone)]
 pub struct PlayerInfo {
+    /// Current group state.
     pub group: Group,
 
     /// Current equipped weapons.

@@ -1,4 +1,5 @@
 #![allow(unused)] // TODO: remove after done
+#![allow(static_mut_refs)]
 
 use super::Element;
 use crate::action::ElementAction;

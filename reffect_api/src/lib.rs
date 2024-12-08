@@ -4,8 +4,6 @@ mod player;
 mod resource;
 mod state;
 
-use std::sync::MutexGuard;
-
 pub use self::{buff::*, error::*, player::*, resource::*, state::*};
 
 /// Interface for API.
@@ -14,8 +12,11 @@ pub trait Interface {
     fn init();
 
     /// Updates and returns the current state.
-    fn update_state() -> MutexGuard<'static, State>;
+    fn update_state(state: &mut State);
 
     /// Retrieves player information.
-    fn get_player_info() -> Result<PlayerInfo, Error>;
+    fn get_player_info() -> Result<PlayerInfo>;
+
+    /// Retrives buff information.
+    fn get_buff_infos() -> &'static Result<BuffInfoMap>;
 }

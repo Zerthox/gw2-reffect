@@ -6,13 +6,13 @@ pub use self::{combat::*, traits::*};
 use super::{check_bitflags_optional, Trigger};
 use crate::{
     context::{Context, EditState, Mount, Profession, Specialization},
+    internal::Weapon,
     render::RenderOptions,
     render_util::enum_combo_bitflags,
     serde_bitflags,
 };
 use enumflags2::BitFlags;
 use nexus::imgui::{ComboBoxFlags, Ui};
-use reffect_internal::Weapon;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]

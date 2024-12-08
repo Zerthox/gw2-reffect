@@ -1,7 +1,7 @@
 use crate::{
     action::Action,
-    api::Traits,
     context::{Context, ContextUpdate, EditState},
+    internal::Traits,
     render::RenderOptions,
     render_util::{helper, input_trait_id},
     trigger::memo::MemoizedTrigger,

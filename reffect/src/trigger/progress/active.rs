@@ -1,6 +1,6 @@
 use crate::{
-    api::{Buff, Resource},
     fmt::Pretty,
+    internal::{Buff, Resource},
 };
 
 #[derive(Debug, Clone)]

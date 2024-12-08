@@ -1,7 +1,7 @@
 use super::Addon;
 use crate::{
-    api::{Interface, Internal},
     elements::Pack,
+    internal::{Interface, Internal},
     settings::Settings,
     texture_manager::TextureManager,
     util::file_name,

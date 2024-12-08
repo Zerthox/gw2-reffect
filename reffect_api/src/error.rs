@@ -1,4 +1,7 @@
+use std::result;
 use thiserror::Error;
+
+pub type Result<T> = result::Result<T, Error>;
 
 /// Error information.
 #[derive(Debug, Clone, Default, Error)]
@@ -15,6 +18,9 @@ pub enum Error {
 
     #[error("Context not found")]
     ContextNotFound,
+
+    #[error("Content not found")]
+    ContentNotFound,
 
     #[error("Failed to get user")]
     UserNotFound,

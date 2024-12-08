@@ -79,7 +79,7 @@ impl TextDecoration {
         enum_combo(ui, "Decoration", self, ComboBoxFlags::empty());
         if *self != Self::None {
             helper_warn(ui, || {
-                ui.text("Warning: many text decorations may negatively impact performance")
+                ui.text("Displaying a lot of text decorations may negatively impact performance")
             });
         }
     }

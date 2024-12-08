@@ -1,4 +1,3 @@
-mod buffs;
 mod edit_state;
 mod links;
 mod map;
@@ -9,12 +8,11 @@ mod ui;
 pub use self::{edit_state::*, links::*, map::*, player::*, settings::*, ui::*};
 
 use crate::{
-    api::{Error, Interface, Internal, Resources},
+    internal::{BuffMap, Interface, Internal, Resources, State},
     interval::Interval,
     render_util::Font,
     settings::icon::IconSettings,
 };
-use buffs::Buffs;
 use enumflags2::{bitflags, BitFlags};
 use windows::Win32::Media::timeGetTime;
 
@@ -42,14 +40,8 @@ pub struct Context {
     /// Information about player character.
     pub player: PlayerContext,
 
-    /// Current own resources.
-    pub resources: Result<Resources, Error>,
-
-    /// Current own buffs by id.
-    pub own_buffs: Result<Buffs, Error>,
-
-    /// Current target buffs by id.
-    pub target_buffs: Result<Buffs, Error>,
+    /// Internal state information.
+    pub state: State,
 
     pub links: Links,
 
@@ -95,18 +87,7 @@ impl Context {
 
     fn update_state(&mut self) {
         self.updates.insert(ContextUpdate::OwnCharacter);
-        let state = Internal::update_state();
-        self.resources = state.own_resources.clone();
-        self.own_buffs = state
-            .own_buffs
-            .as_ref()
-            .map_err(|err| err.clone())
-            .map(|buffs| buffs.iter().cloned().collect());
-        self.target_buffs = state
-            .target_buffs
-            .as_ref()
-            .map_err(|err| err.clone())
-            .map(|buffs| buffs.iter().cloned().collect());
+        Internal::update_state(&mut self.state);
     }
 
     /// Checks whether any updates have happened.
@@ -135,13 +116,14 @@ impl Context {
         self.player_interval.frequency = PLAYER_INTERVAL;
     }
 
-    pub fn own_buffs(&self) -> Option<&Buffs> {
-        self.own_buffs.as_ref().ok()
+    /// Returns the [`BuffMap`] for the own character, if present.
+    pub fn own_buffs(&self) -> Option<&BuffMap> {
+        self.state.own_buffs.as_ref().ok()
     }
 
     /// Returns the [`Resources`] for the own character, if present.
-    pub fn resources(&self) -> Option<&Resources> {
-        self.resources.as_ref().ok()
+    pub fn own_resources(&self) -> Option<&Resources> {
+        self.state.own_resources.as_ref().ok()
     }
 
     /// Returns the duration passed since a given timestamp.
@@ -172,9 +154,7 @@ impl Default for Context {
             ui: UiContext::empty(),
             player: PlayerContext::empty(),
             map: MapContext::empty(),
-            resources: Err(Error::default()),
-            own_buffs: Err(Error::default()),
-            target_buffs: Err(Error::default()),
+            state: State::disabled(),
             links: Links::load(),
             own_interval: Interval::new(OWN_INTERVAL),
             player_interval: Interval::new(PLAYER_INTERVAL),

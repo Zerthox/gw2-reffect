@@ -1,27 +1,27 @@
-use super::{Buff, Error, Resources};
+use super::{BuffMap, Error, Resources, Result};
 
 /// Current state.
 #[derive(Debug, Clone)]
 pub struct State {
-    /// Own buffs.
-    pub own_buffs: Result<Vec<Buff>, Error>,
-
     /// Own resources.
-    pub own_resources: Result<Resources, Error>,
+    pub own_resources: Result<Resources>,
+
+    /// Own buffs.
+    pub own_buffs: Result<BuffMap>,
 
     /// Target buffs.
-    pub target_buffs: Result<Vec<Buff>, Error>,
+    pub target_buffs: Result<BuffMap>,
 
     /// Group buffs.
-    pub group_buffs: Result<[Vec<Buff>; 4], Error>,
+    pub group_buffs: Result<[BuffMap; 4]>,
 }
 
 impl State {
     #[inline]
     pub const fn disabled() -> Self {
         Self {
-            own_buffs: Err(Error::Disabled),
             own_resources: Err(Error::Disabled),
+            own_buffs: Err(Error::Disabled),
             target_buffs: Err(Error::Disabled),
             group_buffs: Err(Error::Disabled),
         }
@@ -30,8 +30,8 @@ impl State {
     #[inline]
     pub fn with_err(err: Error) -> Self {
         Self {
-            own_buffs: Err(err.clone()),
             own_resources: Err(err.clone()),
+            own_buffs: Err(err.clone()),
             target_buffs: Err(err.clone()),
             group_buffs: Err(err),
         }

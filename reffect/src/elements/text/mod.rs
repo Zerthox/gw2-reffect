@@ -9,8 +9,8 @@ use crate::{
     fmt::Pretty,
     render::{Bounds, ComponentWise, Render, RenderDebug, RenderOptions},
     render_util::{
-        debug_optional, draw_text_bg, font_select, helper, helper_warn, input_text_multi_with_menu,
-        Font, FontToken, Rect,
+        debug_optional, draw_text_bg, font_select, helper, helper_error,
+        input_text_multi_with_menu, Font, FontToken, Rect,
     },
     tree::TreeNode,
     trigger::ProgressActive,
@@ -187,9 +187,9 @@ impl RenderOptions for Text {
         }
         if self.font_name.is_some() && self.loaded_font.is_none() {
             match self.loaded_font {
-                Some(font) if !font.is_valid() => helper_warn(ui, || ui.text("Font invalidated")),
+                Some(font) if !font.is_valid() => helper_error(ui, || ui.text("Font invalidated")),
                 Some(_) => {}
-                None => helper_warn(ui, || ui.text("Failed to find font")),
+                None => helper_error(ui, || ui.text("Failed to find font")),
             }
         }
 

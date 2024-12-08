@@ -1,19 +1,14 @@
-/// Information about a currently applied buff.
+use std::collections::{BTreeMap, HashMap};
+
+pub type BuffMap = BTreeMap<u32, Buff>;
+
+/// Currently applied buff.
 ///
-/// Time related information is only given if currently visible.
+/// Times are only given if currently visible.
 /// Always visible for Boons & Conditions (border around them).
 /// Visible for other effects starting from 5 seconds left (icon blinking).
 #[derive(Debug, Clone)]
 pub struct Buff {
-    /// Skill id of the buff.
-    pub id: u32,
-
-    /// Category of the buff.
-    pub category: Category,
-
-    /// Whether the buff stacks in duration.
-    pub duration_stacking: bool,
-
     /// Number of stacks or `1` if not intensity-stacking.
     pub stacks: u32,
 
@@ -27,9 +22,33 @@ pub struct Buff {
 
 impl Buff {
     #[inline]
+    pub const fn empty() -> Self {
+        Self {
+            stacks: 0,
+            apply_time: 0,
+            runout_time: 0,
+        }
+    }
+
+    #[inline]
     pub const fn duration(&self) -> u32 {
         self.runout_time - self.apply_time
     }
+}
+
+pub type BuffInfoMap = HashMap<u32, BuffInfo>;
+
+/// Information about a buff.
+#[derive(Debug, Clone)]
+pub struct BuffInfo {
+    /// Id of the buff.
+    pub id: u32,
+
+    /// Category of the buff.
+    pub category: Category,
+
+    /// Stacking behavior of the buff.
+    pub stacking: Stacking,
 }
 
 /// Category of the buff.
@@ -48,4 +67,17 @@ pub enum Category {
 
     /// Buff is hidden but gives a screen border.
     ScreenBorder = 3,
+}
+
+/// Stacking behavior of the buff.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum Stacking {
+    // Other/unknown stacking type.
+    Other,
+
+    /// Buff stacks in intenstity.
+    Intensity,
+
+    /// Buff stacks in duration.
+    Duration,
 }

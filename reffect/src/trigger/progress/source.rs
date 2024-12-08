@@ -1,10 +1,11 @@
 use super::ProgressActive;
 use crate::{
     action::Action,
-    api::Resource,
     context::{Context, EditState},
-    render::RenderOptions,
-    render_util::{enum_combo, helper, impl_static_variants, input_skill_id},
+    internal::Resource,
+    internal::{Interface, Internal},
+    render::{colors::RED, RenderOptions},
+    render_util::{enum_combo, helper, helper_error, impl_static_variants, input_skill_id},
 };
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
@@ -66,7 +67,8 @@ impl ProgressSource {
             Self::Always => Some(ProgressActive::Resource(Resource { current: 1, max: 1 })),
             Self::Buff(id) => ctx.own_buffs().map(|buffs| {
                 buffs
-                    .buff(*id, ctx.now)
+                    .get(id)
+                    .filter(|buff| buff.runout_time > ctx.now)
                     .map(Into::into)
                     .unwrap_or(ProgressActive::Buff {
                         stacks: 0,
@@ -79,7 +81,7 @@ impl ProgressSource {
                 let mut apply = 0;
                 let mut runout = 0;
                 for id in ids {
-                    if let Some(buff) = buffs.buff(*id, ctx.now) {
+                    if let Some(buff) = buffs.get(id).filter(|buff| buff.runout_time > ctx.now) {
                         stacks += buff.stacks;
                         apply = apply.max(buff.apply_time);
                         runout = runout.max(buff.runout_time);
@@ -91,11 +93,11 @@ impl ProgressSource {
                     runout,
                 }
             }),
-            Self::Health => ctx.resources()?.health.clone().try_into().ok(),
-            Self::Barrier => ctx.resources()?.barrier.clone().try_into().ok(),
-            Self::Endurance => ctx.resources()?.endurance.clone().try_into().ok(),
-            Self::PrimaryResource => ctx.resources()?.primary.clone().try_into().ok(),
-            Self::SecondaryResource => ctx.resources()?.secondary.clone().try_into().ok(),
+            Self::Health => ctx.own_resources()?.health.clone().try_into().ok(),
+            Self::Barrier => ctx.own_resources()?.barrier.clone().try_into().ok(),
+            Self::Endurance => ctx.own_resources()?.endurance.clone().try_into().ok(),
+            Self::PrimaryResource => ctx.own_resources()?.primary.clone().try_into().ok(),
+            Self::SecondaryResource => ctx.own_resources()?.secondary.clone().try_into().ok(),
         }
     }
 
@@ -132,7 +134,17 @@ impl ProgressSource {
         }
     }
 
-    fn buff_helper(ui: &Ui) {
+    fn buff_helper(ui: &Ui, id: u32) {
+        if let Some(infos) = Internal::get_buff_infos().as_ref().ok() {
+            if infos.get(&id).is_none() {
+                helper_error(ui, || {
+                    ui.text("Can be found on the wiki");
+                    ui.text("Supports pasting chat links");
+                    ui.text_colored(RED, format!("Buff {id} is invalid or hidden"));
+                });
+                return;
+            }
+        }
         helper(ui, || {
             ui.text("Can be found on the wiki");
             ui.text("Supports pasting chat links");
@@ -158,21 +170,20 @@ impl RenderOptions for ProgressSource {
         match self {
             Self::Buff(id) => {
                 input_skill_id(ui, "Effect Id", id, InputTextFlags::empty());
-                Self::buff_helper(ui);
+                Self::buff_helper(ui, *id);
             }
             Self::AnyBuff(ids) => {
                 let mut action = Action::new();
                 for (i, id) in ids.iter_mut().enumerate() {
                     let _id = ui.push_id(i as i32);
+
                     action.input_with_buttons(ui, i, || {
                         input_skill_id(ui, "##id", id, InputTextFlags::empty())
                     });
 
                     ui.same_line();
                     ui.text(format!("Effect Id {}", i + 1));
-                    if i == 0 {
-                        Self::buff_helper(ui);
-                    }
+                    Self::buff_helper(ui, *id);
                 }
                 if ui.button("Add Effect") {
                     ids.push(0);

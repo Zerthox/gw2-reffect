@@ -1,7 +1,8 @@
 use super::Addon;
 use crate::{
-    api::Error,
     elements::ELEMENT_ID,
+    internal::Error,
+    internal::State,
     render::colors,
     render_util::{next_window_size_constraints, small_padding},
 };
@@ -94,13 +95,21 @@ impl Addon {
                 });
             });
 
+        let State {
+            own_resources,
+            own_buffs,
+            target_buffs,
+            group_buffs,
+        } = &self.context.state;
+        let player = &self.context.player.info;
         render_errors(
             ui,
             [
-                ("Resources", self.context.resources.as_ref().err()),
-                ("Own Buffs", self.context.own_buffs.as_ref().err()),
-                ("Target Buffs", self.context.target_buffs.as_ref().err()),
-                ("Player", self.context.player.info.as_ref().err()),
+                ("Resources", own_resources.as_ref().err()),
+                ("Own Buffs", own_buffs.as_ref().err()),
+                ("Target Buffs", target_buffs.as_ref().err()),
+                ("Group Buffs", group_buffs.as_ref().err()),
+                ("Player", player.as_ref().err()),
             ],
         );
     }

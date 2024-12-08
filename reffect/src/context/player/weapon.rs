@@ -1,5 +1,5 @@
 use crate::{
-    api::Weapon,
+    internal::Weapon,
     render::colors::{Color, Colored},
     util::ShortName,
 };
