@@ -1,5 +1,4 @@
 pub use reffect_api::*;
-use std::sync::OnceLock;
 
 /// Use dummy as internal API.
 pub type Internal = Dummy;
@@ -25,6 +24,7 @@ impl Interface for Dummy {
     #[inline]
     fn get_buff_infos() -> &'static Result<BuffInfoMap> {
         static BUFF_INFOS: Result<BuffInfoMap> = Err(Error::Disabled);
+
         &BUFF_INFOS
     }
 }
