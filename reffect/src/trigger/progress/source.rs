@@ -4,7 +4,7 @@ use crate::{
     context::{Context, EditState},
     internal::Resource,
     internal::{Interface, Internal},
-    render::{colors::RED, RenderOptions},
+    render::RenderOptions,
     render_util::{enum_combo, helper, helper_error, impl_static_variants, input_skill_id},
 };
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
@@ -135,12 +135,10 @@ impl ProgressSource {
     }
 
     fn buff_helper(ui: &Ui, id: u32) {
-        if let Some(infos) = Internal::get_buff_infos().as_ref().ok() {
+        if let Ok(infos) = Internal::get_buff_infos() {
             if infos.get(&id).is_none() {
                 helper_error(ui, || {
-                    ui.text("Can be found on the wiki");
-                    ui.text("Supports pasting chat links");
-                    ui.text_colored(RED, format!("Buff {id} is invalid or hidden"));
+                    ui.text(format!("Buff {id} is invalid or hidden"));
                 });
                 return;
             }
