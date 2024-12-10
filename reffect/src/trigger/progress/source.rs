@@ -2,12 +2,12 @@ use super::ProgressActive;
 use crate::{
     action::Action,
     context::{Context, EditState},
-    internal::Resource,
-    internal::{Interface, Internal},
+    internal::{Interface, Internal, Resource},
     render::RenderOptions,
-    render_util::{enum_combo, helper, helper_error, impl_static_variants, input_skill_id},
+    render_util::{enum_combo, helper, impl_static_variants, input_skill_id, Validation},
 };
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
+use reffect_internal::Category;
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, IntoStaticStr};
 
@@ -134,15 +134,23 @@ impl ProgressSource {
         }
     }
 
-    fn buff_helper(ui: &Ui, id: u32) {
+    fn buff_validate(id: u32) -> Validation<impl AsRef<str>> {
         if let Ok(infos) = Internal::get_buff_infos() {
-            if infos.get(&id).is_none() {
-                helper_error(ui, || {
-                    ui.text(format!("Buff {id} is invalid or hidden"));
-                });
-                return;
+            if let Some(info) = infos.get(&id) {
+                if info.category == Category::ScreenBorder {
+                    Validation::Warn(format!("{} {id} is only valid for yourself", info.category))
+                } else {
+                    Validation::Confirm(format!("{} {id} is valid", info.category))
+                }
+            } else {
+                Validation::Error(format!("Effect {id} is invalid or hidden"))
             }
+        } else {
+            Validation::Ok
         }
+    }
+
+    fn buff_helper(ui: &Ui) {
         helper(ui, || {
             ui.text("Can be found on the wiki");
             ui.text("Supports pasting chat links");
@@ -167,8 +175,10 @@ impl RenderOptions for ProgressSource {
 
         match self {
             Self::Buff(id) => {
-                input_skill_id(ui, "Effect Id", id, InputTextFlags::empty());
-                Self::buff_helper(ui, *id);
+                Self::buff_validate(*id).for_item(ui, || {
+                    input_skill_id(ui, "Effect Id", id, InputTextFlags::empty());
+                });
+                Self::buff_helper(ui);
             }
             Self::AnyBuff(ids) => {
                 let mut action = Action::new();
@@ -176,12 +186,14 @@ impl RenderOptions for ProgressSource {
                     let _id = ui.push_id(i as i32);
 
                     action.input_with_buttons(ui, i, || {
-                        input_skill_id(ui, "##id", id, InputTextFlags::empty())
+                        Self::buff_validate(*id).for_item(ui, || {
+                            input_skill_id(ui, "##id", id, InputTextFlags::empty());
+                        });
                     });
 
                     ui.same_line();
                     ui.text(format!("Effect Id {}", i + 1));
-                    Self::buff_helper(ui, *id);
+                    Self::buff_helper(ui);
                 }
                 if ui.button("Add Effect") {
                     ids.push(0);

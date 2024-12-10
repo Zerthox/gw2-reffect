@@ -95,7 +95,10 @@ impl Addon {
                 }
 
                 ui.spacing();
-                if ui.collapsing_header("Advanced", TreeNodeFlags::SPAN_AVAIL_WIDTH) {
+                if ui.collapsing_header(
+                    "Advanced",
+                    TreeNodeFlags::SPAN_AVAIL_WIDTH | TreeNodeFlags::DEFAULT_OPEN,
+                ) {
                     if input_u32(
                         ui,
                         "Own character interval",

@@ -9,8 +9,8 @@ use crate::{
     fmt::Pretty,
     render::{Bounds, ComponentWise, Render, RenderDebug, RenderOptions},
     render_util::{
-        debug_optional, draw_text_bg, font_select, helper, helper_error,
-        input_text_multi_with_menu, Font, FontToken, Rect,
+        debug_optional, draw_text_bg, font_select, helper, input_text_multi_with_menu, Font,
+        FontToken, Rect, Validation,
     },
     tree::TreeNode,
     trigger::ProgressActive,
@@ -182,16 +182,20 @@ impl RenderOptions for Text {
 
         self.align.render_combo(ui);
 
-        if font_select(ui, "Font", &mut self.loaded_font) {
-            self.font_name = self.loaded_font.map(|font| font.name_owned());
-        }
-        if self.font_name.is_some() && self.loaded_font.is_none() {
+        let validation = if self.font_name.is_some() {
             match self.loaded_font {
-                Some(font) if !font.is_valid() => helper_error(ui, || ui.text("Font invalidated")),
-                Some(_) => {}
-                None => helper_error(ui, || ui.text("Failed to find font")),
+                Some(font) if !font.is_valid() => Validation::Error("Font invalidated"),
+                Some(_) => Validation::Ok,
+                None => Validation::Error("Failed to find fond"),
             }
-        }
+        } else {
+            Validation::Ok
+        };
+        validation.for_item(ui, || {
+            if font_select(ui, "Font", &mut self.loaded_font) {
+                self.font_name = self.loaded_font.map(|font| font.name_owned());
+            }
+        });
 
         self.props.base.render_options(ui, state);
     }

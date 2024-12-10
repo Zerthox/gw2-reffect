@@ -97,6 +97,7 @@ impl Addon {
 
         let State {
             own_resources,
+            own_skillbar,
             own_buffs,
             target_buffs,
             group_buffs,
@@ -106,9 +107,10 @@ impl Addon {
             ui,
             [
                 ("Resources", own_resources.as_ref().err()),
+                ("Skills", own_skillbar.as_ref().err()),
                 ("Own Buffs", own_buffs.as_ref().err()),
-                ("Target Buffs", target_buffs.as_ref().err()),
-                ("Group Buffs", group_buffs.as_ref().err()),
+                // ("Target Buffs", target_buffs.as_ref().err()),
+                // ("Group Buffs", group_buffs.as_ref().err()),
                 ("Player", player.as_ref().err()),
             ],
         );

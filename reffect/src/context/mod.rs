@@ -125,24 +125,6 @@ impl Context {
     pub fn own_resources(&self) -> Option<&Resources> {
         self.state.own_resources.as_ref().ok()
     }
-
-    /// Returns the duration passed since a given timestamp.
-    pub fn time_since(&self, time: u32) -> Option<u32> {
-        (time != u32::MAX).then(|| self.now.saturating_sub(time))
-    }
-
-    /// Returns the remaining duration until a given timestamp.
-    pub fn time_until(&self, time: u32) -> Option<u32> {
-        (time != u32::MAX).then(|| time.saturating_sub(self.now))
-    }
-
-    /// Returns the remaining progress between two timestamps.
-    pub fn progress_remaining(&self, start: u32, end: u32) -> Option<f32> {
-        self.time_until(end).map(|remain| {
-            let full = end - start;
-            remain as f32 / full as f32
-        })
-    }
 }
 
 impl Default for Context {

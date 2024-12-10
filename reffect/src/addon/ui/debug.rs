@@ -6,7 +6,9 @@ use crate::{
     render::colors::{Colored, GREEN, RED},
 };
 use nexus::imgui::{StyleColor, Ui, Window};
+use reffect_internal::{Slot, State};
 use std::fmt;
+use strum::IntoEnumIterator;
 
 impl Addon {
     pub fn render_debug(&mut self, ui: &Ui) {
@@ -41,9 +43,17 @@ impl Addon {
                     }
                 });
 
+                let State {
+                    own_resources,
+                    own_skillbar,
+                    own_buffs,
+                    target_buffs,
+                    group_buffs,
+                } = &ctx.state;
+
                 ui.text("Own resources:");
                 ui.same_line();
-                debug_result(ui, ctx.state.own_resources.as_ref(), |resources| {
+                debug_result(ui, own_resources.as_ref(), |resources| {
                     let Resources {
                         health,
                         barrier,
@@ -64,26 +74,58 @@ impl Addon {
                     ));
                 });
 
+                ui.text("Own skillbar:");
+                ui.same_line();
+                debug_result(ui, own_skillbar.as_ref(), |skillbar| {
+                    let passed = skillbar.passed(ctx.now);
+
+                    for slot in Slot::iter() {
+                        if let Some(ability) = skillbar.slot(slot) {
+                            ui.text(format!("{}x {:>5}", ability.ammo, ability.id));
+
+                            let recharge = ability.recharge_remaining(passed);
+                            if recharge > 0 {
+                                ui.same_line();
+                                ui.text(format!(
+                                    "{:.1}/{:.1}s {:.1}%",
+                                    to_secs(recharge),
+                                    to_secs(ability.recharge),
+                                    100.0 * ability.recharge_progress(passed)
+                                ));
+                            }
+
+                            let ammo_recharge = ability.ammo_recharge_remaining(passed);
+                            if ammo_recharge > 0 {
+                                ui.same_line();
+                                ui.text(format!(
+                                    "Ammo {:.1}/{:.1}s {:.1}%",
+                                    to_secs(ammo_recharge),
+                                    to_secs(ability.ammo_recharge),
+                                    100.0 * ability.ammo_recharge_progress(passed)
+                                ));
+                            }
+                        }
+                    }
+                });
+
                 ui.text("Own buffs:");
                 ui.same_line();
-                debug_result(ui, ctx.state.own_buffs.as_ref(), |buffs| {
+                debug_result(ui, own_buffs.as_ref(), |buffs| {
                     buffs_tooltip(ui, ctx, infos, buffs)
                 });
 
                 ui.text("Target buffs:");
                 ui.same_line();
-                debug_result(ui, ctx.state.target_buffs.as_ref(), |buffs| {
+                debug_result(ui, target_buffs.as_ref(), |buffs| {
                     buffs_tooltip(ui, ctx, infos, buffs)
                 });
 
                 for i in 0..4 {
                     ui.text(format!("Group Member {} buffs:", i + 1));
                     ui.same_line();
-                    debug_result(
-                        ui,
-                        ctx.state.group_buffs.as_ref().map(|group| &group[i]),
-                        |buffs| buffs_tooltip(ui, ctx, infos, buffs),
-                    );
+                    debug_result(ui, group_buffs.as_ref().map(|group| &group[i]), |buffs| {
+                        buffs_tooltip(ui, ctx, infos, buffs)
+                    });
                 }
 
                 ui.text(format!("Combat: {}", ctx.ui.combat));
@@ -138,23 +180,25 @@ fn debug_result<T>(ui: &Ui, result: Result<&T, &Error>, tooltip: impl FnOnce(&T)
 
 fn buffs_tooltip(ui: &Ui, ctx: &Context, infos: Option<&BuffInfoMap>, buffs: &BuffMap) {
     for (id, buff) in buffs {
-        ui.text(format!("{}x {id}", buff.stacks));
+        ui.text(format!("{:>2}x {id:>5}", buff.stacks));
         if let Some(info) = infos.and_then(|infos| infos.get(id)) {
             ui.same_line();
             ui.text(format!("{:?} {:?}", info.category, info.stacking));
         }
-        if let Some(remain) = ctx.time_until(buff.runout_time) {
-            let full = buff.runout_time - buff.apply_time;
-            let progress = remain as f32 / full as f32;
+        if !buff.is_infinite() {
             ui.same_line();
             ui.text(format!(
                 "{:.1}/{:.1}s {:.1}%",
-                remain as f32 / 1000.0,
-                full as f32 / 1000.0,
-                progress * 100.0,
+                to_secs(buff.remaining(ctx.now)),
+                to_secs(buff.duration()),
+                100.0 * buff.progress(ctx.now),
             ));
         }
     }
+}
+
+fn to_secs(millisecs: u32) -> f32 {
+    millisecs as f32 / 1000.0
 }
 
 fn name_or_unknown_id_colored<T, N>(ui: &Ui, value: Result<T, N>)
