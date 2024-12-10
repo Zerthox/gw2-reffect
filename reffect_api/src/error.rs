@@ -19,8 +19,14 @@ pub enum Error {
     #[error("Context not found")]
     ContextNotFound,
 
+    #[error("World not found")]
+    WorldNotFound,
+
     #[error("Content not found")]
     ContentNotFound,
+
+    #[error("Skill not found")]
+    SkillNotFound,
 
     #[error("Failed to get user")]
     UserNotFound,
@@ -31,26 +37,26 @@ pub enum Error {
     #[error("Unavailable for character state")]
     CharacterState,
 
-    #[error("Failed to get character buffs")]
+    #[error("Character buffs not found")]
     BuffsNotFound,
 
-    #[error("Failed to get character skills")]
-    SkillsNotFound,
+    #[error("Character skillbar not found")]
+    SkillbarNotFound,
 
-    #[error("Failed to get character health")]
+    #[error("Character health not found")]
     HealthNotFound,
 
-    #[error("Failed to get character endurance")]
+    #[error("Character endurance not found")]
     EnduranceNotFound,
 
-    #[error("Failed to get character gear")]
+    #[error("Character gear not found")]
     GearNotFound,
 
-    #[error("Failed to get character specializations")]
+    #[error("Character specialization not found")]
     SpecNotFound,
 
-    #[error("Failed to get character target")]
-    TargetNotFound,
+    #[error("No target")]
+    NoTarget,
 
     #[error("Unavailable for target state")]
     TargetState,
