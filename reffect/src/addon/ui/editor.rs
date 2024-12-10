@@ -99,8 +99,8 @@ impl Addon {
             own_resources,
             own_skillbar,
             own_buffs,
-            target_buffs,
-            group_buffs,
+            target_buffs: _, // TODO: add after implementation completed
+            group_buffs: _,
         } = &self.context.state;
         let player = &self.context.player.info;
         render_errors(
