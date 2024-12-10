@@ -1,5 +1,5 @@
 use std::collections::{BTreeMap, HashMap};
-use strum::{AsRefStr, Display};
+use strum::{AsRefStr, Display, IntoStaticStr};
 
 pub type BuffMap = BTreeMap<u32, Buff>;
 
@@ -77,7 +77,9 @@ pub struct BuffInfo {
 /// Category of the buff.
 ///
 /// Any category except for Boon and Condition is mapped to [`Category::Effect`].
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, AsRefStr, Display)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Display, AsRefStr, IntoStaticStr,
+)]
 pub enum Category {
     /// Buff is a Boon.
     Boon = 0,
@@ -94,7 +96,7 @@ pub enum Category {
 }
 
 /// Stacking behavior of the buff.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Display, AsRefStr, IntoStaticStr)]
 pub enum Stacking {
     // Other/unknown stacking type.
     Other,

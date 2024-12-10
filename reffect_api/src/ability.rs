@@ -1,4 +1,4 @@
-use strum::{EnumCount, EnumIter};
+use strum::{AsRefStr, Display, EnumCount, EnumIter, IntoStaticStr};
 
 pub type SkillSlots = [Option<Ability>; Slot::COUNT];
 
@@ -90,23 +90,67 @@ impl Ability {
 }
 
 /// Skillbar slot.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, EnumCount, EnumIter)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Display,
+    AsRefStr,
+    IntoStaticStr,
+    EnumCount,
+    EnumIter,
+)]
 pub enum Slot {
+    #[strum(serialize = "Weapon 1")]
     Weapon1,
+
+    #[strum(serialize = "Weapon 2")]
     Weapon2,
+
+    #[strum(serialize = "Weapon 3")]
     Weapon3,
+
+    #[strum(serialize = "Weapon 4")]
     Weapon4,
+
+    #[strum(serialize = "Weapon 5")]
     Weapon5,
+
     Heal,
+
+    #[strum(serialize = "Utility 1")]
     Utility1,
+
+    #[strum(serialize = "Utility 2")]
     Utility2,
+
+    #[strum(serialize = "Utility 3")]
     Utility3,
+
     Elite,
+
+    #[strum(serialize = "Profession 1")]
     Profession1,
+
+    #[strum(serialize = "Profession 2")]
     Profession2,
+
+    #[strum(serialize = "Profession 3")]
     Profession3,
+
+    #[strum(serialize = "Profession 4")]
     Profession4,
+
+    #[strum(serialize = "Profession 5")]
     Profession5,
+
+    #[strum(serialize = "Special Action")]
     SpecialAction,
+
     Mount,
 }

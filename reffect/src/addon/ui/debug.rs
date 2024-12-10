@@ -81,7 +81,7 @@ impl Addon {
 
                     for slot in Slot::iter() {
                         if let Some(ability) = skillbar.slot(slot) {
-                            ui.text(format!("{}x {:>5}", ability.ammo, ability.id));
+                            ui.text(format!("{slot:<14} = {}x {:>5}", ability.ammo, ability.id));
 
                             let recharge = ability.recharge_remaining(passed);
                             if recharge > 0 {
