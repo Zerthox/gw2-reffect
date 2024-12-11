@@ -9,8 +9,7 @@ use crate::{
     fmt::Pretty,
     render::{Bounds, ComponentWise, Render, RenderDebug, RenderOptions},
     render_util::{
-        debug_optional, draw_text_bg, font_select, helper, input_text_multi_with_menu, Font,
-        FontToken, Rect, Validation,
+        debug_optional, draw_text_bg, helper, input_text_multi_with_menu, LoadedFont, Rect,
     },
     tree::TreeNode,
     trigger::ProgressActive,
@@ -23,16 +22,13 @@ use serde::{Deserialize, Serialize};
 pub struct Text {
     pub text: String,
 
-    #[serde(rename = "font")]
-    pub font_name: Option<String>,
+    #[serde(flatten)]
+    pub font: LoadedFont,
 
     pub align: AlignHorizontal,
 
     #[serde(flatten)]
     pub props: Props<TextProps>,
-
-    #[serde(skip)]
-    loaded_font: Option<Font>, // TODO: update when fonts are added/changed?
 
     #[serde(skip)]
     frequent: bool,
@@ -108,16 +104,8 @@ impl Text {
         self.align.text_offset(ui, text, self.props.scale)
     }
 
-    fn push_font(&self) -> Option<FontToken> {
-        self.loaded_font.and_then(|font| font.push())
-    }
-
     pub fn load(&mut self) {
-        self.load_font();
-    }
-
-    pub fn load_font(&mut self) {
-        self.loaded_font = self.font_name.as_ref().and_then(Font::from_name_or_warn);
+        self.font.reload();
     }
 }
 
@@ -128,7 +116,7 @@ impl Render for Text {
         self.update(ctx, state);
 
         if let Some(text) = &self.text_memo {
-            let _font = self.push_font();
+            let _font = self.font.push();
             let font_scale = self.props.scale;
             let offset = self.calc_offset(ui, text);
             let pos = state.pos.add(offset);
@@ -149,7 +137,7 @@ impl Bounds for Text {
         self.text_memo
             .as_ref()
             .map(|text| {
-                let _font = self.push_font();
+                let _font = self.font.push();
                 let offset = self.calc_offset(ui, text);
                 let size = ui.calc_text_size(text).mul_scalar(self.props.scale);
                 (offset, offset.add(size))
@@ -182,20 +170,7 @@ impl RenderOptions for Text {
 
         self.align.render_combo(ui);
 
-        let validation = if self.font_name.is_some() {
-            match self.loaded_font {
-                Some(font) if !font.is_valid() => Validation::Error("Font invalidated"),
-                Some(_) => Validation::Ok,
-                None => Validation::Error("Failed to find fond"),
-            }
-        } else {
-            Validation::Ok
-        };
-        validation.for_item(ui, || {
-            if font_select(ui, "Font", &mut self.loaded_font) {
-                self.font_name = self.loaded_font.map(|font| font.name_owned());
-            }
-        });
+        self.font.render_select(ui, "Font");
 
         self.props.base.render_options(ui, state);
     }
@@ -209,11 +184,7 @@ impl RenderOptions for Text {
 
 impl RenderDebug for Text {
     fn render_debug(&mut self, ui: &Ui) {
-        debug_optional(
-            ui,
-            "Font",
-            self.loaded_font.as_ref().map(|font| font.as_ptr()),
-        );
+        debug_optional(ui, "Font", self.font.as_font());
         ui.text(format!("Frequent: {}", self.frequent));
     }
 }
@@ -224,8 +195,7 @@ impl Default for Text {
             text: String::new(),
             align: AlignHorizontal::Center,
             props: Props::default(),
-            font_name: None,
-            loaded_font: None,
+            font: LoadedFont::empty(),
             frequent: false,
             text_memo: None,
         }
@@ -238,8 +208,7 @@ impl Clone for Text {
             text: self.text.clone(),
             align: self.align,
             props: self.props.clone(),
-            font_name: self.font_name.clone(),
-            loaded_font: self.loaded_font,
+            font: self.font.clone(),
             frequent: self.frequent,
             text_memo: None, // dont clone the memo
         }

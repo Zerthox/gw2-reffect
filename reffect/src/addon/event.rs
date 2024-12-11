@@ -156,6 +156,7 @@ impl Addon {
     pub fn reload_fonts() {
         log::debug!("Reloading fonts");
         let mut addon = Self::lock();
+        addon.context.font.reload();
         for pack in &mut addon.packs {
             pack.reload_fonts();
         }

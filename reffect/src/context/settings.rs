@@ -1,5 +1,5 @@
 use super::{Context, OWN_INTERVAL, PLAYER_INTERVAL};
-use crate::{render_util::Font, settings::icon::IconSettings};
+use crate::settings::icon::IconSettings;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -38,7 +38,7 @@ impl Context {
             save_on_unload: self.save_on_unload,
             edit_during_combat: self.edit.during_combat,
             edit_show_all: self.edit.show_all,
-            font: self.font.map(|font| font.name_owned()),
+            font: self.font.name().clone(),
             own_interval: self.own_interval.frequency,
             player_interval: self.player_interval.frequency,
             icon: self.icon_settings.clone(),
@@ -58,7 +58,7 @@ impl Context {
         self.save_on_unload = save_unload;
         self.edit.during_combat = edit_during_combat;
         self.edit.show_all = edit_show_all;
-        self.font = font.and_then(Font::from_name_or_warn);
+        self.font.load(font);
         self.own_interval.frequency = own_interval;
         self.player_interval.frequency = player_interval;
         self.icon_settings = icon;

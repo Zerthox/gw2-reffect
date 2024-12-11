@@ -1,8 +1,8 @@
 use super::Addon;
 use crate::{
     render_util::{
-        enum_combo, font_select, helper, input_color_alpha, input_float_with_format, input_percent,
-        input_pos, input_seconds, input_u32,
+        enum_combo, helper, input_color_alpha, input_float_with_format, input_percent, input_pos,
+        input_seconds, input_u32,
     },
     settings::icon::{DurationBarSettings, DurationTextSettings, StackTextSettings},
 };
@@ -33,7 +33,7 @@ impl Addon {
                     &mut self.context.edit.show_all,
                 );
 
-                font_select(ui, "Font", &mut self.context.font);
+                self.context.font.render_select(ui, "Font");
 
                 ui.spacing();
                 if ui.collapsing_header(

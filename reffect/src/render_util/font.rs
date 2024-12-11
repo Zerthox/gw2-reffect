@@ -1,4 +1,6 @@
+use super::Validation;
 use nexus::imgui::{sys, ComboBoxFlags, Selectable, SelectableFlags, Ui};
+use serde::{Deserialize, Serialize};
 use std::{
     borrow::Cow,
     ffi::{CStr, CString},
@@ -42,6 +44,7 @@ impl Font {
         self.0.as_ptr()
     }
 
+    #[allow(unused)]
     pub fn is_loaded(&self) -> bool {
         unsafe { sys::ImFont_IsLoaded(self.as_ptr()) }
     }
@@ -76,16 +79,23 @@ impl Drop for FontToken {
     }
 }
 
+#[allow(unused)]
 pub fn font_select(ui: &Ui, label: impl AsRef<str>, current: &mut Option<Font>) -> bool {
-    const INHERIT: &str = "Inherit";
-
-    let mut changed = false;
     let preview = current
         .map(|current| unsafe { current.name_raw() }.to_string_lossy())
-        .unwrap_or(Cow::Borrowed(INHERIT));
+        .unwrap_or(Cow::Borrowed("Inherit"));
+    font_select_with_preview(ui, label, preview, current)
+}
 
+pub fn font_select_with_preview(
+    ui: &Ui,
+    label: impl AsRef<str>,
+    preview: impl AsRef<str>,
+    current: &mut Option<Font>,
+) -> bool {
+    let mut changed = false;
     if let Some(_token) = ui.begin_combo_with_flags(label, preview, ComboBoxFlags::HEIGHT_LARGE) {
-        if Selectable::new(INHERIT).build(ui) {
+        if Selectable::new("Inherit").build(ui) {
             *current = None;
             changed = true;
         }
@@ -109,6 +119,72 @@ pub fn font_select(ui: &Ui, label: impl AsRef<str>, current: &mut Option<Font>) 
             }
         }
     }
-
     changed
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LoadedFont {
+    #[serde(rename = "font")]
+    name: Option<String>,
+
+    #[serde(skip)]
+    loaded: Option<Font>,
+}
+
+impl LoadedFont {
+    pub fn empty() -> Self {
+        Self {
+            name: None,
+            loaded: None,
+        }
+    }
+
+    pub fn name(&self) -> &Option<String> {
+        &self.name
+    }
+
+    pub fn load(&mut self, name: Option<String>) {
+        self.name = name;
+        self.reload();
+    }
+
+    pub fn reload(&mut self) {
+        self.loaded = self.name.as_ref().and_then(Font::from_name_or_warn);
+    }
+
+    pub fn push(&self) -> Option<FontToken> {
+        self.loaded?.push()
+    }
+
+    pub fn as_font(&self) -> Option<Font> {
+        self.loaded
+    }
+
+    pub fn render_select(&mut self, ui: &Ui, label: impl AsRef<str>) -> bool {
+        let validation = if self.name.is_some() {
+            match self.loaded {
+                Some(font) if !font.is_valid() => Validation::Error("Font invalidated"),
+                Some(_) => Validation::Ok,
+                None => Validation::Error("Failed to find fond"),
+            }
+        } else {
+            Validation::Ok
+        };
+        validation.for_item(ui, || {
+            if font_select_with_preview(
+                ui,
+                label,
+                self.name
+                    .as_ref()
+                    .map(|name| name.as_str())
+                    .unwrap_or("Inherit"),
+                &mut self.loaded,
+            ) {
+                self.name = self.loaded.map(|font| font.name_owned());
+                true
+            } else {
+                false
+            }
+        })
+    }
 }

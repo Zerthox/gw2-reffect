@@ -10,7 +10,7 @@ pub use self::{edit_state::*, links::*, map::*, player::*, settings::*, ui::*};
 use crate::{
     internal::{BuffMap, Interface, Internal, Resources, State},
     interval::Interval,
-    render_util::Font,
+    render_util::LoadedFont,
     settings::icon::IconSettings,
 };
 use enumflags2::{bitflags, BitFlags};
@@ -51,7 +51,7 @@ pub struct Context {
 
     pub save_on_unload: bool,
 
-    pub font: Option<Font>, // TODO: update when fonts are added/changed?
+    pub font: LoadedFont,
 
     pub icon_settings: IconSettings,
 }
@@ -141,7 +141,7 @@ impl Default for Context {
             own_interval: Interval::new(OWN_INTERVAL),
             player_interval: Interval::new(PLAYER_INTERVAL),
             save_on_unload: true,
-            font: None,
+            font: LoadedFont::empty(),
             icon_settings: IconSettings::default(),
         }
     }
