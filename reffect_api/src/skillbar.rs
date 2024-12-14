@@ -13,6 +13,12 @@ pub struct Skillbar {
 
     /// Skill entries.
     pub skills: SkillSlots,
+
+    /// Weapon swap.
+    pub weapon_swap: Option<Recharge>,
+
+    /// Revenant legend swap.
+    pub legend_swap: Option<Recharge>,
 }
 
 impl Skillbar {
@@ -153,4 +159,22 @@ pub enum Slot {
     SpecialAction,
 
     Mount,
+}
+
+/// Recharge and timestmap.
+#[derive(Debug, Default, Clone)]
+pub struct Recharge {
+    /// Last update timestamp.
+    pub last_update: u32,
+
+    /// Recharge in milliseconds.
+    pub recharge: u32,
+}
+
+impl Recharge {
+    /// Returns the remaining recharge.
+    #[inline]
+    pub fn recharge_remaining(&self, now: u32) -> u32 {
+        (self.last_update + self.recharge).saturating_sub(now)
+    }
 }

@@ -49,8 +49,11 @@ pub enum Error {
     #[error("Character endurance not found")]
     EnduranceNotFound,
 
-    #[error("Character gear not found")]
-    GearNotFound,
+    #[error("Character inventory not found")]
+    InventoryNotFound,
+
+    #[error("Character profession not found")]
+    ProfNotFound,
 
     #[error("Character specialization not found")]
     SpecNotFound,

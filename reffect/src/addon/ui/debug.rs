@@ -79,6 +79,24 @@ impl Addon {
                 debug_result(ui, own_skillbar.as_ref(), |skillbar| {
                     let passed = skillbar.passed(ctx.now);
 
+                    if let Some(weapon) = &skillbar.weapon_swap {
+                        ui.text(format!(
+                            "{:<14} = {:.1}/{:.1}s",
+                            "Weapon Swap",
+                            to_secs(weapon.recharge_remaining(ctx.now)),
+                            to_secs(weapon.recharge),
+                        ));
+                    }
+
+                    if let Some(legend) = &skillbar.legend_swap {
+                        ui.text(format!(
+                            "{:<14} = {:.1}/{:.1}s",
+                            "Legend Swap",
+                            to_secs(legend.recharge_remaining(ctx.now)),
+                            to_secs(legend.recharge),
+                        ));
+                    }
+
                     for slot in Slot::iter() {
                         if let Some(ability) = skillbar.slot(slot) {
                             ui.text(format!("{slot:<14} = {}x {:>5}", ability.ammo, ability.id));
