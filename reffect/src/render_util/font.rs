@@ -174,10 +174,7 @@ impl LoadedFont {
             if font_select_with_preview(
                 ui,
                 label,
-                self.name
-                    .as_ref()
-                    .map(|name| name.as_str())
-                    .unwrap_or("Inherit"),
+                self.name.as_deref().unwrap_or("Inherit"),
                 &mut self.loaded,
             ) {
                 self.name = self.loaded.map(|font| font.name_owned());
