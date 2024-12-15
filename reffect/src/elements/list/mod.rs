@@ -111,26 +111,28 @@ impl RenderOptions for IconList {
             collapsing_header_same_line_end(ui, 3.0 * size_x + 2.0 * spacing_x);
 
             item_context_menu("##listiconctx", || {
-                if MenuItem::new("Cut").build(ui) {
-                    action = IconAction::Cut(i);
-                }
-                if MenuItem::new("Copy").build(ui) {
-                    state.set_clipboard(icon.clone().into_element(self.size))
-                }
-
                 if MenuItem::new("Paste")
                     .enabled(state.has_icon_clipboard())
                     .build(ui)
                 {
                     action = IconAction::Paste(i)
                 }
-
+                if MenuItem::new("Cut").build(ui) {
+                    action = IconAction::Cut(i);
+                }
+                if MenuItem::new("Copy").build(ui) {
+                    state.set_clipboard(icon.clone().into_element(self.size))
+                }
+                if MenuItem::new("Duplicate").build(ui) {
+                    action = IconAction::Duplicate(i);
+                }
                 if MenuItem::new("Move Up").build(ui) {
                     action = IconAction::Up(i);
                 }
                 if MenuItem::new("Move Down").build(ui) {
                     action = IconAction::Down(i);
                 }
+                let _color = ui.push_style_color(StyleColor::HeaderHovered, colors::DELETE_HOVER);
                 if MenuItem::new("Delete").build(ui) {
                     remains = false;
                 }

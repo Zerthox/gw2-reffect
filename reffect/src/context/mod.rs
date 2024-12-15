@@ -46,7 +46,7 @@ pub struct Context {
 
     pub links: Links,
 
-    pub own_interval: Interval,
+    pub state_interval: Interval,
 
     pub player_interval: Interval,
 
@@ -66,7 +66,7 @@ impl Context {
 
         self.ui.update(&self.links);
 
-        if self.own_interval.triggered(self.now) {
+        if self.state_interval.triggered(self.now) {
             self.update_state();
         }
 
@@ -113,7 +113,7 @@ impl Context {
 
     /// Resets the intervals for all updates.
     pub fn reset_intervals(&mut self) {
-        self.own_interval.frequency = OWN_INTERVAL;
+        self.state_interval.frequency = OWN_INTERVAL;
         self.player_interval.frequency = PLAYER_INTERVAL;
     }
 
@@ -144,7 +144,7 @@ impl Default for Context {
             map: MapContext::empty(),
             state: State::disabled(),
             links: Links::load(),
-            own_interval: Interval::new(OWN_INTERVAL),
+            state_interval: Interval::new(OWN_INTERVAL),
             player_interval: Interval::new(PLAYER_INTERVAL),
             save_on_unload: true,
             font: LoadedFont::empty(),

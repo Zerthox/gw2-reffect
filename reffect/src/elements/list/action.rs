@@ -13,6 +13,7 @@ pub enum IconAction {
     Delete(usize),
     Cut(usize),
     Paste(usize),
+    Duplicate(usize),
 }
 
 impl IconAction {
@@ -20,14 +21,9 @@ impl IconAction {
         Self::None
     }
 
-    pub fn perform(
-        self,
-        children: &mut Vec<ListIcon>,
-        size: [f32; 2],
-        state: &mut EditState,
-    ) -> bool {
+    pub fn perform(self, children: &mut Vec<ListIcon>, size: [f32; 2], state: &mut EditState) {
         match self {
-            Self::None => false,
+            Self::None => {}
             Self::Up(index) => {
                 if index == 0 {
                     let first = children.remove(0);
@@ -35,7 +31,6 @@ impl IconAction {
                 } else {
                     children.swap(index, index - 1);
                 }
-                true
             }
             Self::Down(index) => {
                 if index == children.len() - 1 {
@@ -44,15 +39,12 @@ impl IconAction {
                 } else {
                     children.swap(index, index + 1);
                 };
-                true
             }
             Self::Delete(index) => {
                 children.remove(index);
-                true
             }
             Self::Cut(index) => {
                 state.set_clipboard(children.remove(index).into_element(size));
-                true
             }
             Self::Paste(index) => {
                 if let Some(Element {
@@ -66,7 +58,10 @@ impl IconAction {
                 } else {
                     panic!("icon action paste without icon element");
                 }
-                true
+            }
+            Self::Duplicate(index) => {
+                let child = children[index].clone();
+                children.insert(index + 1, child);
             }
         }
     }

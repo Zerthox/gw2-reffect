@@ -11,6 +11,7 @@ pub enum ElementAction {
     None,
     Cut,
     Copy,
+    Duplicate,
     Up,
     Down,
     Delete,
@@ -40,6 +41,11 @@ impl ElementAction {
                 let child = children[index].clone();
                 log::debug!("Copy child {index} {}", child.kind.as_ref());
                 edit.set_clipboard(child);
+            }
+            Self::Duplicate => {
+                let child = children[index].clone();
+                log::debug!("Duplicate child {index} {}", child.kind.as_ref());
+                children.insert(index + 1, child);
             }
             Self::Up => {
                 log::debug!("Move child up {index} {}", children[index].kind.as_ref());

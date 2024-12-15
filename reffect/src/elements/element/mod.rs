@@ -6,14 +6,14 @@ use super::{Animation, Common, RenderState};
 use crate::{
     action::ElementAction,
     context::{Context, EditState},
-    render::{Bounds, Render, RenderDebug, RenderOptions},
+    render::{colors, Bounds, Render, RenderDebug, RenderOptions},
     render_util::{
         delete_confirm_modal, item_context_menu, style_disabled_if, tree_select_empty, Rect,
     },
     tree::{Loader, TreeNode, VisitMut},
     trigger::{FilterTrigger, Trigger},
 };
-use nexus::imgui::{MenuItem, Ui};
+use nexus::imgui::{MenuItem, StyleColor, Ui};
 use serde::{Deserialize, Serialize};
 
 // TODO: anchor to parent vs screen
@@ -98,12 +98,16 @@ impl Element {
             if MenuItem::new("Copy").build(ui) {
                 action = ElementAction::Copy;
             }
+            if MenuItem::new("Duplicate").build(ui) {
+                action = ElementAction::Duplicate;
+            }
             if MenuItem::new("Move Up").build(ui) {
                 action = ElementAction::Up;
             }
             if MenuItem::new("Move Down").build(ui) {
                 action = ElementAction::Down;
             }
+            let _color = ui.push_style_color(StyleColor::HeaderHovered, colors::DELETE_HOVER);
             open = MenuItem::new("Delete").build(ui);
         });
         let title = format!("Confirm Delete##reffect{id}");

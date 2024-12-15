@@ -70,7 +70,7 @@ impl Addon {
 
                     let _id = ui.push_id("duratext");
                     input_seconds("Remaining", min_remain);
-                    helper(ui, || ui.text("Maximum time remaining in seconds"));
+                    helper(ui, || ui.text("Below which remaining time to display"));
                     input_percent("Scale", scale);
                     enum_combo(ui, "Decoration", decoration, ComboBoxFlags::empty());
                     input_color_alpha(ui, "Color", color);
@@ -105,24 +105,22 @@ impl Addon {
                 ) {
                     if input_u32(
                         ui,
-                        "Own character interval",
-                        &mut self.context.own_interval.frequency,
+                        "Combat updates",
+                        &mut self.context.state_interval.frequency,
                         10,
                         100,
                     ) {
                         self.context
-                            .own_interval
+                            .state_interval
                             .refresh_next_update(self.context.now);
                     }
                     helper(ui, || {
-                        ui.text(
-                            "Interval between updates for own buffs & resources in milliseconds",
-                        )
+                        ui.text("Interval between updates for combat information in milliseconds")
                     });
 
                     if input_u32(
                         ui,
-                        "Player interval",
+                        "Player updates",
                         &mut self.context.player_interval.frequency,
                         10,
                         100,

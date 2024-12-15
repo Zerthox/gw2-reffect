@@ -1,6 +1,8 @@
 use nexus::imgui::{sys, StyleColor, Ui};
 use std::ffi::CString;
 
+use crate::render::colors;
+
 pub fn item_context_menu(str_id: impl Into<String>, contents: impl FnOnce()) {
     if let Ok(str_id) = CString::new(str_id.into()) {
         if unsafe {
@@ -26,10 +28,9 @@ pub fn delete_confirm_modal(ui: &Ui, title: impl AsRef<str>, body: impl FnOnce()
 
             ui.spacing();
             {
-                let _style = ui.push_style_color(StyleColor::Button, [0.60, 0.24, 0.24, 1.0]);
-                let _style =
-                    ui.push_style_color(StyleColor::ButtonHovered, [0.70, 0.21, 0.21, 1.0]);
-                let _style = ui.push_style_color(StyleColor::ButtonActive, [0.80, 0.16, 0.16, 1.0]);
+                let _style = ui.push_style_color(StyleColor::Button, colors::DELETE);
+                let _style = ui.push_style_color(StyleColor::ButtonHovered, colors::DELETE_HOVER);
+                let _style = ui.push_style_color(StyleColor::ButtonActive, colors::DELETE_ACTIVE);
                 if ui.button("Delete") {
                     confirm = true;
                     ui.close_current_popup();

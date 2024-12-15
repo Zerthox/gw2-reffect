@@ -10,8 +10,10 @@ pub struct ContextSettings {
     pub edit_show_all: bool,
     pub font: Option<String>,
 
+    #[serde(alias = "combat_interval")]
+    #[serde(alias = "own_interval")]
     #[serde(alias = "buffs_interval")]
-    pub own_interval: u32,
+    pub state_interval: u32,
 
     pub player_interval: u32,
 
@@ -25,7 +27,7 @@ impl Default for ContextSettings {
             edit_during_combat: false,
             edit_show_all: false,
             font: None,
-            own_interval: OWN_INTERVAL,
+            state_interval: OWN_INTERVAL,
             player_interval: PLAYER_INTERVAL,
             icon: IconSettings::default(),
         }
@@ -39,7 +41,7 @@ impl Context {
             edit_during_combat: self.edit.during_combat,
             edit_show_all: self.edit.show_all,
             font: self.font.name().clone(),
-            own_interval: self.own_interval.frequency,
+            state_interval: self.state_interval.frequency,
             player_interval: self.player_interval.frequency,
             icon: self.icon_settings.clone(),
         }
@@ -51,7 +53,7 @@ impl Context {
             edit_during_combat,
             edit_show_all,
             font,
-            own_interval,
+            state_interval: own_interval,
             player_interval,
             icon,
         } = settings;
@@ -59,7 +61,7 @@ impl Context {
         self.edit.during_combat = edit_during_combat;
         self.edit.show_all = edit_show_all;
         self.font.load(font);
-        self.own_interval.frequency = own_interval;
+        self.state_interval.frequency = own_interval;
         self.player_interval.frequency = player_interval;
         self.icon_settings = icon;
     }

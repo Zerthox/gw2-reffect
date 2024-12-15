@@ -1,7 +1,7 @@
 use super::{Common, Element, ScreenAnchor};
 use crate::{
     context::{Context, EditState},
-    render::{Bounds, ComponentWise, RenderDebug, RenderOptions},
+    render::{colors, Bounds, ComponentWise, RenderDebug, RenderOptions},
     render_util::{
         delete_confirm_modal, enum_combo, item_context_menu, style_disabled, style_disabled_if,
         tree_select_empty,
@@ -9,7 +9,7 @@ use crate::{
     schema::Schema,
     tree::{FontReloader, Loader, TreeNode, VisitMut},
 };
-use nexus::imgui::{ComboBoxFlags, MenuItem, Ui};
+use nexus::imgui::{ComboBoxFlags, MenuItem, StyleColor, Ui};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
@@ -98,6 +98,8 @@ impl Pack {
         let mut open = false;
         item_context_menu(&id, || {
             self.common.render_context_menu(ui, state, Some(children));
+
+            let _color = ui.push_style_color(StyleColor::HeaderHovered, colors::DELETE_HOVER);
             open = MenuItem::new("Delete").build(ui);
         });
 
