@@ -2,6 +2,8 @@ mod element;
 mod props;
 mod source;
 
+use std::cmp::Ordering;
+
 pub use self::{element::*, props::*, source::*};
 
 use super::{align::AlignHorizontal, Props, RenderState};
@@ -140,7 +142,9 @@ impl Icon {
                         let DurationTextSettings {
                             max_remain,
                             scale,
-                            color: color @ [_, _, _, alpha],
+                            color,
+                            color_fast,
+                            color_slow,
                             decoration,
                         } = ctx.icon_settings.duration_text;
 
@@ -152,6 +156,12 @@ impl Icon {
                             let offset = AlignHorizontal::Center.text_offset(ui, &text, font_scale);
                             let text_pos = state.pos.add(offset);
 
+                            let color @ [_, _, _, alpha] =
+                                match active.progress_rate().total_cmp(&1.0) {
+                                    Ordering::Less => color_slow,
+                                    Ordering::Equal => color,
+                                    Ordering::Greater => color_fast,
+                                };
                             let decoration_color = with_alpha(colors::BLACK, alpha);
                             decoration.render(ui, &text, text_pos, font_scale, decoration_color);
                             draw_text_bg(ui, &text, text_pos, font_scale, color);

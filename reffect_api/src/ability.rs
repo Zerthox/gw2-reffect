@@ -1,4 +1,5 @@
-use strum::{AsRefStr, Display, EnumCount, EnumIter, IntoStaticStr};
+use serde::{Deserialize, Serialize};
+use strum::{AsRefStr, Display, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 
 pub type SkillSlots = [Option<Ability>; Slot::COUNT];
 
@@ -34,6 +35,12 @@ impl Skillbar {
     pub fn slot(&self, slot: Slot) -> Option<&Ability> {
         self.skills[slot as usize].as_ref()
     }
+
+    /// Returns the ability with the given id.
+    #[inline]
+    pub fn ability(&self, id: u32) -> Option<&Ability> {
+        self.skills.iter().flatten().find(|ablity| ablity.id == id)
+    }
 }
 
 /// Ability.
@@ -41,6 +48,7 @@ impl Skillbar {
 pub struct Ability {
     /// Skill id.
     pub id: u32,
+
     /// Ammunition count.
     pub ammo: u32,
 
@@ -98,6 +106,7 @@ impl Ability {
 /// Skillbar slot.
 #[derive(
     Debug,
+    Default,
     Clone,
     Copy,
     PartialEq,
@@ -110,8 +119,12 @@ impl Ability {
     IntoStaticStr,
     EnumCount,
     EnumIter,
+    VariantArray,
+    Serialize,
+    Deserialize,
 )]
 pub enum Slot {
+    #[default]
     #[strum(serialize = "Weapon 1")]
     Weapon1,
 

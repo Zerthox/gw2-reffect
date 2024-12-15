@@ -32,7 +32,7 @@ pub fn draw_text_bg(
 
 pub fn debug_optional(ui: &Ui, label: impl fmt::Display, value: Option<impl fmt::Debug>) {
     ui.text(match value {
-        Some(value) => format!("{label}: {value:?}"),
+        Some(value) => format!("{label}: {value:#?}"),
         None => format!("{label}: None"),
     })
 }

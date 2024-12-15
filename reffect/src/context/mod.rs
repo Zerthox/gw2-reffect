@@ -14,6 +14,7 @@ use crate::{
     settings::icon::IconSettings,
 };
 use enumflags2::{bitflags, BitFlags};
+use reffect_internal::Skillbar;
 use windows::Win32::Media::timeGetTime;
 
 const OWN_INTERVAL: u32 = 100;
@@ -116,14 +117,19 @@ impl Context {
         self.player_interval.frequency = PLAYER_INTERVAL;
     }
 
+    /// Returns the [`Resources`] for the own character, if present.
+    pub fn own_resources(&self) -> Option<&Resources> {
+        self.state.own_resources.as_ref().ok()
+    }
+
     /// Returns the [`BuffMap`] for the own character, if present.
     pub fn own_buffs(&self) -> Option<&BuffMap> {
         self.state.own_buffs.as_ref().ok()
     }
 
-    /// Returns the [`Resources`] for the own character, if present.
-    pub fn own_resources(&self) -> Option<&Resources> {
-        self.state.own_resources.as_ref().ok()
+    /// Returns the [`Skillbar`] for the own character, if present.
+    pub fn own_skillbar(&self) -> Option<&Skillbar> {
+        self.state.own_skillbar.as_ref().ok()
     }
 }
 

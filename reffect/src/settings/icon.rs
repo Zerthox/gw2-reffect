@@ -38,6 +38,8 @@ pub struct DurationTextSettings {
     pub max_remain: u32,
     pub scale: f32,
     pub color: [f32; 4],
+    pub color_fast: [f32; 4],
+    pub color_slow: [f32; 4],
     pub decoration: TextDecoration,
 }
 
@@ -47,6 +49,8 @@ impl Default for DurationTextSettings {
             max_remain: 5000,
             scale: 0.5,
             color: colors::WHITE,
+            color_fast: colors::GREEN,
+            color_slow: colors::CYAN,
             decoration: TextDecoration::Outline,
         }
     }

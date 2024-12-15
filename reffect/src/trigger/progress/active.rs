@@ -2,41 +2,78 @@ use crate::{
     fmt::Pretty,
     internal::{Buff, Resource},
 };
+use reffect_internal::{Ability, Skillbar};
 
 #[derive(Debug, Clone)]
 pub enum ProgressActive {
-    Buff {
-        stacks: u32,
-        apply: u32,
-        runout: u32,
+    Fixed {
+        current: u32,
+        max: u32,
     },
-    Resource(Resource),
+    Timed {
+        intensity: u32,
+        duration: u32,
+        end: u32,
+        rate: f32,
+    },
 }
 
 impl ProgressActive {
     /// Creates a dummy active progress.
     pub fn dummy() -> Self {
-        Self::Resource(Resource { current: 1, max: 1 })
+        Self::Fixed { current: 1, max: 1 }
     }
 
     /// Creates a new resource progress from percent & maximum.
     pub fn from_percent(progress: f32, max: u32) -> Self {
-        Self::Resource(Resource {
+        Self::Fixed {
             current: (progress * max as f32) as u32,
             max,
-        })
+        }
+    }
+
+    /// Creates an empty timed active progress.
+    pub fn empy_timed() -> Self {
+        Self::Timed {
+            intensity: 0,
+            duration: 0,
+            end: 0,
+            rate: 1.0,
+        }
+    }
+
+    /// Creates new timed active progress from a skillbar and ability.
+    pub fn from_ability(skillbar: &Skillbar, ability: &Ability) -> Self {
+        Self::Timed {
+            intensity: ability.ammo,
+            duration: ability.recharge,
+            end: skillbar.last_update
+                + Self::unscale(ability.recharge_remaining, skillbar.recharge_rate),
+            rate: skillbar.recharge_rate,
+        }
+    }
+
+    /// Creates new timed active progress from a skillbar and ability.
+    pub fn from_ability_ammo(skillbar: &Skillbar, ability: &Ability) -> Self {
+        Self::Timed {
+            intensity: ability.ammo,
+            duration: ability.ammo_recharge,
+            end: skillbar.last_update
+                + Self::unscale(ability.ammo_recharge_remaining, skillbar.recharge_rate),
+            rate: skillbar.recharge_rate,
+        }
     }
 
     /// Whether the progress uses timestamps.
     pub fn is_timed(&self) -> bool {
-        matches!(self, Self::Buff { .. })
+        matches!(self, Self::Timed { .. })
     }
 
     /// Returns the intensity (alternative progress).
     pub fn intensity(&self) -> u32 {
-        match self {
-            Self::Buff { stacks, .. } => *stacks,
-            Self::Resource(resource) => resource.current,
+        match *self {
+            Self::Fixed { current, .. } => current,
+            Self::Timed { intensity, .. } => intensity,
         }
     }
 
@@ -56,39 +93,59 @@ impl ProgressActive {
         self.progress(now).unwrap_or(1.0)
     }
 
+    pub fn progress_rate(&self) -> f32 {
+        match *self {
+            Self::Fixed { .. } => 1.0,
+            Self::Timed { rate, .. } => rate,
+        }
+    }
+
     /// Returns the current amount in its native unit.
     pub fn current(&self, now: u32) -> Option<u32> {
-        match self {
-            Self::Buff { runout, .. } => Self::time_between_checked(now, *runout),
-            Self::Resource(resource) => Some(resource.current),
+        match *self {
+            Self::Fixed { current, .. } => Some(current),
+            Self::Timed { end, rate, .. } => Some(Self::time_between_scaled(now, end, rate)),
         }
     }
 
     /// Returns the current amount as text.
     pub fn current_text(&self, now: u32, pretty: bool) -> String {
-        match self {
-            Self::Buff { runout, .. } => Self::time_between_checked(now, *runout)
-                .map(Self::format_seconds)
-                .unwrap_or_else(|| "?".into()),
-            Self::Resource(resource) => Pretty::string_if(resource.current, pretty),
+        match *self {
+            Self::Fixed { current, .. } => Pretty::string_if(current, pretty),
+            Self::Timed { end, rate, .. } => {
+                if end == u32::MAX {
+                    "?".into()
+                } else {
+                    let time = Self::time_between_scaled(now, end, rate);
+                    if time > 0 {
+                        Self::format_seconds(time)
+                    } else {
+                        String::new()
+                    }
+                }
+            }
         }
     }
 
     /// Returns the maximum amount in its native unit.
     pub fn max(&self) -> u32 {
-        match self {
-            Self::Buff { apply, runout, .. } => Self::time_between(*apply, *runout),
-            Self::Resource(resource) => resource.max,
+        match *self {
+            Self::Fixed { max, .. } => max,
+            Self::Timed { duration, .. } => duration,
         }
     }
 
     /// Returns the maximum amount as text.
     pub fn max_text(&self, pretty: bool) -> String {
-        match self {
-            Self::Buff { apply, runout, .. } => Self::time_between_checked(*apply, *runout)
-                .map(Self::format_seconds)
-                .unwrap_or_else(|| "?".into()),
-            Self::Resource(resource) => Pretty::string_if(resource.max, pretty),
+        match *self {
+            Self::Fixed { max, .. } => Pretty::string_if(max, pretty),
+            Self::Timed { duration, .. } => {
+                if duration != u32::MAX {
+                    Self::format_seconds(duration)
+                } else {
+                    "?".into()
+                }
+            }
         }
     }
 
@@ -96,8 +153,12 @@ impl ProgressActive {
         end.saturating_sub(start)
     }
 
-    fn time_between_checked(now: u32, end: u32) -> Option<u32> {
-        (end != u32::MAX).then(|| Self::time_between(now, end))
+    fn time_between_scaled(start: u32, end: u32, rate: f32) -> u32 {
+        (Self::time_between(start, end) as f32 * rate) as u32
+    }
+
+    fn unscale(time: u32, rate: f32) -> u32 {
+        (time as f32 / rate) as u32
     }
 
     fn format_seconds(time: u32) -> String {
@@ -105,24 +166,30 @@ impl ProgressActive {
     }
 }
 
-impl From<&Buff> for ProgressActive {
-    fn from(buff: &Buff) -> Self {
-        Self::Buff {
-            stacks: buff.stacks,
-            apply: buff.apply_time,
-            runout: buff.runout_time,
-        }
-    }
-}
-
 impl TryFrom<Resource> for ProgressActive {
     type Error = ();
 
     fn try_from(resource: Resource) -> Result<Self, Self::Error> {
-        if resource.max != 0 {
-            Ok(Self::Resource(resource))
+        let Resource { current, max } = resource;
+        if max != 0 {
+            Ok(Self::Fixed { current, max })
         } else {
             Err(())
+        }
+    }
+}
+
+impl From<Buff> for ProgressActive {
+    fn from(buff: Buff) -> Self {
+        Self::Timed {
+            intensity: buff.stacks,
+            duration: if buff.is_infinite() {
+                u32::MAX
+            } else {
+                Self::time_between(buff.apply_time, buff.runout_time)
+            },
+            end: buff.runout_time,
+            rate: 1.0,
         }
     }
 }

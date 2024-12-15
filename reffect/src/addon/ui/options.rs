@@ -63,6 +63,8 @@ impl Addon {
                         max_remain: min_remain,
                         scale,
                         color,
+                        color_fast,
+                        color_slow,
                         decoration,
                     } = &mut self.context.icon_settings.duration_text;
 
@@ -72,6 +74,8 @@ impl Addon {
                     input_percent("Scale", scale);
                     enum_combo(ui, "Decoration", decoration, ComboBoxFlags::empty());
                     input_color_alpha(ui, "Color", color);
+                    input_color_alpha(ui, "Color Slow", color_slow);
+                    input_color_alpha(ui, "Color Fast", color_fast);
                 }
 
                 ui.spacing();

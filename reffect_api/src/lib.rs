@@ -1,11 +1,11 @@
+mod ability;
 mod buff;
 mod error;
 mod player;
 mod resource;
-mod skillbar;
 mod state;
 
-pub use self::{buff::*, error::*, player::*, resource::*, skillbar::*, state::*};
+pub use self::{ability::*, buff::*, error::*, player::*, resource::*, state::*};
 
 /// Interface for API.
 pub trait Interface {

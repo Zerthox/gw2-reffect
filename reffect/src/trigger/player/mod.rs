@@ -86,7 +86,7 @@ impl RenderOptions for PlayerTrigger {
             ui,
             "Weapons",
             &mut self.weapons,
-            ComboBoxFlags::HEIGHT_LARGE,
+            ComboBoxFlags::HEIGHT_LARGEST,
         );
 
         self.traits.render_options(ui, state);

@@ -2,12 +2,12 @@ use super::ProgressActive;
 use crate::{
     action::Action,
     context::{Context, EditState},
-    internal::{Interface, Internal, Resource},
+    internal::{Interface, Internal},
     render::RenderOptions,
     render_util::{enum_combo, helper, impl_static_variants, input_skill_id, Validation},
 };
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
-use reffect_internal::Category;
+use reffect_internal::{Buff, Category, Slot};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, IntoStaticStr};
 
@@ -31,6 +31,18 @@ pub enum ProgressSource {
     #[serde(alias = "Any")]
     #[strum(serialize = "Multiple Effects")]
     AnyBuff(Vec<u32>),
+
+    #[strum(serialize = "Ability Recharge")]
+    Ability(u32),
+
+    #[strum(serialize = "Ability Ammo Recharge")]
+    AbilityAmmo(u32),
+
+    #[strum(serialize = "Slot Recharge")]
+    SkillbarSlot(Slot),
+
+    #[strum(serialize = "Slot Ammo Recharge")]
+    SkillbarSlotAmmo(Slot),
 
     /// Health.
     Health,
@@ -64,35 +76,46 @@ impl ProgressSource {
     ) -> Option<ProgressActive> {
         match self {
             Self::Inherit => parent.cloned(),
-            Self::Always => Some(ProgressActive::Resource(Resource { current: 1, max: 1 })),
+            Self::Always => Some(ProgressActive::dummy()),
             Self::Buff(id) => ctx.own_buffs().map(|buffs| {
                 buffs
                     .get(id)
                     .filter(|buff| buff.runout_time > ctx.now)
+                    .cloned()
                     .map(Into::into)
-                    .unwrap_or(ProgressActive::Buff {
-                        stacks: 0,
-                        apply: 0,
-                        runout: 0,
-                    })
+                    .unwrap_or(ProgressActive::empy_timed())
             }),
             Self::AnyBuff(ids) => ctx.own_buffs().map(|buffs| {
-                let mut stacks = 0;
-                let mut apply = 0;
-                let mut runout = 0;
+                let mut combined = Buff::empty();
                 for id in ids {
                     if let Some(buff) = buffs.get(id).filter(|buff| buff.runout_time > ctx.now) {
-                        stacks += buff.stacks;
-                        apply = apply.max(buff.apply_time);
-                        runout = runout.max(buff.runout_time);
+                        combined.stacks += buff.stacks;
+                        combined.apply_time = combined.apply_time.max(buff.apply_time);
+                        combined.runout_time = combined.runout_time.max(buff.runout_time);
                     }
                 }
-                ProgressActive::Buff {
-                    stacks,
-                    apply,
-                    runout,
-                }
+                combined.into()
             }),
+            Self::SkillbarSlot(slot) => {
+                let skillbar = ctx.own_skillbar()?;
+                let ability = skillbar.slot(*slot)?;
+                Some(ProgressActive::from_ability(skillbar, ability))
+            }
+            Self::SkillbarSlotAmmo(slot) => {
+                let skillbar = ctx.own_skillbar()?;
+                let ability = skillbar.slot(*slot)?;
+                Some(ProgressActive::from_ability_ammo(skillbar, ability))
+            }
+            Self::Ability(id) => {
+                let skillbar = ctx.own_skillbar()?;
+                let ability = skillbar.ability(*id)?;
+                Some(ProgressActive::from_ability(skillbar, ability))
+            }
+            Self::AbilityAmmo(id) => {
+                let skillbar = ctx.own_skillbar()?;
+                let ability = skillbar.ability(*id)?;
+                Some(ProgressActive::from_ability_ammo(skillbar, ability))
+            }
             Self::Health => ctx.own_resources()?.health.clone().try_into().ok(),
             Self::Barrier => ctx.own_resources()?.barrier.clone().try_into().ok(),
             Self::Endurance => ctx.own_resources()?.endurance.clone().try_into().ok(),
@@ -109,12 +132,18 @@ impl ProgressSource {
         match self {
             Self::Inherit => parent.cloned().unwrap_or(ProgressActive::dummy()),
             Self::Always => ProgressActive::dummy(),
-            Self::Buff(_) | Self::AnyBuff(_) => {
+            Self::Buff(_)
+            | Self::AnyBuff(_)
+            | Self::SkillbarSlot(_)
+            | Self::SkillbarSlotAmmo(_)
+            | Self::Ability(_)
+            | Self::AbilityAmmo(_) => {
                 let apply = ctx.now - passed;
-                ProgressActive::Buff {
-                    stacks: (progress * 25.0) as u32,
-                    apply,
-                    runout: apply + CYCLE,
+                ProgressActive::Timed {
+                    intensity: (progress * 25.0) as u32,
+                    duration: apply,
+                    end: apply + CYCLE,
+                    rate: 1.0,
                 }
             }
             Self::Health => ProgressActive::from_percent(progress, 15_000),
@@ -150,7 +179,7 @@ impl ProgressSource {
         }
     }
 
-    fn buff_helper(ui: &Ui) {
+    fn id_helper(ui: &Ui) {
         helper(ui, || {
             ui.text("Can be found on the wiki");
             ui.text("Supports pasting chat links");
@@ -178,7 +207,7 @@ impl RenderOptions for ProgressSource {
                 Self::buff_validate(*id).for_item(ui, || {
                     input_skill_id(ui, "Effect Id", id, InputTextFlags::empty());
                 });
-                Self::buff_helper(ui);
+                Self::id_helper(ui);
             }
             Self::AnyBuff(ids) => {
                 let mut action = Action::new();
@@ -193,13 +222,20 @@ impl RenderOptions for ProgressSource {
 
                     ui.same_line();
                     ui.text(format!("Effect Id {}", i + 1));
-                    Self::buff_helper(ui);
+                    Self::id_helper(ui);
                 }
                 if ui.button("Add Effect") {
                     ids.push(0);
                 }
 
                 action.perform(ids);
+            }
+            Self::Ability(id) | Self::AbilityAmmo(id) => {
+                input_skill_id(ui, "Ability Id", id, InputTextFlags::empty());
+                Self::id_helper(ui);
+            }
+            Self::SkillbarSlot(slot) | Self::SkillbarSlotAmmo(slot) => {
+                enum_combo(ui, "Slot", slot, ComboBoxFlags::HEIGHT_LARGEST);
             }
             _ => {}
         }
