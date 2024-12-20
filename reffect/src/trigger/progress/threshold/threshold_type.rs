@@ -1,6 +1,5 @@
-use std::fmt;
-
 use serde::{Deserialize, Serialize};
+use std::fmt;
 use strum::{AsRefStr, EnumIter, IntoStaticStr, VariantArray};
 
 #[derive(

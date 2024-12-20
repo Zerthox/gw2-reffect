@@ -2,11 +2,11 @@ use super::Addon;
 use crate::{
     context::Context,
     internal::Resources,
-    internal::{BuffInfoMap, BuffMap, Error, Interface, Internal},
+    internal::{BuffMap, Error, Interface, Internal},
     render::colors::{Colored, GREEN, RED},
 };
 use nexus::imgui::{StyleColor, Ui, Window};
-use reffect_internal::{Slot, State};
+use reffect_internal::{SkillInfo, Slot, State};
 use std::fmt;
 use strum::IntoEnumIterator;
 
@@ -18,7 +18,6 @@ impl Addon {
             .opened(&mut self.debug)
             .build(ui, || {
                 let ctx = &self.context;
-                let infos = Internal::get_buff_infos().as_ref().ok();
 
                 ui.text(format!("Show elements: {}", ctx.ui.should_show()));
 
@@ -129,20 +128,20 @@ impl Addon {
                 ui.text("Own buffs:");
                 ui.same_line();
                 debug_result(ui, own_buffs.as_ref(), |buffs| {
-                    buffs_tooltip(ui, ctx, infos, buffs)
+                    buffs_tooltip(ui, ctx, buffs)
                 });
 
                 ui.text("Target buffs:");
                 ui.same_line();
                 debug_result(ui, target_buffs.as_ref(), |buffs| {
-                    buffs_tooltip(ui, ctx, infos, buffs)
+                    buffs_tooltip(ui, ctx, buffs)
                 });
 
                 for i in 0..4 {
                     ui.text(format!("Group Member {} buffs:", i + 1));
                     ui.same_line();
                     debug_result(ui, group_buffs.as_ref().map(|group| &group[i]), |buffs| {
-                        buffs_tooltip(ui, ctx, infos, buffs)
+                        buffs_tooltip(ui, ctx, buffs)
                     });
                 }
 
@@ -196,12 +195,12 @@ fn debug_result<T>(ui: &Ui, result: Result<&T, &Error>, tooltip: impl FnOnce(&T)
     }
 }
 
-fn buffs_tooltip(ui: &Ui, ctx: &Context, infos: Option<&BuffInfoMap>, buffs: &BuffMap) {
+fn buffs_tooltip(ui: &Ui, ctx: &Context, buffs: &BuffMap) {
     for (id, buff) in buffs {
         ui.text(format!("{:>2}x {id:>5}", buff.stacks));
-        if let Some(info) = infos.and_then(|infos| infos.get(id)) {
+        if let Ok(SkillInfo::Buff { category, stacking }) = Internal::get_skill_info(*id) {
             ui.same_line();
-            ui.text(format!("{:?} {:?}", info.category, info.stacking));
+            ui.text(format!("{category} {stacking}"));
         }
         if !buff.is_infinite() {
             ui.same_line();

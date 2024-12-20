@@ -1,5 +1,4 @@
-use std::collections::{BTreeMap, HashMap};
-use strum::{AsRefStr, Display, IntoStaticStr};
+use std::collections::BTreeMap;
 
 pub type BuffMap = BTreeMap<u32, Buff>;
 
@@ -57,53 +56,4 @@ impl Buff {
     pub const fn progress(&self, now: u32) -> f32 {
         self.remaining(now) as f32 / self.duration() as f32
     }
-}
-
-pub type BuffInfoMap = HashMap<u32, BuffInfo>;
-
-/// Information about a buff.
-#[derive(Debug, Clone)]
-pub struct BuffInfo {
-    /// Id of the buff.
-    pub id: u32,
-
-    /// Category of the buff.
-    pub category: Category,
-
-    /// Stacking behavior of the buff.
-    pub stacking: Stacking,
-}
-
-/// Category of the buff.
-///
-/// Any category except for Boon and Condition is mapped to [`Category::Effect`].
-#[derive(
-    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Display, AsRefStr, IntoStaticStr,
-)]
-pub enum Category {
-    /// Buff is a Boon.
-    Boon = 0,
-
-    /// Buff is an uncategorized effect.
-    Effect = 1,
-
-    /// Buff is a Condition.
-    Condition = 2,
-
-    /// Buff is hidden but gives a screen border.
-    #[strum(serialize = "Screen Border")]
-    ScreenBorder = 3,
-}
-
-/// Stacking behavior of the buff.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Display, AsRefStr, IntoStaticStr)]
-pub enum Stacking {
-    // Other/unknown stacking type.
-    Other,
-
-    /// Buff stacks in intenstity.
-    Intensity,
-
-    /// Buff stacks in duration.
-    Duration,
 }

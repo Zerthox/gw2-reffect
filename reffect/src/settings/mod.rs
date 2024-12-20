@@ -1,7 +1,9 @@
+mod context;
 pub mod icon;
 
+use self::context::ContextSettings;
 use super::Addon;
-use crate::context::{Context, ContextSettings};
+use crate::context::Context;
 use serde::{Deserialize, Serialize};
 use std::{
     fs::File,

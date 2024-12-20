@@ -22,9 +22,12 @@ impl Interface for Dummy {
     }
 
     #[inline]
-    fn get_buff_infos() -> &'static Result<BuffInfoMap> {
-        static BUFF_INFOS: Result<BuffInfoMap> = Err(Error::Disabled);
+    fn get_skill_info(id: u32) -> Result<SkillInfo> {
+        Err(Error::Disabled)
+    }
 
-        &BUFF_INFOS
+    #[inline]
+    fn get_skill_icon(id: u32) -> Option<Texture> {
+        None
     }
 }

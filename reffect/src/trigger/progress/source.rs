@@ -7,7 +7,7 @@ use crate::{
     render_util::{enum_combo, helper, impl_static_variants, input_skill_id, Validation},
 };
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
-use reffect_internal::{Buff, Category, Slot};
+use reffect_internal::{Buff, Category, Error, SkillInfo, Slot};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, IntoStaticStr};
 
@@ -164,18 +164,22 @@ impl ProgressSource {
     }
 
     fn buff_validate(id: u32) -> Validation<impl AsRef<str>> {
-        if let Ok(infos) = Internal::get_buff_infos() {
-            if let Some(info) = infos.get(&id) {
-                if info.category == Category::ScreenBorder {
-                    Validation::Warn(format!("{} {id} is only valid for yourself", info.category))
+        match Internal::get_skill_info(id) {
+            Ok(SkillInfo::Buff {
+                category,
+                stacking: _,
+            }) => {
+                if category == Category::ScreenBorder {
+                    Validation::Warn(format!("{category} {id} is only valid for yourself"))
                 } else {
-                    Validation::Confirm(format!("{} {id} is valid", info.category))
+                    Validation::Confirm(format!("{category} {id} is valid"))
                 }
-            } else {
+            }
+            Ok(SkillInfo::Ability) => Validation::Error(format!("Effect {id} is an ability")),
+            Err(Error::SkillNotFound) => {
                 Validation::Error(format!("Effect {id} is invalid or hidden"))
             }
-        } else {
-            Validation::Ok
+            Err(_) => Validation::Ok,
         }
     }
 

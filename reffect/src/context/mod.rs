@@ -2,10 +2,9 @@ mod edit_state;
 mod links;
 mod map;
 mod player;
-mod settings;
 mod ui;
 
-pub use self::{edit_state::*, links::*, map::*, player::*, settings::*, ui::*};
+pub use self::{edit_state::*, links::*, map::*, player::*, ui::*};
 
 use crate::{
     internal::{BuffMap, Interface, Internal, Resources, State},
@@ -16,10 +15,6 @@ use crate::{
 use enumflags2::{bitflags, BitFlags};
 use reffect_internal::Skillbar;
 use windows::Win32::Media::timeGetTime;
-
-const OWN_INTERVAL: u32 = 100;
-
-const PLAYER_INTERVAL: u32 = 1_000;
 
 #[derive(Debug, Clone)]
 pub struct Context {
@@ -58,6 +53,10 @@ pub struct Context {
 }
 
 impl Context {
+    pub const DEFAULT_STATE_INTERVAL: u32 = 100;
+
+    pub const DEFAULT_PLAYER_INTERVAL: u32 = 1_000;
+
     /// Updates the context.
     pub fn update(&mut self) {
         self.updates = BitFlags::empty();
@@ -113,8 +112,8 @@ impl Context {
 
     /// Resets the intervals for all updates.
     pub fn reset_intervals(&mut self) {
-        self.state_interval.frequency = OWN_INTERVAL;
-        self.player_interval.frequency = PLAYER_INTERVAL;
+        self.state_interval.frequency = Self::DEFAULT_STATE_INTERVAL;
+        self.player_interval.frequency = Self::DEFAULT_PLAYER_INTERVAL;
     }
 
     /// Returns the [`Resources`] for the own character, if present.
@@ -144,8 +143,8 @@ impl Default for Context {
             map: MapContext::empty(),
             state: State::disabled(),
             links: Links::load(),
-            state_interval: Interval::new(OWN_INTERVAL),
-            player_interval: Interval::new(PLAYER_INTERVAL),
+            state_interval: Interval::new(Self::DEFAULT_STATE_INTERVAL),
+            player_interval: Interval::new(Self::DEFAULT_PLAYER_INTERVAL),
             save_on_unload: true,
             font: LoadedFont::empty(),
             icon_settings: IconSettings::default(),

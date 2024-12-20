@@ -3,9 +3,14 @@ mod buff;
 mod error;
 mod player;
 mod resource;
+mod skill;
 mod state;
 
-pub use self::{ability::*, buff::*, error::*, player::*, resource::*, state::*};
+use windows::Win32::Graphics::Direct3D11::ID3D11ShaderResourceView;
+
+pub use self::{ability::*, buff::*, error::*, player::*, resource::*, skill::*, state::*};
+
+pub type Texture = ID3D11ShaderResourceView;
 
 /// Interface for API.
 pub trait Interface {
@@ -18,6 +23,9 @@ pub trait Interface {
     /// Retrieves player information.
     fn get_player_info() -> Result<PlayerInfo>;
 
-    /// Retrives buff information.
-    fn get_buff_infos() -> &'static Result<BuffInfoMap>;
+    /// Retrieves skill information.
+    fn get_skill_info(id: u32) -> Result<SkillInfo>;
+
+    /// Retrieves skill icon.
+    fn get_skill_icon(id: u32) -> Option<Texture>;
 }

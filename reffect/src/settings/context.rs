@@ -1,5 +1,5 @@
-use super::{Context, OWN_INTERVAL, PLAYER_INTERVAL};
-use crate::settings::icon::IconSettings;
+use super::icon::IconSettings;
+use crate::context::Context;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -27,8 +27,8 @@ impl Default for ContextSettings {
             edit_during_combat: false,
             edit_show_all: false,
             font: None,
-            state_interval: OWN_INTERVAL,
-            player_interval: PLAYER_INTERVAL,
+            state_interval: Context::DEFAULT_STATE_INTERVAL,
+            player_interval: Context::DEFAULT_PLAYER_INTERVAL,
             icon: IconSettings::default(),
         }
     }
