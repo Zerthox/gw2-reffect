@@ -104,7 +104,9 @@ impl ProgressActive {
     pub fn current(&self, now: u32) -> Option<u32> {
         match *self {
             Self::Fixed { current, .. } => Some(current),
-            Self::Timed { end, rate, .. } => Some(Self::time_between_scaled(now, end, rate)),
+            Self::Timed { end, rate, .. } => {
+                (end != u32::MAX).then(|| Self::time_between_scaled(now, end, rate))
+            }
         }
     }
 
