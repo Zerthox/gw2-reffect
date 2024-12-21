@@ -184,7 +184,7 @@ impl Icon {
 
 impl RenderOptions for Icon {
     fn render_options(&mut self, ui: &Ui, ctx: &Context) {
-        self.source.render_select(ui);
+        self.source.render_select(ui, ctx);
 
         ui.spacing();
 

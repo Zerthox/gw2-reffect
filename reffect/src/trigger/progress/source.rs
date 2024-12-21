@@ -197,10 +197,17 @@ impl ProgressSource {
                     Validation::Confirm(format!("{category} {id} is valid"))
                 }
             }
-            Ok(SkillInfo::Ability) => Validation::Error(format!("Effect {id} is an ability")),
-            Err(Error::SkillNotFound) => {
-                Validation::Error(format!("Effect {id} is invalid or hidden"))
-            }
+            Ok(SkillInfo::Ability) => Validation::Error(format!("Id {id} is an ability")),
+            Err(Error::SkillNotFound) => Validation::Error(format!("Id {id} is invalid or hidden")),
+            Err(_) => Validation::Ok,
+        }
+    }
+
+    fn ability_validate(id: u32) -> Validation<impl AsRef<str>> {
+        match Internal::get_skill_info(id) {
+            Ok(SkillInfo::Ability) => Validation::Confirm(format!("Ability {id} is valid")),
+            Ok(SkillInfo::Buff { .. }) => Validation::Error(format!("Id {id} is an effect")),
+            Err(Error::SkillNotFound) => Validation::Error(format!("Id {id} is invalid or hidden")),
             Err(_) => Validation::Ok,
         }
     }
@@ -257,7 +264,9 @@ impl RenderOptions for ProgressSource {
                 action.perform(ids);
             }
             Self::Ability(id) | Self::AbilityAmmo(id) => {
-                input_skill_id(ui, "Ability Id", id, InputTextFlags::empty());
+                Self::ability_validate(*id).for_item(ui, || {
+                    input_skill_id(ui, "Ability Id", id, InputTextFlags::empty())
+                });
                 Self::id_helper(ui);
             }
             Self::SkillbarSlot(slot) | Self::SkillbarSlotAmmo(slot) => {

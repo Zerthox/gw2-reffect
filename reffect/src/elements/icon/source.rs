@@ -1,7 +1,8 @@
 use crate::{
     addon::Addon,
+    context::Context,
     lockbox::Lockbox,
-    render_util::{enum_combo, helper_warn, impl_static_variants, input_text_simple_menu},
+    render_util::{enum_combo, impl_static_variants, input_text_simple_menu, Validation},
     texture_manager::TextureManager,
 };
 use nexus::imgui::{ComboBoxFlags, TextureId, Ui};
@@ -85,8 +86,14 @@ impl IconSource {
         }
     }
 
-    pub fn render_select(&mut self, ui: &Ui) {
-        enum_combo(ui, "Icon", self, ComboBoxFlags::empty());
+    pub fn render_select(&mut self, ui: &Ui, ctx: &Context) {
+        let validation = match self {
+            Self::Dynamic if !ctx.settings.use_game_icons => {
+                Validation::Error("Requires experimental reuse game icons setting")
+            }
+            _ => Validation::Ok,
+        };
+        validation.for_item(ui, || enum_combo(ui, "Icon", self, ComboBoxFlags::empty()));
 
         // we assume this stays in place, otherwise we consider the file dialog invalidated
         let id = self as *mut _ as usize;
@@ -94,11 +101,18 @@ impl IconSource {
         match self {
             Self::Unknown | Self::Empty | Self::Dynamic => {}
             Self::File(path) => {
-                ui.input_text("##path", &mut path.display().to_string())
-                    .hint("No file")
-                    .auto_select_all(true)
-                    .read_only(true)
-                    .build();
+                let validation = if path.is_absolute() {
+                    Validation::Warn("Non-shareable absolute icon path")
+                } else {
+                    Validation::Ok
+                };
+                validation.for_item(ui, || {
+                    ui.input_text("##path", &mut path.display().to_string())
+                        .hint("No file")
+                        .auto_select_all(true)
+                        .read_only(true)
+                        .build()
+                });
 
                 static FILE: Lockbox<usize, PathBuf> = Lockbox::new();
 
@@ -123,10 +137,6 @@ impl IconSource {
                             FILE.write(id, file);
                         }
                     });
-                }
-
-                if path.is_absolute() {
-                    helper_warn(ui, || ui.text("Non-shareable absolute icon path"));
                 }
 
                 if let Some(file) = FILE.try_take(id) {
