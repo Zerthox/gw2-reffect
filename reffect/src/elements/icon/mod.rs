@@ -69,114 +69,112 @@ impl Icon {
                 .source
                 .get_texture(active.id().filter(|_| ctx.settings.use_game_icons));
 
-            if self.source.is_empty() || texture.is_some() {
-                let (start, end) = Self::bounds(size);
-                let start = state.pos.add(start);
-                let end = state.pos.add(end);
-                let color @ [_, _, _, alpha] = self.texture_color(ui);
+            let (start, end) = Self::bounds(size);
+            let start = state.pos.add(start);
+            let end = state.pos.add(end);
+            let color @ [_, _, _, alpha] = self.texture_color(ui);
 
-                // render icon
-                if let Some(texture) = texture {
-                    let round = self.props.round * small_size;
-                    let uv_change = 0.5 * (1.0 - self.props.zoom);
-                    let uv_min = [uv_change, uv_change];
-                    let uv_max = [1.0, 1.0].sub_scalar(uv_change);
-                    ui.get_background_draw_list()
-                        .add_image_rounded(texture, start, end, round)
-                        .uv_min(uv_min)
-                        .uv_max(uv_max)
-                        .col(color)
-                        .build();
-                }
-
-                // render duration bar
-                if self.duration_bar {
-                    if let Some(progress) = active.progress(ctx.now) {
-                        let DurationBarSettings { height, color } = ctx.settings.icon.duration_bar;
-
-                        let [start_x, _] = start;
-                        let [end_x, end_y] = end;
-
-                        let x1 = start_x;
-                        let x2 = end_x;
-                        let x_mid = x1 + progress * (x2 - x1);
-                        let y1 = end_y - height;
-                        let y2 = end_y;
-
-                        ui.get_background_draw_list()
-                            .add_rect([x1, y1], [x_mid, y2], with_alpha_factor(color, alpha))
-                            .filled(true)
-                            .build();
-                    }
-                }
-
-                // render stack count
-                if self.stacks_text {
-                    let StackTextSettings {
-                        scale,
-                        offset,
-                        color: color @ [_, _, _, alpha],
-                        decoration,
-                    } = ctx.settings.icon.stack_text;
-
-                    let stacks = active.intensity();
-                    let text = if stacks > 99 {
-                        "!"
-                    } else {
-                        &stacks.to_string()
-                    };
-
-                    let font_size = scale * small_size;
-                    let font_scale = font_size / ui.current_font_size();
-                    let [x_offset, _] = AlignHorizontal::Right.text_offset(ui, text, font_scale);
-                    let line_height = font_scale * ui.text_line_height();
-                    let text_pos = end.add([x_offset, -line_height]).sub(offset);
-
-                    let decoration_color = with_alpha(colors::BLACK, alpha);
-                    decoration.render(ui, text, text_pos, font_scale, decoration_color);
-                    draw_text_bg(ui, text, text_pos, font_scale, color);
-                }
-
-                // render duration text
-                if self.duration_text {
-                    if let Some(remain) = active.current(ctx.now) {
-                        let DurationTextSettings {
-                            max_remain,
-                            scale,
-                            color,
-                            color_fast,
-                            color_slow,
-                            decoration,
-                        } = ctx.settings.icon.duration_text;
-
-                        if remain < max_remain {
-                            let text = active.current_text(ctx.now, false);
-
-                            let font_size = scale * small_size;
-                            let font_scale = font_size / ui.current_font_size();
-                            let offset = AlignHorizontal::Center.text_offset(ui, &text, font_scale);
-                            let text_pos = state.pos.add(offset);
-
-                            let color @ [_, _, _, alpha] =
-                                match active.progress_rate().total_cmp(&1.0) {
-                                    Ordering::Less => color_slow,
-                                    Ordering::Equal => color,
-                                    Ordering::Greater => color_fast,
-                                };
-                            let decoration_color = with_alpha(colors::BLACK, alpha);
-                            decoration.render(ui, &text, text_pos, font_scale, decoration_color);
-                            draw_text_bg(ui, &text, text_pos, font_scale, color);
-                        }
-                    }
-                }
-            } else {
+            // render icon
+            if let Some(texture) = texture {
+                let round = self.props.round * small_size;
+                let uv_change = 0.5 * (1.0 - self.props.zoom);
+                let uv_min = [uv_change, uv_change];
+                let uv_max = [1.0, 1.0].sub_scalar(uv_change);
+                ui.get_background_draw_list()
+                    .add_image_rounded(texture, start, end, round)
+                    .uv_min(uv_min)
+                    .uv_max(uv_max)
+                    .col(color)
+                    .build();
+            } else if !self.source.is_empty() {
                 draw_spinner_bg(
                     ui,
                     state.pos,
                     0.4 * small_size,
-                    colors::WHITE,
-                    with_alpha(colors::WHITE, 0.3),
+                    with_alpha(colors::WHITE, alpha),
+                    with_alpha(colors::WHITE, 0.3 * alpha),
                 )
+            }
+
+            // render duration bar
+            if self.duration_bar {
+                if let Some(progress) = active.progress(ctx.now) {
+                    let DurationBarSettings { height, color } = ctx.settings.icon.duration_bar;
+
+                    let [start_x, _] = start;
+                    let [end_x, end_y] = end;
+
+                    let x1 = start_x;
+                    let x2 = end_x;
+                    let x_mid = x1 + progress * (x2 - x1);
+                    let y1 = end_y - height;
+                    let y2 = end_y;
+
+                    ui.get_background_draw_list()
+                        .add_rect([x1, y1], [x_mid, y2], with_alpha_factor(color, alpha))
+                        .filled(true)
+                        .build();
+                }
+            }
+
+            // render stack count
+            if self.stacks_text {
+                let StackTextSettings {
+                    scale,
+                    offset,
+                    color: color @ [_, _, _, alpha],
+                    decoration,
+                } = ctx.settings.icon.stack_text;
+
+                let stacks = active.intensity();
+                let text = if stacks > 99 {
+                    "!"
+                } else {
+                    &stacks.to_string()
+                };
+
+                let font_size = scale * small_size;
+                let font_scale = font_size / ui.current_font_size();
+                let [x_offset, _] = AlignHorizontal::Right.text_offset(ui, text, font_scale);
+                let line_height = font_scale * ui.text_line_height();
+                let text_pos = end.add([x_offset, -line_height]).sub(offset);
+
+                let decoration_color = with_alpha(colors::BLACK, alpha);
+                decoration.render(ui, text, text_pos, font_scale, decoration_color);
+                draw_text_bg(ui, text, text_pos, font_scale, color);
+            }
+
+            // render duration text
+            if self.duration_text {
+                if let Some(remain) = active.current(ctx.now) {
+                    let DurationTextSettings {
+                        max_remain,
+                        scale,
+                        color,
+                        color_fast,
+                        color_slow,
+                        decoration,
+                    } = ctx.settings.icon.duration_text;
+
+                    if remain < max_remain {
+                        let text = active.current_text(ctx.now, false);
+
+                        let font_size = scale * small_size;
+                        let font_scale = font_size / ui.current_font_size();
+                        let offset = AlignHorizontal::Center.text_offset(ui, &text, font_scale);
+                        let text_pos = state.pos.add(offset);
+
+                        let color @ [_, _, _, alpha] = match active.progress_rate().total_cmp(&1.0)
+                        {
+                            Ordering::Less => color_slow,
+                            Ordering::Equal => color,
+                            Ordering::Greater => color_fast,
+                        };
+                        let decoration_color = with_alpha(colors::BLACK, alpha);
+                        decoration.render(ui, &text, text_pos, font_scale, decoration_color);
+                        draw_text_bg(ui, &text, text_pos, font_scale, color);
+                    }
+                }
             }
         }
     }
