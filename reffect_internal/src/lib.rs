@@ -22,12 +22,12 @@ impl Interface for Dummy {
     }
 
     #[inline]
-    fn get_skill_info(id: u32) -> Result<SkillInfo> {
+    fn get_skill_info(_id: u32) -> Result<SkillInfo> {
         Err(Error::Disabled)
     }
 
     #[inline]
-    fn get_skill_icon(id: u32) -> Option<Texture> {
+    fn get_skill_icon(_id: u32) -> Option<Texture> {
         None
     }
 }
