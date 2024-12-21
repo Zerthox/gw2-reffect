@@ -197,8 +197,8 @@ impl From<Option<String>> for LoadedFont {
     }
 }
 
-impl Into<Option<String>> for LoadedFont {
-    fn into(self) -> Option<String> {
-        self.name
+impl From<LoadedFont> for Option<String> {
+    fn from(font: LoadedFont) -> Self {
+        font.name
     }
 }

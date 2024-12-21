@@ -81,13 +81,13 @@ impl ProgressSource {
                 buffs
                     .get(&id)
                     .filter(|buff| buff.runout_time > ctx.now)
-                    .map(|buff| ProgressActive::from_buff(id, &buff))
+                    .map(|buff| ProgressActive::from_buff(id, buff))
                     .unwrap_or_else(|| ProgressActive::empy_timed(id))
             }),
             Self::AnyBuff(ref ids) => ctx.own_buffs().map(|buffs| {
                 let mut combined = Buff::empty();
                 for id in ids {
-                    if let Some(buff) = buffs.get(&id).filter(|buff| buff.runout_time > ctx.now) {
+                    if let Some(buff) = buffs.get(id).filter(|buff| buff.runout_time > ctx.now) {
                         combined.stacks += buff.stacks;
                         combined.apply_time = combined.apply_time.max(buff.apply_time);
                         combined.runout_time = combined.runout_time.max(buff.runout_time);

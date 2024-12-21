@@ -93,10 +93,13 @@ impl EditState {
         self.allowed = false;
     }
 
+    // do not expose these references!
     unsafe fn get_clipboard(&self) -> &Option<Element> {
         self.clipboard.get().as_ref().unwrap_unchecked()
     }
 
+    // do not expose these references!
+    #[allow(clippy::mut_from_ref)]
     unsafe fn get_clipboard_mut(&self) -> &mut Option<Element> {
         self.clipboard.get().as_mut().unwrap_unchecked()
     }
