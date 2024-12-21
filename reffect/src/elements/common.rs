@@ -209,7 +209,7 @@ impl Common {
 }
 
 impl RenderOptions for Common {
-    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
+    fn render_options(&mut self, ui: &Ui, ctx: &Context) {
         ui.checkbox("Enabled", &mut self.enabled);
 
         ui.input_text("Name", &mut self.name).build();
@@ -221,12 +221,12 @@ impl RenderOptions for Common {
 
         ui.spacing();
 
-        self.trigger.render_options(ui, state);
+        self.trigger.render_options(ui, ctx);
     }
 }
 
 impl RenderDebug for Common {
-    fn render_debug(&mut self, ui: &Ui) {
+    fn render_debug(&mut self, ui: &Ui, _ctx: &Context) {
         ui.text(format!("Id: {}", self.id));
         debug_optional(ui, "Trigger", self.trigger.active());
     }

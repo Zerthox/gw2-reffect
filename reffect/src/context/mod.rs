@@ -9,14 +9,13 @@ pub use self::{edit_state::*, links::*, map::*, player::*, ui::*};
 use crate::{
     internal::{BuffMap, Interface, Internal, Resources, State},
     interval::Interval,
-    render_util::LoadedFont,
-    settings::icon::IconSettings,
+    settings::GeneralSettings,
 };
 use enumflags2::{bitflags, BitFlags};
 use reffect_internal::Skillbar;
 use windows::Win32::Media::timeGetTime;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Context {
     /// Current system time.
     pub now: u32,
@@ -45,11 +44,7 @@ pub struct Context {
 
     pub player_interval: Interval,
 
-    pub save_on_unload: bool,
-
-    pub font: LoadedFont,
-
-    pub icon_settings: IconSettings,
+    pub settings: GeneralSettings,
 }
 
 impl Context {
@@ -86,7 +81,7 @@ impl Context {
     }
 
     fn update_state(&mut self) {
-        self.updates.insert(ContextUpdate::OwnCharacter);
+        self.updates.insert(ContextUpdate::State);
         Internal::update_state(&mut self.state);
     }
 
@@ -145,9 +140,7 @@ impl Default for Context {
             links: Links::load(),
             state_interval: Interval::new(Self::DEFAULT_STATE_INTERVAL),
             player_interval: Interval::new(Self::DEFAULT_PLAYER_INTERVAL),
-            save_on_unload: true,
-            font: LoadedFont::empty(),
-            icon_settings: IconSettings::default(),
+            settings: GeneralSettings::default(),
         }
     }
 }
@@ -157,7 +150,7 @@ impl Default for Context {
 #[bitflags]
 #[repr(u8)]
 pub enum ContextUpdate {
-    OwnCharacter = 1 << 0,
+    State = 1 << 0,
     Player = 1 << 1,
     Map = 1 << 2,
 }

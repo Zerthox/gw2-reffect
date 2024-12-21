@@ -5,10 +5,12 @@ use crate::{
     texture_manager::TextureManager,
 };
 use nexus::imgui::{ComboBoxFlags, TextureId, Ui};
+use reffect_internal::{Interface, Internal};
 use rfd::FileDialog;
 use serde::{Deserialize, Serialize};
 use std::{path::PathBuf, thread};
 use strum::{AsRefStr, EnumIter, IntoStaticStr};
+use windows::core::Interface as _;
 
 // TODO: id gen for loaded icons? handle duplicates on load?
 
@@ -28,8 +30,14 @@ use strum::{AsRefStr, EnumIter, IntoStaticStr};
 pub enum IconSource {
     #[default]
     Unknown,
+
     Empty,
+
+    #[serde(alias = "Automatic")]
+    Dynamic,
+
     Url(String),
+
     File(PathBuf),
 }
 
@@ -50,9 +58,10 @@ impl IconSource {
         TextureManager::add_source(self)
     }
 
-    pub fn get_texture(&self) -> Option<TextureId> {
+    pub fn get_texture(&self, skill_id: Option<u32>) -> Option<TextureId> {
         match self {
             Self::Empty => None,
+            Self::Dynamic => Internal::get_skill_icon(skill_id?).map(|srv| srv.as_raw().into()),
             _ => TextureManager::get_texture(self),
         }
     }
@@ -60,7 +69,7 @@ impl IconSource {
     pub fn generate_id(&self) -> String {
         match self {
             Self::Unknown => Self::UNKNOWN_ID.into(),
-            Self::Empty => String::new(),
+            Self::Empty | Self::Dynamic => String::new(),
             Self::File(path) => format!("REFFECT_ICON_FILE_\"{}\"", path.display()),
             Self::Url(url) => format!("REFFECT_ICON_URL_\"{url}\""),
         }
@@ -70,6 +79,7 @@ impl IconSource {
         match self {
             Self::Unknown => "unknown".into(),
             Self::Empty => "empty".into(),
+            Self::Dynamic => "dynamic".into(),
             Self::File(path) => format!("file \"{}\"", path.display()),
             Self::Url(url) => format!("url \"{url}\""),
         }
@@ -82,7 +92,7 @@ impl IconSource {
         let id = self as *mut _ as usize;
 
         match self {
-            Self::Unknown | Self::Empty => {}
+            Self::Unknown | Self::Empty | Self::Dynamic => {}
             Self::File(path) => {
                 ui.input_text("##path", &mut path.display().to_string())
                     .hint("No file")

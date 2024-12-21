@@ -21,7 +21,7 @@ impl IconAction {
         Self::None
     }
 
-    pub fn perform(self, children: &mut Vec<ListIcon>, size: [f32; 2], state: &mut EditState) {
+    pub fn perform(self, children: &mut Vec<ListIcon>, size: [f32; 2], edit: &EditState) {
         match self {
             Self::None => {}
             Self::Up(index) => {
@@ -44,7 +44,7 @@ impl IconAction {
                 children.remove(index);
             }
             Self::Cut(index) => {
-                state.set_clipboard(children.remove(index).into_element(size));
+                edit.set_clipboard(children.remove(index).into_element(size));
             }
             Self::Paste(index) => {
                 if let Some(Element {
@@ -52,7 +52,7 @@ impl IconAction {
                     filter,
                     kind: ElementType::Icon(element),
                     ..
-                }) = state.take_clipboard()
+                }) = edit.take_clipboard()
                 {
                     children.insert(index, ListIcon::from_element(common, element, filter));
                 } else {

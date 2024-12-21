@@ -1,6 +1,6 @@
 use super::ProgressActive;
 use crate::{
-    context::{Context, EditState},
+    context::Context,
     render::RenderOptions,
     render_util::{enum_combo, impl_static_variants},
     trigger::{MapTrigger, PlayerTrigger, ProgressThreshold, Trigger},
@@ -49,14 +49,14 @@ impl fmt::Display for ConditionTrigger {
 }
 
 impl RenderOptions for ConditionTrigger {
-    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
+    fn render_options(&mut self, ui: &Ui, ctx: &Context) {
         enum_combo(ui, "Condition", self, ComboBoxFlags::empty());
 
         match self {
-            Self::ProgressThreshold(threshold) => threshold.render_options(ui, state),
-            Self::Player(player) => player.render_options(ui, state),
+            Self::ProgressThreshold(threshold) => threshold.render_options(ui, ctx),
+            Self::Player(player) => player.render_options(ui, ctx),
             Self::Map(map) => {
-                map.render_options(ui, state);
+                map.render_options(ui, ctx);
             }
         }
     }

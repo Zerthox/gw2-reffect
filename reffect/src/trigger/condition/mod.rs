@@ -3,11 +3,7 @@ mod trigger;
 pub use self::trigger::*;
 
 use super::ProgressActive;
-use crate::{
-    context::{Context, EditState},
-    elements::PartialProps,
-    render::RenderOptions,
-};
+use crate::{context::Context, elements::PartialProps, render::RenderOptions};
 use nexus::imgui::Ui;
 use partial::{IntoPartial, Partial, PartialOps};
 use serde::{Deserialize, Serialize};
@@ -35,11 +31,11 @@ where
         }
     }
 
-    pub fn render_options(&mut self, ui: &Ui, state: &mut EditState, base: &T)
+    pub fn render_options(&mut self, ui: &Ui, ctx: &Context, base: &T)
     where
         Partial<T>: PartialProps<T>,
     {
-        self.trigger.render_options(ui, state);
+        self.trigger.render_options(ui, ctx);
         ui.spacing();
         self.properties.render_options(ui, base);
         ui.spacing();

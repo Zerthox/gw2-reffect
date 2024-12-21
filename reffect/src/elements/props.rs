@@ -1,6 +1,6 @@
 use crate::{
     action::Action,
-    context::{Context, EditState},
+    context::Context,
     render::colors,
     render_util::{collapsing_header_same_line_end, delete_confirm_modal},
     trigger::{Condition, ProgressActive},
@@ -60,7 +60,7 @@ where
     T: Clone + IntoPartial,
     T::Partial: Clone + fmt::Debug + Serialize + for<'d> Deserialize<'d> + PartialProps<T>,
 {
-    pub fn render_condition_options(&mut self, ui: &Ui, state: &mut EditState) {
+    pub fn render_condition_options(&mut self, ui: &Ui, ctx: &Context) {
         let mut action = Action::new();
         for (i, condition) in self.conditions.iter_mut().enumerate() {
             let _id = ui.push_id(i as i32);
@@ -98,7 +98,7 @@ where
             }
 
             if open {
-                condition.render_options(ui, state, &self.base);
+                condition.render_options(ui, ctx, &self.base);
             }
         }
         action.perform(&mut self.conditions);

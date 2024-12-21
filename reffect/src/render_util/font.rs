@@ -123,11 +123,10 @@ pub fn font_select_with_preview(
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(from = "Option<String>")]
+#[serde(into = "Option<String>")]
 pub struct LoadedFont {
-    #[serde(rename = "font")]
     name: Option<String>,
-
-    #[serde(skip)]
     loaded: Option<Font>,
 }
 
@@ -137,6 +136,12 @@ impl LoadedFont {
             name: None,
             loaded: None,
         }
+    }
+
+    pub fn loaded(name: Option<String>) -> Self {
+        let mut font = Self::empty();
+        font.load(name);
+        font
     }
 
     pub fn name(&self) -> &Option<String> {
@@ -183,5 +188,17 @@ impl LoadedFont {
                 false
             }
         })
+    }
+}
+
+impl From<Option<String>> for LoadedFont {
+    fn from(name: Option<String>) -> Self {
+        Self::loaded(name)
+    }
+}
+
+impl Into<Option<String>> for LoadedFont {
+    fn into(self) -> Option<String> {
+        self.name
     }
 }

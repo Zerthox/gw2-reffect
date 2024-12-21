@@ -123,14 +123,14 @@ impl Pack {
 
     /// Attempts to render options if selected.
     /// Returns `true` if the pack or a child rendered.
-    pub fn try_render_options(&mut self, ui: &Ui, state: &mut EditState) -> bool {
+    pub fn try_render_options(&mut self, ui: &Ui, ctx: &Context) -> bool {
         let id = self.common.id;
-        if state.is_selected(id) {
-            self.render_options(ui, state);
+        if ctx.edit.is_selected(id) {
+            self.render_options(ui, ctx);
             return true;
-        } else if state.is_selected_parent(id) {
+        } else if ctx.edit.is_selected_parent(id) {
             for child in &mut self.elements {
-                if child.try_render_options(ui, state) {
+                if child.try_render_options(ui, ctx) {
                     return true;
                 }
             }
@@ -139,10 +139,10 @@ impl Pack {
     }
 
     /// Renders the pack options.
-    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
+    fn render_options(&mut self, ui: &Ui, ctx: &Context) {
         if let Some(_token) = ui.tab_bar(self.common.id_string()) {
             if let Some(_token) = ui.tab_item("Pack") {
-                self.common.render_options(ui, state);
+                self.common.render_options(ui, ctx);
 
                 ui.spacing();
 
@@ -159,15 +159,15 @@ impl Pack {
                 }
             }
             if let Some(_token) = ui.tab_item("?") {
-                self.render_debug(ui);
+                self.render_debug(ui, ctx);
             }
         }
     }
 }
 
 impl RenderDebug for Pack {
-    fn render_debug(&mut self, ui: &Ui) {
-        self.common.render_debug(ui);
+    fn render_debug(&mut self, ui: &Ui, ctx: &Context) {
+        self.common.render_debug(ui, ctx);
 
         ui.text("File:");
         if let Some(file) = self.file.file_name().and_then(|file| file.to_str()) {

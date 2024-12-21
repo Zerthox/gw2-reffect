@@ -3,7 +3,7 @@ pub mod legacy;
 use super::{check_bitflags, memo::MemoizedTrigger};
 use crate::{
     action::Action,
-    context::{Context, ContextUpdate, EditState, MapCategory},
+    context::{Context, ContextUpdate, MapCategory},
     render::RenderOptions,
     render_util::{enum_combo_bitflags, helper, input_u32, item_context_menu, map_select},
     serde_bitflags,
@@ -54,7 +54,7 @@ impl MemoizedTrigger for MapTrigger {
 }
 
 impl RenderOptions<bool> for MapTrigger {
-    fn render_options(&mut self, ui: &Ui, _state: &mut EditState) -> bool {
+    fn render_options(&mut self, ui: &Ui, _ctx: &Context) -> bool {
         let _id = ui.push_id("map");
 
         let mut changed = enum_combo_bitflags(

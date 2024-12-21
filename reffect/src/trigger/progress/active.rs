@@ -11,6 +11,7 @@ pub enum ProgressActive {
         max: u32,
     },
     Timed {
+        id: u32,
         intensity: u32,
         duration: u32,
         end: u32,
@@ -20,12 +21,12 @@ pub enum ProgressActive {
 
 impl ProgressActive {
     /// Creates a dummy active progress.
-    pub fn dummy() -> Self {
+    pub const fn dummy() -> Self {
         Self::Fixed { current: 1, max: 1 }
     }
 
     /// Creates a new resource progress from percent & maximum.
-    pub fn from_percent(progress: f32, max: u32) -> Self {
+    pub const fn from_percent(progress: f32, max: u32) -> Self {
         Self::Fixed {
             current: (progress * max as f32) as u32,
             max,
@@ -33,8 +34,9 @@ impl ProgressActive {
     }
 
     /// Creates an empty timed active progress.
-    pub fn empy_timed() -> Self {
+    pub const fn empy_timed(id: u32) -> Self {
         Self::Timed {
+            id,
             intensity: 0,
             duration: 0,
             end: 0,
@@ -42,9 +44,25 @@ impl ProgressActive {
         }
     }
 
+    /// Creates new timed active progress from a buff.
+    pub fn from_buff(id: u32, buff: &Buff) -> Self {
+        Self::Timed {
+            id,
+            intensity: buff.stacks,
+            duration: if buff.is_infinite() {
+                u32::MAX
+            } else {
+                Self::time_between(buff.apply_time, buff.runout_time)
+            },
+            end: buff.runout_time,
+            rate: 1.0,
+        }
+    }
+
     /// Creates new timed active progress from a skillbar and ability.
     pub fn from_ability(skillbar: &Skillbar, ability: &Ability) -> Self {
         Self::Timed {
+            id: ability.id,
             intensity: ability.ammo,
             duration: ability.recharge,
             end: skillbar.last_update
@@ -56,6 +74,7 @@ impl ProgressActive {
     /// Creates new timed active progress from a skillbar and ability.
     pub fn from_ability_ammo(skillbar: &Skillbar, ability: &Ability) -> Self {
         Self::Timed {
+            id: ability.id,
             intensity: ability.ammo,
             duration: ability.ammo_recharge,
             end: skillbar.last_update
@@ -64,13 +83,20 @@ impl ProgressActive {
         }
     }
 
+    pub const fn id(&self) -> Option<u32> {
+        match *self {
+            Self::Fixed { .. } => None,
+            Self::Timed { id, .. } => Some(id),
+        }
+    }
+
     /// Whether the progress uses timestamps.
-    pub fn is_timed(&self) -> bool {
+    pub const fn is_timed(&self) -> bool {
         matches!(self, Self::Timed { .. })
     }
 
     /// Returns the intensity (alternative progress).
-    pub fn intensity(&self) -> u32 {
+    pub const fn intensity(&self) -> u32 {
         match *self {
             Self::Fixed { current, .. } => current,
             Self::Timed { intensity, .. } => intensity,
@@ -177,21 +203,6 @@ impl TryFrom<Resource> for ProgressActive {
             Ok(Self::Fixed { current, max })
         } else {
             Err(())
-        }
-    }
-}
-
-impl From<Buff> for ProgressActive {
-    fn from(buff: Buff) -> Self {
-        Self::Timed {
-            intensity: buff.stacks,
-            duration: if buff.is_infinite() {
-                u32::MAX
-            } else {
-                Self::time_between(buff.apply_time, buff.runout_time)
-            },
-            end: buff.runout_time,
-            rate: 1.0,
         }
     }
 }

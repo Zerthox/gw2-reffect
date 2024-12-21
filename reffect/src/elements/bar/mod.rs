@@ -6,7 +6,7 @@ pub use self::{progress::*, props::*};
 use super::{align::Align, Direction, Props, RenderState, Unit};
 use crate::{
     action::Action,
-    context::{Context, EditState},
+    context::Context,
     render::{
         colors::with_alpha_factor, Bounds, ComponentWise, Render, RenderDebug, RenderOptions,
     },
@@ -122,7 +122,7 @@ impl Bounds for Bar {
 }
 
 impl RenderOptions for Bar {
-    fn render_options(&mut self, ui: &Ui, _state: &mut EditState) {
+    fn render_options(&mut self, ui: &Ui, _ctx: &Context) {
         enum_combo(
             ui,
             "Progress",
@@ -219,15 +219,15 @@ impl RenderOptions for Bar {
         }
     }
 
-    fn render_tabs(&mut self, ui: &Ui, state: &mut EditState) {
+    fn render_tabs(&mut self, ui: &Ui, ctx: &Context) {
         if let Some(_token) = ui.tab_item("Condition") {
-            self.props.render_condition_options(ui, state);
+            self.props.render_condition_options(ui, ctx);
         }
     }
 }
 
 impl RenderDebug for Bar {
-    fn render_debug(&mut self, ui: &Ui) {
+    fn render_debug(&mut self, ui: &Ui, _ctx: &Context) {
         ui.text(format!(
             "Progress factor: {}",
             self.props.base.progress_factor

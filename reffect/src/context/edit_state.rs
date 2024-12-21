@@ -4,8 +4,8 @@ use crate::{
     id::Id,
 };
 use nexus::imgui::Ui;
+use std::{cell::UnsafeCell, fmt};
 
-#[derive(Debug, Clone)]
 pub struct EditState {
     /// Whether edit mode is allowed in combat.
     pub during_combat: bool,
@@ -24,7 +24,7 @@ pub struct EditState {
     parents: Vec<Id>,
 
     /// Current clipboard contents.
-    clipboard: Option<Element>,
+    clipboard: UnsafeCell<Option<Element>>, // we never give out references to this!
 }
 
 impl EditState {
@@ -93,13 +93,21 @@ impl EditState {
         self.allowed = false;
     }
 
-    pub fn has_clipboard(&mut self) -> bool {
-        self.clipboard.is_some()
+    unsafe fn get_clipboard(&self) -> &Option<Element> {
+        self.clipboard.get().as_ref().unwrap_unchecked()
     }
 
-    pub fn has_icon_clipboard(&mut self) -> bool {
+    unsafe fn get_clipboard_mut(&self) -> &mut Option<Element> {
+        self.clipboard.get().as_mut().unwrap_unchecked()
+    }
+
+    pub fn has_clipboard(&self) -> bool {
+        unsafe { self.get_clipboard() }.is_some()
+    }
+
+    pub fn has_icon_clipboard(&self) -> bool {
         matches!(
-            self.clipboard,
+            unsafe { self.get_clipboard() },
             Some(Element {
                 kind: ElementType::Icon(_),
                 ..
@@ -107,12 +115,12 @@ impl EditState {
         )
     }
 
-    pub fn take_clipboard(&mut self) -> Option<Element> {
-        self.clipboard.take()
+    pub fn take_clipboard(&self) -> Option<Element> {
+        unsafe { self.get_clipboard_mut() }.take()
     }
 
-    pub fn set_clipboard(&mut self, element: Element) {
-        self.clipboard = Some(element);
+    pub fn set_clipboard(&self, element: Element) {
+        *unsafe { self.get_clipboard_mut() } = Some(element);
     }
 
     pub fn debug(&self, ui: &Ui) {
@@ -122,7 +130,7 @@ impl EditState {
 
         ui.text("Clipboard:");
         ui.same_line();
-        match &self.clipboard {
+        match unsafe { self.get_clipboard() } {
             Some(element) => ui.text(&element.kind),
             None => ui.text_disabled("empty"),
         }
@@ -147,7 +155,20 @@ impl Default for EditState {
             allowed: true,
             selected: Id::default(),
             parents: Vec::new(),
-            clipboard: None,
+            clipboard: UnsafeCell::new(None),
         }
+    }
+}
+
+impl fmt::Debug for EditState {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.debug_struct("EditState")
+            .field("during_combat", &self.during_combat)
+            .field("show_all", &self.show_all)
+            .field("allowed", &self.allowed)
+            .field("selected", &self.selected)
+            .field("parents", &self.parents)
+            .field("clipboard", unsafe { self.get_clipboard() })
+            .finish()
     }
 }

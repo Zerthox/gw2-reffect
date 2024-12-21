@@ -5,7 +5,7 @@ pub use self::{combat::*, traits::*};
 
 use super::{check_bitflags_optional, Trigger};
 use crate::{
-    context::{Context, EditState, Mount, Profession, Specialization},
+    context::{Context, Mount, Profession, Specialization},
     internal::Weapon,
     render::RenderOptions,
     render_util::enum_combo_bitflags,
@@ -72,8 +72,8 @@ impl Trigger for PlayerTrigger {
 }
 
 impl RenderOptions for PlayerTrigger {
-    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
-        self.combat.render_options(ui, state);
+    fn render_options(&mut self, ui: &Ui, ctx: &Context) {
+        self.combat.render_options(ui, ctx);
 
         enum_combo_bitflags(
             ui,
@@ -89,7 +89,7 @@ impl RenderOptions for PlayerTrigger {
             ComboBoxFlags::HEIGHT_LARGEST,
         );
 
-        self.traits.render_options(ui, state);
+        self.traits.render_options(ui, ctx);
 
         enum_combo_bitflags(ui, "Mount", &mut self.mounts, ComboBoxFlags::HEIGHT_LARGE);
     }

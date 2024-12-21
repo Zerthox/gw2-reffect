@@ -1,5 +1,6 @@
+use super::Element;
 use crate::{
-    context::{Context, EditState},
+    context::Context,
     elements::{Bar, Group, IconElement, IconList, RenderState, Text},
     render::{Bounds, Render, RenderDebug, RenderOptions},
     render_util::{impl_static_variants, Rect},
@@ -8,8 +9,6 @@ use crate::{
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, IntoStaticStr};
-
-use super::Element;
 
 #[derive(Debug, Clone, EnumIter, AsRefStr, IntoStaticStr, Serialize, Deserialize)]
 #[serde(tag = "type")]
@@ -66,44 +65,44 @@ impl Bounds for ElementType {
 }
 
 impl RenderOptions for ElementType {
-    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
+    fn render_options(&mut self, ui: &Ui, ctx: &Context) {
         match self {
-            Self::Group(group) => group.render_options(ui, state),
-            Self::Icon(icon) => icon.render_options(ui, state),
-            Self::IconList(list) => list.render_options(ui, state),
-            Self::Text(text) => text.render_options(ui, state),
-            Self::Bar(bar) => bar.render_options(ui, state),
+            Self::Group(group) => group.render_options(ui, ctx),
+            Self::Icon(icon) => icon.render_options(ui, ctx),
+            Self::IconList(list) => list.render_options(ui, ctx),
+            Self::Text(text) => text.render_options(ui, ctx),
+            Self::Bar(bar) => bar.render_options(ui, ctx),
         }
     }
 
-    fn render_tabs(&mut self, ui: &Ui, state: &mut EditState) {
+    fn render_tabs(&mut self, ui: &Ui, ctx: &Context) {
         match self {
-            Self::Group(group) => group.render_tabs(ui, state),
-            Self::Icon(icon) => icon.render_tabs(ui, state),
-            Self::IconList(list) => list.render_tabs(ui, state),
-            Self::Text(text) => text.render_tabs(ui, state),
-            Self::Bar(bar) => bar.render_tabs(ui, state),
+            Self::Group(group) => group.render_tabs(ui, ctx),
+            Self::Icon(icon) => icon.render_tabs(ui, ctx),
+            Self::IconList(list) => list.render_tabs(ui, ctx),
+            Self::Text(text) => text.render_tabs(ui, ctx),
+            Self::Bar(bar) => bar.render_tabs(ui, ctx),
         }
     }
 }
 
 impl ElementType {
-    pub fn render_filters(&mut self, ui: &Ui, state: &mut EditState) {
+    pub fn render_filters(&mut self, ui: &Ui, ctx: &Context) {
         match self {
-            Self::IconList(list) => list.render_filters(ui, state),
+            Self::IconList(list) => list.render_filters(ui, ctx),
             Self::Group(_) | Self::Icon(_) | Self::Text(_) | Self::Bar(_) => {}
         }
     }
 }
 
 impl RenderDebug for ElementType {
-    fn render_debug(&mut self, ui: &Ui) {
+    fn render_debug(&mut self, ui: &Ui, ctx: &Context) {
         match self {
-            Self::Group(group) => group.render_debug(ui),
-            Self::Icon(icon) => icon.render_debug(ui),
-            Self::IconList(list) => list.render_debug(ui),
-            Self::Text(text) => text.render_debug(ui),
-            Self::Bar(bar) => bar.render_debug(ui),
+            Self::Group(group) => group.render_debug(ui, ctx),
+            Self::Icon(icon) => icon.render_debug(ui, ctx),
+            Self::IconList(list) => list.render_debug(ui, ctx),
+            Self::Text(text) => text.render_debug(ui, ctx),
+            Self::Bar(bar) => bar.render_debug(ui, ctx),
         }
     }
 }

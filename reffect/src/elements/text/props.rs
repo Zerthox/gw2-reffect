@@ -1,6 +1,6 @@
 use super::TextDecoration;
 use crate::{
-    context::EditState,
+    context::Context,
     elements::PartialProps,
     render::{colors, RenderOptions},
     render_util::{input_color_alpha, input_optional, input_percent},
@@ -30,7 +30,7 @@ impl Default for TextProps {
 }
 
 impl RenderOptions for TextProps {
-    fn render_options(&mut self, ui: &Ui, _state: &mut EditState) {
+    fn render_options(&mut self, ui: &Ui, _ctx: &Context) {
         let Self {
             scale,
             color,

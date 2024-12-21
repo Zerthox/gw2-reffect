@@ -1,5 +1,5 @@
 use crate::{
-    context::EditState,
+    context::Context,
     elements::PartialProps,
     render::{colors, RenderOptions},
     render_util::{
@@ -44,7 +44,7 @@ impl Default for BarProps {
 }
 
 impl RenderOptions for BarProps {
-    fn render_options(&mut self, _ui: &Ui, _state: &mut EditState) {
+    fn render_options(&mut self, _ui: &Ui, _ctx: &Context) {
         // rendered by bar
     }
 }

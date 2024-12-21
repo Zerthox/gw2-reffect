@@ -1,7 +1,12 @@
 use crate::{
     elements::text::TextDecoration,
     render::colors::{self, with_alpha},
+    render_util::{
+        enum_combo, helper, input_color_alpha, input_float_with_format, input_percent, input_pos,
+        input_seconds,
+    },
 };
+use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
@@ -32,6 +37,21 @@ impl Default for StackTextSettings {
     }
 }
 
+impl StackTextSettings {
+    pub fn render_options(&mut self, ui: &Ui) {
+        let Self {
+            scale,
+            offset,
+            color,
+            decoration,
+        } = self;
+        input_percent("Scale", scale);
+        input_pos(offset);
+        enum_combo(ui, "Decoration", decoration, ComboBoxFlags::empty());
+        input_color_alpha(ui, "Color", color);
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct DurationTextSettings {
@@ -56,6 +76,26 @@ impl Default for DurationTextSettings {
     }
 }
 
+impl DurationTextSettings {
+    pub fn render_options(&mut self, ui: &Ui) {
+        let Self {
+            max_remain,
+            scale,
+            color,
+            color_fast,
+            color_slow,
+            decoration,
+        } = self;
+        input_seconds("Remaining", max_remain);
+        helper(ui, || ui.text("Below which remaining time to display"));
+        input_percent("Scale", scale);
+        enum_combo(ui, "Decoration", decoration, ComboBoxFlags::empty());
+        input_color_alpha(ui, "Color", color);
+        input_color_alpha(ui, "Color Slow", color_slow);
+        input_color_alpha(ui, "Color Fast", color_fast);
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct DurationBarSettings {
@@ -69,5 +109,13 @@ impl Default for DurationBarSettings {
             height: 2.0,
             color: colors::GREEN,
         }
+    }
+}
+
+impl DurationBarSettings {
+    pub fn render_options(&mut self, ui: &Ui) {
+        let Self { height, color } = self;
+        input_float_with_format("Height", height, 1.0, 10.0, "%.2f", InputTextFlags::empty());
+        input_color_alpha(ui, "Color", color);
     }
 }

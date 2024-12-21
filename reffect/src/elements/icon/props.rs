@@ -1,5 +1,5 @@
 use crate::{
-    context::EditState,
+    context::Context,
     elements::PartialProps,
     render::{colors, RenderOptions},
     render_util::{
@@ -31,7 +31,7 @@ impl Default for IconProps {
 }
 
 impl RenderOptions for IconProps {
-    fn render_options(&mut self, ui: &Ui, _state: &mut EditState) {
+    fn render_options(&mut self, ui: &Ui, _ctx: &Context) {
         let Self { tint, zoom, round } = self;
 
         input_color_alpha(ui, "Tint", tint);

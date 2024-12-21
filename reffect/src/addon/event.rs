@@ -2,7 +2,7 @@ use super::Addon;
 use crate::{
     elements::Pack,
     internal::{Interface, Internal},
-    settings::Settings,
+    settings::AddonSettings,
     texture_manager::TextureManager,
     util::file_name,
 };
@@ -42,8 +42,8 @@ impl Addon {
         Self::create_dirs();
 
         let mut plugin = Self::lock();
-        if let Some(settings) = Settings::try_load() {
-            plugin.context.load(settings.context);
+        if let Some(settings) = AddonSettings::try_load() {
+            settings.apply(&mut plugin.context);
         }
         plugin.load_packs();
     }
@@ -53,8 +53,8 @@ impl Addon {
 
         {
             let plugin = Self::lock();
-            Settings::new(&plugin.context).save();
-            if plugin.context.save_on_unload {
+            AddonSettings::new(&plugin.context).save();
+            if plugin.context.settings.save_on_unload {
                 plugin.save_packs();
             }
         }
@@ -156,7 +156,7 @@ impl Addon {
     pub fn reload_fonts() {
         log::debug!("Reloading fonts");
         let mut addon = Self::lock();
-        addon.context.font.reload();
+        addon.context.settings.font.reload();
         for pack in &mut addon.packs {
             pack.reload_fonts();
         }

@@ -1,6 +1,6 @@
 use super::{Element, RenderState};
 use crate::{
-    context::{Context, EditState},
+    context::Context,
     render::{Bounds, Render, RenderDebug, RenderOptions},
     render_util::Rect,
     tree::TreeNode,
@@ -35,11 +35,11 @@ impl Bounds for Group {
 }
 
 impl RenderOptions for Group {
-    fn render_options(&mut self, _ui: &Ui, _state: &mut EditState) {}
+    fn render_options(&mut self, _ui: &Ui, _ctx: &Context) {}
 }
 
 impl RenderDebug for Group {
-    fn render_debug(&mut self, ui: &Ui) {
+    fn render_debug(&mut self, ui: &Ui, _ctx: &Context) {
         ui.text(format!("Members: {}", self.members.len()));
     }
 }

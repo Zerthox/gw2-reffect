@@ -1,7 +1,7 @@
 use super::ProgressActive;
 use crate::{
     action::Action,
-    context::{Context, EditState},
+    context::Context,
     internal::{Interface, Internal},
     render::RenderOptions,
     render_util::{enum_combo, helper, impl_static_variants, input_skill_id, Validation},
@@ -74,46 +74,45 @@ impl ProgressSource {
         ctx: &Context,
         parent: Option<&ProgressActive>,
     ) -> Option<ProgressActive> {
-        match self {
+        match *self {
             Self::Inherit => parent.cloned(),
             Self::Always => Some(ProgressActive::dummy()),
             Self::Buff(id) => ctx.own_buffs().map(|buffs| {
                 buffs
-                    .get(id)
+                    .get(&id)
                     .filter(|buff| buff.runout_time > ctx.now)
-                    .cloned()
-                    .map(Into::into)
-                    .unwrap_or(ProgressActive::empy_timed())
+                    .map(|buff| ProgressActive::from_buff(id, &buff))
+                    .unwrap_or_else(|| ProgressActive::empy_timed(id))
             }),
-            Self::AnyBuff(ids) => ctx.own_buffs().map(|buffs| {
+            Self::AnyBuff(ref ids) => ctx.own_buffs().map(|buffs| {
                 let mut combined = Buff::empty();
                 for id in ids {
-                    if let Some(buff) = buffs.get(id).filter(|buff| buff.runout_time > ctx.now) {
+                    if let Some(buff) = buffs.get(&id).filter(|buff| buff.runout_time > ctx.now) {
                         combined.stacks += buff.stacks;
                         combined.apply_time = combined.apply_time.max(buff.apply_time);
                         combined.runout_time = combined.runout_time.max(buff.runout_time);
                     }
                 }
-                combined.into()
+                ProgressActive::from_buff(ids.first().copied().unwrap_or(0), &combined)
             }),
             Self::SkillbarSlot(slot) => {
                 let skillbar = ctx.own_skillbar()?;
-                let ability = skillbar.slot(*slot)?;
+                let ability = skillbar.slot(slot)?;
                 Some(ProgressActive::from_ability(skillbar, ability))
             }
             Self::SkillbarSlotAmmo(slot) => {
                 let skillbar = ctx.own_skillbar()?;
-                let ability = skillbar.slot(*slot)?;
+                let ability = skillbar.slot(slot)?;
                 Some(ProgressActive::from_ability_ammo(skillbar, ability))
             }
             Self::Ability(id) => {
                 let skillbar = ctx.own_skillbar()?;
-                let ability = skillbar.ability(*id)?;
+                let ability = skillbar.ability(id)?;
                 Some(ProgressActive::from_ability(skillbar, ability))
             }
             Self::AbilityAmmo(id) => {
                 let skillbar = ctx.own_skillbar()?;
-                let ability = skillbar.ability(*id)?;
+                let ability = skillbar.ability(id)?;
                 Some(ProgressActive::from_ability_ammo(skillbar, ability))
             }
             Self::Health => ctx.own_resources()?.health.clone().try_into().ok(),
@@ -129,17 +128,40 @@ impl ProgressSource {
 
         let passed = ctx.now % CYCLE;
         let progress = passed as f32 / CYCLE as f32;
-        match self {
+        match *self {
             Self::Inherit => parent.cloned().unwrap_or(ProgressActive::dummy()),
             Self::Always => ProgressActive::dummy(),
-            Self::Buff(_)
-            | Self::AnyBuff(_)
-            | Self::SkillbarSlot(_)
-            | Self::SkillbarSlotAmmo(_)
-            | Self::Ability(_)
-            | Self::AbilityAmmo(_) => {
+            Self::Buff(id) | Self::Ability(id) | Self::AbilityAmmo(id) => {
                 let apply = ctx.now - passed;
                 ProgressActive::Timed {
+                    id,
+                    intensity: (progress * 25.0) as u32,
+                    duration: apply,
+                    end: apply + CYCLE,
+                    rate: 1.0,
+                }
+            }
+            Self::SkillbarSlot(slot) | Self::SkillbarSlotAmmo(slot) => {
+                let apply = ctx.now - passed;
+                ProgressActive::Timed {
+                    id: ctx
+                        .state
+                        .own_skillbar
+                        .as_ref()
+                        .ok()
+                        .and_then(|skillbar| skillbar.slot(slot))
+                        .map(|ability| ability.id)
+                        .unwrap_or(0),
+                    intensity: (progress * 25.0) as u32,
+                    duration: apply,
+                    end: apply + CYCLE,
+                    rate: 1.0,
+                }
+            }
+            Self::AnyBuff(ref ids) => {
+                let apply = ctx.now - passed;
+                ProgressActive::Timed {
+                    id: ids.first().copied().unwrap_or(0),
                     intensity: (progress * 25.0) as u32,
                     duration: apply,
                     end: apply + CYCLE,
@@ -192,7 +214,7 @@ impl ProgressSource {
 }
 
 impl RenderOptions for ProgressSource {
-    fn render_options(&mut self, ui: &Ui, _state: &mut EditState) {
+    fn render_options(&mut self, ui: &Ui, _ctx: &Context) {
         if let Some(prev) = enum_combo(ui, "Trigger", self, ComboBoxFlags::HEIGHT_LARGE) {
             match self {
                 Self::Buff(id) => {

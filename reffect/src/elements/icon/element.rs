@@ -1,6 +1,6 @@
 use super::{Icon, RenderState};
 use crate::{
-    context::{Context, EditState},
+    context::Context,
     render::{Bounds, Render, RenderDebug, RenderOptions},
     render_util::{input_size, Rect},
     tree::TreeNode,
@@ -32,20 +32,20 @@ impl Bounds for IconElement {
 }
 
 impl RenderOptions for IconElement {
-    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
+    fn render_options(&mut self, ui: &Ui, ctx: &Context) {
         input_size(&mut self.size);
 
-        self.icon.render_options(ui, state);
+        self.icon.render_options(ui, ctx);
     }
 
-    fn render_tabs(&mut self, ui: &Ui, state: &mut EditState) {
-        self.icon.render_tabs(ui, state);
+    fn render_tabs(&mut self, ui: &Ui, ctx: &Context) {
+        self.icon.render_tabs(ui, ctx);
     }
 }
 
 impl RenderDebug for IconElement {
-    fn render_debug(&mut self, ui: &Ui) {
-        self.icon.render_debug(ui)
+    fn render_debug(&mut self, ui: &Ui, ctx: &Context) {
+        self.icon.render_debug(ui, ctx)
     }
 }
 

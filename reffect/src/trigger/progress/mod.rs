@@ -5,7 +5,7 @@ mod threshold;
 pub use self::{active::*, source::*, threshold::*};
 
 use crate::{
-    context::{Context, ContextUpdate, EditState},
+    context::{Context, ContextUpdate},
     render::RenderOptions,
     serde_migrate::migrate,
 };
@@ -42,7 +42,7 @@ impl ProgressTrigger {
     }
 
     pub fn update(&mut self, ctx: &Context, edited: bool, parent: Option<&ProgressActive>) {
-        if ctx.has_update_or_edit(ContextUpdate::OwnCharacter) {
+        if ctx.has_update_or_edit(ContextUpdate::State) {
             // TODO: end of edit causes memo to "flash", maybe flag to end edit mode?
             self.active_memo = self.active_updated(ctx, edited, parent);
         }
@@ -73,10 +73,10 @@ impl ProgressTrigger {
 }
 
 impl RenderOptions for ProgressTrigger {
-    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
-        self.source.render_options(ui, state);
+    fn render_options(&mut self, ui: &Ui, ctx: &Context) {
+        self.source.render_options(ui, ctx);
         if !self.source.no_threshold() {
-            self.threshold.render_options(ui, state);
+            self.threshold.render_options(ui, ctx);
             // TODO: we rely on interval refreshing the memo, render options might want context for updates
         }
     }

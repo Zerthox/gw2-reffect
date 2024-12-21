@@ -1,8 +1,5 @@
 use super::Trigger;
-use crate::{
-    context::{Context, EditState},
-    render::RenderOptions,
-};
+use crate::{context::Context, render::RenderOptions};
 use nexus::imgui::{Selectable, Ui};
 use serde::{Deserialize, Serialize};
 
@@ -28,7 +25,7 @@ impl Trigger for CombatTrigger {
 }
 
 impl RenderOptions for CombatTrigger {
-    fn render_options(&mut self, ui: &Ui, _state: &mut EditState) {
+    fn render_options(&mut self, ui: &Ui, _ctx: &Context) {
         if let Some(_token) = ui.begin_combo("Combat", Self::label(self.0)) {
             const VALUES: &[Option<bool>] = &[None, Some(true), Some(false)];
 

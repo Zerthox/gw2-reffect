@@ -1,5 +1,5 @@
 use crate::{
-    context::{Context, EditState},
+    context::Context,
     render::RenderOptions,
     render_util::{enum_combo, helper, input_float_with_format},
     trigger::ProgressActive,
@@ -101,7 +101,7 @@ impl AmountType {
 }
 
 impl RenderOptions<Option<Self>> for AmountType {
-    fn render_options(&mut self, ui: &Ui, _state: &mut EditState) -> Option<Self> {
+    fn render_options(&mut self, ui: &Ui, _ctx: &Context) -> Option<Self> {
         let result = enum_combo(ui, "Amount type", self, ComboBoxFlags::empty());
         helper(ui, || ui.text("Type of amount to check"));
         result

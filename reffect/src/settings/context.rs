@@ -1,14 +1,15 @@
-use super::icon::IconSettings;
+use super::GeneralSettings;
 use crate::context::Context;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct ContextSettings {
-    pub save_on_unload: bool,
+    #[serde(flatten)]
+    pub general: GeneralSettings,
+
     pub edit_during_combat: bool,
     pub edit_show_all: bool,
-    pub font: Option<String>,
 
     #[serde(alias = "combat_interval")]
     #[serde(alias = "own_interval")]
@@ -16,53 +17,45 @@ pub struct ContextSettings {
     pub state_interval: u32,
 
     pub player_interval: u32,
-
-    pub icon: IconSettings,
 }
 
 impl Default for ContextSettings {
     fn default() -> Self {
         Self {
-            save_on_unload: true,
+            general: GeneralSettings::default(),
             edit_during_combat: false,
             edit_show_all: false,
-            font: None,
             state_interval: Context::DEFAULT_STATE_INTERVAL,
             player_interval: Context::DEFAULT_PLAYER_INTERVAL,
-            icon: IconSettings::default(),
         }
     }
 }
 
-impl Context {
-    pub fn settings(&self) -> ContextSettings {
-        ContextSettings {
-            save_on_unload: self.save_on_unload,
-            edit_during_combat: self.edit.during_combat,
-            edit_show_all: self.edit.show_all,
-            font: self.font.name().clone(),
-            state_interval: self.state_interval.frequency,
-            player_interval: self.player_interval.frequency,
-            icon: self.icon_settings.clone(),
+impl From<&Context> for ContextSettings {
+    fn from(ctx: &Context) -> Self {
+        Self {
+            general: ctx.settings.clone(),
+            edit_during_combat: ctx.edit.during_combat,
+            edit_show_all: ctx.edit.show_all,
+            state_interval: ctx.state_interval.frequency,
+            player_interval: ctx.player_interval.frequency,
         }
     }
+}
 
-    pub fn load(&mut self, settings: ContextSettings) {
-        let ContextSettings {
-            save_on_unload: save_unload,
+impl ContextSettings {
+    pub fn apply(self, ctx: &mut Context) {
+        let Self {
+            general,
             edit_during_combat,
             edit_show_all,
-            font,
-            state_interval: own_interval,
+            state_interval,
             player_interval,
-            icon,
-        } = settings;
-        self.save_on_unload = save_unload;
-        self.edit.during_combat = edit_during_combat;
-        self.edit.show_all = edit_show_all;
-        self.font.load(font);
-        self.state_interval.frequency = own_interval;
-        self.player_interval.frequency = player_interval;
-        self.icon_settings = icon;
+        } = self;
+        ctx.settings = general;
+        ctx.edit.during_combat = edit_during_combat;
+        ctx.edit.show_all = edit_show_all;
+        ctx.state_interval.frequency = state_interval;
+        ctx.player_interval.frequency = player_interval;
     }
 }

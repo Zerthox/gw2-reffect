@@ -2,13 +2,11 @@ mod element;
 mod props;
 mod source;
 
-use std::cmp::Ordering;
-
 pub use self::{element::*, props::*, source::*};
 
 use super::{align::AlignHorizontal, Props, RenderState};
 use crate::{
-    context::{Context, EditState},
+    context::Context,
     render::{
         colors::{self, with_alpha, with_alpha_factor},
         ComponentWise, RenderDebug, RenderOptions,
@@ -19,6 +17,7 @@ use crate::{
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
+use std::cmp::Ordering;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
@@ -66,7 +65,9 @@ impl Icon {
         if let Some(active) = active {
             let [width, height] = size;
             let small_size = width.min(height);
-            let texture = self.source.get_texture();
+            let texture = self
+                .source
+                .get_texture(active.id().filter(|_| ctx.settings.use_game_icons));
 
             if self.source.is_empty() || texture.is_some() {
                 let (start, end) = Self::bounds(size);
@@ -91,7 +92,7 @@ impl Icon {
                 // render duration bar
                 if self.duration_bar {
                     if let Some(progress) = active.progress(ctx.now) {
-                        let DurationBarSettings { height, color } = ctx.icon_settings.duration_bar;
+                        let DurationBarSettings { height, color } = ctx.settings.icon.duration_bar;
 
                         let [start_x, _] = start;
                         let [end_x, end_y] = end;
@@ -116,7 +117,7 @@ impl Icon {
                         offset,
                         color: color @ [_, _, _, alpha],
                         decoration,
-                    } = ctx.icon_settings.stack_text;
+                    } = ctx.settings.icon.stack_text;
 
                     let stacks = active.intensity();
                     let text = if stacks > 99 {
@@ -146,7 +147,7 @@ impl Icon {
                             color_fast,
                             color_slow,
                             decoration,
-                        } = ctx.icon_settings.duration_text;
+                        } = ctx.settings.icon.duration_text;
 
                         if remain < max_remain {
                             let text = active.current_text(ctx.now, false);
@@ -182,32 +183,32 @@ impl Icon {
 }
 
 impl RenderOptions for Icon {
-    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
+    fn render_options(&mut self, ui: &Ui, ctx: &Context) {
         self.source.render_select(ui);
 
         ui.spacing();
 
-        self.props.base.render_options(ui, state);
+        self.props.base.render_options(ui, ctx);
 
         ui.checkbox("Show Duration Bar", &mut self.duration_bar);
         ui.checkbox("Show Duration Text", &mut self.duration_text);
         ui.checkbox("Show Stacks", &mut self.stacks_text);
     }
 
-    fn render_tabs(&mut self, ui: &Ui, state: &mut EditState) {
+    fn render_tabs(&mut self, ui: &Ui, ctx: &Context) {
         if let Some(_token) = ui.tab_item("Condition") {
-            self.props.render_condition_options(ui, state);
+            self.props.render_condition_options(ui, ctx);
         }
     }
 }
 
 impl RenderDebug for Icon {
-    fn render_debug(&mut self, ui: &Ui) {
+    fn render_debug(&mut self, ui: &Ui, _ctx: &Context) {
         debug_optional(
             ui,
             "Texture",
             self.source
-                .get_texture()
+                .get_texture(None)
                 .map(|texture| texture.id() as *mut ()),
         );
     }

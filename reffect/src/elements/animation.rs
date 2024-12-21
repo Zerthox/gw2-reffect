@@ -1,5 +1,5 @@
 use crate::{
-    context::EditState,
+    context::Context,
     render::RenderOptions,
     render_util::{cycle_progress, enum_combo, helper, input_seconds, push_alpha_change},
     util::non_zero_u32,
@@ -27,7 +27,7 @@ impl Animation {
 }
 
 impl RenderOptions for Animation {
-    fn render_options(&mut self, ui: &Ui, _state: &mut EditState) {
+    fn render_options(&mut self, ui: &Ui, _ctx: &Context) {
         enum_combo(ui, "Animation", &mut self.kind, ComboBoxFlags::empty());
 
         let mut period = self.period.get();

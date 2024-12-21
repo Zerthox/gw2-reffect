@@ -1,6 +1,6 @@
 use crate::{
     action::Action,
-    context::{Context, ContextUpdate, EditState},
+    context::{Context, ContextUpdate},
     internal::Traits,
     render::RenderOptions,
     render_util::{helper, input_trait_id},
@@ -36,7 +36,7 @@ impl MemoizedTrigger for TraitTrigger {
 }
 
 impl RenderOptions for TraitTrigger {
-    fn render_options(&mut self, ui: &Ui, _state: &mut EditState) {
+    fn render_options(&mut self, ui: &Ui, _ctx: &Context) {
         let _id = ui.push_id("trait");
         let mut action = Action::new();
         for (i, req) in self.traits.iter_mut().enumerate() {

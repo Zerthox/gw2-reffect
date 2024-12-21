@@ -136,14 +136,14 @@ impl Element {
 
     /// Attempts to render options if selected.
     /// Returns `true` if the element or a child rendered.
-    pub fn try_render_options(&mut self, ui: &Ui, state: &mut EditState) -> bool {
+    pub fn try_render_options(&mut self, ui: &Ui, ctx: &Context) -> bool {
         let id = self.common.id;
-        if state.is_selected(id) {
-            self.render_options(ui, state);
+        if ctx.edit.is_selected(id) {
+            self.render_options(ui, ctx);
             return true;
-        } else if let (true, Some(children)) = (state.is_selected_parent(id), self.children()) {
+        } else if let (true, Some(children)) = (ctx.edit.is_selected_parent(id), self.children()) {
             for child in children {
-                if child.try_render_options(ui, state) {
+                if child.try_render_options(ui, ctx) {
                     return true;
                 }
             }
@@ -152,19 +152,19 @@ impl Element {
     }
 
     /// Renders the element options.
-    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
+    fn render_options(&mut self, ui: &Ui, ctx: &Context) {
         if let Some(_token) = ui.tab_bar(self.common.id_string()) {
             if let Some(_token) = ui.tab_item(&self.kind) {
-                self.common.render_options(ui, state);
+                self.common.render_options(ui, ctx);
                 ui.spacing();
-                self.kind.render_options(ui, state);
+                self.kind.render_options(ui, ctx);
             }
 
-            self.kind.render_tabs(ui, state);
+            self.kind.render_tabs(ui, ctx);
 
             if let Some(_token) = ui.tab_item("Filter") {
-                self.filter.render_options(ui, state);
-                self.kind.render_filters(ui, state);
+                self.filter.render_options(ui, ctx);
+                self.kind.render_filters(ui, ctx);
             }
 
             if let Some(_token) = ui.tab_item("Animation") {
@@ -177,22 +177,22 @@ impl Element {
                 }
 
                 if let Some(animation) = &mut self.animation {
-                    animation.render_options(ui, state);
+                    animation.render_options(ui, ctx);
                 }
             }
 
             if let Some(_token) = ui.tab_item("?") {
-                self.render_debug(ui)
+                self.render_debug(ui, ctx)
             }
         }
     }
 }
 
 impl RenderDebug for Element {
-    fn render_debug(&mut self, ui: &Ui) {
-        self.common.render_debug(ui);
-        self.filter.render_debug(ui);
-        self.kind.render_debug(ui);
+    fn render_debug(&mut self, ui: &Ui, ctx: &Context) {
+        self.common.render_debug(ui, ctx);
+        self.filter.render_debug(ui, ctx);
+        self.kind.render_debug(ui, ctx);
     }
 }
 

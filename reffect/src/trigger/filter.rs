@@ -2,7 +2,7 @@ use super::{
     map::legacy::MapTriggerLegacy, memo::MemoizedTrigger, MapTrigger, PlayerTrigger, Trigger,
 };
 use crate::{
-    context::{Context, EditState},
+    context::Context,
     elements::RenderState,
     render::{RenderDebug, RenderOptions},
     render_util::debug_optional,
@@ -42,11 +42,11 @@ impl Trigger for FilterTrigger {
 }
 
 impl RenderOptions for FilterTrigger {
-    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
-        self.player.render_options(ui, state);
+    fn render_options(&mut self, ui: &Ui, ctx: &Context) {
+        self.player.render_options(ui, ctx);
 
         ui.spacing();
-        let changed = self.map.render_options(ui, state);
+        let changed = self.map.render_options(ui, ctx);
         if changed {
             // map trigger changed, ensure fresh state next access
             self.map.clear();
@@ -55,7 +55,7 @@ impl RenderOptions for FilterTrigger {
 }
 
 impl RenderDebug for FilterTrigger {
-    fn render_debug(&mut self, ui: &Ui) {
+    fn render_debug(&mut self, ui: &Ui, _ctx: &Context) {
         debug_optional(ui, "Trait filter", self.player.traits.get());
         debug_optional(ui, "Map filter", self.map.get());
     }

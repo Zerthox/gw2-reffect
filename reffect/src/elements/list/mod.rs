@@ -6,7 +6,7 @@ pub use self::{action::*, icon::*, layout::*};
 
 use super::{Direction, RenderState};
 use crate::{
-    context::{Context, EditState},
+    context::Context,
     render::{colors, Bounds, Render, RenderDebug, RenderOptions},
     render_util::{
         collapsing_header_same_line_end, delete_confirm_modal, enum_combo, input_float_with_format,
@@ -77,7 +77,7 @@ impl Bounds for IconList {
 }
 
 impl RenderOptions for IconList {
-    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
+    fn render_options(&mut self, ui: &Ui, ctx: &Context) {
         enum_combo(ui, "Layout", &mut self.layout, ComboBoxFlags::empty());
 
         enum_combo(ui, "Direction", &mut self.direction, ComboBoxFlags::empty());
@@ -112,7 +112,7 @@ impl RenderOptions for IconList {
 
             item_context_menu("##listiconctx", || {
                 if MenuItem::new("Paste")
-                    .enabled(state.has_icon_clipboard())
+                    .enabled(ctx.edit.has_icon_clipboard())
                     .build(ui)
                 {
                     action = IconAction::Paste(i)
@@ -121,7 +121,7 @@ impl RenderOptions for IconList {
                     action = IconAction::Cut(i);
                 }
                 if MenuItem::new("Copy").build(ui) {
-                    state.set_clipboard(icon.clone().into_element(self.size))
+                    ctx.edit.set_clipboard(icon.clone().into_element(self.size))
                 }
                 if MenuItem::new("Duplicate").build(ui) {
                     action = IconAction::Duplicate(i);
@@ -163,7 +163,7 @@ impl RenderOptions for IconList {
             drop(style);
             if open {
                 // TODO: apply option to all context menu option
-                icon.render_options(ui, state);
+                icon.render_options(ui, ctx);
                 ui.spacing();
             }
         }
@@ -172,17 +172,17 @@ impl RenderOptions for IconList {
         }
         item_context_menu("##addiconctx", || {
             if MenuItem::new("Paste")
-                .enabled(state.has_icon_clipboard())
+                .enabled(ctx.edit.has_icon_clipboard())
                 .build(ui)
             {
                 action = IconAction::Paste(self.icons.len());
             }
         });
 
-        action.perform(&mut self.icons, self.size, state);
+        action.perform(&mut self.icons, self.size, &ctx.edit);
     }
 
-    fn render_tabs(&mut self, ui: &Ui, state: &mut EditState) {
+    fn render_tabs(&mut self, ui: &Ui, ctx: &Context) {
         if let Some(_token) = ui.tab_item("Condition") {
             const INDENT: f32 = 10.0;
             for (i, icon) in self.icons.iter_mut().enumerate() {
@@ -192,7 +192,7 @@ impl RenderOptions for IconList {
                     .begin(ui);
                 if open {
                     ui.indent_by(INDENT);
-                    icon.icon.props.render_condition_options(ui, state);
+                    icon.icon.props.render_condition_options(ui, ctx);
                     ui.unindent_by(INDENT);
                 }
             }
@@ -201,7 +201,7 @@ impl RenderOptions for IconList {
 }
 
 impl IconList {
-    pub fn render_filters(&mut self, ui: &Ui, state: &mut EditState) {
+    pub fn render_filters(&mut self, ui: &Ui, ctx: &Context) {
         ui.spacing();
         for (i, icon) in self.icons.iter_mut().enumerate() {
             let _id = ui.push_id(i as i32);
@@ -209,18 +209,18 @@ impl IconList {
                 .flags(TreeNodeFlags::ALLOW_ITEM_OVERLAP)
                 .begin(ui);
             if open {
-                icon.filter.render_options(ui, state);
+                icon.filter.render_options(ui, ctx);
             }
         }
     }
 }
 
 impl RenderDebug for IconList {
-    fn render_debug(&mut self, ui: &Ui) {
+    fn render_debug(&mut self, ui: &Ui, ctx: &Context) {
         ui.text(format!("Icons: {}", self.icons.len()));
         for icon in &mut self.icons {
             ui.spacing();
-            icon.render_debug(ui);
+            icon.render_debug(ui, ctx);
         }
     }
 }

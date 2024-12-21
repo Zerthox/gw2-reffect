@@ -1,5 +1,5 @@
 use crate::{
-    context::{Context, EditState},
+    context::Context,
     elements::{Common, Element, ElementType, Icon, IconElement, RenderState},
     render::{RenderDebug, RenderOptions},
     render_util::Rect,
@@ -70,23 +70,23 @@ impl ListIcon {
 }
 
 impl RenderOptions for ListIcon {
-    fn render_options(&mut self, ui: &Ui, state: &mut EditState) {
+    fn render_options(&mut self, ui: &Ui, ctx: &Context) {
         ui.checkbox("Enabled", &mut self.enabled);
         ui.input_text("Name", &mut self.name).build();
 
         ui.spacing();
 
-        self.trigger.render_options(ui, state);
+        self.trigger.render_options(ui, ctx);
 
         ui.spacing();
 
-        self.icon.render_options(ui, state);
+        self.icon.render_options(ui, ctx);
     }
 }
 
 impl RenderDebug for ListIcon {
-    fn render_debug(&mut self, ui: &Ui) {
-        self.icon.render_debug(ui)
+    fn render_debug(&mut self, ui: &Ui, ctx: &Context) {
+        self.icon.render_debug(ui, ctx)
     }
 }
 
