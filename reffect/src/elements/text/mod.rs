@@ -1,8 +1,6 @@
 mod decoration;
 mod props;
 
-pub use self::{decoration::*, props::*};
-
 use super::{align::AlignHorizontal, Props, RenderState};
 use crate::{
     context::{Context, ContextUpdate},
@@ -12,10 +10,13 @@ use crate::{
         debug_optional, draw_text_bg, helper, input_text_multi_with_menu, LoadedFont, Rect,
     },
     tree::TreeNode,
-    trigger::ProgressActive,
+    trigger::{ProgressActive, ProgressValue},
 };
 use nexus::imgui::{InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
+use std::{iter::Peekable, str::Chars};
+
+pub use self::{decoration::*, props::*};
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(default)]
@@ -47,6 +48,10 @@ impl Text {
         }
     }
 
+    pub fn load(&mut self) {
+        self.font.reload();
+    }
+
     fn process_text(
         &mut self,
         active: &ProgressActive,
@@ -57,55 +62,105 @@ impl Text {
 
         let mut result = String::with_capacity(self.text.len()); // always same or larger size
 
-        let mut prefix = false;
         let is_timed = active.is_timed();
-        for el in self.text.chars() {
-            if prefix {
-                prefix = false;
-                match el {
-                    'n' => result.push_str(&state.common.name),
-                    'i' | 's' => result.push_str(&active.intensity().to_string()),
-                    'I' => result.push_str(&Pretty(active.intensity()).to_string()),
-                    'c' | 'r' => {
-                        result.push_str(&active.current_text(ctx.now, false));
-                        self.frequent = is_timed;
+        let mut iter = self.text.chars().peekable();
+        while let Some(el) = iter.next() {
+            if el == PREFIX {
+                if let Some(next) = iter.peek() {
+                    match next {
+                        'n' => {
+                            iter.next();
+                            result.push_str(&state.common.name);
+                        }
+                        'i' | 's' => {
+                            iter.next();
+                            result.push_str(&active.intensity().to_string());
+                        }
+                        'I' => {
+                            iter.next();
+                            result.push_str(&Pretty(active.intensity()).to_string());
+                        }
+                        'c' | 'r' => {
+                            iter.next();
+                            result.push_str(&active.current_text(
+                                Self::parse_value(&mut iter),
+                                ctx.now,
+                                false,
+                            ));
+                            self.frequent = is_timed;
+                        }
+                        'C' => {
+                            iter.next();
+                            result.push_str(&active.current_text(
+                                Self::parse_value(&mut iter),
+                                ctx.now,
+                                true,
+                            ));
+                            self.frequent = is_timed;
+                        }
+                        'f' => {
+                            iter.next();
+                            result.push_str(&active.max_text(Self::parse_value(&mut iter), false));
+                        }
+                        'F' => {
+                            iter.next();
+                            result.push_str(&active.max_text(Self::parse_value(&mut iter), true));
+                        }
+                        'p' | 'P' => {
+                            iter.next();
+                            let progress =
+                                active.progress_or_default(Self::parse_value(&mut iter), ctx.now);
+                            result.push_str(&format!("{:.1}", (100.0 * progress)));
+                            self.frequent = is_timed;
+                        }
+                        &PREFIX => {
+                            iter.next();
+                            result.push(PREFIX);
+                        }
+                        _ => {
+                            result.push(PREFIX);
+                        }
                     }
-                    'C' => {
-                        result.push_str(&active.current_text(ctx.now, true));
-                        self.frequent = is_timed;
-                    }
-                    'f' => result.push_str(&active.max_text(false)),
-                    'F' => result.push_str(&active.max_text(true)),
-                    'p' | 'P' => {
-                        let progress = active.progress_or_default(ctx.now);
-                        result.push_str(&format!("{:.1}", (100.0 * progress)));
-                        self.frequent = is_timed;
-                    }
-                    PREFIX => result.push(PREFIX),
-                    other => {
-                        result.push(PREFIX);
-                        result.push(other);
-                    }
+                } else {
+                    result.push(el);
                 }
-            } else if el == PREFIX {
-                prefix = true;
             } else {
                 result.push(el);
             }
-        }
-        if prefix {
-            result.push(PREFIX); // handle ending prefix
         }
 
         result
     }
 
-    fn calc_offset(&self, ui: &Ui, text: &str) -> [f32; 2] {
-        self.align.text_offset(ui, text, self.props.scale)
+    fn parse_value(iter: &mut Peekable<Chars>) -> ProgressValue {
+        match iter.peek() {
+            Some('1') => {
+                iter.next();
+                ProgressValue::Primary
+            }
+            Some('2') => {
+                iter.next();
+                ProgressValue::Secondary
+            }
+            _ => ProgressValue::Primary,
+        }
     }
 
-    pub fn load(&mut self) {
-        self.font.reload();
+    fn helper(ui: &Ui) {
+        helper(ui, || {
+            ui.text("Uppercase for pretty format");
+            ui.text("Suffix 1 or 2 for primary/secondary");
+            ui.text("%n for name");
+            ui.text("%i for intensity");
+            ui.text("%c for current amount");
+            ui.text("%f for full/max amount");
+            ui.text("%p for progress percent");
+            ui.text("%% for % sign");
+        });
+    }
+
+    fn calc_offset(&self, ui: &Ui, text: &str) -> [f32; 2] {
+        self.align.text_offset(ui, text, self.props.scale)
     }
 }
 
@@ -158,15 +213,7 @@ impl RenderOptions for Text {
 
         ui.same_line();
         ui.text("Text"); // own label to fix helper position
-        helper(ui, || {
-            ui.text("Uppercase for pretty format");
-            ui.text("%n for name");
-            ui.text("%i for intensity");
-            ui.text("%c for current amount");
-            ui.text("%f for full/max amount");
-            ui.text("%p for progress percent");
-            ui.text("%% for % sign");
-        });
+        Self::helper(ui);
 
         self.align.render_combo(ui);
 

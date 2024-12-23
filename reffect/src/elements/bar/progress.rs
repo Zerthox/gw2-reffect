@@ -1,4 +1,7 @@
-use crate::{context::Context, trigger::ProgressActive};
+use crate::{
+    context::Context,
+    trigger::{ProgressActive, ProgressValue},
+};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, VariantArray};
 
@@ -19,15 +22,18 @@ use strum::{AsRefStr, EnumIter, VariantArray};
     Deserialize,
 )]
 pub enum Progress {
+    Intensity,
+
     #[default]
     Duration,
-    Intensity,
+
+    #[strum(serialize = "Secondary Duration")]
+    SecondaryDuration,
 }
 
 impl Progress {
     pub fn calc_progress(&self, ctx: &Context, active: &ProgressActive, max: u32) -> f32 {
         match self {
-            Self::Duration => active.progress_or_default(ctx.now),
             Self::Intensity => {
                 if max > 0 {
                     active.intensity() as f32 / max as f32
@@ -35,13 +41,18 @@ impl Progress {
                     0.0
                 }
             }
+            Self::Duration => active.progress_or_default(ProgressValue::Primary, ctx.now),
+            Self::SecondaryDuration => {
+                active.progress_or_default(ProgressValue::Secondary, ctx.now)
+            }
         }
     }
 
     pub fn progress_max(&self, active: &ProgressActive, max: u32) -> u32 {
         match self {
-            Self::Duration => active.max(),
             Self::Intensity => max,
+            Self::Duration => active.max(ProgressValue::Primary),
+            Self::SecondaryDuration => active.max(ProgressValue::Secondary),
         }
     }
 }

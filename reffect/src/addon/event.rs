@@ -51,13 +51,14 @@ impl Addon {
     pub fn unload() {
         log::info!("Reffect v{VERSION} unload");
 
-        {
-            let plugin = Self::lock();
-            AddonSettings::new(&plugin.context).save();
-            if plugin.context.settings.save_on_unload {
-                plugin.save_packs();
-            }
+        let plugin = Self::lock();
+        AddonSettings::new(&plugin.context).save();
+        if plugin.context.settings.save_on_unload {
+            plugin.save_packs();
         }
+        drop(plugin);
+
+        Internal::deinit();
 
         TextureManager::unload();
     }

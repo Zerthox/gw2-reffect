@@ -188,6 +188,12 @@ impl Recharge {
     /// Returns the remaining recharge.
     #[inline]
     pub fn recharge_remaining(&self, now: u32) -> u32 {
-        (self.last_update + self.recharge).saturating_sub(now)
+        self.end().saturating_sub(now)
+    }
+
+    /// Returns the end timestamp.
+    #[inline]
+    pub fn end(&self) -> u32 {
+        self.last_update + self.recharge
     }
 }

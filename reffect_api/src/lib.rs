@@ -15,7 +15,12 @@ pub type Texture = ID3D11ShaderResourceView;
 /// Interface for API.
 pub trait Interface {
     /// Initializes the API.
-    fn init();
+    #[inline]
+    fn init() {}
+
+    /// Deinitializes the API.
+    #[inline]
+    fn deinit() {}
 
     /// Updates and returns the current state.
     fn update_state(state: &mut State);

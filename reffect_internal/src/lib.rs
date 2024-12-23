@@ -9,9 +9,6 @@ pub struct Dummy;
 
 impl Interface for Dummy {
     #[inline]
-    fn init() {}
-
-    #[inline]
     fn update_state(state: &mut State) {
         *state = State::disabled();
     }

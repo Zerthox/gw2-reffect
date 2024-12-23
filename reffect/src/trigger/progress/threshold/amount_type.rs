@@ -2,7 +2,7 @@ use crate::{
     context::Context,
     render::RenderOptions,
     render_util::{enum_combo, helper, input_float_with_format},
-    trigger::ProgressActive,
+    trigger::{ProgressActive, ProgressValue},
 };
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Slider, SliderFlags, Ui};
 use serde::{Deserialize, Serialize};
@@ -37,6 +37,12 @@ pub enum AmountType {
     /// Progress percent.
     #[strum(serialize = "Progress %")]
     Percent,
+
+    #[strum(serialize = "Secondary Duration")]
+    SecondaryDuration,
+
+    #[strum(serialize = "Secondary Progress %")]
+    SecondaryPercent,
 }
 
 impl AmountType {
@@ -44,10 +50,17 @@ impl AmountType {
         match self {
             Self::Intensity => active.intensity() as f32,
             Self::Duration => active
-                .current(ctx.now)
+                .current(ProgressValue::Primary, ctx.now)
                 .map(|current| current as f32 / 1000.0)
                 .unwrap_or(f32::INFINITY),
-            Self::Percent => 100.0 * active.progress_or_default(ctx.now),
+            Self::Percent => 100.0 * active.progress_or_default(ProgressValue::Primary, ctx.now),
+            Self::SecondaryDuration => active
+                .current(ProgressValue::Secondary, ctx.now)
+                .map(|current| current as f32 / 1000.0)
+                .unwrap_or(f32::INFINITY),
+            &Self::SecondaryPercent => {
+                100.0 * active.progress_or_default(ProgressValue::Secondary, ctx.now)
+            }
         }
     }
 
@@ -73,7 +86,7 @@ impl AmountType {
                 helper(ui, || ui.text("Intensity in stacks or resource units"));
                 changed
             }
-            Self::Duration => {
+            Self::Duration | Self::SecondaryDuration => {
                 let changed = input_float_with_format(
                     label,
                     value,
@@ -85,7 +98,7 @@ impl AmountType {
                 helper(ui, || ui.text("Duration in seconds"));
                 changed
             }
-            Self::Percent => {
+            Self::Percent | Self::SecondaryPercent => {
                 let changed = Slider::new(label, 0.0, 100.0)
                     .flags(SliderFlags::ALWAYS_CLAMP)
                     .display_format("%.2f")

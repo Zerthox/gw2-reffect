@@ -13,7 +13,7 @@ use crate::{
     },
     render_util::{debug_optional, draw_spinner_bg, draw_text_bg, Rect},
     settings::icon::{DurationBarSettings, DurationTextSettings, StackTextSettings},
-    trigger::ProgressActive,
+    trigger::{ProgressActive, ProgressValue},
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
@@ -98,7 +98,7 @@ impl Icon {
 
             // render duration bar
             if self.duration_bar {
-                if let Some(progress) = active.progress(ctx.now) {
+                if let Some(progress) = active.progress(ProgressValue::Secondary, ctx.now) {
                     let DurationBarSettings { height, color } = ctx.settings.icon.duration_bar;
 
                     let [start_x, _] = start;
@@ -146,7 +146,7 @@ impl Icon {
 
             // render duration text
             if self.duration_text {
-                if let Some(remain) = active.current(ctx.now) {
+                if let Some(remain) = active.current(ProgressValue::Primary, ctx.now) {
                     let DurationTextSettings {
                         max_remain,
                         scale,
@@ -157,7 +157,7 @@ impl Icon {
                     } = ctx.settings.icon.duration_text;
 
                     if remain < max_remain {
-                        let text = active.current_text(ctx.now, false);
+                        let text = active.current_text(ProgressValue::Primary, ctx.now, false);
 
                         let font_size = scale * small_size;
                         let font_scale = font_size / ui.current_font_size();

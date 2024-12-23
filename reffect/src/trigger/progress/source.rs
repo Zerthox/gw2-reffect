@@ -1,13 +1,12 @@
-use super::ProgressActive;
+use super::{ProgressActive, Slot};
 use crate::{
     action::Action,
     context::Context,
-    internal::{Interface, Internal},
+    internal::{Buff, Category, Error, Interface, Internal, SkillInfo},
     render::RenderOptions,
     render_util::{enum_combo, helper, impl_static_variants, input_skill_id, Validation},
 };
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
-use reffect_internal::{Buff, Category, Error, SkillInfo, Slot};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, IntoStaticStr};
 
@@ -35,14 +34,8 @@ pub enum ProgressSource {
     #[strum(serialize = "Ability Recharge")]
     Ability(u32),
 
-    #[strum(serialize = "Ability Ammo Recharge")]
-    AbilityAmmo(u32),
-
     #[strum(serialize = "Slot Recharge")]
     SkillbarSlot(Slot),
-
-    #[strum(serialize = "Slot Ammo Recharge")]
-    SkillbarSlotAmmo(Slot),
 
     /// Health.
     Health,
@@ -82,7 +75,7 @@ impl ProgressSource {
                     .get(&id)
                     .filter(|buff| buff.runout_time > ctx.now)
                     .map(|buff| ProgressActive::from_buff(id, buff))
-                    .unwrap_or_else(|| ProgressActive::empy_timed(id))
+                    .unwrap_or_else(|| ProgressActive::empy_buff(id))
             }),
             Self::AnyBuff(ref ids) => ctx.own_buffs().map(|buffs| {
                 let mut combined = Buff::empty();
@@ -95,25 +88,11 @@ impl ProgressSource {
                 }
                 ProgressActive::from_buff(ids.first().copied().unwrap_or(0), &combined)
             }),
-            Self::SkillbarSlot(slot) => {
-                let skillbar = ctx.own_skillbar()?;
-                let ability = skillbar.slot(slot)?;
-                Some(ProgressActive::from_ability(skillbar, ability))
-            }
-            Self::SkillbarSlotAmmo(slot) => {
-                let skillbar = ctx.own_skillbar()?;
-                let ability = skillbar.slot(slot)?;
-                Some(ProgressActive::from_ability_ammo(skillbar, ability))
-            }
+            Self::SkillbarSlot(slot) => slot.get_progress(ctx.own_skillbar()?),
             Self::Ability(id) => {
                 let skillbar = ctx.own_skillbar()?;
                 let ability = skillbar.ability(id)?;
                 Some(ProgressActive::from_ability(skillbar, ability))
-            }
-            Self::AbilityAmmo(id) => {
-                let skillbar = ctx.own_skillbar()?;
-                let ability = skillbar.ability(id)?;
-                Some(ProgressActive::from_ability_ammo(skillbar, ability))
             }
             Self::Health => ctx.own_resources()?.health.clone().try_into().ok(),
             Self::Barrier => ctx.own_resources()?.barrier.clone().try_into().ok(),
@@ -131,48 +110,24 @@ impl ProgressSource {
         match *self {
             Self::Inherit => parent.cloned().unwrap_or(ProgressActive::dummy()),
             Self::Always => ProgressActive::dummy(),
-            Self::Buff(id) | Self::Ability(id) | Self::AbilityAmmo(id) => {
-                let apply = ctx.now - passed;
-                ProgressActive::Timed {
-                    id,
-                    intensity: (progress * 25.0) as u32,
-                    duration: apply,
-                    end: apply + CYCLE,
-                    rate: 1.0,
-                }
-            }
-            Self::SkillbarSlot(slot) | Self::SkillbarSlotAmmo(slot) => {
-                let apply = ctx.now - passed;
-                ProgressActive::Timed {
-                    id: ctx
-                        .state
-                        .own_skillbar
-                        .as_ref()
-                        .ok()
-                        .and_then(|skillbar| skillbar.slot(slot))
-                        .map(|ability| ability.id)
-                        .unwrap_or(0),
-                    intensity: (progress * 25.0) as u32,
-                    duration: apply,
-                    end: apply + CYCLE,
-                    rate: 1.0,
-                }
+            Self::Buff(id) => ProgressActive::edit_buff(id, progress, ctx.now),
+            Self::Ability(id) => ProgressActive::edit_ability(id, progress, ctx.now),
+            Self::SkillbarSlot(slot) => {
+                let id = ctx
+                    .own_skillbar()
+                    .and_then(|skillbar| slot.get_id(skillbar))
+                    .unwrap_or(0);
+                ProgressActive::edit_ability(id, progress, ctx.now)
             }
             Self::AnyBuff(ref ids) => {
-                let apply = ctx.now - passed;
-                ProgressActive::Timed {
-                    id: ids.first().copied().unwrap_or(0),
-                    intensity: (progress * 25.0) as u32,
-                    duration: apply,
-                    end: apply + CYCLE,
-                    rate: 1.0,
-                }
+                let id = ids.first().copied().unwrap_or(0);
+                ProgressActive::edit_buff(id, progress, ctx.now)
             }
-            Self::Health => ProgressActive::from_percent(progress, 15_000),
-            Self::Barrier => ProgressActive::from_percent(0.5 * progress, 15_000),
-            Self::Endurance => ProgressActive::from_percent(progress, 100),
+            Self::Health => ProgressActive::edit_resource(progress, 15_000),
+            Self::Barrier => ProgressActive::edit_resource(0.5 * progress, 15_000),
+            Self::Endurance => ProgressActive::edit_resource(progress, 100),
             Self::PrimaryResource | Self::SecondaryResource => {
-                ProgressActive::from_percent(progress, 30)
+                ProgressActive::edit_resource(progress, 30)
             }
         }
     }
@@ -263,13 +218,13 @@ impl RenderOptions for ProgressSource {
 
                 action.perform(ids);
             }
-            Self::Ability(id) | Self::AbilityAmmo(id) => {
+            Self::Ability(id) => {
                 Self::ability_validate(*id).for_item(ui, || {
                     input_skill_id(ui, "Ability Id", id, InputTextFlags::empty())
                 });
                 Self::id_helper(ui);
             }
-            Self::SkillbarSlot(slot) | Self::SkillbarSlotAmmo(slot) => {
+            Self::SkillbarSlot(slot) => {
                 enum_combo(ui, "Slot", slot, ComboBoxFlags::HEIGHT_LARGEST);
             }
             _ => {}
