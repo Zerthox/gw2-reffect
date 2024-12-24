@@ -72,15 +72,30 @@ impl ProgressActive {
 
     /// Creates new timed active progress from a skillbar and ability.
     pub fn from_ability(skillbar: &Skillbar, ability: &Ability) -> Self {
+        let Ability {
+            id,
+            ammo,
+            recharge,
+            recharge_remaining,
+            ammo_recharge,
+            ammo_recharge_remaining,
+        } = *ability;
         Self::Ability {
-            id: ability.id,
-            ammo: ability.ammo,
-            duration: ability.recharge,
-            end: skillbar.last_update
-                + Self::unscale(ability.recharge_remaining, skillbar.recharge_rate),
-            ammo_duration: ability.ammo_recharge,
-            ammo_end: skillbar.last_update
-                + Self::unscale(ability.ammo_recharge_remaining, skillbar.recharge_rate),
+            id,
+            ammo,
+            duration: recharge,
+            end: if recharge > 0 {
+                skillbar.last_update + Self::unscale(recharge_remaining, skillbar.recharge_rate)
+            } else {
+                0
+            },
+            ammo_duration: ammo_recharge,
+            ammo_end: if ammo_recharge > 0 {
+                skillbar.last_update
+                    + Self::unscale(ammo_recharge_remaining, skillbar.recharge_rate)
+            } else {
+                0
+            },
             rate: skillbar.recharge_rate,
         }
     }
@@ -134,6 +149,11 @@ impl ProgressActive {
         matches!(self, Self::Buff { .. } | Self::Ability { .. })
     }
 
+    /// Whether the progress is inverted.
+    pub const fn is_inverted(&self) -> bool {
+        matches!(self, Self::Ability { .. })
+    }
+
     /// Returns the intensity (alternative progress).
     pub const fn intensity(&self) -> u32 {
         match *self {
@@ -144,7 +164,7 @@ impl ProgressActive {
     }
 
     /// Returns the current progress rate.
-    pub fn progress_rate(&self) -> f32 {
+    pub const fn progress_rate(&self) -> f32 {
         match *self {
             Self::Fixed { .. } | Self::Buff { .. } => 1.0,
             Self::Ability { rate, .. } => rate,
@@ -157,7 +177,14 @@ impl ProgressActive {
             match (current, self.max(value)) {
                 (0, 0) => 0.0, // treat 0/0 as 0% progress
                 (_, 0) => 1.0, // treat x/0 as 100% progress
-                (current, max) => current as f32 / max as f32,
+                (current, max) => {
+                    let progress = current as f32 / max as f32;
+                    if self.is_inverted() {
+                        1.0 - progress
+                    } else {
+                        progress
+                    }
+                }
             }
         })
     }
@@ -173,17 +200,16 @@ impl ProgressActive {
             Self::Fixed { current, .. } => Some(current),
             Self::Buff { end, .. } => (end != u32::MAX).then(|| Self::time_between(now, end)),
             Self::Ability {
+                ammo,
                 end,
                 ammo_end,
                 rate,
                 ..
-            } => {
-                let end = match value {
-                    ProgressValue::Primary => end,
-                    ProgressValue::Secondary => ammo_end,
-                };
-                Some(Self::time_between_scaled(now, end, rate))
-            }
+            } => Some(Self::time_between_scaled(
+                now,
+                value.pick(ammo, end, ammo_end),
+                rate,
+            )),
         }
     }
 
@@ -199,17 +225,16 @@ impl ProgressActive {
                 }
             }
             Self::Ability {
+                ammo,
                 end,
                 ammo_end,
                 rate,
                 ..
-            } => {
-                let end = match value {
-                    ProgressValue::Primary => end,
-                    ProgressValue::Secondary => ammo_end,
-                };
-                Self::duration_text(Self::time_between_scaled(now, end, rate))
-            }
+            } => Self::duration_text(Self::time_between_scaled(
+                now,
+                value.pick(ammo, end, ammo_end),
+                rate,
+            )),
         }
     }
 
@@ -219,13 +244,11 @@ impl ProgressActive {
             Self::Fixed { max, .. } => max,
             Self::Buff { duration, .. } => duration,
             Self::Ability {
+                ammo,
                 duration,
                 ammo_duration,
                 ..
-            } => match value {
-                ProgressValue::Primary => duration,
-                ProgressValue::Secondary => ammo_duration,
-            },
+            } => value.pick(ammo, duration, ammo_duration),
         }
     }
 
@@ -241,13 +264,11 @@ impl ProgressActive {
                 }
             }
             Self::Ability {
+                ammo,
                 duration,
                 ammo_duration,
                 ..
-            } => Self::format_seconds(match value {
-                ProgressValue::Primary => duration,
-                ProgressValue::Secondary => ammo_duration,
-            }),
+            } => Self::format_seconds(value.pick(ammo, duration, ammo_duration)),
         }
     }
 
@@ -293,4 +314,29 @@ impl TryFrom<Resource> for ProgressActive {
 pub enum ProgressValue {
     Primary,
     Secondary,
+    PreferPrimary,
+    PreferSecondary,
+}
+
+impl ProgressValue {
+    pub fn pick(&self, intensity: u32, primary: u32, secondary: u32) -> u32 {
+        match self {
+            Self::Primary => primary,
+            Self::Secondary => secondary,
+            Self::PreferPrimary => {
+                if intensity > 0 {
+                    primary
+                } else {
+                    secondary
+                }
+            }
+            Self::PreferSecondary => {
+                if secondary > 0 {
+                    secondary
+                } else {
+                    primary
+                }
+            }
+        }
+    }
 }
