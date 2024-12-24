@@ -5,8 +5,7 @@ use crate::{
     id::Id,
     render::{colors, ComponentWise, RenderDebug, RenderOptions},
     render_util::{
-        debug_optional, helper_slider, input_pos, push_alpha_change, slider_percent,
-        EnumStaticVariants, Rect,
+        helper_slider, input_pos, push_alpha_change, slider_percent, EnumStaticVariants, Rect,
     },
     trigger::ProgressTrigger,
 };

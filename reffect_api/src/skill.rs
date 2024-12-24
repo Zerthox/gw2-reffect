@@ -4,7 +4,10 @@ use strum::{AsRefStr, Display, IntoStaticStr};
 #[derive(Debug, Clone)]
 pub enum SkillInfo {
     /// Ability.
-    Ability,
+    Ability {
+        /// Whether the ability is an ammunition skill.
+        is_ammo: bool,
+    },
 
     /// Buff.
     Buff {

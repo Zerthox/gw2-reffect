@@ -146,7 +146,7 @@ impl Icon {
 
             // render duration text
             if self.duration_text {
-                if let Some(remain) = active.current(ProgressValue::PreferPrimary, ctx.now) {
+                if let Some(remain) = active.current(ProgressValue::Primary, ctx.now) {
                     let DurationTextSettings {
                         max_remain,
                         scale,
@@ -157,8 +157,7 @@ impl Icon {
                     } = ctx.settings.icon.duration_text;
 
                     if remain < max_remain {
-                        let text =
-                            active.current_text(ProgressValue::PreferPrimary, ctx.now, false);
+                        let text = active.current_text(ProgressValue::Primary, ctx.now, false);
 
                         let font_size = scale * small_size;
                         let font_scale = font_size / ui.current_font_size();

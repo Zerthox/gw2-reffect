@@ -200,14 +200,13 @@ impl ProgressActive {
             Self::Fixed { current, .. } => Some(current),
             Self::Buff { end, .. } => (end != u32::MAX).then(|| Self::time_between(now, end)),
             Self::Ability {
-                ammo,
                 end,
                 ammo_end,
                 rate,
                 ..
             } => Some(Self::time_between_scaled(
                 now,
-                value.pick(ammo, end, ammo_end),
+                value.pick(end, ammo_end),
                 rate,
             )),
         }
@@ -225,14 +224,13 @@ impl ProgressActive {
                 }
             }
             Self::Ability {
-                ammo,
                 end,
                 ammo_end,
                 rate,
                 ..
             } => Self::duration_text(Self::time_between_scaled(
                 now,
-                value.pick(ammo, end, ammo_end),
+                value.pick(end, ammo_end),
                 rate,
             )),
         }
@@ -244,11 +242,10 @@ impl ProgressActive {
             Self::Fixed { max, .. } => max,
             Self::Buff { duration, .. } => duration,
             Self::Ability {
-                ammo,
                 duration,
                 ammo_duration,
                 ..
-            } => value.pick(ammo, duration, ammo_duration),
+            } => value.pick(duration, ammo_duration),
         }
     }
 
@@ -264,11 +261,10 @@ impl ProgressActive {
                 }
             }
             Self::Ability {
-                ammo,
                 duration,
                 ammo_duration,
                 ..
-            } => Self::format_seconds(value.pick(ammo, duration, ammo_duration)),
+            } => Self::format_seconds(value.pick(duration, ammo_duration)),
         }
     }
 
@@ -319,12 +315,12 @@ pub enum ProgressValue {
 }
 
 impl ProgressValue {
-    pub fn pick(&self, intensity: u32, primary: u32, secondary: u32) -> u32 {
+    pub fn pick(&self, primary: u32, secondary: u32) -> u32 {
         match self {
             Self::Primary => primary,
             Self::Secondary => secondary,
             Self::PreferPrimary => {
-                if intensity > 0 {
+                if primary > 0 {
                     primary
                 } else {
                     secondary

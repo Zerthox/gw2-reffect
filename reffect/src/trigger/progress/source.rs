@@ -152,7 +152,7 @@ impl ProgressSource {
                     Validation::Confirm(format!("{category} {id} is valid"))
                 }
             }
-            Ok(SkillInfo::Ability) => Validation::Error(format!("Id {id} is an ability")),
+            Ok(SkillInfo::Ability { .. }) => Validation::Error(format!("Id {id} is an ability")),
             Err(Error::SkillNotFound) => Validation::Error(format!("Id {id} is invalid or hidden")),
             Err(_) => Validation::Ok,
         }
@@ -160,7 +160,7 @@ impl ProgressSource {
 
     fn ability_validate(id: u32) -> Validation<impl AsRef<str>> {
         match Internal::get_skill_info(id) {
-            Ok(SkillInfo::Ability) => Validation::Confirm(format!("Ability {id} is valid")),
+            Ok(SkillInfo::Ability { .. }) => Validation::Confirm(format!("Ability {id} is valid")),
             Ok(SkillInfo::Buff { .. }) => Validation::Error(format!("Id {id} is an effect")),
             Err(Error::SkillNotFound) => Validation::Error(format!("Id {id} is invalid or hidden")),
             Err(_) => Validation::Ok,
