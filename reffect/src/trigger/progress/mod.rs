@@ -7,7 +7,8 @@ pub use self::{active::*, slot::*, source::*, threshold::*};
 
 use crate::{
     context::{Context, ContextUpdate},
-    render::RenderOptions,
+    render::{RenderDebug, RenderOptions},
+    render_util::debug_optional,
     serde_migrate::migrate,
 };
 use nexus::imgui::Ui;
@@ -80,6 +81,12 @@ impl RenderOptions for ProgressTrigger {
             self.threshold.render_options(ui, ctx);
             // TODO: we rely on interval refreshing the memo, render options might want context for updates
         }
+    }
+}
+
+impl RenderDebug for ProgressTrigger {
+    fn render_debug(&mut self, ui: &Ui, _ctx: &Context) {
+        debug_optional(ui, "Trigger", self.active());
     }
 }
 

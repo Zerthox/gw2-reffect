@@ -226,9 +226,9 @@ impl RenderOptions for Common {
 }
 
 impl RenderDebug for Common {
-    fn render_debug(&mut self, ui: &Ui, _ctx: &Context) {
+    fn render_debug(&mut self, ui: &Ui, ctx: &Context) {
         ui.text(format!("Id: {}", self.id));
-        debug_optional(ui, "Trigger", self.trigger.active());
+        self.trigger.render_debug(ui, ctx);
     }
 }
 

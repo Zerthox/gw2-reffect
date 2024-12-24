@@ -86,6 +86,8 @@ impl RenderOptions for ListIcon {
 
 impl RenderDebug for ListIcon {
     fn render_debug(&mut self, ui: &Ui, ctx: &Context) {
+        self.trigger.render_debug(ui, ctx);
+        self.filter.render_debug(ui, ctx);
         self.icon.render_debug(ui, ctx)
     }
 }

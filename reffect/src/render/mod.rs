@@ -25,5 +25,6 @@ pub trait RenderOptions<T = ()> {
 /// Render debug UI.
 pub trait RenderDebug {
     /// Renders debug info for the type.
+    // TODO: const ref instead?
     fn render_debug(&mut self, ui: &Ui, ctx: &Context);
 }

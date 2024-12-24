@@ -218,9 +218,13 @@ impl IconList {
 impl RenderDebug for IconList {
     fn render_debug(&mut self, ui: &Ui, ctx: &Context) {
         ui.text(format!("Icons: {}", self.icons.len()));
-        for icon in &mut self.icons {
-            ui.spacing();
-            icon.render_debug(ui, ctx);
+        for (i, icon) in self.icons.iter_mut().enumerate() {
+            if CollapsingHeader::new(format!("{}###icon{i}", icon.name))
+                .flags(TreeNodeFlags::ALLOW_ITEM_OVERLAP)
+                .begin(ui)
+            {
+                icon.render_debug(ui, ctx);
+            }
         }
     }
 }
