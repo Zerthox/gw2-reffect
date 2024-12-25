@@ -18,6 +18,9 @@ pub struct Skillbar {
     /// Weapon swap.
     pub weapon_swap: Option<Recharge>,
 
+    /// Whether the player is carrying a bundle.
+    pub has_bundle: bool,
+
     /// Revenant legend swap.
     pub legend_swap: Option<Recharge>,
 }

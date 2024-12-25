@@ -13,7 +13,7 @@ use crate::{
     },
     render_util::{debug_optional, draw_spinner_bg, draw_text_bg, Rect},
     settings::icon::{DurationBarSettings, DurationTextSettings, StackTextSettings},
-    trigger::{ProgressActive, ProgressValue},
+    trigger::{ProgressActive, ProgressValue, Skill},
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
@@ -65,9 +65,11 @@ impl Icon {
         if let Some(active) = active {
             let [width, height] = size;
             let small_size = width.min(height);
-            let texture = self
-                .source
-                .get_texture(active.id().filter(|_| ctx.settings.use_game_icons));
+            let texture = self.source.get_texture(if ctx.settings.use_game_icons {
+                active.skill()
+            } else {
+                Skill::Unknown
+            });
 
             let (start, end) = Self::bounds(size);
             let start = state.pos.add(start);
@@ -206,7 +208,7 @@ impl RenderDebug for Icon {
             ui,
             "Texture",
             self.source
-                .get_texture(None)
+                .get_texture(Skill::Unknown)
                 .map(|texture| texture.id() as *mut ()),
         );
     }

@@ -16,12 +16,12 @@ pub enum ProgressActive {
         end: u32,
     },
     Ability {
-        id: u32,
+        skill: Skill,
         ammo: u32,
         rate: f32,
-        duration: u32,
+        recharge: u32,
         end: u32,
-        ammo_duration: u32,
+        ammo_recharge: u32,
         ammo_end: u32,
     },
 }
@@ -57,14 +57,14 @@ impl ProgressActive {
     }
 
     /// Creates new timed active progress from a recharge.
-    pub fn from_recharge(recharge: &Recharge) -> Self {
+    pub fn from_recharge(skill: Skill, recharge: &Recharge) -> Self {
         let duration = recharge.recharge;
         Self::Ability {
-            id: 0,
-            ammo: if duration > 0 { 1 } else { 0 },
-            duration,
+            skill,
+            ammo: if duration == 0 { 1 } else { 0 },
+            recharge: duration,
             end: recharge.end(),
-            ammo_duration: 0,
+            ammo_recharge: 0,
             ammo_end: 0,
             rate: 1.0,
         }
@@ -81,15 +81,15 @@ impl ProgressActive {
             ammo_recharge_remaining,
         } = *ability;
         Self::Ability {
-            id,
+            skill: id.into(),
             ammo,
-            duration: recharge,
+            recharge,
             end: if recharge > 0 {
                 skillbar.last_update + Self::unscale(recharge_remaining, skillbar.recharge_rate)
             } else {
                 0
             },
-            ammo_duration: ammo_recharge,
+            ammo_recharge,
             ammo_end: if ammo_recharge > 0 {
                 skillbar.last_update
                     + Self::unscale(ammo_recharge_remaining, skillbar.recharge_rate)
@@ -119,28 +119,24 @@ impl ProgressActive {
     }
 
     /// Creates an ability progress for edit mode.
-    pub const fn edit_ability(id: u32, progress: f32, now: u32) -> Self {
-        // half speed
-        let slow = if progress < 0.5 {
-            2.0 * progress
-        } else {
-            2.0 * progress - 1.0
-        };
+    pub const fn edit_ability(skill: Skill, progress: f32, now: u32) -> Self {
         Self::Ability {
-            id,
+            skill,
             ammo: (5.0 * progress) as u32,
-            duration: 5000,
+            recharge: 5000,
             end: now + (5000.0 * progress) as u32,
             rate: 1.0,
-            ammo_duration: 10_000,
-            ammo_end: now + (10000.0 * slow) as u32,
+            ammo_recharge: 5000,
+            ammo_end: now + (5000.0 * progress) as u32,
         }
     }
 
-    pub const fn id(&self) -> Option<u32> {
+    /// Returns the assoicated skill.
+    pub const fn skill(&self) -> Skill {
         match *self {
-            Self::Fixed { .. } => None,
-            Self::Buff { id, .. } | Self::Ability { id, .. } => Some(id),
+            Self::Fixed { .. } => Skill::Unknown,
+            Self::Buff { id, .. } => Skill::Id(id),
+            Self::Ability { skill, .. } => skill,
         }
     }
 
@@ -242,10 +238,10 @@ impl ProgressActive {
             Self::Fixed { max, .. } => max,
             Self::Buff { duration, .. } => duration,
             Self::Ability {
-                duration,
-                ammo_duration,
+                recharge,
+                ammo_recharge,
                 ..
-            } => value.pick(duration, ammo_duration),
+            } => value.pick(recharge, ammo_recharge),
         }
     }
 
@@ -261,10 +257,10 @@ impl ProgressActive {
                 }
             }
             Self::Ability {
-                duration,
-                ammo_duration,
+                recharge,
+                ammo_recharge,
                 ..
-            } => Self::format_seconds(value.pick(duration, ammo_duration)),
+            } => Self::format_seconds(value.pick(recharge, ammo_recharge)),
         }
     }
 
@@ -334,5 +330,20 @@ impl ProgressValue {
                 }
             }
         }
+    }
+}
+
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum Skill {
+    #[default]
+    Unknown,
+    WeaponSwap,
+    BundleDrop,
+    Id(u32),
+}
+
+impl From<u32> for Skill {
+    fn from(id: u32) -> Self {
+        Self::Id(id)
     }
 }

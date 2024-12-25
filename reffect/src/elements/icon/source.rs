@@ -4,6 +4,7 @@ use crate::{
     lockbox::Lockbox,
     render_util::{enum_combo, impl_static_variants, input_text_simple_menu, Validation},
     texture_manager::TextureManager,
+    trigger::Skill,
 };
 use nexus::imgui::{ComboBoxFlags, TextureId, Ui};
 use reffect_internal::{Interface, Internal};
@@ -59,10 +60,18 @@ impl IconSource {
         TextureManager::add_source(self)
     }
 
-    pub fn get_texture(&self, skill_id: Option<u32>) -> Option<TextureId> {
+    pub fn get_texture(&self, skill: Skill) -> Option<TextureId> {
         match self {
             Self::Empty => None,
-            Self::Dynamic => Internal::get_skill_icon(skill_id?).map(|srv| srv.as_raw().into()),
+            Self::Dynamic => match skill {
+                Skill::Unknown => TextureManager::get_texture(&IconSource::Unknown),
+                Skill::WeaponSwap => TextureManager::get_weapon_swap(),
+                Skill::BundleDrop => TextureManager::get_bundle_drop(),
+                Skill::Id(id) => match Internal::get_skill_icon(id) {
+                    Some(tex) => Some(tex.as_raw().into()),
+                    None => TextureManager::get_texture(&IconSource::Unknown),
+                },
+            },
             _ => TextureManager::get_texture(self),
         }
     }

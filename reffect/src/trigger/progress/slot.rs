@@ -1,4 +1,4 @@
-use super::ProgressActive;
+use super::{ProgressActive, Skill};
 use crate::internal::{self, Skillbar};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, Display, EnumCount, EnumIter, IntoStaticStr, VariantArray};
@@ -78,22 +78,31 @@ pub enum Slot {
 }
 
 impl Slot {
-    pub fn get_id(&self, skillbar: &Skillbar) -> Option<u32> {
-        let slot = (*self).try_into().ok()?;
-        Some(skillbar.slot(slot)?.id)
+    pub fn get_skill(&self, skillbar: &Skillbar) -> Option<Skill> {
+        match *self {
+            Self::WeaponSwap => Some(Skill::WeaponSwap),
+            slot => {
+                let slot = slot.try_into().ok()?;
+                Some(skillbar.slot(slot)?.id.into())
+            }
+        }
     }
 
     pub fn get_progress(&self, skillbar: &Skillbar) -> Option<ProgressActive> {
         match *self {
-            Self::WeaponSwap => {
-                let swap = skillbar.weapon_swap.as_ref()?;
-                Some(ProgressActive::from_recharge(swap))
-            }
-            Self::Profession1 => {
-                if let Some(swap) = &skillbar.legend_swap {
-                    Some(ProgressActive::from_recharge(swap))
+            Self::WeaponSwap => Some(ProgressActive::from_recharge(
+                if skillbar.has_bundle {
+                    Skill::BundleDrop
                 } else {
-                    let ability = skillbar.slot(internal::Slot::Profession1)?;
+                    Skill::WeaponSwap
+                },
+                skillbar.weapon_swap.as_ref()?,
+            )),
+            Self::Profession1 => {
+                let ability = skillbar.slot(internal::Slot::Profession1)?;
+                if let Some(swap) = &skillbar.legend_swap {
+                    Some(ProgressActive::from_recharge(ability.id.into(), swap))
+                } else {
                     Some(ProgressActive::from_ability(skillbar, ability))
                 }
             }

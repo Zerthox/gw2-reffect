@@ -111,13 +111,13 @@ impl ProgressSource {
             Self::Inherit => parent.cloned().unwrap_or(ProgressActive::dummy()),
             Self::Always => ProgressActive::dummy(),
             Self::Buff(id) => ProgressActive::edit_buff(id, progress, ctx.now),
-            Self::Ability(id) => ProgressActive::edit_ability(id, progress, ctx.now),
+            Self::Ability(id) => ProgressActive::edit_ability(id.into(), progress, ctx.now),
             Self::SkillbarSlot(slot) => {
-                let id = ctx
+                let skill = ctx
                     .own_skillbar()
-                    .and_then(|skillbar| slot.get_id(skillbar))
-                    .unwrap_or(0);
-                ProgressActive::edit_ability(id, progress, ctx.now)
+                    .and_then(|skillbar| slot.get_skill(skillbar))
+                    .unwrap_or_default();
+                ProgressActive::edit_ability(skill, progress, ctx.now)
             }
             Self::AnyBuff(ref ids) => {
                 let id = ids.first().copied().unwrap_or(0);

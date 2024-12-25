@@ -1,8 +1,4 @@
-use crate::{
-    addon::Addon,
-    assets::{MONSTER_ICON, TEMP_ICON},
-    elements::icon::IconSource,
-};
+use crate::{addon::Addon, assets, elements::icon::IconSource};
 use nexus::{
     imgui::TextureId,
     texture::{
@@ -24,21 +20,36 @@ static TEXTURE_MANAGER: OnceLock<Mutex<TextureManager>> = OnceLock::new();
 #[derive(Debug)]
 pub struct TextureManager {
     loader: Option<TextureLoader>,
-    error: Option<TextureId>,
     pending: HashMap<String, IconSource>,
     loaded: HashMap<IconSource, TextureId>,
+    error: Option<TextureId>,
+    weapon: Option<TextureId>,
+    bundle: Option<TextureId>,
 }
 
 impl TextureManager {
     const ERROR_ID: &'static str = "REFFECT_ICON_ERROR";
+    const WEAPON_ID: &'static str = "REFFECT_ICON_WEAPON";
+    const BUNDLE_ID: &'static str = "REFFECT_ICON_BUNDLE";
 
     fn new() -> Self {
         Self {
             loader: TextureLoader::spawn(Self::loader_thread),
-            error: None,
             pending: HashMap::new(),
             loaded: HashMap::new(),
+            error: None,
+            weapon: None,
+            bundle: None,
         }
+        .with_defaults()
+    }
+
+    fn with_defaults(mut self) -> Self {
+        self.try_load_from_mem(Self::ERROR_ID, assets::TEMP_ICON);
+        self.try_load_from_mem(Self::WEAPON_ID, assets::WEAPON_SWAP);
+        self.try_load_from_mem(Self::BUNDLE_ID, assets::BUNDLE_DROP);
+        self.try_load_from_mem(IconSource::UNKNOWN_ID, assets::MONSTER_ICON);
+        self
     }
 
     fn loader_thread(source: IconSource) -> bool {
@@ -72,12 +83,6 @@ impl TextureManager {
         self.loaded.contains_key(source) || self.pending.contains_key(&source.generate_id())
     }
 
-    fn with_defaults(mut self) -> Self {
-        self.try_load_from_mem(Self::ERROR_ID, TEMP_ICON);
-        self.try_load_from_mem(IconSource::UNKNOWN_ID, MONSTER_ICON);
-        self
-    }
-
     fn try_load_from_mem(&mut self, id: impl AsRef<str>, data: impl AsRef<[u8]>) {
         // check for the texture ourself to avoid recursive locking
         let id = id.as_ref();
@@ -90,7 +95,7 @@ impl TextureManager {
     }
 
     pub fn load() -> &'static Mutex<TextureManager> {
-        TEXTURE_MANAGER.get_or_init(|| Mutex::new(Self::new().with_defaults()))
+        TEXTURE_MANAGER.get_or_init(|| Mutex::new(Self::new()))
     }
 
     fn lock() -> MutexGuard<'static, TextureManager> {
@@ -105,10 +110,16 @@ impl TextureManager {
         }
     }
 
+    pub fn get_weapon_swap() -> Option<TextureId> {
+        Self::lock().weapon
+    }
+
+    pub fn get_bundle_drop() -> Option<TextureId> {
+        Self::lock().bundle
+    }
+
     pub fn get_texture(source: &IconSource) -> Option<TextureId> {
-        // TODO: error state?
-        let textures = Self::lock();
-        textures.loaded.get(source).copied()
+        Self::lock().loaded.get(source).copied()
     }
 
     pub fn add_source(source: &IconSource) {
@@ -165,22 +176,39 @@ impl TextureManager {
     }
 
     fn add_loaded(&mut self, pending_id: &str, texture_id: Option<TextureId>) {
-        if pending_id == Self::ERROR_ID {
-            self.error = texture_id;
-            if self.error.is_none() {
-                log::error!("Failed to error icon source");
+        match pending_id {
+            Self::ERROR_ID => {
+                if texture_id.is_none() {
+                    log::error!("Failed to error icon source");
+                }
+                self.error = texture_id;
             }
-        } else if let Some(source) = self.pending.remove(pending_id) {
-            if let Some(texture_id) = texture_id {
-                self.loaded.insert(source, texture_id);
-            } else {
-                log::warn!("Failed to load icon source {}", source.pretty_print());
-                if let Some(texture_id) = self.error {
-                    self.loaded.insert(source, texture_id);
+            Self::WEAPON_ID => {
+                if texture_id.is_none() {
+                    log::error!("Failed to weapon swap icon source");
+                }
+                self.weapon = texture_id;
+            }
+            Self::BUNDLE_ID => {
+                if texture_id.is_none() {
+                    log::error!("Failed to bundle drop icon source");
+                }
+                self.bundle = texture_id;
+            }
+            _ => {
+                if let Some(source) = self.pending.remove(pending_id) {
+                    if let Some(texture_id) = texture_id {
+                        self.loaded.insert(source, texture_id);
+                    } else {
+                        log::warn!("Failed to load icon source {}", source.pretty_print());
+                        if let Some(texture_id) = self.error {
+                            self.loaded.insert(source, texture_id);
+                        }
+                    }
+                } else {
+                    log::warn!("Received load for non-pending texture \"{pending_id}\"");
                 }
             }
-        } else {
-            log::warn!("Received load for non-pending texture \"{pending_id}\"");
         }
     }
 }
