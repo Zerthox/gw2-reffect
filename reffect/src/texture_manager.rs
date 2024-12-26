@@ -45,10 +45,16 @@ impl TextureManager {
     }
 
     fn with_defaults(mut self) -> Self {
-        self.try_load_from_mem(Self::ERROR_ID, assets::TEMP_ICON);
-        self.try_load_from_mem(Self::WEAPON_ID, assets::WEAPON_SWAP);
-        self.try_load_from_mem(Self::BUNDLE_ID, assets::BUNDLE_DROP);
-        self.try_load_from_mem(IconSource::UNKNOWN_ID, assets::MONSTER_ICON);
+        self.error = self.try_load_from_mem(Self::ERROR_ID, assets::TEMP_ICON);
+        self.weapon = self.try_load_from_mem(Self::WEAPON_ID, assets::WEAPON_SWAP);
+        self.bundle = self.try_load_from_mem(Self::BUNDLE_ID, assets::BUNDLE_DROP);
+
+        let unknown = IconSource::UNKNOWN_ID;
+        if let Some(texture) = self.try_load_from_mem(unknown, assets::MONSTER_ICON) {
+            self.loaded.insert(IconSource::Unknown, texture);
+        } else {
+            self.pending.insert(unknown.into(), IconSource::Unknown);
+        }
         self
     }
 
@@ -83,15 +89,17 @@ impl TextureManager {
         self.loaded.contains_key(source) || self.pending.contains_key(&source.generate_id())
     }
 
-    fn try_load_from_mem(&mut self, id: impl AsRef<str>, data: impl AsRef<[u8]>) {
+    fn try_load_from_mem(
+        &mut self,
+        id: impl AsRef<str>,
+        data: impl AsRef<[u8]>,
+    ) -> Option<TextureId> {
         // check for the texture ourself to avoid recursive locking
         let id = id.as_ref();
-        if let Some(texture) = get_texture(id) {
-            self.loaded.insert(IconSource::Unknown, texture.id());
-        } else {
-            self.pending.insert(id.into(), IconSource::Unknown);
+        get_texture(id).map(|texture| texture.id()).or_else(|| {
             load_texture_from_memory(id, data, Some(Self::RECEIVE_TEXTURE));
-        };
+            None
+        })
     }
 
     pub fn load() -> &'static Mutex<TextureManager> {
