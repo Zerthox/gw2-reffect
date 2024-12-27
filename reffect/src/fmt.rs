@@ -2,7 +2,6 @@ use std::fmt;
 
 #[derive(Debug, Clone, Copy)]
 #[repr(transparent)]
-
 pub struct Time(pub u32);
 
 impl Time {
