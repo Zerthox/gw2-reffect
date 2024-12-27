@@ -55,7 +55,7 @@ impl StackTextSettings {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct DurationTextSettings {
-    pub max_remain: u32,
+    pub max_remain: u32, // TODO: different for buff & ability
     pub scale: f32,
     pub color: [f32; 4],
     pub color_fast: [f32; 4],

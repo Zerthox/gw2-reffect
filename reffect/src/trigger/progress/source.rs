@@ -188,7 +188,7 @@ impl RenderOptions for ProgressSource {
                 _ => {}
             }
         }
-        helper(ui, || ui.text("Source of information"));
+        helper(ui, || ui.text("Source of information")); // TODO: mention inherit being passed down, not affecting group visibility
 
         match self {
             Self::Buff(id) => {

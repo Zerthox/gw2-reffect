@@ -1,5 +1,5 @@
 use crate::{
-    fmt::Pretty,
+    fmt::{Time, Unit},
     internal::{Ability, Buff, Recharge, Resource, Skillbar},
 };
 
@@ -209,9 +209,9 @@ impl ProgressActive {
     }
 
     /// Returns the current amount as text.
-    pub fn current_text(&self, value: ProgressValue, now: u32, pretty: bool) -> String {
+    pub fn current_text(&self, value: ProgressValue, now: u32, unit: bool) -> String {
         match *self {
-            Self::Fixed { current, .. } => Pretty::string_if(current, pretty),
+            Self::Fixed { current, .. } => Unit::format_if(current, unit),
             Self::Buff { end, .. } => {
                 if end == u32::MAX {
                     "?".into()
@@ -246,12 +246,12 @@ impl ProgressActive {
     }
 
     /// Returns the maximum amount as text.
-    pub fn max_text(&self, value: ProgressValue, pretty: bool) -> String {
+    pub fn max_text(&self, value: ProgressValue, unit: bool) -> String {
         match *self {
-            Self::Fixed { max, .. } => Pretty::string_if(max, pretty),
+            Self::Fixed { max, .. } => Unit::format_if(max, unit),
             Self::Buff { duration, .. } => {
                 if duration != u32::MAX {
-                    Self::format_seconds(duration)
+                    Time::format(duration)
                 } else {
                     "?".into()
                 }
@@ -260,7 +260,7 @@ impl ProgressActive {
                 recharge,
                 ammo_recharge,
                 ..
-            } => Self::format_seconds(value.pick(recharge, ammo_recharge)),
+            } => Time::format(value.pick(recharge, ammo_recharge)),
         }
     }
 
@@ -276,13 +276,9 @@ impl ProgressActive {
         (time as f32 / rate) as u32
     }
 
-    fn format_seconds(time: u32) -> String {
-        format!("{:.1}", time as f32 / 1000.0)
-    }
-
     fn duration_text(time: u32) -> String {
         if time > 0 {
-            Self::format_seconds(time)
+            Time::format(time)
         } else {
             String::new()
         }

@@ -4,7 +4,7 @@ mod props;
 use super::{align::AlignHorizontal, Props, RenderState};
 use crate::{
     context::{Context, ContextUpdate},
-    fmt::Pretty,
+    fmt::Unit,
     render::{Bounds, ComponentWise, Render, RenderDebug, RenderOptions},
     render_util::{
         debug_optional, draw_text_bg, helper, input_text_multi_with_menu, LoadedFont, Rect,
@@ -78,7 +78,7 @@ impl Text {
                         }
                         'I' => {
                             iter.next();
-                            result.push_str(&Pretty(active.intensity()).to_string());
+                            result.push_str(&Unit::format(active.intensity()));
                         }
                         'c' | 'r' => {
                             iter.next();
