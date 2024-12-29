@@ -284,7 +284,7 @@ impl ProgressActive {
 
     fn duration_text(time: u32, settings: &FormatSettings) -> String {
         if time > 0 {
-            Time::format(time, settings.minutes_threshold)
+            Time::format(time, settings.minutes_threshold, settings.millis_threshold)
         } else {
             String::new()
         }

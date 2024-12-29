@@ -2,42 +2,70 @@ use std::fmt;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Time {
-    value: u32,
-    threshold: u32,
+    millis: u32,
+    min_threshold: u32,
+    milli_threshold: u32,
 }
 
 impl Time {
-    pub const DEFAULT_THRESHOLD: u32 = 60_000;
+    pub const DEFAULT_MIN_THRESHOLD: u32 = 60_000;
+    pub const DEFAULT_MILLI_THRESHOLD: u32 = 10_000;
     pub const SEC: u32 = 1000;
     pub const MIN: u32 = 60 * Self::SEC;
 
     #[allow(unused)]
-    pub const fn new(min: u32, sec: u32, ms: u32) -> Self {
-        Self::with_threshold(min, sec, ms, Self::DEFAULT_THRESHOLD)
+    pub const fn new(mins: u32, secs: u32, millis: u32) -> Self {
+        Self::with_threshold(
+            mins,
+            secs,
+            millis,
+            Self::DEFAULT_MIN_THRESHOLD,
+            Self::DEFAULT_MILLI_THRESHOLD,
+        )
     }
 
     #[allow(unused)]
-    pub const fn with_threshold(min: u32, sec: u32, ms: u32, threshold: u32) -> Self {
+    pub const fn with_threshold(
+        mins: u32,
+        secs: u32,
+        millis: u32,
+        min_threshold: u32,
+        milli_threshold: u32,
+    ) -> Self {
         Self {
-            value: Self::MIN * min + Self::SEC * sec + ms,
-            threshold,
+            millis: Self::MIN * mins + Self::SEC * secs + millis,
+            min_threshold,
+            milli_threshold,
         }
     }
 
-    pub fn format(value: u32, threshold: u32) -> String {
-        Self { value, threshold }.to_string()
+    #[allow(unused)]
+    pub fn format(millis: u32, min_threshold: u32, milli_threshold: u32) -> String {
+        Self {
+            millis,
+            min_threshold,
+            milli_threshold,
+        }
+        .to_string()
     }
 }
 
 impl fmt::Display for Time {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let Self { value, threshold } = self;
-        if value >= threshold {
-            let min = value / Self::MIN;
-            let secs = (value % Self::MIN) as f32 / Self::SEC as f32;
-            write!(f, "{min}:{secs:0>4.1}")
+        let Self {
+            millis,
+            min_threshold,
+            milli_threshold,
+        } = *self;
+
+        if millis >= min_threshold {
+            let mins = millis / Self::MIN;
+            let secs = (millis % Self::MIN) as f32 / Self::SEC as f32;
+            write!(f, "{mins}:{secs:02.0}")
         } else {
-            write!(f, "{value:.1}")
+            let secs = millis as f32 / Self::SEC as f32;
+            let prec = if millis >= milli_threshold { 0 } else { 1 };
+            write!(f, "{secs:.prec$}")
         }
     }
 }

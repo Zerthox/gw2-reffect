@@ -51,23 +51,34 @@ impl GeneralSettings {
 #[serde(default)]
 pub struct FormatSettings {
     pub minutes_threshold: u32,
+    pub millis_threshold: u32,
 }
 
 impl Default for FormatSettings {
     fn default() -> Self {
         Self {
             minutes_threshold: 60_000,
+            millis_threshold: 10_000,
         }
     }
 }
 
 impl FormatSettings {
     pub fn render_options(&mut self, ui: &Ui) {
-        let Self { minutes_threshold } = self;
+        let Self {
+            minutes_threshold,
+            millis_threshold,
+        } = self;
 
         input_seconds("Minute threshold", minutes_threshold);
         helper(ui, || {
-            ui.text("Above how many seconds to display MM:SS format")
+            ui.text("Above how many seconds to display MM:SS format");
+        });
+
+        input_seconds("Millisecond threshold", millis_threshold);
+        helper(ui, || {
+            ui.text("Below how many seconds to display milliseconds");
+            ui.text("MM:SS format always hides milliseconds");
         });
     }
 }
