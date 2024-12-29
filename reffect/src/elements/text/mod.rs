@@ -86,6 +86,7 @@ impl Text {
                                 Self::parse_value(&mut iter),
                                 ctx.now,
                                 false,
+                                &ctx.settings.format,
                             ));
                             self.frequent = is_timed;
                         }
@@ -95,16 +96,25 @@ impl Text {
                                 Self::parse_value(&mut iter),
                                 ctx.now,
                                 true,
+                                &ctx.settings.format,
                             ));
                             self.frequent = is_timed;
                         }
                         'f' => {
                             iter.next();
-                            result.push_str(&active.max_text(Self::parse_value(&mut iter), false));
+                            result.push_str(&active.max_text(
+                                Self::parse_value(&mut iter),
+                                false,
+                                &ctx.settings.format,
+                            ));
                         }
                         'F' => {
                             iter.next();
-                            result.push_str(&active.max_text(Self::parse_value(&mut iter), true));
+                            result.push_str(&active.max_text(
+                                Self::parse_value(&mut iter),
+                                true,
+                                &ctx.settings.format,
+                            ));
                         }
                         'p' | 'P' => {
                             iter.next();

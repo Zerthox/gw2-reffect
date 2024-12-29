@@ -1,32 +1,43 @@
 use std::fmt;
 
 #[derive(Debug, Clone, Copy)]
-#[repr(transparent)]
-pub struct Time(pub u32);
+pub struct Time {
+    value: u32,
+    threshold: u32,
+}
 
 impl Time {
+    pub const DEFAULT_THRESHOLD: u32 = 60_000;
     pub const SEC: u32 = 1000;
     pub const MIN: u32 = 60 * Self::SEC;
 
     #[allow(unused)]
     pub const fn new(min: u32, sec: u32, ms: u32) -> Self {
-        Self(Self::MIN * min + Self::SEC * sec + ms)
+        Self::with_threshold(min, sec, ms, Self::DEFAULT_THRESHOLD)
     }
 
-    pub fn format(value: u32) -> String {
-        Self(value).to_string()
+    #[allow(unused)]
+    pub const fn with_threshold(min: u32, sec: u32, ms: u32, threshold: u32) -> Self {
+        Self {
+            value: Self::MIN * min + Self::SEC * sec + ms,
+            threshold,
+        }
+    }
+
+    pub fn format(value: u32, threshold: u32) -> String {
+        Self { value, threshold }.to_string()
     }
 }
 
 impl fmt::Display for Time {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let value = self.0;
-        let min = value / Self::MIN;
-        let secs = (value % Self::MIN) as f32 / Self::SEC as f32;
-        if min > 0 {
+        let Self { value, threshold } = self;
+        if value >= threshold {
+            let min = value / Self::MIN;
+            let secs = (value % Self::MIN) as f32 / Self::SEC as f32;
             write!(f, "{min}:{secs:0>4.1}")
         } else {
-            write!(f, "{secs:.1}")
+            write!(f, "{value:.1}")
         }
     }
 }
@@ -94,8 +105,8 @@ mod tests {
 
     #[test]
     fn time() {
-        assert_eq!(Time::format(0), "0.0");
-        assert_eq!(Time::format(1234), "1.2");
+        assert_eq!(Time::new(0, 0, 00).to_string(), "0.0");
+        assert_eq!(Time::new(0, 0, 1234).to_string(), "1.2");
         assert_eq!(Time::new(3, 4, 567).to_string(), "3:04.6");
     }
 

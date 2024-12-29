@@ -86,8 +86,12 @@ impl DurationTextSettings {
             color_slow,
             decoration,
         } = self;
+
         input_seconds("Remaining", max_remain);
-        helper(ui, || ui.text("Below which remaining time to display"));
+        helper(ui, || {
+            ui.text("Below how many remaining seconds to display text")
+        });
+
         input_percent("Scale", scale);
         enum_combo(ui, "Decoration", decoration, ComboBoxFlags::empty());
         input_color_alpha(ui, "Color", color);

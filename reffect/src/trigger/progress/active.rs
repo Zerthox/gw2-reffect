@@ -1,6 +1,7 @@
 use crate::{
     fmt::{Time, Unit},
     internal::{Ability, Buff, Recharge, Resource, Skillbar},
+    settings::FormatSettings,
 };
 
 #[derive(Debug, Clone)]
@@ -209,14 +210,20 @@ impl ProgressActive {
     }
 
     /// Returns the current amount as text.
-    pub fn current_text(&self, value: ProgressValue, now: u32, unit: bool) -> String {
+    pub fn current_text(
+        &self,
+        value: ProgressValue,
+        now: u32,
+        unit: bool,
+        settings: &FormatSettings,
+    ) -> String {
         match *self {
             Self::Fixed { current, .. } => Unit::format_if(current, unit),
             Self::Buff { end, .. } => {
                 if end == u32::MAX {
                     "?".into()
                 } else {
-                    Self::duration_text(Self::time_between(now, end))
+                    Self::duration_text(Self::time_between(now, end), settings)
                 }
             }
             Self::Ability {
@@ -224,11 +231,10 @@ impl ProgressActive {
                 ammo_end,
                 rate,
                 ..
-            } => Self::duration_text(Self::time_between_scaled(
-                now,
-                value.pick(end, ammo_end),
-                rate,
-            )),
+            } => Self::duration_text(
+                Self::time_between_scaled(now, value.pick(end, ammo_end), rate),
+                settings,
+            ),
         }
     }
 
@@ -246,12 +252,12 @@ impl ProgressActive {
     }
 
     /// Returns the maximum amount as text.
-    pub fn max_text(&self, value: ProgressValue, unit: bool) -> String {
+    pub fn max_text(&self, value: ProgressValue, unit: bool, settings: &FormatSettings) -> String {
         match *self {
             Self::Fixed { max, .. } => Unit::format_if(max, unit),
             Self::Buff { duration, .. } => {
                 if duration != u32::MAX {
-                    Time::format(duration)
+                    Self::duration_text(duration, settings)
                 } else {
                     "?".into()
                 }
@@ -260,7 +266,7 @@ impl ProgressActive {
                 recharge,
                 ammo_recharge,
                 ..
-            } => Time::format(value.pick(recharge, ammo_recharge)),
+            } => Self::duration_text(value.pick(recharge, ammo_recharge), settings),
         }
     }
 
@@ -276,9 +282,9 @@ impl ProgressActive {
         (time as f32 / rate) as u32
     }
 
-    fn duration_text(time: u32) -> String {
+    fn duration_text(time: u32, settings: &FormatSettings) -> String {
         if time > 0 {
-            Time::format(time)
+            Time::format(time, settings.minutes_threshold)
         } else {
             String::new()
         }
