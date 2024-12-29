@@ -3,10 +3,11 @@ use crate::{
     elements::PartialProps,
     render::{colors, RenderOptions},
     render_util::{
-        helper, input_color_alpha, input_optional, input_percent_inverse, slider_percent_capped,
+        helper, input_color_alpha, input_optional, input_percent_inverse,
+        input_positive_with_format, slider_percent_capped,
     },
 };
-use nexus::imgui::Ui;
+use nexus::imgui::{InputTextFlags, Ui};
 use partial::Partial;
 use serde::{Deserialize, Serialize};
 
@@ -18,6 +19,9 @@ pub struct IconProps {
     pub tint: [f32; 4],
     pub zoom: f32, // kept as factor to avoid divisions
     pub round: f32,
+
+    pub border_size: f32,
+    pub border_color: [f32; 4],
 }
 
 impl Default for IconProps {
@@ -26,13 +30,21 @@ impl Default for IconProps {
             tint: colors::WHITE,
             zoom: 1.0,
             round: 0.0,
+            border_size: 0.0,
+            border_color: colors::BLACK,
         }
     }
 }
 
 impl RenderOptions for IconProps {
     fn render_options(&mut self, ui: &Ui, _ctx: &Context) {
-        let Self { tint, zoom, round } = self;
+        let Self {
+            tint,
+            zoom,
+            round,
+            border_size,
+            border_color,
+        } = self;
 
         input_color_alpha(ui, "Tint", tint);
 
@@ -41,12 +53,28 @@ impl RenderOptions for IconProps {
 
         slider_percent_capped(ui, "Round", round, 50.0);
         helper(ui, || ui.text("Corner rounding in percent"));
+
+        input_positive_with_format(
+            "Border size",
+            border_size,
+            1.0,
+            10.0,
+            "%.1f",
+            InputTextFlags::empty(),
+        );
+        input_color_alpha(ui, "Border color", border_color);
     }
 }
 
 impl PartialProps<IconProps> for Partial<IconProps> {
     fn render_options(&mut self, ui: &Ui, base: &IconProps) {
-        let Self { tint, zoom, round } = self;
+        let Self {
+            tint,
+            zoom,
+            round,
+            border_size,
+            border_color,
+        } = self;
         input_optional(
             ui,
             "Tint",
@@ -67,6 +95,30 @@ impl PartialProps<IconProps> for Partial<IconProps> {
             round,
             || base.round,
             |round| slider_percent_capped(ui, "Round", round, 50.0),
+        );
+
+        input_optional(
+            ui,
+            "Border size",
+            border_size,
+            || base.border_size,
+            |size| {
+                input_positive_with_format(
+                    "Border size",
+                    size,
+                    1.0,
+                    10.0,
+                    "%.1f",
+                    InputTextFlags::empty(),
+                )
+            },
+        );
+        input_optional(
+            ui,
+            "Border color",
+            border_color,
+            || base.border_color,
+            |color| input_color_alpha(ui, "Border color", color),
         );
     }
 }

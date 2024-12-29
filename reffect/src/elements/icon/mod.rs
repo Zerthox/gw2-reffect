@@ -74,11 +74,11 @@ impl Icon {
             let (start, end) = Self::bounds(size);
             let start = state.pos.add(start);
             let end = state.pos.add(end);
+            let round = self.props.round * small_size;
             let color @ [_, _, _, alpha] = self.texture_color(ui);
 
             // render icon
             if let Some(texture) = texture {
-                let round = self.props.round * small_size;
                 let uv_change = 0.5 * (1.0 - self.props.zoom);
                 let uv_min = [uv_change, uv_change];
                 let uv_max = [1.0, 1.0].sub_scalar(uv_change);
@@ -96,6 +96,18 @@ impl Icon {
                     with_alpha(colors::WHITE, alpha),
                     with_alpha(colors::WHITE, 0.3 * alpha),
                 )
+            }
+
+            if self.props.border_size > 0.0 {
+                ui.get_background_draw_list()
+                    .add_rect(
+                        start,
+                        end,
+                        with_alpha_factor(self.props.border_color, alpha),
+                    )
+                    .thickness(self.props.border_size)
+                    .rounding(round)
+                    .build();
             }
 
             // render duration bar
