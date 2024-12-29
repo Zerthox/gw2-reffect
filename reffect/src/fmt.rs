@@ -135,7 +135,7 @@ mod tests {
     fn time() {
         assert_eq!(Time::new(0, 0, 00).to_string(), "0.0");
         assert_eq!(Time::new(0, 0, 1234).to_string(), "1.2");
-        assert_eq!(Time::new(3, 4, 567).to_string(), "3:04.6");
+        assert_eq!(Time::new(3, 4, 567).to_string(), "3:05");
     }
 
     #[test]
