@@ -76,49 +76,31 @@ impl Addon {
                 ui.text("Own skillbar:");
                 ui.same_line();
                 debug_result(ui, own_skillbar.as_ref(), |skillbar| {
-                    let passed = skillbar.passed(ctx.now);
-
-                    if let Some(weapon) = &skillbar.weapon_swap {
-                        ui.text(format!(
-                            "{:<14} = {:.1}/{:.1}s",
-                            "Weapon Swap",
-                            to_secs(weapon.recharge_remaining(ctx.now)),
-                            to_secs(weapon.recharge),
-                        ));
-                    }
-
-                    if let Some(legend) = &skillbar.legend_swap {
-                        ui.text(format!(
-                            "{:<14} = {:.1}/{:.1}s",
-                            "Legend Swap",
-                            to_secs(legend.recharge_remaining(ctx.now)),
-                            to_secs(legend.recharge),
-                        ));
-                    }
-
+                    let now = ctx.now;
+                    ui.text(format!("Bundle: {}", skillbar.has_bundle));
                     for slot in Slot::iter() {
                         if let Some(ability) = skillbar.slot(slot) {
                             ui.text(format!("{slot:<14} = {}x {:>5}", ability.ammo, ability.id));
 
-                            let recharge = ability.recharge_remaining(passed);
+                            let recharge = ability.recharge_remaining(now);
                             if recharge > 0 {
                                 ui.same_line();
                                 ui.text(format!(
                                     "{:.1}/{:.1}s {:.1}%",
                                     to_secs(recharge),
                                     to_secs(ability.recharge),
-                                    100.0 * ability.recharge_progress(passed)
+                                    100.0 * ability.recharge_progress(now)
                                 ));
                             }
 
-                            let ammo_recharge = ability.ammo_recharge_remaining(passed);
+                            let ammo_recharge = ability.ammo_recharge_remaining(now);
                             if ammo_recharge > 0 {
                                 ui.same_line();
                                 ui.text(format!(
                                     "Ammo {:.1}/{:.1}s {:.1}%",
                                     to_secs(ammo_recharge),
                                     to_secs(ability.ammo_recharge),
-                                    100.0 * ability.ammo_recharge_progress(passed)
+                                    100.0 * ability.ammo_recharge_progress(now)
                                 ));
                             }
                         }

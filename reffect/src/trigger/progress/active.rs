@@ -1,6 +1,8 @@
+use reffect_internal::{Skillbar, Slot};
+
 use crate::{
     fmt::{Time, Unit},
-    internal::{Ability, Buff, Recharge, Resource, Skillbar},
+    internal::{Ability, Buff, Resource},
     settings::FormatSettings,
 };
 
@@ -57,47 +59,34 @@ impl ProgressActive {
         }
     }
 
-    /// Creates new timed active progress from a recharge.
-    pub fn from_recharge(skill: Skill, recharge: &Recharge) -> Self {
-        let duration = recharge.recharge;
-        Self::Ability {
-            skill,
-            ammo: if duration == 0 { 1 } else { 0 },
-            recharge: duration,
-            end: recharge.end(),
-            ammo_recharge: 0,
-            ammo_end: 0,
-            rate: 1.0,
-        }
-    }
-
-    /// Creates new timed active progress from a skillbar and ability.
-    pub fn from_ability(skillbar: &Skillbar, ability: &Ability) -> Self {
+    /// Creates new timed active progress from an ability.
+    pub fn from_ability(skill: Skill, ability: &Ability) -> Self {
         let Ability {
-            id,
+            id: _,
             ammo,
+            last_update,
+            recharge_rate,
             recharge,
             recharge_remaining,
             ammo_recharge,
             ammo_recharge_remaining,
         } = *ability;
         Self::Ability {
-            skill: id.into(),
+            skill,
             ammo,
             recharge,
             end: if recharge > 0 {
-                skillbar.last_update + Self::unscale(recharge_remaining, skillbar.recharge_rate)
+                last_update + Self::unscale(recharge_remaining, recharge_rate)
             } else {
                 0
             },
             ammo_recharge,
             ammo_end: if ammo_recharge > 0 {
-                skillbar.last_update
-                    + Self::unscale(ammo_recharge_remaining, skillbar.recharge_rate)
+                last_update + Self::unscale(ammo_recharge_remaining, recharge_rate)
             } else {
                 0
             },
-            rate: skillbar.recharge_rate,
+            rate: recharge_rate,
         }
     }
 
@@ -342,6 +331,23 @@ pub enum Skill {
     WeaponSwap,
     BundleDrop,
     Id(u32),
+}
+
+impl Skill {
+    pub fn from_slot(skillbar: &Skillbar, slot: Slot) -> Self {
+        if slot == Slot::WeaponSwap {
+            if skillbar.has_bundle {
+                Skill::BundleDrop
+            } else {
+                Skill::WeaponSwap
+            }
+        } else {
+            skillbar
+                .slot(slot)
+                .map(|ability| ability.id.into())
+                .unwrap_or_default()
+        }
+    }
 }
 
 impl From<u32> for Skill {

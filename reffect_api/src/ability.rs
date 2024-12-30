@@ -6,33 +6,14 @@ pub type SkillSlots = [Option<Ability>; Slot::COUNT];
 /// Character skillbar.
 #[derive(Debug, Default, Clone)]
 pub struct Skillbar {
-    /// Last update timestamp.
-    pub last_update: u32,
-
-    /// Recharge rate.
-    pub recharge_rate: f32,
-
-    /// Skill entries.
-    pub skills: SkillSlots,
-
-    /// Weapon swap.
-    pub weapon_swap: Option<Recharge>,
-
     /// Whether the player is carrying a bundle.
     pub has_bundle: bool,
 
-    /// Revenant legend swap.
-    pub legend_swap: Option<Recharge>,
+    /// Skill entries.
+    pub skills: SkillSlots,
 }
 
 impl Skillbar {
-    /// Returns the scaled amount of time passed since the last update.
-    #[inline]
-    pub fn passed(&self, now: u32) -> u32 {
-        let passed = now.saturating_sub(self.last_update);
-        (passed as f32 * self.recharge_rate) as u32
-    }
-
     /// Returns the ability in the given slot.
     #[inline]
     pub fn slot(&self, slot: Slot) -> Option<&Ability> {
@@ -44,6 +25,12 @@ impl Skillbar {
     pub fn ability(&self, id: u32) -> Option<&Ability> {
         self.skills.iter().flatten().find(|ablity| ablity.id == id)
     }
+
+    /// Sets the ability in the given slot.
+    #[inline]
+    pub fn set_slot(&mut self, slot: Slot, ability: Option<Ability>) {
+        self.skills[slot as usize] = ability;
+    }
 }
 
 /// Ability.
@@ -54,6 +41,12 @@ pub struct Ability {
 
     /// Ammunition count.
     pub ammo: u32,
+
+    /// Last update timestamp.
+    pub last_update: u32,
+
+    /// Recharge rate.
+    pub recharge_rate: f32,
 
     /// Total recharge in milliseconds.
     pub recharge: u32,
@@ -69,11 +62,14 @@ pub struct Ability {
 }
 
 impl Ability {
+    /// Creates a new ability without cooldowns.
     #[inline]
-    pub const fn new(id: u32, ammo: u32) -> Self {
+    pub const fn available(id: u32, ammo: u32, last_update: u32, recharge_rate: f32) -> Self {
         Self {
             id,
             ammo,
+            last_update,
+            recharge_rate,
             recharge: 0,
             recharge_remaining: 0,
             ammo_recharge: 0,
@@ -81,28 +77,51 @@ impl Ability {
         }
     }
 
+    /// Creates a new ability with simple recharge.
+    #[inline]
+    pub const fn simple(id: u32, last_update: u32, recharge: u32) -> Self {
+        Self {
+            id,
+            ammo: if recharge == 0 { 1 } else { 0 },
+            last_update,
+            recharge_rate: 1.0,
+            recharge,
+            recharge_remaining: recharge,
+            ammo_recharge: 0,
+            ammo_recharge_remaining: 0,
+        }
+    }
+
+    /// Returns the scaled amount of time passed since the last update.
+    #[inline]
+    pub fn passed(&self, now: u32) -> u32 {
+        let passed = now.saturating_sub(self.last_update);
+        (passed as f32 * self.recharge_rate) as u32
+    }
+
     /// Returns the remaining recharge.
     #[inline]
-    pub fn recharge_remaining(&self, passed: u32) -> u32 {
-        self.recharge_remaining.saturating_sub(passed)
+    pub fn recharge_remaining(&self, now: u32) -> u32 {
+        self.recharge_remaining.saturating_sub(self.passed(now))
     }
 
     /// Returns the recharge progress.
     #[inline]
-    pub fn recharge_progress(&self, passed: u32) -> f32 {
-        self.recharge_remaining(passed) as f32 / self.recharge as f32
+    pub fn recharge_progress(&self, now: u32) -> f32 {
+        self.recharge_remaining(self.passed(now)) as f32 / self.recharge as f32
     }
 
     /// Returns the remaining ammo recharge.
     #[inline]
-    pub fn ammo_recharge_remaining(&self, passed: u32) -> u32 {
-        self.ammo_recharge_remaining.saturating_sub(passed)
+    pub fn ammo_recharge_remaining(&self, now: u32) -> u32 {
+        self.ammo_recharge_remaining
+            .saturating_sub(self.passed(now))
     }
 
     /// Returns the ammo recharge progress.
     #[inline]
-    pub fn ammo_recharge_progress(&self, passed: u32) -> f32 {
-        self.ammo_recharge_remaining(passed) as f32 / self.ammo_recharge as f32
+    pub fn ammo_recharge_progress(&self, now: u32) -> f32 {
+        self.ammo_recharge_remaining(self.passed(now)) as f32 / self.ammo_recharge as f32
     }
 }
 
@@ -128,6 +147,9 @@ impl Ability {
 )]
 pub enum Slot {
     #[default]
+    #[strum(serialize = "Weapon Swap")]
+    WeaponSwap,
+
     #[strum(serialize = "Weapon 1")]
     Weapon1,
 
@@ -175,28 +197,4 @@ pub enum Slot {
     SpecialAction,
 
     Mount,
-}
-
-/// Recharge and timestmap.
-#[derive(Debug, Default, Clone)]
-pub struct Recharge {
-    /// Last update timestamp.
-    pub last_update: u32,
-
-    /// Recharge in milliseconds.
-    pub recharge: u32,
-}
-
-impl Recharge {
-    /// Returns the remaining recharge.
-    #[inline]
-    pub fn recharge_remaining(&self, now: u32) -> u32 {
-        self.end().saturating_sub(now)
-    }
-
-    /// Returns the end timestamp.
-    #[inline]
-    pub fn end(&self) -> u32 {
-        self.last_update + self.recharge
-    }
 }

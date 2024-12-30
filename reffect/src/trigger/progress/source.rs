@@ -1,8 +1,8 @@
-use super::{ProgressActive, Slot};
+use super::{ProgressActive, Skill};
 use crate::{
     action::Action,
     context::Context,
-    internal::{Buff, Category, Error, Interface, Internal, SkillInfo},
+    internal::{Buff, Category, Error, Interface, Internal, SkillInfo, Slot},
     render::RenderOptions,
     render_util::{enum_combo, helper, impl_static_variants, input_skill_id, Validation},
 };
@@ -88,11 +88,20 @@ impl ProgressSource {
                 }
                 ProgressActive::from_buff(ids.first().copied().unwrap_or(0), &combined)
             }),
-            Self::SkillbarSlot(slot) => slot.get_progress(ctx.own_skillbar()?),
-            Self::Ability(id) => {
+            Self::SkillbarSlot(slot) => {
                 let skillbar = ctx.own_skillbar()?;
-                let ability = skillbar.ability(id)?;
-                Some(ProgressActive::from_ability(skillbar, ability))
+                let ability = skillbar.slot(slot)?;
+                let skill = Skill::from_slot(skillbar, slot);
+                Some(ProgressActive::from_ability(skill, ability))
+            }
+            Self::Ability(id) => {
+                if id > 0 {
+                    let skillbar = ctx.own_skillbar()?;
+                    let ability = skillbar.ability(id)?;
+                    Some(ProgressActive::from_ability(ability.id.into(), ability))
+                } else {
+                    None
+                }
             }
             Self::Health => ctx.own_resources()?.health.clone().try_into().ok(),
             Self::Barrier => ctx.own_resources()?.barrier.clone().try_into().ok(),
@@ -115,7 +124,7 @@ impl ProgressSource {
             Self::SkillbarSlot(slot) => {
                 let skill = ctx
                     .own_skillbar()
-                    .and_then(|skillbar| slot.get_skill(skillbar))
+                    .map(|skillbar| Skill::from_slot(skillbar, slot))
                     .unwrap_or_default();
                 ProgressActive::edit_ability(skill, progress, ctx.now)
             }

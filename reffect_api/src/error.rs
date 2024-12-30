@@ -58,6 +58,9 @@ pub enum Error {
     #[error("Character specialization not found")]
     SpecNotFound,
 
+    #[error("Kennel not found")]
+    KennelNotFound,
+
     #[error("No target")]
     NoTarget,
 
