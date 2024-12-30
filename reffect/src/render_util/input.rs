@@ -1,6 +1,6 @@
-use super::input_text_simple_menu;
+use super::{input_text_simple_menu, item_context_menu};
 use crate::chat_code::{decode_skill, decode_trait};
-use nexus::imgui::{sys, InputTextFlags, Ui};
+use nexus::imgui::{sys, InputTextFlags, MenuItem, Ui};
 use std::ffi::CString;
 
 pub fn input_u32(
@@ -26,14 +26,14 @@ pub fn input_u32(
 }
 
 pub fn input_float_with_format(
-    label: impl Into<String>,
+    label: impl AsRef<str>,
     value: &mut f32,
     step: f32,
     step_fast: f32,
-    format: impl Into<String>,
+    format: impl AsRef<str>,
     flags: InputTextFlags,
 ) -> bool {
-    if let (Ok(label), Ok(format)) = (CString::new(label.into()), CString::new(format.into())) {
+    if let (Ok(label), Ok(format)) = (CString::new(label.as_ref()), CString::new(format.as_ref())) {
         unsafe {
             sys::igInputFloat(
                 label.as_ptr(),
@@ -50,11 +50,11 @@ pub fn input_float_with_format(
 }
 
 pub fn input_positive_with_format(
-    label: impl Into<String>,
+    label: impl AsRef<str>,
     value: &mut f32,
     step: f32,
     step_fast: f32,
-    format: impl Into<String>,
+    format: impl AsRef<str>,
     flags: InputTextFlags,
 ) -> bool {
     if input_float_with_format(label, value, step, step_fast, format, flags) {
@@ -75,7 +75,7 @@ pub fn input_size([x, y]: &mut [f32; 2]) {
     input_positive_with_format("Size y", y, 1.0, 10.0, "%.2f", InputTextFlags::empty());
 }
 
-pub fn input_percent(label: impl Into<String>, value: &mut f32) -> bool {
+pub fn input_percent(label: impl AsRef<str>, value: &mut f32) -> bool {
     let mut percent = *value * 100.0;
     if input_positive_with_format(
         label,
@@ -92,7 +92,7 @@ pub fn input_percent(label: impl Into<String>, value: &mut f32) -> bool {
     }
 }
 
-pub fn input_percent_inverse(label: impl Into<String>, value: &mut f32) -> bool {
+pub fn input_percent_inverse(label: impl AsRef<str>, value: &mut f32) -> bool {
     let mut inverse = if *value == 0.0 { 0.0 } else { 1.0 / *value };
     if input_percent(label, &mut inverse) {
         *value = if inverse == 0.0 { 0.0 } else { 1.0 / inverse };
@@ -102,14 +102,29 @@ pub fn input_percent_inverse(label: impl Into<String>, value: &mut f32) -> bool 
     }
 }
 
-pub fn input_seconds(label: impl Into<String>, ms: &mut u32) -> bool {
-    let mut secs = *ms as f32 / 1000.0;
-    if input_positive_with_format(label, &mut secs, 0.5, 1.0, "%.3f", InputTextFlags::empty()) {
-        *ms = (secs * 1000.0) as u32;
-        true
+pub fn input_seconds(ui: &Ui, label: impl AsRef<str>, ms: &mut u32) -> bool {
+    let label = label.as_ref();
+    let mut secs = if *ms != u32::MAX {
+        *ms as f32 / 1000.0
     } else {
-        false
+        f32::INFINITY
+    };
+    let changed =
+        input_positive_with_format(label, &mut secs, 0.5, 1.0, "%.3f", InputTextFlags::empty());
+    if changed {
+        *ms = if secs.is_finite() {
+            (secs * 1000.0) as u32
+        } else {
+            0
+        };
     }
+    item_context_menu(format!("##ctx{label}"), || {
+        if MenuItem::new("Set to infinite").build(ui) {
+            *ms = u32::MAX;
+        }
+    });
+
+    changed
 }
 
 pub fn input_chatcode(

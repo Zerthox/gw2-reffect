@@ -17,7 +17,6 @@ use crate::{
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
-use std::cmp::Ordering;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
@@ -134,6 +133,7 @@ impl Icon {
             // render stack count
             if self.stacks_text {
                 let StackTextSettings {
+                    threshold,
                     scale,
                     offset,
                     color: color @ [_, _, _, alpha],
@@ -141,36 +141,41 @@ impl Icon {
                 } = ctx.settings.icon.stack_text;
 
                 let stacks = active.intensity();
-                let text = if stacks > 99 {
-                    "!"
-                } else {
-                    &stacks.to_string()
-                };
+                if stacks >= threshold {
+                    let text = if stacks > 99 {
+                        "!"
+                    } else {
+                        &stacks.to_string()
+                    };
 
-                let font_size = scale * small_size;
-                let font_scale = font_size / ui.current_font_size();
-                let [x_offset, _] = AlignHorizontal::Right.text_offset(ui, text, font_scale);
-                let line_height = font_scale * ui.text_line_height();
-                let text_pos = end.add([x_offset, -line_height]).sub(offset);
+                    let font_size = scale * small_size;
+                    let font_scale = font_size / ui.current_font_size();
+                    let [x_offset, _] = AlignHorizontal::Right.text_offset(ui, text, font_scale);
+                    let line_height = font_scale * ui.text_line_height();
+                    let text_pos = end.add([x_offset, -line_height]).sub(offset);
 
-                let decoration_color = with_alpha(colors::BLACK, alpha);
-                decoration.render(ui, text, text_pos, font_scale, decoration_color);
-                draw_text_bg(ui, text, text_pos, font_scale, color);
+                    let decoration_color = with_alpha(colors::BLACK, alpha);
+                    decoration.render(ui, text, text_pos, font_scale, decoration_color);
+                    draw_text_bg(ui, text, text_pos, font_scale, color);
+                }
             }
 
             // render duration text
             if self.duration_text {
                 if let Some(remain) = active.current(ProgressValue::Primary, ctx.now) {
+                    let settings = &ctx.settings.icon.duration_text;
                     let DurationTextSettings {
-                        max_remain,
+                        threshold_buff: _,
+                        threshold_ability: _,
                         scale,
-                        color,
-                        color_fast,
-                        color_slow,
+                        color: _,
+                        color_fast: _,
+                        color_slow: _,
                         decoration,
-                    } = ctx.settings.icon.duration_text;
+                    } = *settings;
 
-                    if remain < max_remain {
+                    let threshold = settings.threshold(active);
+                    if remain < threshold {
                         let text = active.current_text(
                             ProgressValue::Primary,
                             ctx.now,
@@ -183,12 +188,7 @@ impl Icon {
                         let offset = AlignHorizontal::Center.text_offset(ui, &text, font_scale);
                         let text_pos = state.pos.add(offset);
 
-                        let color @ [_, _, _, alpha] = match active.progress_rate().total_cmp(&1.0)
-                        {
-                            Ordering::Less => color_slow,
-                            Ordering::Equal => color,
-                            Ordering::Greater => color_fast,
-                        };
+                        let color @ [_, _, _, alpha] = settings.color(active.progress_rate());
                         let decoration_color = with_alpha(colors::BLACK, alpha);
                         decoration.render(ui, &text, text_pos, font_scale, decoration_color);
                         draw_text_bg(ui, &text, text_pos, font_scale, color);

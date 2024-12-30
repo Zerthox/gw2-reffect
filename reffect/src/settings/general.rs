@@ -70,12 +70,12 @@ impl FormatSettings {
             millis_threshold,
         } = self;
 
-        input_seconds("Minute threshold", minutes_threshold);
+        input_seconds(ui, "Minute threshold", minutes_threshold);
         helper(ui, || {
             ui.text("Above how many seconds to display MM:SS format");
         });
 
-        input_seconds("Millisecond threshold", millis_threshold);
+        input_seconds(ui, "Millisecond threshold", millis_threshold);
         helper(ui, || {
             ui.text("Below how many seconds to display milliseconds");
             ui.text("MM:SS format always hides milliseconds");

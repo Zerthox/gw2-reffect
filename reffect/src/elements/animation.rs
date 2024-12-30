@@ -31,7 +31,7 @@ impl RenderOptions for Animation {
         enum_combo(ui, "Animation", &mut self.kind, ComboBoxFlags::empty());
 
         let mut period = self.period.get();
-        if input_seconds("Period", &mut period) {
+        if input_seconds(ui, "Period", &mut period) {
             self.period = NonZero::new(period).unwrap_or(non_zero_u32!(1));
         }
         helper(ui, || ui.text("Animation loop duration in seconds"));

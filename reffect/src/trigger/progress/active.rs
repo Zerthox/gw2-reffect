@@ -1,11 +1,11 @@
-use reffect_internal::{Skillbar, Slot};
-
 use crate::{
     fmt::{Time, Unit},
     internal::{Ability, Buff, Resource},
     settings::FormatSettings,
 };
+use reffect_internal::{Skillbar, Slot};
 
+// TODO: buff intensity stacking, ability ammo?
 #[derive(Debug, Clone)]
 pub enum ProgressActive {
     Fixed {
@@ -100,24 +100,26 @@ impl ProgressActive {
 
     /// Creates a uff progress for edit mode.
     pub const fn edit_buff(id: u32, progress: f32, now: u32) -> Self {
+        let decreasing = 1.0 - progress;
         Self::Buff {
             id,
             stacks: (25.0 * progress) as u32,
             duration: 5000,
-            end: now + (5000.0 * progress) as u32,
+            end: now + (5000.0 * decreasing) as u32,
         }
     }
 
     /// Creates an ability progress for edit mode.
     pub const fn edit_ability(skill: Skill, progress: f32, now: u32) -> Self {
+        let decreasing = 1.0 - progress;
         Self::Ability {
             skill,
             ammo: (5.0 * progress) as u32,
             recharge: 5000,
-            end: now + (5000.0 * progress) as u32,
+            end: now + (5000.0 * decreasing) as u32,
             rate: 1.0,
             ammo_recharge: 5000,
-            ammo_end: now + (5000.0 * progress) as u32,
+            ammo_end: now + (5000.0 * decreasing) as u32,
         }
     }
 

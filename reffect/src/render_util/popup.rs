@@ -1,7 +1,6 @@
+use crate::render::colors;
 use nexus::imgui::{sys, StyleColor, Ui};
 use std::ffi::CString;
-
-use crate::render::colors;
 
 pub fn item_context_menu(str_id: impl Into<String>, contents: impl FnOnce()) {
     if let Ok(str_id) = CString::new(str_id.into()) {
