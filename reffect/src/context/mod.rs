@@ -1,10 +1,11 @@
+mod clipboard;
 mod edit_state;
 mod links;
 mod map;
 mod player;
 mod ui;
 
-pub use self::{edit_state::*, links::*, map::*, player::*, ui::*};
+pub use self::{clipboard::*, edit_state::*, links::*, map::*, player::*, ui::*};
 
 use crate::{
     internal::{BuffMap, Interface, Internal, Resources, State},

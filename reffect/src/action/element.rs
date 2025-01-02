@@ -35,12 +35,12 @@ impl ElementAction {
             Self::Cut => {
                 let child = children.remove(index);
                 log::debug!("Cut child {index} {}", child.kind.as_ref());
-                edit.set_clipboard(child);
+                edit.clipboard.set(child);
             }
             Self::Copy => {
                 let child = children[index].clone();
                 log::debug!("Copy child {index} {}", child.kind.as_ref());
-                edit.set_clipboard(child);
+                edit.clipboard.set(child);
             }
             Self::Duplicate => {
                 let child = children[index].clone();

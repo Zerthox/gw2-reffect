@@ -198,10 +198,10 @@ impl Common {
                 })
             });
             if MenuItem::new("Paste")
-                .enabled(state.has_clipboard())
+                .enabled(state.clipboard.has_some())
                 .build(ui)
             {
-                children.push(state.take_clipboard().expect("paste without clipboard"))
+                children.push(state.clipboard.take().expect("paste without clipboard"))
             }
         }
     }

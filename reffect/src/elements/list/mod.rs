@@ -112,7 +112,7 @@ impl RenderOptions for IconList {
 
             item_context_menu("##listiconctx", || {
                 if MenuItem::new("Paste")
-                    .enabled(ctx.edit.has_icon_clipboard())
+                    .enabled(ctx.edit.clipboard.has_icon())
                     .build(ui)
                 {
                     action = IconAction::Paste(i)
@@ -121,7 +121,7 @@ impl RenderOptions for IconList {
                     action = IconAction::Cut(i);
                 }
                 if MenuItem::new("Copy").build(ui) {
-                    ctx.edit.set_clipboard(icon.clone().into_element(self.size))
+                    ctx.edit.clipboard.set(icon.clone().into_element(self.size))
                 }
                 if MenuItem::new("Duplicate").build(ui) {
                     action = IconAction::Duplicate(i);
@@ -172,7 +172,7 @@ impl RenderOptions for IconList {
         }
         item_context_menu("##addiconctx", || {
             if MenuItem::new("Paste")
-                .enabled(ctx.edit.has_icon_clipboard())
+                .enabled(ctx.edit.clipboard.has_icon())
                 .build(ui)
             {
                 action = IconAction::Paste(self.icons.len());

@@ -44,7 +44,8 @@ impl IconAction {
                 children.remove(index);
             }
             Self::Cut(index) => {
-                edit.set_clipboard(children.remove(index).into_element(size));
+                edit.clipboard
+                    .set(children.remove(index).into_element(size));
             }
             Self::Paste(index) => {
                 if let Some(Element {
@@ -52,7 +53,7 @@ impl IconAction {
                     filter,
                     kind: ElementType::Icon(element),
                     ..
-                }) = edit.take_clipboard()
+                }) = edit.clipboard.take()
                 {
                     children.insert(index, ListIcon::from_element(common, element, filter));
                 } else {
