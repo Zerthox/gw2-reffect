@@ -15,7 +15,7 @@ use enumflags2::BitFlags;
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct PlayerTrigger {
     pub combat: CombatTrigger,

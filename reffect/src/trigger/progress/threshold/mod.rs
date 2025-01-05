@@ -13,7 +13,7 @@ use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
-#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct ProgressThreshold {
     /// Threshold type.
     pub threshold_type: ThresholdType,

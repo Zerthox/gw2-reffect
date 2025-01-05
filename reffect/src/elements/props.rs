@@ -1,5 +1,5 @@
 use crate::{
-    action::Action,
+    action::{Action, DynAction},
     context::Context,
     render::colors,
     render_util::{collapsing_header_same_line_end, delete_confirm_modal},
@@ -57,19 +57,34 @@ where
 
 impl<T> Props<T>
 where
-    T: Clone + IntoPartial,
-    T::Partial: Clone + fmt::Debug + Serialize + for<'d> Deserialize<'d> + PartialProps<T>,
+    T: Clone + IntoPartial + 'static,
+    T::Partial: fmt::Debug + Clone + Serialize + for<'d> Deserialize<'d> + PartialProps<T>,
 {
-    pub fn render_condition_options(&mut self, ui: &Ui, ctx: &Context) {
+    pub fn render_condition_options(&mut self, ui: &Ui, ctx: &Context) -> DynAction<Self> {
+        let mut copy_action = DynAction::<Self>::empty();
         let mut action = Action::new();
+
+        let len = self.conditions.len();
         for (i, condition) in self.conditions.iter_mut().enumerate() {
             let _id = ui.push_id(i as i32);
 
             let mut remains = true;
 
-            let open = CollapsingHeader::new(format!("{}###cond{i}", condition.trigger))
+            let label = format!("{}###cond{i}", condition.trigger);
+            let open = CollapsingHeader::new(&label)
                 .flags(TreeNodeFlags::ALLOW_ITEM_OVERLAP)
                 .begin_with_close_button(ui, &mut remains);
+
+            let cloned = condition.clone();
+            copy_action.render_copy_all(ui, label, move |props| {
+                if props.conditions.len() == len
+                    && props.conditions[i].trigger.is_same_type(&cloned.trigger)
+                {
+                    props.conditions[i] = cloned.clone();
+                } else {
+                    props.conditions.push(cloned.clone());
+                }
+            });
 
             {
                 let size_x = ui.frame_height();
@@ -106,6 +121,8 @@ where
         if ui.button("Add Condition") {
             self.conditions.push(Condition::default());
         }
+
+        copy_action
     }
 }
 

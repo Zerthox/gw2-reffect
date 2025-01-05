@@ -1,4 +1,5 @@
 use crate::{
+    action::DynAction,
     context::Context,
     elements::{Common, Element, ElementType, Icon, IconElement, RenderState},
     render::{RenderDebug, RenderOptions},
@@ -69,8 +70,8 @@ impl ListIcon {
     }
 }
 
-impl RenderOptions for ListIcon {
-    fn render_options(&mut self, ui: &Ui, ctx: &Context) {
+impl RenderOptions<DynAction<ListIcon>> for ListIcon {
+    fn render_options(&mut self, ui: &Ui, ctx: &Context) -> DynAction<Self> {
         ui.checkbox("Enabled", &mut self.enabled);
         ui.input_text("Name", &mut self.name).build();
 
@@ -80,7 +81,8 @@ impl RenderOptions for ListIcon {
 
         ui.spacing();
 
-        self.icon.render_options(ui, ctx);
+        let icon_action = self.icon.render_options(ui, ctx);
+        icon_action.map(|list_icon: &mut Self| &mut list_icon.icon)
     }
 }
 

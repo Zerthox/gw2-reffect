@@ -9,7 +9,7 @@ use crate::{
 use nexus::imgui::{InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct TraitTrigger {
     pub traits: Vec<TraitRequirement>,
@@ -70,7 +70,7 @@ impl RenderOptions for TraitTrigger {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct TraitRequirement {
     pub id: u32,

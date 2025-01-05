@@ -3,7 +3,7 @@ use crate::{context::Context, render::RenderOptions};
 use nexus::imgui::{Selectable, Ui};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 #[repr(transparent)]
 pub struct CombatTrigger(Option<bool>);

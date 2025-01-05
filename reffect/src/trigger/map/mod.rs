@@ -12,7 +12,7 @@ use enumflags2::BitFlags;
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct MapTrigger {
     #[serde(with = "serde_bitflags")]
     pub category: BitFlags<MapCategory>,

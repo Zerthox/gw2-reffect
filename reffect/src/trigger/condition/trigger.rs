@@ -7,10 +7,10 @@ use crate::{
 };
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
-use std::fmt;
+use std::{fmt, mem};
 use strum::{AsRefStr, EnumIter, IntoStaticStr};
 
-#[derive(Debug, Clone, AsRefStr, IntoStaticStr, EnumIter, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, AsRefStr, IntoStaticStr, EnumIter, Serialize, Deserialize)]
 pub enum ConditionTrigger {
     #[strum(serialize = "Progress Threshold")]
     ProgressThreshold(ProgressThreshold),
@@ -29,6 +29,10 @@ impl ConditionTrigger {
             Self::Player(player) => player.is_active(ctx),
             Self::Map(map) => map.is_active(ctx),
         }
+    }
+
+    pub fn is_same_type(&self, other: &Self) -> bool {
+        mem::discriminant(self) == mem::discriminant(other)
     }
 }
 

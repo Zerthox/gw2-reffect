@@ -6,11 +6,13 @@ pub use self::{element::*, props::*, source::*};
 
 use super::{align::AlignHorizontal, Props, RenderState};
 use crate::{
+    action::DynAction,
     context::Context,
     render::{
         colors::{self, with_alpha, with_alpha_factor},
         ComponentWise, RenderDebug, RenderOptions,
     },
+    render_copy_field,
     render_util::{debug_optional, draw_spinner_bg, draw_text_bg, Rect},
     settings::icon::{DurationBarSettings, DurationTextSettings, StackTextSettings},
     trigger::{ProgressActive, ProgressValue, Skill},
@@ -197,24 +199,36 @@ impl Icon {
             }
         }
     }
-}
 
-impl RenderOptions for Icon {
-    fn render_options(&mut self, ui: &Ui, ctx: &Context) {
+    pub fn render_options(&mut self, ui: &Ui, ctx: &Context) -> DynAction<Self> {
+        let mut action = DynAction::<Self>::empty();
+
         self.source.render_select(ui, ctx);
 
         ui.spacing();
 
-        self.props.base.render_options(ui, ctx);
+        let props_action = self.props.base.render_options(ui, ctx);
+        action.or(props_action.map(|icon: &mut Self| &mut icon.props.base));
 
         ui.checkbox("Show Duration Bar", &mut self.duration_bar);
+        render_copy_field!(action, ui, self.duration_bar);
+
         ui.checkbox("Show Duration Text", &mut self.duration_text);
+        render_copy_field!(action, ui, self.duration_text);
+
         ui.checkbox("Show Stacks", &mut self.stacks_text);
+        render_copy_field!(action, ui, self.stacks_text);
+
+        action
     }
 
-    fn render_tabs(&mut self, ui: &Ui, ctx: &Context) {
+    pub fn render_tabs(&mut self, ui: &Ui, ctx: &Context) -> DynAction<Self> {
         if let Some(_token) = ui.tab_item("Condition") {
-            self.props.render_condition_options(ui, ctx);
+            self.props
+                .render_condition_options(ui, ctx)
+                .map(|icon: &mut Self| &mut icon.props)
+        } else {
+            DynAction::empty()
         }
     }
 }

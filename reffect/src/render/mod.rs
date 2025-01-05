@@ -14,12 +14,17 @@ pub trait Render<T = ()> {
 }
 
 /// Render options UI.
-pub trait RenderOptions<T = ()> {
+pub trait RenderOptions<O = (), C = ()>
+where
+    C: Default,
+{
     /// Renders options for the type.
-    fn render_options(&mut self, ui: &Ui, ctx: &Context) -> T;
+    fn render_options(&mut self, ui: &Ui, ctx: &Context) -> O;
 
     /// Renders special option tabs for the type.
-    fn render_tabs(&mut self, _ui: &Ui, _ctx: &Context) {}
+    fn render_tabs(&mut self, _ui: &Ui, _ctx: &Context) -> C {
+        C::default()
+    }
 }
 
 /// Render debug UI.

@@ -1,9 +1,18 @@
 use serde::{Deserialize, Serialize};
 use std::fmt;
-use strum::{AsRefStr, EnumIter, IntoStaticStr, VariantArray};
+use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 
 #[derive(
-    Debug, Default, Clone, PartialEq, AsRefStr, IntoStaticStr, EnumIter, Serialize, Deserialize,
+    Debug,
+    Default,
+    Clone,
+    PartialEq,
+    AsRefStr,
+    IntoStaticStr,
+    EnumIter,
+    EnumCount,
+    Serialize,
+    Deserialize,
 )]
 pub enum ThresholdType {
     /// Always met.
@@ -48,6 +57,12 @@ impl VariantArray for ThresholdType {
         Self::Between(0.0, 1.0),
     ];
 }
+
+const _: () = {
+    if ThresholdType::VARIANTS.len() != ThresholdType::COUNT {
+        panic!("missing variant in variant array");
+    }
+};
 
 impl fmt::Display for ThresholdType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

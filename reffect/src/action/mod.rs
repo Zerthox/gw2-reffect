@@ -1,9 +1,10 @@
+mod dynamic;
 mod element;
 
 use crate::render_util::{button_size_with_spacing, close_button};
 use nexus::imgui::{Direction, Ui};
 
-pub use self::element::*;
+pub use self::{dynamic::*, element::*};
 
 // TODO: action clear entire vec?
 

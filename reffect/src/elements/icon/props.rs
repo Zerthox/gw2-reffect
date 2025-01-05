@@ -1,7 +1,9 @@
 use crate::{
+    action::DynAction,
     context::Context,
     elements::PartialProps,
     render::{colors, RenderOptions},
+    render_copy_field,
     render_util::{
         helper, input_color_alpha, input_optional, input_percent_inverse,
         input_positive_with_format, slider_percent_capped,
@@ -36,8 +38,8 @@ impl Default for IconProps {
     }
 }
 
-impl RenderOptions for IconProps {
-    fn render_options(&mut self, ui: &Ui, _ctx: &Context) {
+impl RenderOptions<DynAction<IconProps>> for IconProps {
+    fn render_options(&mut self, ui: &Ui, _ctx: &Context) -> DynAction<Self> {
         let Self {
             tint,
             zoom,
@@ -46,12 +48,17 @@ impl RenderOptions for IconProps {
             border_color,
         } = self;
 
+        let mut action = DynAction::<Self>::empty();
+
         input_color_alpha(ui, "Tint", tint);
+        render_copy_field!(action, ui, *tint);
 
         input_percent_inverse("Zoom", zoom);
         helper(ui, || ui.text("Icon zoom in percent"));
+        render_copy_field!(action, ui, *zoom);
 
         slider_percent_capped(ui, "Round", round, 50.0);
+        render_copy_field!(action, ui, *round);
         helper(ui, || ui.text("Corner rounding in percent"));
 
         input_positive_with_format(
@@ -62,7 +69,12 @@ impl RenderOptions for IconProps {
             "%.1f",
             InputTextFlags::empty(),
         );
+        render_copy_field!(action, ui, *border_size);
+
         input_color_alpha(ui, "Border color", border_color);
+        render_copy_field!(action, ui, *border_color);
+
+        action
     }
 }
 

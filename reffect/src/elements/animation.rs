@@ -65,6 +65,8 @@ impl Default for Animation {
 )]
 pub enum AnimationKind {
     Pulse,
+    // TODO: shake
+    // TODO: bounce
 }
 
 impl AnimationKind {

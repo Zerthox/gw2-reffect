@@ -6,6 +6,7 @@ pub use self::{action::*, icon::*, layout::*};
 
 use super::{Direction, RenderState};
 use crate::{
+    action::DynAction,
     context::Context,
     render::{colors, Bounds, Render, RenderDebug, RenderOptions},
     render_util::{
@@ -97,12 +98,13 @@ impl RenderOptions for IconList {
         ui.text_disabled("Icons");
 
         let mut action = IconAction::new();
-        for (i, icon) in self.icons.iter_mut().enumerate() {
+        let mut copy_action = DynAction::<ListIcon>::empty();
+        for (i, list_icon) in self.icons.iter_mut().enumerate() {
             let _id = ui.push_id(i as i32);
 
             let mut remains = true;
-            let style = style_disabled_if(ui, !icon.enabled);
-            let open = CollapsingHeader::new(format!("{}###icon{i}", icon.name))
+            let style = style_disabled_if(ui, !list_icon.enabled);
+            let open = CollapsingHeader::new(format!("{}###icon{i}", list_icon.name))
                 .flags(TreeNodeFlags::ALLOW_ITEM_OVERLAP)
                 .begin_with_close_button(ui, &mut remains);
 
@@ -121,7 +123,9 @@ impl RenderOptions for IconList {
                     action = IconAction::Cut(i);
                 }
                 if MenuItem::new("Copy").build(ui) {
-                    ctx.edit.clipboard.set(icon.clone().into_element(self.size))
+                    ctx.edit
+                        .clipboard
+                        .set(list_icon.clone().into_element(self.size))
                 }
                 if MenuItem::new("Duplicate").build(ui) {
                     action = IconAction::Duplicate(i);
@@ -155,15 +159,14 @@ impl RenderOptions for IconList {
                 ui.open_popup(&title);
             }
             if delete_confirm_modal(ui, &title, || {
-                ui.text(format!("Delete Icon {}?", icon.name))
+                ui.text(format!("Delete Icon {}?", list_icon.name))
             }) {
                 action = IconAction::Delete(i);
             }
 
             drop(style);
             if open {
-                // TODO: apply option to all context menu option
-                icon.render_options(ui, ctx);
+                copy_action.or(list_icon.render_options(ui, ctx));
                 ui.spacing();
             }
         }
@@ -180,21 +183,30 @@ impl RenderOptions for IconList {
         });
 
         action.perform(&mut self.icons, self.size, &ctx.edit);
+        for icon in &mut self.icons {
+            copy_action.perform(icon);
+        }
     }
 
     fn render_tabs(&mut self, ui: &Ui, ctx: &Context) {
         if let Some(_token) = ui.tab_item("Condition") {
             const INDENT: f32 = 10.0;
-            for (i, icon) in self.icons.iter_mut().enumerate() {
+            let mut action = DynAction::empty();
+
+            for (i, list_icon) in self.icons.iter_mut().enumerate() {
                 let _id = ui.push_id(i as i32);
-                let open = CollapsingHeader::new(format!("{}###icon{i}", icon.name))
+                let open = CollapsingHeader::new(format!("{}###icon{i}", list_icon.name))
                     .flags(TreeNodeFlags::ALLOW_ITEM_OVERLAP)
                     .begin(ui);
                 if open {
                     ui.indent_by(INDENT);
-                    icon.icon.props.render_condition_options(ui, ctx);
+                    action.or(list_icon.icon.props.render_condition_options(ui, ctx));
                     ui.unindent_by(INDENT);
                 }
+            }
+
+            for list_icon in &mut self.icons {
+                action.perform(&mut list_icon.icon.props);
             }
         }
     }
