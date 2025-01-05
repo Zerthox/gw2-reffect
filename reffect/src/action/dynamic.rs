@@ -30,9 +30,20 @@ impl<T> DynAction<T> {
         self.0.is_some()
     }
 
-    pub fn perform(&mut self, value: &mut T) {
+    pub fn apply(&mut self, value: &mut T) {
         if let Some(action) = self.0.as_mut() {
             action(value)
+        }
+    }
+
+    pub fn apply_to_all<'a>(&mut self, iter: impl IntoIterator<Item = &'a mut T>)
+    where
+        T: 'static,
+    {
+        if let Some(action) = self.0.as_mut() {
+            for item in iter.into_iter() {
+                action(item);
+            }
         }
     }
 

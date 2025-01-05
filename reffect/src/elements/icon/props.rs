@@ -54,8 +54,8 @@ impl RenderOptions<DynAction<IconProps>> for IconProps {
         render_copy_field!(action, ui, *tint);
 
         input_percent_inverse("Zoom", zoom);
-        helper(ui, || ui.text("Icon zoom in percent"));
         render_copy_field!(action, ui, *zoom);
+        helper(ui, || ui.text("Icon zoom in percent"));
 
         slider_percent_capped(ui, "Round", round, 50.0);
         render_copy_field!(action, ui, *round);

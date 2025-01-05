@@ -183,9 +183,7 @@ impl RenderOptions for IconList {
         });
 
         action.perform(&mut self.icons, self.size, &ctx.edit);
-        for icon in &mut self.icons {
-            copy_action.perform(icon);
-        }
+        copy_action.apply_to_all(&mut self.icons);
     }
 
     fn render_tabs(&mut self, ui: &Ui, ctx: &Context) {
@@ -205,9 +203,11 @@ impl RenderOptions for IconList {
                 }
             }
 
-            for list_icon in &mut self.icons {
-                action.perform(&mut list_icon.icon.props);
-            }
+            action.apply_to_all(
+                self.icons
+                    .iter_mut()
+                    .map(|list_icon| &mut list_icon.icon.props),
+            );
         }
     }
 }
