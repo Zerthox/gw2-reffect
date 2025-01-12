@@ -9,7 +9,7 @@ use crate::{
     internal::Weapon,
     render::RenderOptions,
     render_util::enum_combo_bitflags,
-    serde_bitflags,
+    serde::bitflags,
 };
 use enumflags2::BitFlags;
 use nexus::imgui::{ComboBoxFlags, Ui};
@@ -21,19 +21,19 @@ pub struct PlayerTrigger {
     pub combat: CombatTrigger,
 
     #[serde(skip_serializing)]
-    #[serde(with = "serde_bitflags")]
+    #[serde(with = "bitflags")]
     profs: BitFlags<Profession>, // TODO: remove after grace period
 
-    #[serde(with = "serde_bitflags")]
+    #[serde(with = "bitflags")]
     pub specs: BitFlags<Specialization>,
 
-    #[serde(with = "serde_bitflags")]
+    #[serde(with = "bitflags")]
     pub weapons: BitFlags<Weapon>,
 
     #[serde(flatten)]
     pub traits: TraitTrigger,
 
-    #[serde(with = "serde_bitflags")]
+    #[serde(with = "bitflags")]
     pub mounts: BitFlags<Mount>,
 }
 

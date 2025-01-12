@@ -6,7 +6,7 @@ use crate::{
     context::{Context, ContextUpdate, MapCategory},
     render::RenderOptions,
     render_util::{enum_combo_bitflags, helper, input_u32, item_context_menu, map_select},
-    serde_bitflags,
+    serde::bitflags,
 };
 use enumflags2::BitFlags;
 use nexus::imgui::{ComboBoxFlags, Ui};
@@ -14,7 +14,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct MapTrigger {
-    #[serde(with = "serde_bitflags")]
+    #[serde(with = "bitflags")]
     pub category: BitFlags<MapCategory>,
 
     #[serde(default = "default_true")]

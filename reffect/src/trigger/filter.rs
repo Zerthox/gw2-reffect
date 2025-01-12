@@ -6,7 +6,7 @@ use crate::{
     elements::RenderState,
     render::{RenderDebug, RenderOptions},
     render_util::debug_optional,
-    serde_migrate::migrate,
+    serde::migrate,
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};

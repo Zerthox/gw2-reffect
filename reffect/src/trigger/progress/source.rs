@@ -8,9 +8,13 @@ use crate::{
 };
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
+use serde_with::{formats::PreferMany, serde_as, OneOrMany};
 use strum::{AsRefStr, EnumIter, IntoStaticStr};
 
-#[derive(Debug, Default, Clone, AsRefStr, IntoStaticStr, EnumIter, Serialize, Deserialize)]
+#[serde_as]
+#[derive(
+    Debug, Default, Clone, PartialEq, AsRefStr, IntoStaticStr, EnumIter, Serialize, Deserialize,
+)]
 pub enum ProgressSource {
     /// Inherit from above.
     #[default]
@@ -20,20 +24,20 @@ pub enum ProgressSource {
     #[serde(alias = "None")]
     Always,
 
-    /// Single buff id.
+    /// Buff ids, multiple matches are merged.
     #[serde(alias = "Single")]
     #[serde(alias = "Has")]
-    #[strum(serialize = "Single Effect")]
-    Buff(u32),
-
-    /// Any of the buff ids, stacks are summed.
     #[serde(alias = "Any")]
-    #[strum(serialize = "Multiple Effects")]
-    AnyBuff(Vec<u32>),
+    #[serde(alias = "AnyBuff")]
+    #[serde(alias = "Effect")]
+    #[strum(serialize = "Effect")]
+    Buff(#[serde_as(as = "OneOrMany<_, PreferMany>")] Vec<u32>),
 
+    /// Ability ids, first match is used.
     #[strum(serialize = "Ability Recharge")]
-    Ability(u32),
+    Ability(Vec<u32>),
 
+    /// Skillbar slot.
     #[strum(serialize = "Slot Recharge")]
     SkillbarSlot(Slot),
 
@@ -70,14 +74,7 @@ impl ProgressSource {
         match *self {
             Self::Inherit => parent.cloned(),
             Self::Always => Some(ProgressActive::dummy()),
-            Self::Buff(id) => ctx.own_buffs().map(|buffs| {
-                buffs
-                    .get(&id)
-                    .filter(|buff| buff.runout_time > ctx.now)
-                    .map(|buff| ProgressActive::from_buff(id, buff))
-                    .unwrap_or_else(|| ProgressActive::empy_buff(id))
-            }),
-            Self::AnyBuff(ref ids) => ctx.own_buffs().map(|buffs| {
+            Self::Buff(ref ids) => ctx.own_buffs().map(|buffs| {
                 let mut combined = Buff::empty();
                 for id in ids {
                     if let Some(buff) = buffs.get(id).filter(|buff| buff.runout_time > ctx.now) {
@@ -94,14 +91,13 @@ impl ProgressSource {
                 let skill = Skill::from_slot(skillbar, slot);
                 Some(ProgressActive::from_ability(skill, ability))
             }
-            Self::Ability(id) => {
-                if id > 0 {
-                    let skillbar = ctx.own_skillbar()?;
-                    let ability = skillbar.ability(id)?;
-                    Some(ProgressActive::from_ability(ability.id.into(), ability))
-                } else {
-                    None
-                }
+            Self::Ability(ref ids) => {
+                let skillbar = ctx.own_skillbar()?;
+                ids.iter()
+                    .copied()
+                    .filter(|id| *id > 0)
+                    .find_map(|id| skillbar.ability(id))
+                    .map(|ability| ProgressActive::from_ability(ability.id.into(), ability))
             }
             Self::Health => ctx.own_resources()?.health.clone().try_into().ok(),
             Self::Barrier => ctx.own_resources()?.barrier.clone().try_into().ok(),
@@ -119,18 +115,20 @@ impl ProgressSource {
         match *self {
             Self::Inherit => parent.cloned().unwrap_or(ProgressActive::dummy()),
             Self::Always => ProgressActive::dummy(),
-            Self::Buff(id) => ProgressActive::edit_buff(id, progress, ctx.now),
-            Self::Ability(id) => ProgressActive::edit_ability(id.into(), progress, ctx.now),
+            Self::Buff(ref ids) => {
+                let id = ids.first().copied().unwrap_or(0);
+                ProgressActive::edit_buff(id, progress, ctx.now)
+            }
+            Self::Ability(ref ids) => {
+                let id = ids.first().copied().unwrap_or(0);
+                ProgressActive::edit_ability(id.into(), progress, ctx.now)
+            }
             Self::SkillbarSlot(slot) => {
                 let skill = ctx
                     .own_skillbar()
                     .map(|skillbar| Skill::from_slot(skillbar, slot))
                     .unwrap_or_default();
                 ProgressActive::edit_ability(skill, progress, ctx.now)
-            }
-            Self::AnyBuff(ref ids) => {
-                let id = ids.first().copied().unwrap_or(0);
-                ProgressActive::edit_buff(id, progress, ctx.now)
             }
             Self::Health => ProgressActive::edit_resource(progress, 15_000),
             Self::Barrier => ProgressActive::edit_resource(0.5 * progress, 15_000),
@@ -143,8 +141,8 @@ impl ProgressSource {
 
     pub fn into_ids(self) -> Vec<u32> {
         match self {
-            Self::Buff(id) => vec![id],
-            Self::AnyBuff(ids) => ids,
+            Self::Buff(ids) => ids,
+            Self::Ability(ids) => ids,
             _ => Vec::new(),
         }
     }
@@ -188,25 +186,20 @@ impl RenderOptions for ProgressSource {
     fn render_options(&mut self, ui: &Ui, _ctx: &Context) {
         if let Some(prev) = enum_combo(ui, "Trigger", self, ComboBoxFlags::HEIGHT_LARGE) {
             match self {
-                Self::Buff(id) => {
-                    if let Some(first) = prev.into_ids().first() {
-                        *id = *first;
-                    }
-                }
-                Self::AnyBuff(ids) => *ids = prev.into_ids(),
+                Self::Buff(ids) => *ids = prev.into_ids(),
+                Self::Ability(ids) => *ids = prev.into_ids(),
                 _ => {}
             }
         }
-        helper(ui, || ui.text("Source of information")); // TODO: mention inherit being passed down, not affecting group visibility
+        helper(ui, || {
+            ui.text("Source of information");
+            ui.text("Effect merges all matches");
+            ui.text("Ability uses first match");
+            ui.text("For group no effect on visibility, only passed down for inherit");
+        });
 
         match self {
-            Self::Buff(id) => {
-                Self::buff_validate(*id).for_item(ui, || {
-                    input_skill_id(ui, "Effect Id", id, InputTextFlags::empty());
-                });
-                Self::id_helper(ui);
-            }
-            Self::AnyBuff(ids) => {
+            Self::Buff(ids) => {
                 let mut action = Action::new();
                 for (i, id) in ids.iter_mut().enumerate() {
                     let _id = ui.push_id(i as i32);
@@ -227,16 +220,43 @@ impl RenderOptions for ProgressSource {
 
                 action.perform(ids);
             }
-            Self::Ability(id) => {
-                Self::ability_validate(*id).for_item(ui, || {
-                    input_skill_id(ui, "Ability Id", id, InputTextFlags::empty())
-                });
-                Self::id_helper(ui);
+            Self::Ability(ids) => {
+                let mut action = Action::new();
+                for (i, id) in ids.iter_mut().enumerate() {
+                    let _id = ui.push_id(i as i32);
+
+                    action.input_with_buttons(ui, i, || {
+                        Self::ability_validate(*id).for_item(ui, || {
+                            input_skill_id(ui, "##id", id, InputTextFlags::empty());
+                        });
+                    });
+
+                    ui.same_line();
+                    ui.text(format!("Ability Id {}", i + 1));
+                    Self::id_helper(ui);
+                }
+                if ui.button("Add Ability") {
+                    ids.push(0);
+                }
+
+                action.perform(ids);
             }
             Self::SkillbarSlot(slot) => {
                 enum_combo(ui, "Slot", slot, ComboBoxFlags::HEIGHT_LARGEST);
             }
             _ => {}
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn migrate() {
+        let json = r#"{ "Buff": 123 }"#;
+        let result = serde_json::from_str::<ProgressSource>(&json).expect("failed to deserialize");
+        assert_eq!(result, ProgressSource::Buff(vec![123]));
     }
 }

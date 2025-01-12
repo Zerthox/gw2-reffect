@@ -99,7 +99,7 @@ impl Default for ListIcon {
         Self {
             enabled: true,
             name: "Unnamed".into(),
-            trigger: ProgressTrigger::effect(),
+            trigger: ProgressTrigger::buff(),
             filter: FilterTrigger::default(),
             icon: Icon::default(),
         }

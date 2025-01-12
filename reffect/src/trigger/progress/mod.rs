@@ -8,7 +8,7 @@ use crate::{
     context::{Context, ContextUpdate},
     render::{RenderDebug, RenderOptions},
     render_util::debug_optional,
-    serde_migrate::migrate,
+    serde::migrate,
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
@@ -31,9 +31,9 @@ pub struct ProgressTrigger {
 }
 
 impl ProgressTrigger {
-    pub fn effect() -> Self {
+    pub fn buff() -> Self {
         Self {
-            source: ProgressSource::Buff(0),
+            source: ProgressSource::Buff(vec![0]),
             threshold: ProgressThreshold {
                 threshold_type: ThresholdType::Present,
                 amount_type: AmountType::default(),

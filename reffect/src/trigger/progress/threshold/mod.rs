@@ -87,14 +87,14 @@ impl RenderOptions for ProgressThreshold {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::serde_migrate::Migrate;
+    use crate::serde::Migrate;
 
     #[test]
     fn migrate() {
         let json = r#"{ "Between": [1, 23] }"#;
-        let result = serde_json::from_str::<Migrate<ProgressThreshold, ThresholdType>>(&json);
-        assert!(result.is_ok());
-        let threshold = result.unwrap().inner;
+        let result = serde_json::from_str::<Migrate<ProgressThreshold, ThresholdType>>(&json)
+            .expect("failed to deserialize");
+        let threshold = result.inner;
         assert_eq!(threshold.threshold_type, ThresholdType::Between(1.0, 23.0));
     }
 }
