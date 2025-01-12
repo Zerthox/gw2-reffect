@@ -259,7 +259,7 @@ impl Clone for Common {
             enabled: self.enabled,
             id: ELEMENT_ID.generate(), // we want a fresh id for the clone
             name: self.name.clone(),
-            anchor: self.anchor.clone(),
+            anchor: self.anchor,
             pos: self.pos,
             opacity: self.opacity,
             trigger: self.trigger.clone(),
