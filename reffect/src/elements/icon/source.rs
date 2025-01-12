@@ -1,4 +1,5 @@
 use crate::{
+    action::DynAction,
     addon::Addon,
     context::Context,
     lockbox::Lockbox,
@@ -35,8 +36,8 @@ pub enum IconSource {
 
     Empty,
 
-    #[serde(alias = "Automatic")]
-    Dynamic,
+    #[serde(alias = "Dynamic")]
+    Automatic,
 
     Url(String),
 
@@ -63,7 +64,7 @@ impl IconSource {
     pub fn get_texture(&self, skill: Skill) -> Option<TextureId> {
         match self {
             Self::Empty => None,
-            Self::Dynamic => match skill {
+            Self::Automatic => match skill {
                 Skill::Unknown => TextureManager::get_texture(&IconSource::Unknown),
                 Skill::WeaponSwap => TextureManager::get_weapon_swap(),
                 Skill::BundleDrop => TextureManager::get_bundle_drop(),
@@ -79,7 +80,7 @@ impl IconSource {
     pub fn generate_id(&self) -> String {
         match self {
             Self::Unknown => Self::UNKNOWN_ID.into(),
-            Self::Empty | Self::Dynamic => String::new(),
+            Self::Empty | Self::Automatic => String::new(),
             Self::File(path) => format!("REFFECT_ICON_FILE_\"{}\"", path.display()),
             Self::Url(url) => format!("REFFECT_ICON_URL_\"{url}\""),
         }
@@ -89,26 +90,31 @@ impl IconSource {
         match self {
             Self::Unknown => "unknown".into(),
             Self::Empty => "empty".into(),
-            Self::Dynamic => "dynamic".into(),
+            Self::Automatic => "automatic".into(),
             Self::File(path) => format!("file \"{}\"", path.display()),
             Self::Url(url) => format!("url \"{url}\""),
         }
     }
 
-    pub fn render_select(&mut self, ui: &Ui, ctx: &Context) {
+    pub fn render_select(&mut self, ui: &Ui, ctx: &Context) -> DynAction<Self> {
+        let mut action = DynAction::empty();
+
         let validation = match self {
-            Self::Dynamic if !ctx.settings.use_game_icons => {
+            Self::Automatic if !ctx.settings.use_game_icons => {
                 Validation::Error("Requires experimental reuse game icons setting")
             }
             _ => Validation::Ok,
         };
         validation.for_item(ui, || enum_combo(ui, "Icon", self, ComboBoxFlags::empty()));
+        action.render_copy_all_cloned(ui, "iconsrc", self, |target, source| {
+            *target = source.clone()
+        });
 
         // we assume this stays in place, otherwise we consider the file dialog invalidated
         let id = self as *mut _ as usize;
 
         match self {
-            Self::Unknown | Self::Empty | Self::Dynamic => {}
+            Self::Unknown | Self::Empty | Self::Automatic => {}
             Self::File(path) => {
                 let validation = if path.is_absolute() {
                     Validation::Warn("Non-shareable absolute icon path")
@@ -166,5 +172,7 @@ impl IconSource {
                 }
             }
         }
+
+        action
     }
 }

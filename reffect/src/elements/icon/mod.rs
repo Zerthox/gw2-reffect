@@ -203,7 +203,8 @@ impl Icon {
     pub fn render_options(&mut self, ui: &Ui, ctx: &Context) -> DynAction<Self> {
         let mut action = DynAction::<Self>::empty();
 
-        self.source.render_select(ui, ctx);
+        let source_action = self.source.render_select(ui, ctx);
+        action.or(source_action.map(|icon: &mut Self| &mut icon.source));
 
         ui.spacing();
 

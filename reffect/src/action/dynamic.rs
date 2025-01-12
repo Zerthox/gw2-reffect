@@ -97,6 +97,23 @@ impl<T> DynAction<T> {
             }
         });
     }
+
+    pub fn render_copy_all_cloned(
+        &mut self,
+        ui: &Ui,
+        id: impl Into<String>,
+        value: &T,
+        mut action: impl FnMut(&mut T, &T) + 'static,
+    ) where
+        T: Clone + 'static,
+    {
+        item_context_menu(id, || {
+            if MenuItem::new("Copy to all siblings").build(ui) {
+                let cloned = value.clone();
+                self.set(move |target| action(target, &cloned));
+            }
+        });
+    }
 }
 
 impl<T> fmt::Debug for DynAction<T> {

@@ -68,7 +68,7 @@ impl TextureManager {
 
         if !textures.exists(&source) {
             match &source {
-                IconSource::Unknown | IconSource::Empty | IconSource::Dynamic => {}
+                IconSource::Unknown | IconSource::Empty | IconSource::Automatic => {}
                 IconSource::File(path) => {
                     let id = textures.add_pending(source.clone());
                     drop(textures); // drop to avoid recursive locking
