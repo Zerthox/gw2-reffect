@@ -1,25 +1,24 @@
-use super::{Common, Element, ScreenAnchor};
+use super::{Anchor, Common, Element, ScreenAnchor};
 use crate::{
     context::{Context, EditState},
-    render::{colors, Bounds, ComponentWise, RenderDebug, RenderOptions},
+    render::{colors, Bounds, RenderDebug, RenderOptions},
     render_util::{
-        delete_confirm_modal, enum_combo, item_context_menu, style_disabled, style_disabled_if,
+        delete_confirm_modal, item_context_menu, style_disabled, style_disabled_if,
         tree_select_empty,
     },
     schema::Schema,
     tree::{FontReloader, Loader, TreeNode, VisitMut},
 };
-use nexus::imgui::{ComboBoxFlags, MenuItem, StyleColor, Ui};
+use nexus::imgui::{MenuItem, StyleColor, Ui};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
-#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Pack {
     #[serde(flatten)]
     pub common: Common,
 
-    pub anchor: ScreenAnchor,
     pub layer: i32,
     pub elements: Vec<Element>,
 
@@ -63,18 +62,16 @@ impl Pack {
     /// Renders the pack.
     pub fn render(&mut self, ui: &Ui, ctx: &Context) {
         let edit = ctx.edit.show_all && ctx.edit.is_edited_or_parent(self.common.id);
-        let anchor_pos = self.anchor.calc_pos(ui);
-        self.common
-            .render_initial(ui, ctx, edit, anchor_pos, |state| {
-                for element in &mut self.elements {
-                    element.render(ui, ctx, &state);
-                }
-            });
+        self.common.render_root(ui, ctx, edit, |state| {
+            for element in &mut self.elements {
+                element.render(ui, ctx, &state);
+            }
+        });
 
         if ctx.edit.is_edited(self.common.id) {
-            let pos = anchor_pos.add(self.common.pos);
             let bounds = Bounds::combined_bounds(self.elements.iter(), ui, ctx);
-            self.common.render_edit_indicators(ui, pos, bounds)
+            self.common
+                .render_edit_indicators(ui, Anchor::root(ui), bounds)
         }
     }
 
@@ -146,8 +143,6 @@ impl Pack {
 
                 ui.spacing();
 
-                enum_combo(ui, "Anchor", &mut self.anchor, ComboBoxFlags::empty());
-
                 {
                     // TODO: layer input
                     let _style = style_disabled(ui);
@@ -182,5 +177,19 @@ impl RenderDebug for Pack {
 impl TreeNode for Pack {
     fn children(&mut self) -> Option<&mut Vec<Element>> {
         Some(&mut self.elements)
+    }
+}
+
+impl Default for Pack {
+    fn default() -> Self {
+        Self {
+            common: Common {
+                anchor: Anchor::Screen(ScreenAnchor::default()),
+                ..Common::default()
+            },
+            layer: 0,
+            elements: Vec::new(),
+            file: PathBuf::new(),
+        }
     }
 }

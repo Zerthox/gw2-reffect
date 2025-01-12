@@ -1,6 +1,58 @@
-use nexus::imgui::Ui;
+use crate::render_util::{enum_combo, impl_static_variants};
+use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, VariantArray};
+
+/// Anchor point.
+#[derive(
+    Debug,
+    Default,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    EnumIter,
+    AsRefStr,
+    Serialize,
+    Deserialize,
+)]
+pub enum Anchor {
+    #[default]
+    Parent,
+
+    Screen(ScreenAnchor),
+}
+
+impl_static_variants!(Anchor);
+
+impl Anchor {
+    /// Calculates the root position.
+    pub fn root(ui: &Ui) -> [f32; 2] {
+        ScreenAnchor::Center.calc_pos(ui)
+    }
+
+    /// Calculates the anchor position.
+    pub fn pos(&self, ui: &Ui, parent: [f32; 2]) -> [f32; 2] {
+        match self {
+            Self::Parent => parent,
+            Self::Screen(screen) => screen.calc_pos(ui),
+        }
+    }
+
+    pub fn render_select(&mut self, ui: &Ui) {
+        enum_combo(ui, "Anchor", self, ComboBoxFlags::empty());
+
+        match self {
+            Self::Parent => {}
+            Self::Screen(screen) => {
+                enum_combo(ui, "Screen Anchor", screen, ComboBoxFlags::empty());
+            }
+        }
+    }
+}
 
 /// Screen anchor point.
 #[derive(
@@ -63,5 +115,11 @@ impl ScreenAnchor {
             Self::LeftCenter => [0.0, 0.5 * screen_y],
             Self::RightCenter => [screen_x, 0.5 * screen_y],
         }
+    }
+}
+
+impl From<ScreenAnchor> for Anchor {
+    fn from(screen: ScreenAnchor) -> Self {
+        Self::Screen(screen)
     }
 }

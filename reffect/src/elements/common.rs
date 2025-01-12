@@ -1,4 +1,4 @@
-use super::{Element, ElementType, RenderState, ELEMENT_ID};
+use super::{Anchor, Element, ElementType, RenderState, ScreenAnchor, ELEMENT_ID};
 use crate::{
     action::ChildElementAction,
     context::{Context, EditState},
@@ -7,6 +7,7 @@ use crate::{
     render_util::{
         helper_slider, input_pos, push_alpha_change, slider_percent, EnumStaticVariants, Rect,
     },
+    serde::migrate,
     trigger::ProgressTrigger,
 };
 use nexus::imgui::{Condition, MenuItem, MouseButton, StyleVar, Ui, Window};
@@ -25,6 +26,8 @@ pub struct Common {
 
     pub name: String,
 
+    #[serde(deserialize_with = "migrate::<_, _, ScreenAnchor>")]
+    pub anchor: Anchor,
     pub pos: [f32; 2],
 
     pub opacity: f32,
@@ -47,16 +50,15 @@ impl Common {
         self.enabled || ctx.edit.is_edited_or_parent(self.id)
     }
 
-    pub fn pos(&self, state: &RenderState) -> [f32; 2] {
-        state.pos.add(self.pos)
+    pub fn pos(&self, ui: &Ui, parent_pos: [f32; 2]) -> [f32; 2] {
+        self.anchor.pos(ui, parent_pos).add(self.pos)
     }
 
-    pub fn render_initial(
+    pub fn render_root(
         &mut self,
         ui: &Ui,
         ctx: &Context,
         edit: bool,
-        pos: [f32; 2],
         contents: impl FnOnce(RenderState),
     ) {
         if self.visible(ctx) {
@@ -64,6 +66,7 @@ impl Common {
             self.trigger.update(ctx, edit, None);
 
             let _style = push_alpha_change(ui, self.opacity);
+            let pos = self.pos(ui, Anchor::root(ui));
             let state = RenderState::initial(edit, pos, self);
             contents(state);
         }
@@ -82,7 +85,7 @@ impl Common {
             self.trigger.update(ctx, edit, parent_active);
 
             let _style = push_alpha_change(ui, self.opacity);
-            let state = parent.for_child(ctx, self);
+            let state = parent.for_child(ui, ctx, self);
             contents(state);
         }
     }
@@ -90,12 +93,13 @@ impl Common {
     /// Renders the element edit indicators.
     ///
     /// Updates the position if moved.
-    pub fn render_edit_indicators(&mut self, ui: &Ui, anchor: [f32; 2], bounds: Rect) {
+    pub fn render_edit_indicators(&mut self, ui: &Ui, parent_pos: [f32; 2], bounds: Rect) {
         const ANCHOR_SIZE: f32 = 5.0;
         const ANCHOR_OFFSET: [f32; 2] = [0.5 * ANCHOR_SIZE, 0.5 * ANCHOR_SIZE];
         const COLOR: [f32; 4] = colors::WHITE;
         const COLOR_DRAG: [f32; 4] = colors::YELLOW;
 
+        let anchor = self.pos(ui, parent_pos);
         let (min, max) = bounds;
         let min = anchor.add(min);
         let max = anchor.add(max);
@@ -213,6 +217,7 @@ impl RenderOptions for Common {
 
         ui.input_text("Name", &mut self.name).build();
 
+        self.anchor.render_select(ui);
         input_pos(&mut self.pos);
 
         slider_percent(ui, "Opacity", &mut self.opacity);
@@ -227,6 +232,8 @@ impl RenderOptions for Common {
 impl RenderDebug for Common {
     fn render_debug(&mut self, ui: &Ui, ctx: &Context) {
         ui.text(format!("Id: {}", self.id));
+        ui.text(format!("Pos: {:?}", self.pos(ui, Anchor::root(ui))));
+
         self.trigger.render_debug(ui, ctx);
     }
 }
@@ -237,6 +244,7 @@ impl Default for Common {
             enabled: true,
             id: ELEMENT_ID.generate(),
             name: "Unnamed".into(),
+            anchor: Anchor::default(),
             pos: [0.0, 0.0],
             opacity: 1.0,
             trigger: ProgressTrigger::default(),
@@ -251,6 +259,7 @@ impl Clone for Common {
             enabled: self.enabled,
             id: ELEMENT_ID.generate(), // we want a fresh id for the clone
             name: self.name.clone(),
+            anchor: self.anchor.clone(),
             pos: self.pos,
             opacity: self.opacity,
             trigger: self.trigger.clone(),

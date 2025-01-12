@@ -4,6 +4,7 @@ pub mod icon;
 pub mod list;
 pub mod text;
 
+mod anchor;
 mod animation;
 mod common;
 mod direction;
@@ -13,10 +14,10 @@ mod group;
 mod pack;
 mod props;
 mod render_state;
-mod screen_anchor;
 mod unit;
 
 pub use self::{
+    anchor::*,
     animation::*,
     bar::Bar,
     common::*,
@@ -29,7 +30,6 @@ pub use self::{
     pack::*,
     props::*,
     render_state::*,
-    screen_anchor::*,
     text::Text,
     unit::*,
 };

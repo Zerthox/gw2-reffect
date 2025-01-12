@@ -60,9 +60,8 @@ impl Element {
         });
 
         if ctx.edit.is_edited(self.common.id) {
-            let pos = self.common.pos(state);
             let bounds = self.kind.bounds(ui, ctx);
-            self.common.render_edit_indicators(ui, pos, bounds);
+            self.common.render_edit_indicators(ui, state.pos, bounds);
         }
     }
 
