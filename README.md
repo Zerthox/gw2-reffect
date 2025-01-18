@@ -28,9 +28,11 @@ Requires the [Nexus](https://github.com/RaidcoreGG/Nexus) addon manager ([websit
 Reffect uses memory reading to access internal information of the Guild Wars 2 game client.
 The information is retrieved with the following policy in mind:
 
-1. The information must be currently conveyed to the player via the graphical user interface. If it is conveyed to the player anyway, we consider it fine to give the same pieces of information in an alternative format.
+1. Information which is expected to be known by the player and does generally **not** change during combat is fine to give at all times. For example the player's current profession & elite specialization, selected traits, equipped weapons or the map they are on.
 
-2. The alternative display format must limit combination of individual pieces of information to a reasonably low logical complexity. We do **not** consider it fine to combine individual pieces of information to new information that is much more than the sum of its parts.
+2. Combat information must be currently conveyed to the player via the game's own graphical user interface. If it is conveyed to the player anyway, we consider it fine to give the same pieces of information in an alternative format. For example their currently visible effects, abilities or health.
+
+3. The alternative display format must limit combination of individual pieces of combat information to a reasonably low logical complexity. We do **not** consider it fine to combine individual pieces of combat information to new information that is much more than the sum of its parts. For example logic combining current might stacks, current quickness and elite ability recharge into a single piece of displayed information is **not** possible.
 
 ## Limitations 
 - Not available in competitive modes (PvP & WvW).
