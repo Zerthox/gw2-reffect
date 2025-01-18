@@ -7,8 +7,7 @@ Requires the [Nexus](https://github.com/RaidcoreGG/Nexus) addon manager ([websit
 **WARNING:** Reffect performs memory reading. Use the addon and created displays at your own risk. See [our information policy](#information-policy) below and the [Guild Wars 2 policy on third-party programs](https://help.guildwars2.com/hc/en-us/articles/360013625034-Policy-Third-Party-Programs).
 
 ![Boons display](./docs/img/boons.png)
-
-![List element](./docs/img/list.png)
+![Editor](./docs/img/editor.png)
 
 ## Features
 - Display information as custom icons or text
@@ -16,12 +15,14 @@ Requires the [Nexus](https://github.com/RaidcoreGG/Nexus) addon manager ([websit
 - Ingame editor for display creation & configuration
 - Sharing created displays as individual packs
 - Effect stacks & durations mimicking ingame behavior
+- Abiltiy cooldowns mimicking ingame behavior
+- Health, barrier, endurance, profession resources
 
 ## Installation
 1. Install the [Nexus](https://github.com/RaidcoreGG/Nexus) addon manager ([website](https://raidcore.gg/Nexus)).
 2. Download [`reffect.dll`](../../releases/latest) and place it in your `addons` folder (e.g. `C:\Program Files\Guild Wars 2\addons`).
 3. Open the Nexus addon window, click on the refresh button if necessary and load Reffect.
-4. *Optional: read the [getting started guide](./docs/getting-started.md) or [documentation on elements](./docs/elements.md).*
+4. *Optional: read the [getting started guide](./docs/getting-started.md), [documentation on elements](./docs/elements.md).*
 
 ## Information Policy
 Reffect uses memory reading to access internal information of the Guild Wars 2 game client.
@@ -37,5 +38,6 @@ The information is retrieved with the following policy in mind:
 - Screen border effects do not show durations.
 - No true stack count for duration stacking effects.
 - No information about effects hidden from the player.
-- No combining logic for multiple effects outside of grouping them into a single UI element.
+- No combining logic for multiple triggers outside of grouping stacks of multiple effects into a single UI element.
 - No information about profession resources when hidden from the player.
+- No information about ability cooldowns when hidden from the player.
