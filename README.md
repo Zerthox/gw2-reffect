@@ -22,7 +22,7 @@ Requires the [Nexus](https://github.com/RaidcoreGG/Nexus) addon manager ([websit
 1. Install the [Nexus](https://github.com/RaidcoreGG/Nexus) addon manager ([website](https://raidcore.gg/Nexus)).
 2. Download [`reffect.dll`](../../releases/latest) and place it in your `addons` folder (e.g. `C:\Program Files\Guild Wars 2\addons`).
 3. Open the Nexus addon window, click on the refresh button if necessary and load Reffect.
-4. *Optional: read the [getting started guide](./docs/getting-started.md), [documentation on elements](./docs/elements.md).*
+4. *Optional: read the [getting started guide](./docs/getting-started.md) and [documentation on elements](./docs/elements.md).*
 
 ## Information Policy
 Reffect uses memory reading to access internal information of the Guild Wars 2 game client.
@@ -38,6 +38,12 @@ The information is retrieved with the following policy in mind:
 - Screen border effects do not show durations.
 - No true stack count for duration stacking effects.
 - No information about effects hidden from the player.
-- No combining logic for multiple triggers outside of grouping stacks of multiple effects into a single UI element.
+- No combining logic for combat information outside of grouping stacks of multiple effects into a single UI element.
 - No information about profession resources when hidden from the player.
 - No information about ability cooldowns when hidden from the player.
+
+## Building from source
+Reffect is *partially* open source: while the major part of the addon is open source, there is a closed source portion which is responsible for memory reading information from the game.
+
+When building from source this closed source portion is substituted with a dummy implementation, disabling all features that require memory reading capabilities.
+Contributors can request full builds with memory reading for their pull requests when necessary.
