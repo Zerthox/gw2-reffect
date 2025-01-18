@@ -1,158 +1,297 @@
 {
-    "schema": "v1",
-    "enabled": true,
-    "name": "Reminders",
-    "pos": [500.0, 300.0],
-    "opacity": 1.0,
-    "trigger": {
+  "schema": "v1",
+  "enabled": true,
+  "name": "Reminders",
+  "anchor": {
+    "Screen": "TopLeft"
+  },
+  "pos": [
+    500.0,
+    300.0
+  ],
+  "opacity": 1.0,
+  "trigger": {
+    "source": "Inherit",
+    "threshold": {
+      "threshold_type": "Always",
+      "amount_type": "Intensity"
+    }
+  },
+  "layer": 1,
+  "elements": [
+    {
+      "enabled": true,
+      "name": "Instanced",
+      "anchor": "Parent",
+      "pos": [
+        0.0,
+        0.0
+      ],
+      "opacity": 1.0,
+      "trigger": {
         "source": "Inherit",
         "threshold": {
-            "threshold_type": "Always",
-            "amount_type": "Intensity"
+          "threshold_type": "Always",
+          "amount_type": "Intensity"
         }
-    },
-    "anchor": "TopLeft",
-    "layer": 1,
-    "elements": [
+      },
+      "filter": {
+        "player": {
+          "combat": null,
+          "specs": [],
+          "weapons": [],
+          "traits": [],
+          "mounts": []
+        },
+        "map": {
+          "category": [],
+          "whitelist": true,
+          "ids": [
+            1155,
+            1154,
+            1062,
+            1149,
+            1156,
+            1188,
+            1264,
+            1303,
+            1323,
+            872,
+            954,
+            947,
+            948,
+            950,
+            949,
+            952,
+            951,
+            953,
+            958,
+            955,
+            959,
+            956,
+            957,
+            960,
+            1164,
+            1177,
+            1205,
+            1267,
+            1290,
+            1309,
+            1384,
+            1500,
+            1538,
+            1432,
+            1450,
+            1451,
+            1437,
+            1485,
+            1515,
+            1520
+          ]
+        }
+      },
+      "animation": {
+        "kind": "Pulse",
+        "period": 3000
+      },
+      "type": "Group",
+      "members": [
         {
-            "enabled": true,
-            "name": "Instanced",
-            "pos": [0.0, 0.0],
-            "opacity": 1.0,
-            "trigger": {
-                "source": "Inherit",
-                "threshold": {
-                    "threshold_type": "Always",
-                    "amount_type": "Intensity"
-                }
+          "enabled": true,
+          "name": "Reminder Icons",
+          "anchor": "Parent",
+          "pos": [
+            0.0,
+            0.0
+          ],
+          "opacity": 0.7,
+          "trigger": {
+            "source": "Inherit",
+            "threshold": {
+              "threshold_type": "Always",
+              "amount_type": "Intensity"
+            }
+          },
+          "filter": {
+            "player": {
+              "combat": null,
+              "specs": [],
+              "weapons": [],
+              "traits": [],
+              "mounts": []
             },
-            "filter": {
+            "map": {
+              "category": [],
+              "whitelist": true,
+              "ids": []
+            }
+          },
+          "animation": null,
+          "type": "IconList",
+          "layout": "Dynamic",
+          "direction": "Horizontal",
+          "size": [
+            48.0,
+            48.0
+          ],
+          "pad": 5.0,
+          "icons": [
+            {
+              "enabled": true,
+              "name": "Malnourished",
+              "trigger": {
+                "source": {
+                  "Buff": [
+                    46587
+                  ]
+                },
+                "threshold": {
+                  "threshold_type": "Present",
+                  "amount_type": "Intensity"
+                }
+              },
+              "filter": {
                 "player": {
-                    "combat": null,
-                    "specs": [],
-                    "traits": [],
-                    "mounts": []
+                  "combat": null,
+                  "specs": [],
+                  "weapons": [],
+                  "traits": [],
+                  "mounts": []
                 },
                 "map": {
-                    "category": [],
-                    "whitelist": true,
-                    "ids": [
-                        1155, 1154, 1062, 1149, 1156, 1188, 1264, 1303, 1323, 872, 954, 947, 948,
-                        950, 949, 952, 951, 953, 958, 955, 959, 956, 957, 960, 1164, 1177, 1205,
-                        1267, 1290, 1309, 1384, 1500, 1538, 1432, 1450, 1451, 1437, 1485, 1515, 1520
-                    ]
+                  "category": [],
+                  "whitelist": true,
+                  "ids": []
                 }
+              },
+              "icon": {
+                "Url": "https://wiki.guildwars2.com/images/6/67/Malnourished.png"
+              },
+              "tint": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ],
+              "zoom": 1.0,
+              "round": 0.0,
+              "border_size": 0.0,
+              "border_color": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "conditions": [],
+              "duration_bar": false,
+              "duration_text": false,
+              "stacks_text": false
             },
-            "animation": {
-                "kind": "Pulse",
-                "period": 3000
-            },
-            "type": "Group",
-            "members": [
-                {
-                    "enabled": true,
-                    "name": "Reminder Icons",
-                    "pos": [0.0, 0.0],
-                    "opacity": 0.7,
-                    "trigger": {
-                        "source": "Inherit",
-                        "threshold": {
-                            "threshold_type": "Always",
-                            "amount_type": "Intensity"
-                        }
-                    },
-                    "filter": {
-                        "player": {
-                            "combat": null,
-                            "specs": [],
-                            "traits": [],
-                            "mounts": []
-                        },
-                        "map": {
-                            "category": [],
-                            "whitelist": true,
-                            "ids": []
-                        }
-                    },
-                    "animation": null,
-                    "type": "IconList",
-                    "layout": "Dynamic",
-                    "direction": "Horizontal",
-                    "size": [48.0, 48.0],
-                    "pad": 5.0,
-                    "icons": [
-                        {
-                            "enabled": true,
-                            "name": "Malnourished",
-                            "trigger": {
-                                "source": {
-                                    "Buff": 46587
-                                },
-                                "threshold": {
-                                    "threshold_type": "Present",
-                                    "amount_type": "Intensity"
-                                }
-                            },
-                            "icon": {
-                                "Url": "https://wiki.guildwars2.com/images/6/67/Malnourished.png"
-                            },
-                            "tint": [1.0, 1.0, 1.0, 1.0],
-                            "zoom": 1.0,
-                            "round": 0.0,
-                            "conditions": [],
-                            "duration_bar": false,
-                            "duration_text": false,
-                            "stacks_text": false
-                        },
-                        {
-                            "enabled": true,
-                            "name": "Diminished",
-                            "trigger": {
-                                "source": {
-                                    "Buff": 46668
-                                },
-                                "threshold": {
-                                    "threshold_type": "Present",
-                                    "amount_type": "Intensity"
-                                }
-                            },
-                            "icon": {
-                                "Url": "https://wiki.guildwars2.com/images/7/71/Diminished.png"
-                            },
-                            "tint": [1.0, 1.0, 1.0, 1.0],
-                            "zoom": 1.0,
-                            "round": 0.0,
-                            "conditions": [],
-                            "duration_bar": false,
-                            "duration_text": false,
-                            "stacks_text": false
-                        },
-                        {
-                            "enabled": true,
-                            "name": "Reinforced",
-                            "trigger": {
-                                "source": {
-                                    "Buff": 9283
-                                },
-                                "threshold": {
-                                    "threshold_type": "Missing",
-                                    "amount_type": "Intensity"
-                                }
-                            },
-                            "icon": {
-                                "Url": "https://wiki.guildwars2.com/images/8/83/Reinforced_Armor.png"
-                            },
-                            "tint": [1.0, 1.0, 1.0, 1.0],
-                            "zoom": 1.0,
-                            "round": 0.0,
-                            "conditions": [],
-                            "duration_bar": false,
-                            "duration_text": false,
-                            "stacks_text": false
-                        }
-                    ]
+            {
+              "enabled": true,
+              "name": "Diminished",
+              "trigger": {
+                "source": {
+                  "Buff": [
+                    46668
+                  ]
+                },
+                "threshold": {
+                  "threshold_type": "Present",
+                  "amount_type": "Intensity"
                 }
-            ]
+              },
+              "filter": {
+                "player": {
+                  "combat": null,
+                  "specs": [],
+                  "weapons": [],
+                  "traits": [],
+                  "mounts": []
+                },
+                "map": {
+                  "category": [],
+                  "whitelist": true,
+                  "ids": []
+                }
+              },
+              "icon": {
+                "Url": "https://wiki.guildwars2.com/images/7/71/Diminished.png"
+              },
+              "tint": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ],
+              "zoom": 1.0,
+              "round": 0.0,
+              "border_size": 0.0,
+              "border_color": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "conditions": [],
+              "duration_bar": false,
+              "duration_text": false,
+              "stacks_text": false
+            },
+            {
+              "enabled": true,
+              "name": "Reinforced",
+              "trigger": {
+                "source": {
+                  "Buff": [
+                    9283
+                  ]
+                },
+                "threshold": {
+                  "threshold_type": "Missing",
+                  "amount_type": "Intensity"
+                }
+              },
+              "filter": {
+                "player": {
+                  "combat": null,
+                  "specs": [],
+                  "weapons": [],
+                  "traits": [],
+                  "mounts": []
+                },
+                "map": {
+                  "category": [],
+                  "whitelist": true,
+                  "ids": []
+                }
+              },
+              "icon": {
+                "Url": "https://wiki.guildwars2.com/images/8/83/Reinforced_Armor.png"
+              },
+              "tint": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ],
+              "zoom": 1.0,
+              "round": 0.0,
+              "border_size": 0.0,
+              "border_color": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "conditions": [],
+              "duration_bar": false,
+              "duration_text": false,
+              "stacks_text": false
+            }
+          ]
         }
-    ]
+      ]
+    }
+  ]
 }

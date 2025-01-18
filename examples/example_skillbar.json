@@ -1,0 +1,1367 @@
+{
+  "schema": "v1",
+  "enabled": true,
+  "name": "Skillbar",
+  "anchor": {
+    "Screen": "BottomCenter"
+  },
+  "pos": [
+    0.0,
+    -250.0
+  ],
+  "opacity": 0.8,
+  "trigger": {
+    "source": "Inherit",
+    "threshold": {
+      "threshold_type": "Always",
+      "amount_type": "Intensity"
+    }
+  },
+  "layer": 0,
+  "elements": [
+    {
+      "enabled": true,
+      "name": "Weapon Swap",
+      "anchor": "Parent",
+      "pos": [
+        -237.0,
+        0.0
+      ],
+      "opacity": 1.0,
+      "trigger": {
+        "source": {
+          "SkillbarSlot": "WeaponSwap"
+        },
+        "threshold": {
+          "threshold_type": "Always",
+          "amount_type": "Intensity"
+        }
+      },
+      "filter": {
+        "player": {
+          "combat": null,
+          "specs": [],
+          "weapons": [],
+          "traits": [],
+          "mounts": []
+        },
+        "map": {
+          "category": [],
+          "whitelist": true,
+          "ids": []
+        }
+      },
+      "animation": null,
+      "type": "Icon",
+      "icon": "Automatic",
+      "tint": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "zoom": 0.62499994,
+      "round": 0.0,
+      "border_size": 0.0,
+      "border_color": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "conditions": [
+        {
+          "trigger": {
+            "ProgressThreshold": {
+              "threshold_type": "Missing",
+              "amount_type": "Intensity"
+            }
+          },
+          "properties": {
+            "tint": [
+              1.0,
+              1.0,
+              1.0,
+              0.3137255
+            ],
+            "zoom": null,
+            "round": null,
+            "border_size": null,
+            "border_color": null
+          }
+        }
+      ],
+      "duration_bar": true,
+      "duration_text": true,
+      "stacks_text": false,
+      "size": [
+        32.0,
+        32.0
+      ]
+    },
+    {
+      "enabled": true,
+      "name": "Main",
+      "anchor": "Parent",
+      "pos": [
+        0.0,
+        0.0
+      ],
+      "opacity": 1.0,
+      "trigger": {
+        "source": "Inherit",
+        "threshold": {
+          "threshold_type": "Always",
+          "amount_type": "Intensity"
+        }
+      },
+      "filter": {
+        "player": {
+          "combat": null,
+          "specs": [],
+          "weapons": [],
+          "traits": [],
+          "mounts": []
+        },
+        "map": {
+          "category": [],
+          "whitelist": true,
+          "ids": []
+        }
+      },
+      "animation": null,
+      "type": "IconList",
+      "layout": "Static",
+      "direction": "Horizontal",
+      "size": [
+        42.0,
+        42.0
+      ],
+      "pad": 2.0,
+      "icons": [
+        {
+          "enabled": true,
+          "name": "Weapon 1",
+          "trigger": {
+            "source": {
+              "SkillbarSlot": "Weapon1"
+            },
+            "threshold": {
+              "threshold_type": "Always",
+              "amount_type": "Intensity"
+            }
+          },
+          "filter": {
+            "player": {
+              "combat": null,
+              "specs": [],
+              "weapons": [],
+              "traits": [],
+              "mounts": []
+            },
+            "map": {
+              "category": [],
+              "whitelist": true,
+              "ids": []
+            }
+          },
+          "icon": "Automatic",
+          "tint": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zoom": 0.7692308,
+          "round": 0.0,
+          "border_size": 0.0,
+          "border_color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "conditions": [
+            {
+              "trigger": {
+                "ProgressThreshold": {
+                  "threshold_type": "Missing",
+                  "amount_type": "Intensity"
+                }
+              },
+              "properties": {
+                "tint": [
+                  0.47058824,
+                  0.47058824,
+                  0.47058824,
+                  0.5882353
+                ],
+                "zoom": null,
+                "round": null,
+                "border_size": null,
+                "border_color": null
+              }
+            }
+          ],
+          "duration_bar": true,
+          "duration_text": true,
+          "stacks_text": true
+        },
+        {
+          "enabled": true,
+          "name": "Weapon 2",
+          "trigger": {
+            "source": {
+              "SkillbarSlot": "Weapon2"
+            },
+            "threshold": {
+              "threshold_type": "Always",
+              "amount_type": "Intensity"
+            }
+          },
+          "filter": {
+            "player": {
+              "combat": null,
+              "specs": [],
+              "weapons": [],
+              "traits": [],
+              "mounts": []
+            },
+            "map": {
+              "category": [],
+              "whitelist": true,
+              "ids": []
+            }
+          },
+          "icon": "Automatic",
+          "tint": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zoom": 0.7692308,
+          "round": 0.0,
+          "border_size": 0.0,
+          "border_color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "conditions": [
+            {
+              "trigger": {
+                "ProgressThreshold": {
+                  "threshold_type": "Missing",
+                  "amount_type": "Intensity"
+                }
+              },
+              "properties": {
+                "tint": [
+                  0.47058824,
+                  0.47058824,
+                  0.47058824,
+                  0.5882353
+                ],
+                "zoom": null,
+                "round": null,
+                "border_size": null,
+                "border_color": null
+              }
+            }
+          ],
+          "duration_bar": true,
+          "duration_text": true,
+          "stacks_text": true
+        },
+        {
+          "enabled": true,
+          "name": "Weapon 3",
+          "trigger": {
+            "source": {
+              "SkillbarSlot": "Weapon3"
+            },
+            "threshold": {
+              "threshold_type": "Always",
+              "amount_type": "Intensity"
+            }
+          },
+          "filter": {
+            "player": {
+              "combat": null,
+              "specs": [],
+              "weapons": [],
+              "traits": [],
+              "mounts": []
+            },
+            "map": {
+              "category": [],
+              "whitelist": true,
+              "ids": []
+            }
+          },
+          "icon": "Automatic",
+          "tint": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zoom": 0.7692308,
+          "round": 0.0,
+          "border_size": 0.0,
+          "border_color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "conditions": [
+            {
+              "trigger": {
+                "ProgressThreshold": {
+                  "threshold_type": "Missing",
+                  "amount_type": "Intensity"
+                }
+              },
+              "properties": {
+                "tint": [
+                  0.47058824,
+                  0.47058824,
+                  0.47058824,
+                  0.5882353
+                ],
+                "zoom": null,
+                "round": null,
+                "border_size": null,
+                "border_color": null
+              }
+            }
+          ],
+          "duration_bar": true,
+          "duration_text": true,
+          "stacks_text": true
+        },
+        {
+          "enabled": true,
+          "name": "Weapon 4",
+          "trigger": {
+            "source": {
+              "SkillbarSlot": "Weapon4"
+            },
+            "threshold": {
+              "threshold_type": "Always",
+              "amount_type": "Intensity"
+            }
+          },
+          "filter": {
+            "player": {
+              "combat": null,
+              "specs": [],
+              "weapons": [],
+              "traits": [],
+              "mounts": []
+            },
+            "map": {
+              "category": [],
+              "whitelist": true,
+              "ids": []
+            }
+          },
+          "icon": "Automatic",
+          "tint": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zoom": 0.7692308,
+          "round": 0.0,
+          "border_size": 0.0,
+          "border_color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "conditions": [
+            {
+              "trigger": {
+                "ProgressThreshold": {
+                  "threshold_type": "Missing",
+                  "amount_type": "Intensity"
+                }
+              },
+              "properties": {
+                "tint": [
+                  0.47058824,
+                  0.47058824,
+                  0.47058824,
+                  0.5882353
+                ],
+                "zoom": null,
+                "round": null,
+                "border_size": null,
+                "border_color": null
+              }
+            }
+          ],
+          "duration_bar": true,
+          "duration_text": true,
+          "stacks_text": true
+        },
+        {
+          "enabled": true,
+          "name": "Weapon 5",
+          "trigger": {
+            "source": {
+              "SkillbarSlot": "Weapon5"
+            },
+            "threshold": {
+              "threshold_type": "Always",
+              "amount_type": "Intensity"
+            }
+          },
+          "filter": {
+            "player": {
+              "combat": null,
+              "specs": [],
+              "weapons": [],
+              "traits": [],
+              "mounts": []
+            },
+            "map": {
+              "category": [],
+              "whitelist": true,
+              "ids": []
+            }
+          },
+          "icon": "Automatic",
+          "tint": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zoom": 0.7692308,
+          "round": 0.0,
+          "border_size": 0.0,
+          "border_color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "conditions": [
+            {
+              "trigger": {
+                "ProgressThreshold": {
+                  "threshold_type": "Missing",
+                  "amount_type": "Intensity"
+                }
+              },
+              "properties": {
+                "tint": [
+                  0.47058824,
+                  0.47058824,
+                  0.47058824,
+                  0.5882353
+                ],
+                "zoom": null,
+                "round": null,
+                "border_size": null,
+                "border_color": null
+              }
+            }
+          ],
+          "duration_bar": true,
+          "duration_text": true,
+          "stacks_text": true
+        },
+        {
+          "enabled": true,
+          "name": "Heal",
+          "trigger": {
+            "source": {
+              "SkillbarSlot": "Heal"
+            },
+            "threshold": {
+              "threshold_type": "Always",
+              "amount_type": "Intensity"
+            }
+          },
+          "filter": {
+            "player": {
+              "combat": null,
+              "specs": [],
+              "weapons": [],
+              "traits": [],
+              "mounts": []
+            },
+            "map": {
+              "category": [],
+              "whitelist": true,
+              "ids": []
+            }
+          },
+          "icon": "Automatic",
+          "tint": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zoom": 0.7692308,
+          "round": 0.0,
+          "border_size": 0.0,
+          "border_color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "conditions": [
+            {
+              "trigger": {
+                "ProgressThreshold": {
+                  "threshold_type": "Missing",
+                  "amount_type": "Intensity"
+                }
+              },
+              "properties": {
+                "tint": [
+                  0.47058824,
+                  0.47058824,
+                  0.47058824,
+                  0.5882353
+                ],
+                "zoom": null,
+                "round": null,
+                "border_size": null,
+                "border_color": null
+              }
+            }
+          ],
+          "duration_bar": true,
+          "duration_text": true,
+          "stacks_text": true
+        },
+        {
+          "enabled": true,
+          "name": "Utility 1",
+          "trigger": {
+            "source": {
+              "SkillbarSlot": "Utility1"
+            },
+            "threshold": {
+              "threshold_type": "Always",
+              "amount_type": "Intensity"
+            }
+          },
+          "filter": {
+            "player": {
+              "combat": null,
+              "specs": [],
+              "weapons": [],
+              "traits": [],
+              "mounts": []
+            },
+            "map": {
+              "category": [],
+              "whitelist": true,
+              "ids": []
+            }
+          },
+          "icon": "Automatic",
+          "tint": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zoom": 0.7692308,
+          "round": 0.0,
+          "border_size": 0.0,
+          "border_color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "conditions": [
+            {
+              "trigger": {
+                "ProgressThreshold": {
+                  "threshold_type": "Missing",
+                  "amount_type": "Intensity"
+                }
+              },
+              "properties": {
+                "tint": [
+                  0.47058824,
+                  0.47058824,
+                  0.47058824,
+                  0.5882353
+                ],
+                "zoom": null,
+                "round": null,
+                "border_size": null,
+                "border_color": null
+              }
+            }
+          ],
+          "duration_bar": true,
+          "duration_text": true,
+          "stacks_text": true
+        },
+        {
+          "enabled": true,
+          "name": "Utility 2",
+          "trigger": {
+            "source": {
+              "SkillbarSlot": "Utility2"
+            },
+            "threshold": {
+              "threshold_type": "Always",
+              "amount_type": "Intensity"
+            }
+          },
+          "filter": {
+            "player": {
+              "combat": null,
+              "specs": [],
+              "weapons": [],
+              "traits": [],
+              "mounts": []
+            },
+            "map": {
+              "category": [],
+              "whitelist": true,
+              "ids": []
+            }
+          },
+          "icon": "Automatic",
+          "tint": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zoom": 0.7692308,
+          "round": 0.0,
+          "border_size": 0.0,
+          "border_color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "conditions": [
+            {
+              "trigger": {
+                "ProgressThreshold": {
+                  "threshold_type": "Missing",
+                  "amount_type": "Intensity"
+                }
+              },
+              "properties": {
+                "tint": [
+                  0.47058824,
+                  0.47058824,
+                  0.47058824,
+                  0.5882353
+                ],
+                "zoom": null,
+                "round": null,
+                "border_size": null,
+                "border_color": null
+              }
+            }
+          ],
+          "duration_bar": true,
+          "duration_text": true,
+          "stacks_text": true
+        },
+        {
+          "enabled": true,
+          "name": "Utility 3",
+          "trigger": {
+            "source": {
+              "SkillbarSlot": "Utility3"
+            },
+            "threshold": {
+              "threshold_type": "Always",
+              "amount_type": "Intensity"
+            }
+          },
+          "filter": {
+            "player": {
+              "combat": null,
+              "specs": [],
+              "weapons": [],
+              "traits": [],
+              "mounts": []
+            },
+            "map": {
+              "category": [],
+              "whitelist": true,
+              "ids": []
+            }
+          },
+          "icon": "Automatic",
+          "tint": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zoom": 0.7692308,
+          "round": 0.0,
+          "border_size": 0.0,
+          "border_color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "conditions": [
+            {
+              "trigger": {
+                "ProgressThreshold": {
+                  "threshold_type": "Missing",
+                  "amount_type": "Intensity"
+                }
+              },
+              "properties": {
+                "tint": [
+                  0.47058824,
+                  0.47058824,
+                  0.47058824,
+                  0.5882353
+                ],
+                "zoom": null,
+                "round": null,
+                "border_size": null,
+                "border_color": null
+              }
+            }
+          ],
+          "duration_bar": true,
+          "duration_text": true,
+          "stacks_text": true
+        },
+        {
+          "enabled": true,
+          "name": "Elite",
+          "trigger": {
+            "source": {
+              "SkillbarSlot": "Elite"
+            },
+            "threshold": {
+              "threshold_type": "Always",
+              "amount_type": "Intensity"
+            }
+          },
+          "filter": {
+            "player": {
+              "combat": null,
+              "specs": [],
+              "weapons": [],
+              "traits": [],
+              "mounts": []
+            },
+            "map": {
+              "category": [],
+              "whitelist": true,
+              "ids": []
+            }
+          },
+          "icon": "Automatic",
+          "tint": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zoom": 0.7692308,
+          "round": 0.0,
+          "border_size": 0.0,
+          "border_color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "conditions": [
+            {
+              "trigger": {
+                "ProgressThreshold": {
+                  "threshold_type": "Missing",
+                  "amount_type": "Intensity"
+                }
+              },
+              "properties": {
+                "tint": [
+                  0.47058824,
+                  0.47058824,
+                  0.47058824,
+                  0.5882353
+                ],
+                "zoom": null,
+                "round": null,
+                "border_size": null,
+                "border_color": null
+              }
+            }
+          ],
+          "duration_bar": true,
+          "duration_text": true,
+          "stacks_text": true
+        }
+      ]
+    },
+    {
+      "enabled": true,
+      "name": "Prof",
+      "anchor": "Parent",
+      "pos": [
+        0.0,
+        -41.0
+      ],
+      "opacity": 1.0,
+      "trigger": {
+        "source": "Inherit",
+        "threshold": {
+          "threshold_type": "Always",
+          "amount_type": "Intensity"
+        }
+      },
+      "filter": {
+        "player": {
+          "combat": null,
+          "specs": [],
+          "weapons": [],
+          "traits": [],
+          "mounts": []
+        },
+        "map": {
+          "category": [],
+          "whitelist": true,
+          "ids": []
+        }
+      },
+      "animation": null,
+      "type": "IconList",
+      "layout": "Dynamic",
+      "direction": "Horizontal",
+      "size": [
+        36.0,
+        36.0
+      ],
+      "pad": 2.0,
+      "icons": [
+        {
+          "enabled": true,
+          "name": "Prof 1",
+          "trigger": {
+            "source": {
+              "SkillbarSlot": "Profession1"
+            },
+            "threshold": {
+              "threshold_type": "Always",
+              "amount_type": "Intensity"
+            }
+          },
+          "filter": {
+            "player": {
+              "combat": null,
+              "specs": [],
+              "weapons": [],
+              "traits": [],
+              "mounts": []
+            },
+            "map": {
+              "category": [],
+              "whitelist": true,
+              "ids": []
+            }
+          },
+          "icon": "Automatic",
+          "tint": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zoom": 0.7692308,
+          "round": 0.0,
+          "border_size": 0.0,
+          "border_color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "conditions": [
+            {
+              "trigger": {
+                "ProgressThreshold": {
+                  "threshold_type": "Missing",
+                  "amount_type": "Intensity"
+                }
+              },
+              "properties": {
+                "tint": [
+                  0.47058824,
+                  0.47058824,
+                  0.47058824,
+                  0.5882353
+                ],
+                "zoom": null,
+                "round": null,
+                "border_size": null,
+                "border_color": null
+              }
+            }
+          ],
+          "duration_bar": true,
+          "duration_text": true,
+          "stacks_text": true
+        },
+        {
+          "enabled": true,
+          "name": "Prof 2",
+          "trigger": {
+            "source": {
+              "SkillbarSlot": "Profession2"
+            },
+            "threshold": {
+              "threshold_type": "Always",
+              "amount_type": "Intensity"
+            }
+          },
+          "filter": {
+            "player": {
+              "combat": null,
+              "specs": [],
+              "weapons": [],
+              "traits": [],
+              "mounts": []
+            },
+            "map": {
+              "category": [],
+              "whitelist": true,
+              "ids": []
+            }
+          },
+          "icon": "Automatic",
+          "tint": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zoom": 0.7692308,
+          "round": 0.0,
+          "border_size": 0.0,
+          "border_color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "conditions": [
+            {
+              "trigger": {
+                "ProgressThreshold": {
+                  "threshold_type": "Missing",
+                  "amount_type": "Intensity"
+                }
+              },
+              "properties": {
+                "tint": [
+                  0.47058824,
+                  0.47058824,
+                  0.47058824,
+                  0.5882353
+                ],
+                "zoom": null,
+                "round": null,
+                "border_size": null,
+                "border_color": null
+              }
+            }
+          ],
+          "duration_bar": true,
+          "duration_text": true,
+          "stacks_text": true
+        },
+        {
+          "enabled": true,
+          "name": "Prof 3",
+          "trigger": {
+            "source": {
+              "SkillbarSlot": "Profession3"
+            },
+            "threshold": {
+              "threshold_type": "Always",
+              "amount_type": "Intensity"
+            }
+          },
+          "filter": {
+            "player": {
+              "combat": null,
+              "specs": [],
+              "weapons": [],
+              "traits": [],
+              "mounts": []
+            },
+            "map": {
+              "category": [],
+              "whitelist": true,
+              "ids": []
+            }
+          },
+          "icon": "Automatic",
+          "tint": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zoom": 0.7692308,
+          "round": 0.0,
+          "border_size": 0.0,
+          "border_color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "conditions": [
+            {
+              "trigger": {
+                "ProgressThreshold": {
+                  "threshold_type": "Missing",
+                  "amount_type": "Intensity"
+                }
+              },
+              "properties": {
+                "tint": [
+                  0.47058824,
+                  0.47058824,
+                  0.47058824,
+                  0.5882353
+                ],
+                "zoom": null,
+                "round": null,
+                "border_size": null,
+                "border_color": null
+              }
+            }
+          ],
+          "duration_bar": true,
+          "duration_text": true,
+          "stacks_text": true
+        },
+        {
+          "enabled": true,
+          "name": "Prof 4",
+          "trigger": {
+            "source": {
+              "SkillbarSlot": "Profession4"
+            },
+            "threshold": {
+              "threshold_type": "Always",
+              "amount_type": "Intensity"
+            }
+          },
+          "filter": {
+            "player": {
+              "combat": null,
+              "specs": [],
+              "weapons": [],
+              "traits": [],
+              "mounts": []
+            },
+            "map": {
+              "category": [],
+              "whitelist": true,
+              "ids": []
+            }
+          },
+          "icon": "Automatic",
+          "tint": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zoom": 0.7692308,
+          "round": 0.0,
+          "border_size": 0.0,
+          "border_color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "conditions": [
+            {
+              "trigger": {
+                "ProgressThreshold": {
+                  "threshold_type": "Missing",
+                  "amount_type": "Intensity"
+                }
+              },
+              "properties": {
+                "tint": [
+                  0.47058824,
+                  0.47058824,
+                  0.47058824,
+                  0.5882353
+                ],
+                "zoom": null,
+                "round": null,
+                "border_size": null,
+                "border_color": null
+              }
+            }
+          ],
+          "duration_bar": true,
+          "duration_text": true,
+          "stacks_text": true
+        },
+        {
+          "enabled": true,
+          "name": "Prof 5",
+          "trigger": {
+            "source": {
+              "SkillbarSlot": "Profession5"
+            },
+            "threshold": {
+              "threshold_type": "Always",
+              "amount_type": "Intensity"
+            }
+          },
+          "filter": {
+            "player": {
+              "combat": null,
+              "specs": [],
+              "weapons": [],
+              "traits": [],
+              "mounts": []
+            },
+            "map": {
+              "category": [],
+              "whitelist": true,
+              "ids": []
+            }
+          },
+          "icon": "Automatic",
+          "tint": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zoom": 0.7692308,
+          "round": 0.0,
+          "border_size": 0.0,
+          "border_color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "conditions": [
+            {
+              "trigger": {
+                "ProgressThreshold": {
+                  "threshold_type": "Missing",
+                  "amount_type": "Intensity"
+                }
+              },
+              "properties": {
+                "tint": [
+                  0.47058824,
+                  0.47058824,
+                  0.47058824,
+                  0.5882353
+                ],
+                "zoom": null,
+                "round": null,
+                "border_size": null,
+                "border_color": null
+              }
+            }
+          ],
+          "duration_bar": true,
+          "duration_text": true,
+          "stacks_text": true
+        }
+      ]
+    },
+    {
+      "enabled": true,
+      "name": "SAK",
+      "anchor": "Parent",
+      "pos": [
+        -135.0,
+        -48.0
+      ],
+      "opacity": 1.0,
+      "trigger": {
+        "source": {
+          "SkillbarSlot": "SpecialAction"
+        },
+        "threshold": {
+          "threshold_type": "Always",
+          "amount_type": "Intensity"
+        }
+      },
+      "filter": {
+        "player": {
+          "combat": null,
+          "specs": [],
+          "weapons": [],
+          "traits": [],
+          "mounts": []
+        },
+        "map": {
+          "category": [],
+          "whitelist": true,
+          "ids": []
+        }
+      },
+      "animation": null,
+      "type": "Icon",
+      "icon": "Automatic",
+      "tint": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "zoom": 0.7692308,
+      "round": 0.0,
+      "border_size": 0.0,
+      "border_color": [
+        0.000001,
+        9.9999e-7,
+        9.9999e-7,
+        1.0
+      ],
+      "conditions": [
+        {
+          "trigger": {
+            "ProgressThreshold": {
+              "threshold_type": "Missing",
+              "amount_type": "Intensity"
+            }
+          },
+          "properties": {
+            "tint": [
+              1.0,
+              1.0,
+              1.0,
+              0.3137255
+            ],
+            "zoom": null,
+            "round": null,
+            "border_size": null,
+            "border_color": null
+          }
+        }
+      ],
+      "duration_bar": true,
+      "duration_text": true,
+      "stacks_text": true,
+      "size": [
+        38.0,
+        38.0
+      ]
+    },
+    {
+      "enabled": true,
+      "name": "Mount",
+      "anchor": "Parent",
+      "pos": [
+        238.0,
+        0.0
+      ],
+      "opacity": 1.0,
+      "trigger": {
+        "source": {
+          "SkillbarSlot": "Mount"
+        },
+        "threshold": {
+          "threshold_type": "Always",
+          "amount_type": "Intensity"
+        }
+      },
+      "filter": {
+        "player": {
+          "combat": null,
+          "specs": [],
+          "weapons": [],
+          "traits": [],
+          "mounts": []
+        },
+        "map": {
+          "category": [],
+          "whitelist": true,
+          "ids": []
+        }
+      },
+      "animation": null,
+      "type": "Icon",
+      "icon": "Automatic",
+      "tint": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "zoom": 0.7692308,
+      "round": 0.0,
+      "border_size": 0.0,
+      "border_color": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "conditions": [
+        {
+          "trigger": {
+            "ProgressThreshold": {
+              "threshold_type": "Missing",
+              "amount_type": "Intensity"
+            }
+          },
+          "properties": {
+            "tint": [
+              1.0,
+              1.0,
+              1.0,
+              0.3137255
+            ],
+            "zoom": null,
+            "round": null,
+            "border_size": null,
+            "border_color": null
+          }
+        }
+      ],
+      "duration_bar": true,
+      "duration_text": true,
+      "stacks_text": false,
+      "size": [
+        32.0,
+        32.0
+      ]
+    }
+  ]
+}

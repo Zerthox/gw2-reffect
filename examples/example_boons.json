@@ -1,167 +1,320 @@
 {
-    "schema": "v1",
-    "enabled": true,
-    "name": "Important Boons",
-    "pos": [0.0, -300.0],
-    "opacity": 1.0,
-    "trigger": {
+  "schema": "v1",
+  "enabled": true,
+  "name": "Important Boons",
+  "anchor": {
+    "Screen": "BottomCenter"
+  },
+  "pos": [
+    0.0,
+    -300.0
+  ],
+  "opacity": 1.0,
+  "trigger": {
+    "source": "Inherit",
+    "threshold": {
+      "threshold_type": "Always",
+      "amount_type": "Intensity"
+    }
+  },
+  "layer": 0,
+  "elements": [
+    {
+      "enabled": true,
+      "name": "Boon Icons",
+      "anchor": "Parent",
+      "pos": [
+        0.0,
+        0.0
+      ],
+      "opacity": 0.8,
+      "trigger": {
         "source": "Inherit",
         "threshold": {
-            "threshold_type": "Always",
-            "amount_type": "Intensity"
+          "threshold_type": "Always",
+          "amount_type": "Intensity"
         }
-    },
-    "anchor": "BottomCenter",
-    "layer": 0,
-    "elements": [
+      },
+      "filter": {
+        "player": {
+          "combat": null,
+          "specs": [],
+          "weapons": [],
+          "traits": [],
+          "mounts": []
+        },
+        "map": {
+          "category": [],
+          "whitelist": true,
+          "ids": []
+        }
+      },
+      "animation": null,
+      "type": "IconList",
+      "layout": "Dynamic",
+      "direction": "Horizontal",
+      "size": [
+        32.0,
+        32.0
+      ],
+      "pad": 2.0,
+      "icons": [
         {
-            "enabled": true,
-            "name": "Boon Icons",
-            "pos": [0.0, 0.0],
-            "opacity": 0.8,
-            "trigger": {
-                "source": "Inherit",
-                "threshold": {
-                    "threshold_type": "Always",
-                    "amount_type": "Intensity"
-                }
+          "enabled": true,
+          "name": "Aegis",
+          "trigger": {
+            "source": {
+              "Buff": [
+                743
+              ]
             },
-            "filter": {
-                "player": {
-                    "combat": null,
-                    "specs": [],
-                    "traits": [],
-                    "mounts": []
-                },
-                "map": {
-                    "category": [],
-                    "whitelist": true,
-                    "ids": []
-                }
+            "threshold": {
+              "threshold_type": "Present",
+              "amount_type": "Intensity"
+            }
+          },
+          "filter": {
+            "player": {
+              "combat": null,
+              "specs": [],
+              "weapons": [],
+              "traits": [],
+              "mounts": []
             },
-            "animation": null,
-            "type": "IconList",
-            "layout": "Dynamic",
-            "direction": "Horizontal",
-            "size": [32.0, 32.0],
-            "pad": 2.0,
-            "icons": [
-                {
-                    "enabled": true,
-                    "name": "Aegis",
-                    "trigger": {
-                        "source": {
-                            "Buff": 743
-                        },
-                        "threshold": {
-                            "threshold_type": "Present",
-                            "amount_type": "Intensity"
-                        }
-                    },
-                    "icon": {
-                        "Url": "https://wiki.guildwars2.com/images/e/e5/Aegis.png"
-                    },
-                    "tint": [1.0, 1.0, 1.0, 1.0],
-                    "zoom": 1.0,
-                    "round": 0.0,
-                    "conditions": [],
-                    "duration_bar": true,
-                    "duration_text": false,
-                    "stacks_text": false
-                },
-                {
-                    "enabled": true,
-                    "name": "Might",
-                    "trigger": {
-                        "source": {
-                            "Buff": 740
-                        },
-                        "threshold": {
-                            "threshold_type": "Present",
-                            "amount_type": "Intensity"
-                        }
-                    },
-                    "icon": {
-                        "Url": "https://wiki.guildwars2.com/images/7/7c/Might.png"
-                    },
-                    "tint": [1.0, 1.0, 1.0, 1.0],
-                    "zoom": 1.0,
-                    "round": 0.0,
-                    "conditions": [],
-                    "duration_bar": true,
-                    "duration_text": false,
-                    "stacks_text": true
-                },
-                {
-                    "enabled": true,
-                    "name": "Quickness",
-                    "trigger": {
-                        "source": {
-                            "Buff": 1187
-                        },
-                        "threshold": {
-                            "threshold_type": "Present",
-                            "amount_type": "Intensity"
-                        }
-                    },
-                    "icon": {
-                        "Url": "https://wiki.guildwars2.com/images/b/b4/Quickness.png"
-                    },
-                    "tint": [1.0, 1.0, 1.0, 1.0],
-                    "zoom": 1.0,
-                    "round": 0.0,
-                    "conditions": [],
-                    "duration_bar": true,
-                    "duration_text": false,
-                    "stacks_text": false
-                },
-                {
-                    "enabled": true,
-                    "name": "Alacrity",
-                    "trigger": {
-                        "source": {
-                            "Buff": 30328
-                        },
-                        "threshold": {
-                            "threshold_type": "Present",
-                            "amount_type": "Intensity"
-                        }
-                    },
-                    "icon": {
-                        "Url": "https://wiki.guildwars2.com/images/4/4c/Alacrity.png"
-                    },
-                    "tint": [1.0, 1.0, 1.0, 1.0],
-                    "zoom": 1.0,
-                    "round": 0.0,
-                    "conditions": [],
-                    "duration_bar": true,
-                    "duration_text": false,
-                    "stacks_text": false
-                },
-                {
-                    "enabled": true,
-                    "name": "Stability",
-                    "trigger": {
-                        "source": {
-                            "Buff": 1122
-                        },
-                        "threshold": {
-                            "threshold_type": "Present",
-                            "amount_type": "Intensity"
-                        }
-                    },
-                    "icon": {
-                        "Url": "https://wiki.guildwars2.com/images/a/ae/Stability.png"
-                    },
-                    "tint": [1.0, 1.0, 1.0, 1.0],
-                    "zoom": 1.0,
-                    "round": 0.0,
-                    "conditions": [],
-                    "duration_bar": true,
-                    "duration_text": false,
-                    "stacks_text": true
-                }
-            ]
+            "map": {
+              "category": [],
+              "whitelist": true,
+              "ids": []
+            }
+          },
+          "icon": {
+            "Url": "https://wiki.guildwars2.com/images/e/e5/Aegis.png"
+          },
+          "tint": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zoom": 1.0,
+          "round": 0.0,
+          "border_size": 0.0,
+          "border_color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "conditions": [],
+          "duration_bar": true,
+          "duration_text": false,
+          "stacks_text": false
+        },
+        {
+          "enabled": true,
+          "name": "Might",
+          "trigger": {
+            "source": {
+              "Buff": [
+                740
+              ]
+            },
+            "threshold": {
+              "threshold_type": "Present",
+              "amount_type": "Intensity"
+            }
+          },
+          "filter": {
+            "player": {
+              "combat": null,
+              "specs": [],
+              "weapons": [],
+              "traits": [],
+              "mounts": []
+            },
+            "map": {
+              "category": [],
+              "whitelist": true,
+              "ids": []
+            }
+          },
+          "icon": {
+            "Url": "https://wiki.guildwars2.com/images/7/7c/Might.png"
+          },
+          "tint": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zoom": 1.0,
+          "round": 0.0,
+          "border_size": 0.0,
+          "border_color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "conditions": [],
+          "duration_bar": true,
+          "duration_text": false,
+          "stacks_text": true
+        },
+        {
+          "enabled": true,
+          "name": "Quickness",
+          "trigger": {
+            "source": {
+              "Buff": [
+                1187
+              ]
+            },
+            "threshold": {
+              "threshold_type": "Present",
+              "amount_type": "Intensity"
+            }
+          },
+          "filter": {
+            "player": {
+              "combat": null,
+              "specs": [],
+              "weapons": [],
+              "traits": [],
+              "mounts": []
+            },
+            "map": {
+              "category": [],
+              "whitelist": true,
+              "ids": []
+            }
+          },
+          "icon": {
+            "Url": "https://wiki.guildwars2.com/images/b/b4/Quickness.png"
+          },
+          "tint": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zoom": 1.0,
+          "round": 0.0,
+          "border_size": 0.0,
+          "border_color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "conditions": [],
+          "duration_bar": true,
+          "duration_text": false,
+          "stacks_text": false
+        },
+        {
+          "enabled": true,
+          "name": "Alacrity",
+          "trigger": {
+            "source": {
+              "Buff": [
+                30328
+              ]
+            },
+            "threshold": {
+              "threshold_type": "Present",
+              "amount_type": "Intensity"
+            }
+          },
+          "filter": {
+            "player": {
+              "combat": null,
+              "specs": [],
+              "weapons": [],
+              "traits": [],
+              "mounts": []
+            },
+            "map": {
+              "category": [],
+              "whitelist": true,
+              "ids": []
+            }
+          },
+          "icon": {
+            "Url": "https://wiki.guildwars2.com/images/4/4c/Alacrity.png"
+          },
+          "tint": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zoom": 1.0,
+          "round": 0.0,
+          "border_size": 0.0,
+          "border_color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "conditions": [],
+          "duration_bar": true,
+          "duration_text": false,
+          "stacks_text": false
+        },
+        {
+          "enabled": true,
+          "name": "Stability",
+          "trigger": {
+            "source": {
+              "Buff": [
+                1122
+              ]
+            },
+            "threshold": {
+              "threshold_type": "Present",
+              "amount_type": "Intensity"
+            }
+          },
+          "filter": {
+            "player": {
+              "combat": null,
+              "specs": [],
+              "weapons": [],
+              "traits": [],
+              "mounts": []
+            },
+            "map": {
+              "category": [],
+              "whitelist": true,
+              "ids": []
+            }
+          },
+          "icon": {
+            "Url": "https://wiki.guildwars2.com/images/a/ae/Stability.png"
+          },
+          "tint": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zoom": 1.0,
+          "round": 0.0,
+          "border_size": 0.0,
+          "border_color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "conditions": [],
+          "duration_bar": true,
+          "duration_text": false,
+          "stacks_text": true
         }
-    ]
+      ]
+    }
+  ]
 }
