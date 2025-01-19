@@ -5,7 +5,8 @@ use crate::{
     id::Id,
     render::{colors, ComponentWise, RenderDebug, RenderOptions},
     render_util::{
-        helper_slider, input_pos, push_alpha_change, slider_percent, EnumStaticVariants, Rect,
+        helper_slider, input_pos, push_alpha_change, push_window_clip_rect_fullscreen,
+        slider_percent, EnumStaticVariants, Rect,
     },
     serde::migrate,
     trigger::ProgressTrigger,
@@ -94,10 +95,10 @@ impl Common {
     ///
     /// Updates the position if moved.
     pub fn render_edit_indicators(&mut self, ui: &Ui, parent_pos: [f32; 2], bounds: Rect) {
-        const ANCHOR_SIZE: f32 = 5.0;
-        const ANCHOR_OFFSET: [f32; 2] = [0.5 * ANCHOR_SIZE, 0.5 * ANCHOR_SIZE];
+        const ANCHOR_HALF_SIZE: f32 = 2.0;
         const COLOR: [f32; 4] = colors::WHITE;
         const COLOR_DRAG: [f32; 4] = colors::YELLOW;
+        const COLOR_SHADOW: [f32; 4] = colors::with_alpha(colors::BLACK, 0.7);
 
         let anchor = self.pos(ui, parent_pos);
         let (min, max) = bounds;
@@ -131,17 +132,26 @@ impl Common {
                 self.dragging = hover && ui.is_mouse_down(MouseButton::Left);
                 let color = if self.dragging { COLOR_DRAG } else { COLOR };
 
-                let draw_list = ui.get_foreground_draw_list();
+                let draw_list = ui.get_window_draw_list();
+                let _clip = push_window_clip_rect_fullscreen(ui);
 
                 if hover {
+                    draw_list
+                        .add_rect(min.add_scalar(1.0), max.add_scalar(1.0), COLOR_SHADOW)
+                        .build();
                     draw_list.add_rect(min, max, color).build();
                 }
 
-                let start = anchor.sub(ANCHOR_OFFSET);
-                let end = anchor.add(ANCHOR_OFFSET);
+                let start = anchor.sub_scalar(ANCHOR_HALF_SIZE);
+                let end = anchor.add_scalar(ANCHOR_HALF_SIZE);
+                draw_list
+                    .add_rect(start.sub_scalar(1.0), end.add_scalar(1.0), COLOR_SHADOW)
+                    .filled(true)
+                    .build();
                 draw_list.add_rect(start, end, color).filled(true).build();
 
-                let text_pos = anchor.add([0.5 * ANCHOR_SIZE + 1.0, 0.0]);
+                let text_pos = anchor.add([ANCHOR_HALF_SIZE + 1.0, 0.0]);
+                draw_list.add_text(text_pos.add_scalar(1.0), COLOR_SHADOW, &self.name);
                 draw_list.add_text(text_pos, color, &self.name);
 
                 if self.dragging {

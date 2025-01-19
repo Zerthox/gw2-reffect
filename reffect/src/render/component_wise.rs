@@ -46,26 +46,30 @@ where
     }
 }
 
-impl ComponentWise<f32> for [f32; 2] {
-    fn component_wise_map(&self, op: impl Fn(f32) -> f32) -> Self {
-        let [x, y] = *self;
-        [op(x), op(y)]
+impl<T> ComponentWise<T> for [T; 2]
+where
+    T: Copy + Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Div<Output = T>,
+{
+    fn component_wise_map(&self, op: impl Fn(T) -> T) -> Self {
+        self.map(op)
     }
 
-    fn component_wise_zip(&self, other: &Self, op: impl Fn(f32, f32) -> f32) -> Self {
+    fn component_wise_zip(&self, other: &Self, op: impl Fn(T, T) -> T) -> Self {
         let [x1, y1] = *self;
         let [x2, y2] = *other;
         [op(x1, x2), op(y1, y2)]
     }
 }
 
-impl ComponentWise<f32> for [f32; 4] {
-    fn component_wise_map(&self, op: impl Fn(f32) -> f32) -> Self {
-        let [a, b, c, d] = *self;
-        [op(a), op(b), op(c), op(d)]
+impl<T> ComponentWise<T> for [T; 4]
+where
+    T: Copy + Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Div<Output = T>,
+{
+    fn component_wise_map(&self, op: impl Fn(T) -> T) -> Self {
+        self.map(op)
     }
 
-    fn component_wise_zip(&self, other: &Self, op: impl Fn(f32, f32) -> f32) -> Self {
+    fn component_wise_zip(&self, other: &Self, op: impl Fn(T, T) -> T) -> Self {
         let [a1, b1, c1, d1] = *self;
         let [a2, b2, c2, d2] = *other;
         [op(a1, a2), op(b1, b2), op(c1, c2), op(d1, d2)]
