@@ -41,7 +41,7 @@ pub struct Context {
 
     pub links: Links,
 
-    pub state_interval: Interval,
+    pub state_interval: Interval, // TODO: upper cap
 
     pub player_interval: Interval,
 

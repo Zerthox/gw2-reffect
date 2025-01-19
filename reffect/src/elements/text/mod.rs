@@ -23,7 +23,6 @@ pub use self::{decoration::*, props::*};
 pub struct Text {
     pub text: String,
 
-    #[serde(flatten)]
     pub font: LoadedFont,
 
     pub align: AlignHorizontal,
