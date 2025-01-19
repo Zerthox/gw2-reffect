@@ -4,8 +4,7 @@ use super::{
 use crate::{
     context::Context,
     elements::RenderState,
-    render::{RenderDebug, RenderOptions},
-    render_util::debug_optional,
+    render::{debug_optional, RenderDebug, RenderOptions},
     serde::migrate,
 };
 use nexus::imgui::Ui;

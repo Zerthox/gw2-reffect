@@ -1,4 +1,4 @@
-use crate::render_util::{enum_combo, impl_static_variants};
+use crate::render::{enum_combo, impl_static_variants};
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, VariantArray};

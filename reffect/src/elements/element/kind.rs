@@ -2,8 +2,7 @@ use super::Element;
 use crate::{
     context::Context,
     elements::{Bar, Group, IconElement, IconList, RenderState, Text},
-    render::{Bounds, Render, RenderDebug, RenderOptions},
-    render_util::{impl_static_variants, Rect},
+    render::{impl_static_variants, Bounds, Rect, Render, RenderDebug, RenderOptions},
     tree::TreeNode,
 };
 use nexus::imgui::Ui;

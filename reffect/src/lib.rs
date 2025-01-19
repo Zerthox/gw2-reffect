@@ -10,7 +10,6 @@ mod internal;
 mod interval;
 mod lockbox;
 mod render;
-mod render_util;
 mod schema;
 mod serde;
 mod settings;

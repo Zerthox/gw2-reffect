@@ -1,9 +1,7 @@
-use std::cmp::Ordering;
-
 use crate::{
     elements::text::TextDecoration,
-    render::colors::{self, with_alpha},
-    render_util::{
+    render::{
+        colors::{self, with_alpha},
         enum_combo, helper, input_color_alpha, input_float_with_format, input_percent, input_pos,
         input_seconds, input_u32,
     },
@@ -11,6 +9,7 @@ use crate::{
 };
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
+use std::cmp::Ordering;
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(default)]

@@ -1,8 +1,5 @@
-use super::ComponentWise;
-use crate::{
-    context::Context,
-    render_util::{Point, Rect},
-};
+use super::{ComponentWise, Point, Rect};
+use crate::context::Context;
 use nexus::imgui::Ui;
 
 /// UI element bounds.

@@ -7,8 +7,7 @@ use super::{check_bitflags_optional, Trigger};
 use crate::{
     context::{Context, Mount, Profession, Specialization},
     internal::Weapon,
-    render::RenderOptions,
-    render_util::enum_combo_bitflags,
+    render::{enum_combo_bitflags, RenderOptions},
     serde::bitflags,
 };
 use enumflags2::BitFlags;

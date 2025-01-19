@@ -1,7 +1,4 @@
-use crate::{
-    render::ComponentWise,
-    render_util::{draw_text_bg, enum_combo, helper_warn},
-};
+use crate::render::{draw_text_bg, enum_combo, helper_warn, ComponentWise};
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, VariantArray};

@@ -1,8 +1,7 @@
 use super::{Element, RenderState};
 use crate::{
     context::Context,
-    render::{Bounds, Render, RenderDebug, RenderOptions},
-    render_util::Rect,
+    render::{Bounds, Rect, Render, RenderDebug, RenderOptions},
     tree::TreeNode,
 };
 use nexus::imgui::Ui;

@@ -8,10 +8,10 @@ use super::{Direction, RenderState};
 use crate::{
     action::DynAction,
     context::Context,
-    render::{colors, Bounds, Render, RenderDebug, RenderOptions},
-    render_util::{
-        collapsing_header_same_line_end, delete_confirm_modal, enum_combo, input_float_with_format,
-        input_size, item_context_menu, style_disabled_if, Rect,
+    render::{
+        collapsing_header_same_line_end, colors, delete_confirm_modal, enum_combo,
+        input_float_with_format, input_size, item_context_menu, style_disabled_if, Bounds, Rect,
+        Render, RenderDebug, RenderOptions,
     },
     tree::TreeNode,
 };

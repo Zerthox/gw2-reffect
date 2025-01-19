@@ -3,8 +3,7 @@ use crate::{
     elements::ELEMENT_ID,
     internal::Error,
     internal::State,
-    render::colors,
-    render_util::{next_window_size_constraints, small_padding},
+    render::{colors, next_window_size_constraints, small_padding},
 };
 use nexus::imgui::{ChildWindow, StyleVar, Ui};
 

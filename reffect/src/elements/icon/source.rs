@@ -3,7 +3,7 @@ use crate::{
     addon::Addon,
     context::Context,
     lockbox::Lockbox,
-    render_util::{enum_combo, impl_static_variants, input_text_simple_menu, Validation},
+    render::{enum_combo, impl_static_variants, input_text_simple_menu, Validation},
     texture_manager::TextureManager,
     trigger::Skill,
 };

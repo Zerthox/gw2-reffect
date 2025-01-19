@@ -8,12 +8,10 @@ use crate::{
     action::Action,
     context::Context,
     render::{
-        colors::with_alpha_factor, Bounds, ComponentWise, Render, RenderDebug, RenderOptions,
-    },
-    render_util::{
-        enum_combo, helper, helper_slider, input_color_alpha, input_float_with_format,
-        input_percent, input_percent_inverse, input_positive_with_format, input_size, input_u32,
-        slider_percent, Rect,
+        colors::with_alpha_factor, enum_combo, helper, helper_slider, input_color_alpha,
+        input_float_with_format, input_percent, input_percent_inverse, input_positive_with_format,
+        input_size, input_u32, slider_percent, Bounds, ComponentWise, Rect, Render, RenderDebug,
+        RenderOptions,
     },
     tree::TreeNode,
 };

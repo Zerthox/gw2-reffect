@@ -1,7 +1,7 @@
 mod dynamic;
 mod element;
 
-use crate::render_util::{button_size_with_spacing, close_button};
+use crate::render::{button_size_with_spacing, close_button};
 use nexus::imgui::{Direction, Ui};
 
 pub use self::{dynamic::*, element::*};

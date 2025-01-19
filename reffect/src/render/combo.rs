@@ -19,7 +19,7 @@ where
 /// Helper to implement [`EnumStaticVariants`] for enums already implementing [`IntoEnumIterator`].
 macro_rules! impl_static_variants {
     ($ty:ty) => {
-        impl $crate::render_util::EnumStaticVariants for $ty {
+        impl $crate::render::EnumStaticVariants for $ty {
             fn with_variants<R>(action: impl FnOnce(&[Self]) -> R) -> R {
                 use ::std::thread_local;
                 use ::strum::IntoEnumIterator;

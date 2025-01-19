@@ -1,4 +1,4 @@
-use super::style_disabled;
+use super::style::style_disabled;
 use crate::render::{colors::TRANSPARENT, ComponentWise};
 use nexus::imgui::{StyleColor, Ui};
 

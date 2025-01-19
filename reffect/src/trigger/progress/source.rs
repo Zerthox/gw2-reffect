@@ -3,8 +3,7 @@ use crate::{
     action::Action,
     context::Context,
     internal::{Buff, Category, Error, Interface, Internal, SkillInfo, Slot},
-    render::RenderOptions,
-    render_util::{enum_combo, helper, impl_static_variants, input_skill_id, Validation},
+    render::{enum_combo, helper, impl_static_variants, input_skill_id, RenderOptions, Validation},
 };
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};

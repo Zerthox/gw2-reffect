@@ -1,10 +1,9 @@
 use crate::{
     context::Context,
     elements::PartialProps,
-    render::{colors, RenderOptions},
-    render_util::{
-        input_color_alpha, input_optional, input_percent, input_percent_inverse,
-        input_positive_with_format,
+    render::{
+        colors, input_color_alpha, input_optional, input_percent, input_percent_inverse,
+        input_positive_with_format, RenderOptions,
     },
 };
 use nexus::imgui::{InputTextFlags, Ui};

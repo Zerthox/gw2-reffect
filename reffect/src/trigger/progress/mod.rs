@@ -6,8 +6,7 @@ pub use self::{active::*, source::*, threshold::*};
 
 use crate::{
     context::{Context, ContextUpdate},
-    render::{RenderDebug, RenderOptions},
-    render_util::debug_optional,
+    render::{debug_optional, RenderDebug, RenderOptions},
     serde::migrate,
 };
 use nexus::imgui::Ui;

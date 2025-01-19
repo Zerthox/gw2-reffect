@@ -2,8 +2,7 @@ use crate::{
     action::Action,
     context::{Context, ContextUpdate},
     internal::Traits,
-    render::RenderOptions,
-    render_util::{helper, input_trait_id},
+    render::{helper, input_trait_id, RenderOptions},
     trigger::memo::MemoizedTrigger,
 };
 use nexus::imgui::{InputTextFlags, Ui};

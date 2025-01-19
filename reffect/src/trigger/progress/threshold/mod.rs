@@ -6,8 +6,7 @@ pub use self::{amount_type::*, threshold_type::*};
 use super::ProgressActive;
 use crate::{
     context::Context,
-    render::RenderOptions,
-    render_util::{enum_combo, helper},
+    render::{enum_combo, helper, RenderOptions},
 };
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};

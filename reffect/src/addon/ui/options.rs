@@ -1,5 +1,5 @@
 use super::Addon;
-use crate::render_util::{helper, input_u32};
+use crate::render::{helper, input_u32};
 use nexus::imgui::{TreeNodeFlags, Ui};
 
 impl Addon {

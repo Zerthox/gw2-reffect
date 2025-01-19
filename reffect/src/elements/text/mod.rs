@@ -5,9 +5,9 @@ use super::{align::AlignHorizontal, Props, RenderState};
 use crate::{
     context::{Context, ContextUpdate},
     fmt::Unit,
-    render::{Bounds, ComponentWise, Render, RenderDebug, RenderOptions},
-    render_util::{
-        debug_optional, draw_text_bg, helper, input_text_multi_with_menu, LoadedFont, Rect,
+    render::{
+        debug_optional, draw_text_bg, helper, input_text_multi_with_menu, Bounds, ComponentWise,
+        LoadedFont, Rect, Render, RenderDebug, RenderOptions,
     },
     tree::TreeNode,
     trigger::{ProgressActive, ProgressValue},

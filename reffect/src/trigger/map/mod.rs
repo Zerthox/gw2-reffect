@@ -4,8 +4,9 @@ use super::{check_bitflags, memo::MemoizedTrigger};
 use crate::{
     action::Action,
     context::{Context, ContextUpdate, MapCategory},
-    render::RenderOptions,
-    render_util::{enum_combo_bitflags, helper, input_u32, item_context_menu, map_select},
+    render::{
+        enum_combo_bitflags, helper, input_u32, item_context_menu, map_select, RenderOptions,
+    },
     serde::bitflags,
 };
 use enumflags2::BitFlags;

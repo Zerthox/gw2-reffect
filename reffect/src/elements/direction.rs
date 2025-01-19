@@ -1,5 +1,5 @@
 use super::{align::Align, Icon};
-use crate::{render::ComponentWise, render_util::Rect};
+use crate::{render::ComponentWise, render::Rect};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, VariantArray};
 

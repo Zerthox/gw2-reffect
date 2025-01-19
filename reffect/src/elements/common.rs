@@ -3,10 +3,9 @@ use crate::{
     action::ChildElementAction,
     context::{Context, EditState},
     id::Id,
-    render::{colors, ComponentWise, RenderDebug, RenderOptions},
-    render_util::{
-        helper_slider, input_pos, push_alpha_change, push_window_clip_rect_fullscreen,
-        slider_percent, EnumStaticVariants, Rect,
+    render::{
+        colors, helper_slider, input_pos, push_alpha_change, push_window_clip_rect_fullscreen,
+        slider_percent, ComponentWise, EnumStaticVariants, Rect, RenderDebug, RenderOptions,
     },
     serde::migrate,
     trigger::ProgressTrigger,

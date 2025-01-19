@@ -2,12 +2,11 @@ use crate::{
     action::DynAction,
     context::Context,
     elements::PartialProps,
-    render::{colors, RenderOptions},
-    render_copy_field,
-    render_util::{
-        helper, input_color_alpha, input_optional, input_percent_inverse,
-        input_positive_with_format, slider_percent_capped,
+    render::{
+        colors, helper, input_color_alpha, input_optional, input_percent_inverse,
+        input_positive_with_format, slider_percent_capped, RenderOptions,
     },
+    render_copy_field,
 };
 use nexus::imgui::{InputTextFlags, Ui};
 use partial::Partial;

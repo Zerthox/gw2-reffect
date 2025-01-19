@@ -2,8 +2,7 @@ use super::TextDecoration;
 use crate::{
     context::Context,
     elements::PartialProps,
-    render::{colors, RenderOptions},
-    render_util::{input_color_alpha, input_optional, input_percent},
+    render::{colors, input_color_alpha, input_optional, input_percent, RenderOptions},
 };
 use nexus::imgui::Ui;
 use partial::Partial;

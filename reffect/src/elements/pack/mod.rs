@@ -1,10 +1,9 @@
 use super::{Anchor, Common, Element, ScreenAnchor};
 use crate::{
     context::{Context, EditState},
-    render::{colors, Bounds, RenderDebug, RenderOptions},
-    render_util::{
-        delete_confirm_modal, item_context_menu, style_disabled, style_disabled_if,
-        tree_select_empty,
+    render::{
+        colors, delete_confirm_modal, item_context_menu, style_disabled, style_disabled_if,
+        tree_select_empty, Bounds, RenderDebug, RenderOptions,
     },
     schema::Schema,
     tree::{FontReloader, Loader, TreeNode, VisitMut},

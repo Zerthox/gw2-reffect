@@ -6,9 +6,9 @@ use super::{Animation, Common, RenderState};
 use crate::{
     action::ElementAction,
     context::{Context, EditState},
-    render::{colors, Bounds, Render, RenderDebug, RenderOptions},
-    render_util::{
-        delete_confirm_modal, item_context_menu, style_disabled_if, tree_select_empty, Rect,
+    render::{
+        colors, delete_confirm_modal, item_context_menu, style_disabled_if, tree_select_empty,
+        Bounds, Rect, Render, RenderDebug, RenderOptions,
     },
     tree::{Loader, TreeNode, VisitMut},
     trigger::{FilterTrigger, Trigger},

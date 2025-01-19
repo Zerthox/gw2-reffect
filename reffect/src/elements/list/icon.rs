@@ -2,8 +2,7 @@ use crate::{
     action::DynAction,
     context::Context,
     elements::{Common, Element, ElementType, Icon, IconElement, RenderState},
-    render::{RenderDebug, RenderOptions},
-    render_util::Rect,
+    render::{Rect, RenderDebug, RenderOptions},
     trigger::{FilterTrigger, ProgressTrigger, Trigger},
 };
 use nexus::imgui::Ui;

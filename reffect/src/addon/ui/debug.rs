@@ -3,7 +3,7 @@ use crate::{
     context::Context,
     internal::Resources,
     internal::{BuffMap, Error, Interface, Internal},
-    render::colors::{Colored, GREEN, RED},
+    render::colors::{self, Colored},
 };
 use nexus::imgui::{StyleColor, Ui, Window};
 use reffect_internal::{SkillInfo, Slot, State};
@@ -163,13 +163,13 @@ impl Addon {
 fn debug_result<T>(ui: &Ui, result: Result<&T, &Error>, tooltip: impl FnOnce(&T)) {
     match result {
         Ok(value) => {
-            ui.text_colored(GREEN, "available");
+            ui.text_colored(colors::GREEN, "available");
             if ui.is_item_hovered() {
                 ui.tooltip(|| tooltip(value));
             }
         }
         Err(err) => {
-            ui.text_colored(RED, "unavailable");
+            ui.text_colored(colors::RED, "unavailable");
             if ui.is_item_hovered() {
                 ui.tooltip_text(err.to_string());
             }

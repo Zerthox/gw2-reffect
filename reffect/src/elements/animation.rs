@@ -1,7 +1,6 @@
 use crate::{
     context::Context,
-    render::RenderOptions,
-    render_util::{cycle_progress, enum_combo, helper, input_seconds, push_alpha_change},
+    render::{cycle_progress, enum_combo, helper, input_seconds, push_alpha_change, RenderOptions},
     util::non_zero_u32,
 };
 use nexus::imgui::{ComboBoxFlags, Ui};
