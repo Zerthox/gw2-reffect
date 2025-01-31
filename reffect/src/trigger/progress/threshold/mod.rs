@@ -12,6 +12,7 @@ use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
+// TODO: create a more straightforward threshold?
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct ProgressThreshold {
     /// Threshold type.

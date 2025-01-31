@@ -1,4 +1,4 @@
-use base64::{prelude::BASE64_STANDARD, Engine};
+use base64::prelude::*;
 
 /// Decodes a chat link to bytes.
 pub fn chatcode_bytes(code: &str) -> Option<Vec<u8>> {

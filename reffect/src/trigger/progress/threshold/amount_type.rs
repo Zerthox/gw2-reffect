@@ -82,7 +82,10 @@ impl AmountType {
                 if changed {
                     *value = value.round();
                 }
-                helper(ui, || ui.text("Intensity in stacks or resource units"));
+                helper(ui, || {
+                    ui.text("Intensity in stacks or resource units");
+                    ui.text("Range includes the value itself");
+                });
                 changed
             }
             Self::Duration | Self::SecondaryDuration => {
@@ -94,7 +97,10 @@ impl AmountType {
                     "%.3f",
                     InputTextFlags::empty(),
                 );
-                helper(ui, || ui.text("Duration in seconds"));
+                helper(ui, || {
+                    ui.text("Duration in seconds");
+                    ui.text("Range includes the value itself");
+                });
                 changed
             }
             Self::Percent | Self::SecondaryPercent => {
@@ -104,6 +110,7 @@ impl AmountType {
                     .build(ui, value);
                 helper(ui, || {
                     ui.text("Progress/duration in percent");
+                    ui.text("Range includes the value itself");
                     ui.text("Ctrl+click to type a number");
                 });
                 changed

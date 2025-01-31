@@ -11,7 +11,7 @@ use strum::{AsRefStr, EnumIter, IntoStaticStr};
 
 #[derive(Debug, Clone, PartialEq, AsRefStr, IntoStaticStr, EnumIter, Serialize, Deserialize)]
 pub enum ConditionTrigger {
-    #[strum(serialize = "Progress Threshold")]
+    #[strum(serialize = "Trigger Threshold")]
     ProgressThreshold(ProgressThreshold),
 
     Player(PlayerTrigger),
