@@ -8,12 +8,13 @@ default-members = ["reffect"]
 resolver = "2"
 
 [workspace.dependencies]
-windows = "0.58.0"
+log = "0.4.18"
+windows = "0.59.0"
 
 [patch."https://github.com/zerthox/gw2-reffect"]
 reffect_internal = { path = "reffect_internal" }
 
 [profile.release]
 lto = "thin"
-debug = "limited"
+debug = "full"
 split-debuginfo = "packed"
