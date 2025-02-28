@@ -27,17 +27,21 @@ pub enum SkillInfo {
 )]
 pub enum Category {
     /// Buff is a Boon.
-    Boon = 0,
+    Boon,
 
     /// Buff is an uncategorized effect.
-    Effect = 1,
+    Effect,
 
     /// Buff is a Condition.
-    Condition = 2,
+    Condition,
 
     /// Buff is hidden but gives a screen border.
     #[strum(serialize = "Screen Border")]
-    ScreenBorder = 3,
+    ScreenBorder,
+
+    /// Buff is hidden but highlights player in squad.
+    #[strum(serialize = "Squad Highlight")]
+    SquadHighlight,
 }
 
 /// Stacking behavior of the buff.

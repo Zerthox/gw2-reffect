@@ -148,16 +148,17 @@ impl ProgressSource {
 
     fn buff_validate(id: u32) -> Validation<impl AsRef<str>> {
         match Internal::get_skill_info(id) {
-            Ok(SkillInfo::Buff {
-                category,
-                stacking: _,
-            }) => {
-                if category == Category::ScreenBorder {
-                    Validation::Warn(format!("{category} {id} is only valid for yourself"))
-                } else {
+            Ok(SkillInfo::Buff { category, .. }) => match category {
+                Category::Boon | Category::Condition | Category::Effect => {
                     Validation::Confirm(format!("{category} {id} is valid"))
                 }
-            }
+                Category::ScreenBorder => {
+                    Validation::Warn(format!("Screen border {id} is only valid for yourself"))
+                }
+                Category::SquadHighlight => {
+                    Validation::Warn(format!("Squad highlight {id} is only valid for your squad"))
+                }
+            },
             Ok(SkillInfo::Ability { .. }) => Validation::Error(format!("Id {id} is an ability")),
             Err(Error::SkillNotFound) => Validation::Error(format!("Id {id} is invalid or hidden")),
             Err(_) => Validation::Ok,
