@@ -23,7 +23,7 @@ impl Addon {
 
                 ui.text("Own weapons:");
                 ui.same_line();
-                debug_result(ui, ctx.player.info.as_ref(), |info| {
+                debug_result_tooltip(ui, ctx.player.info.as_ref(), |info| {
                     for weapon in info.weapons.iter() {
                         ui.text(weapon);
                     }
@@ -31,7 +31,7 @@ impl Addon {
 
                 ui.text("Own traits:");
                 ui.same_line();
-                debug_result(ui, ctx.player.info.as_ref(), |info| {
+                debug_result_tooltip(ui, ctx.player.info.as_ref(), |info| {
                     let traits = &info.traits;
                     for [a, b, c] in [
                         [traits[0], traits[1], traits[2]],
@@ -52,7 +52,7 @@ impl Addon {
 
                 ui.text("Own resources:");
                 ui.same_line();
-                debug_result(ui, own_resources.as_ref(), |resources| {
+                debug_result_tooltip(ui, own_resources.as_ref(), |resources| {
                     let Resources {
                         health,
                         barrier,
@@ -75,7 +75,7 @@ impl Addon {
 
                 ui.text("Own skillbar:");
                 ui.same_line();
-                debug_result(ui, own_skillbar.as_ref(), |skillbar| {
+                debug_result_tooltip(ui, own_skillbar.as_ref(), |skillbar| {
                     let now = ctx.now;
                     ui.text(format!("Bundle: {}", skillbar.has_bundle));
                     for slot in Slot::iter() {
@@ -109,22 +109,36 @@ impl Addon {
 
                 ui.text("Own buffs:");
                 ui.same_line();
-                debug_result(ui, own_buffs.as_ref(), |buffs| {
+                debug_result_tooltip(ui, own_buffs.as_ref(), |buffs| {
                     buffs_tooltip(ui, ctx, buffs)
+                });
+
+                ui.text("Last screen border:");
+                ui.same_line();
+                debug_result(ui, ctx.player.info.as_ref(), |info| {
+                    ui.text(info.last_screen_border.to_string());
+                });
+
+                ui.text("Last squad highlight:");
+                ui.same_line();
+                debug_result(ui, ctx.player.info.as_ref(), |info| {
+                    ui.text(info.last_squad_highlight.to_string());
                 });
 
                 ui.text("Target buffs:");
                 ui.same_line();
-                debug_result(ui, target_buffs.as_ref(), |buffs| {
+                debug_result_tooltip(ui, target_buffs.as_ref(), |buffs| {
                     buffs_tooltip(ui, ctx, buffs)
                 });
 
                 for i in 0..4 {
                     ui.text(format!("Group Member {} buffs:", i + 1));
                     ui.same_line();
-                    debug_result(ui, group_buffs.as_ref().map(|group| &group[i]), |buffs| {
-                        buffs_tooltip(ui, ctx, buffs)
-                    });
+                    debug_result_tooltip(
+                        ui,
+                        group_buffs.as_ref().map(|group| &group[i]),
+                        |buffs| buffs_tooltip(ui, ctx, buffs),
+                    );
                 }
 
                 ui.text(format!("Combat: {}", ctx.ui.combat));
@@ -160,14 +174,9 @@ impl Addon {
     }
 }
 
-fn debug_result<T>(ui: &Ui, result: Result<&T, &Error>, tooltip: impl FnOnce(&T)) {
+fn debug_result<T>(ui: &Ui, result: Result<&T, &Error>, body: impl FnOnce(&T)) {
     match result {
-        Ok(value) => {
-            ui.text_colored(colors::GREEN, "available");
-            if ui.is_item_hovered() {
-                ui.tooltip(|| tooltip(value));
-            }
-        }
+        Ok(value) => body(value),
         Err(err) => {
             ui.text_colored(colors::RED, "unavailable");
             if ui.is_item_hovered() {
@@ -175,6 +184,15 @@ fn debug_result<T>(ui: &Ui, result: Result<&T, &Error>, tooltip: impl FnOnce(&T)
             }
         }
     }
+}
+
+fn debug_result_tooltip<T>(ui: &Ui, result: Result<&T, &Error>, tooltip: impl FnOnce(&T)) {
+    debug_result(ui, result, |value| {
+        ui.text_colored(colors::GREEN, "available");
+        if ui.is_item_hovered() {
+            ui.tooltip(|| tooltip(value));
+        }
+    })
 }
 
 fn buffs_tooltip(ui: &Ui, ctx: &Context, buffs: &BuffMap) {

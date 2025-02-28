@@ -13,6 +13,12 @@ pub struct PlayerInfo {
 
     /// Current selected traits.
     pub traits: Traits,
+
+    /// Last applied screen border.
+    pub last_screen_border: u32,
+
+    /// Last applied squad highlight.
+    pub last_squad_highlight: u32,
 }
 
 #[derive(
