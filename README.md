@@ -37,7 +37,7 @@ The information is retrieved with the following policy in mind:
 ## Limitations 
 - Not available in competitive modes (PvP & WvW).
 - Generic effects do not show durations above 5 seconds. *Ingame this information is usually only visible on hover. With 5s left effect icons start to blink, conveying the remaining duration to the player.*
-- Screen border effects do not show durations.
+- Screen border & squad highlight effects do not show durations.
 - No true stack count for duration stacking effects.
 - No information about effects hidden from the player.
 - No combining logic for combat information outside of grouping stacks of multiple effects into a single UI element.
