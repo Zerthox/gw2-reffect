@@ -5,7 +5,7 @@ use crate::{
 };
 use reffect_internal::{Skillbar, Slot};
 
-// TODO: buff intensity stacking, ability ammo?
+// TODO: add ability flags?
 #[derive(Debug, Clone)]
 pub enum ProgressActive {
     Fixed {
@@ -70,6 +70,7 @@ impl ProgressActive {
             recharge_remaining,
             ammo_recharge,
             ammo_recharge_remaining,
+            ..
         } = *ability;
         Self::Ability {
             skill,

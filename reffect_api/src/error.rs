@@ -67,6 +67,9 @@ pub enum Error {
     #[error("Unavailable for target state")]
     TargetState,
 
+    #[error("Group not found")]
+    GroupNotFound,
+
     #[error("Windows error: {0}")]
     Windows(windows::core::Error),
 }

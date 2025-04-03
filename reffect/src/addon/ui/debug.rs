@@ -137,7 +137,11 @@ impl Addon {
                     debug_result_tooltip(
                         ui,
                         group_buffs.as_ref().map(|group| &group[i]),
-                        |buffs| buffs_tooltip(ui, ctx, buffs),
+                        |buffs| {
+                            if let Some(buffs) = buffs {
+                                buffs_tooltip(ui, ctx, buffs)
+                            }
+                        },
                     );
                 }
 

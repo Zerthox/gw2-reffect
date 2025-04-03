@@ -59,12 +59,29 @@ pub struct Ability {
 
     /// Remining ammo recharge in milliseconds.
     pub ammo_recharge_remaining: u32,
+
+    /// Whether the ability can be cast.
+    pub is_available: bool,
+
+    /// Whether the ability is pressed.
+    pub is_pressed: bool,
+
+    /// Whether the ability is casted or queued.
+    pub is_pending: bool,
 }
 
 impl Ability {
     /// Creates a new ability without cooldowns.
     #[inline]
-    pub const fn available(id: u32, ammo: u32, last_update: u32, recharge_rate: f32) -> Self {
+    pub const fn new(
+        id: u32,
+        ammo: u32,
+        last_update: u32,
+        recharge_rate: f32,
+        is_available: bool,
+        is_pressed: bool,
+        is_pending: bool,
+    ) -> Self {
         Self {
             id,
             ammo,
@@ -74,6 +91,9 @@ impl Ability {
             recharge_remaining: 0,
             ammo_recharge: 0,
             ammo_recharge_remaining: 0,
+            is_available,
+            is_pressed,
+            is_pending,
         }
     }
 
@@ -89,6 +109,9 @@ impl Ability {
             recharge_remaining: recharge,
             ammo_recharge: 0,
             ammo_recharge_remaining: 0,
+            is_available: recharge == 0,
+            is_pressed: false,
+            is_pending: false,
         }
     }
 

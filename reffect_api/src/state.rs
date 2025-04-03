@@ -16,7 +16,7 @@ pub struct State {
     pub target_buffs: Result<BuffMap>,
 
     /// Group buffs.
-    pub group_buffs: Result<[BuffMap; 4]>,
+    pub group_buffs: Result<[Option<BuffMap>; 4]>,
 }
 
 impl State {
