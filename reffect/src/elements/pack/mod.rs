@@ -6,7 +6,7 @@ use crate::{
         tree_select_empty, Bounds, RenderDebug, RenderOptions,
     },
     schema::Schema,
-    tree::{FontReloader, Loader, TreeNode, VisitMut},
+    tree::{FontReloader, Loader, Resizer, TreeNode, VisitMut},
 };
 use nexus::imgui::{MenuItem, StyleColor, Ui};
 use serde::{Deserialize, Serialize};
@@ -91,12 +91,16 @@ impl Pack {
             state.select(self.common.id);
         }
 
-        let mut open = false;
+        let mut open_delete = false;
+        let mut open_resize = false;
+
         item_context_menu(&id, || {
             self.common.render_context_menu(ui, state, Some(children));
 
+            open_resize = MenuItem::new("Resize").build(ui);
+
             let _color = ui.push_style_color(StyleColor::HeaderHovered, colors::DELETE_HOVER);
-            open = MenuItem::new("Delete").build(ui);
+            open_delete = MenuItem::new("Delete").build(ui);
         });
 
         {
@@ -108,8 +112,12 @@ impl Pack {
             self.common.render_tree_children(ui, state, children);
         }
 
+        if let Some(factor) = self.common.render_resize(ui, open_resize) {
+            Resizer::resize_pack(self, factor);
+        }
+
         let title = format!("Confirm Delete##reffect{id}");
-        if open {
+        if open_delete {
             ui.open_popup(&title);
         }
         delete_confirm_modal(ui, &title, || {

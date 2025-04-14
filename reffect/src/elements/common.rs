@@ -4,14 +4,16 @@ use crate::{
     context::{Context, EditState},
     id::Id,
     render::{
-        colors, helper_slider, input_pos, push_alpha_change, push_window_clip_rect_fullscreen,
-        slider_percent, ComponentWise, EnumStaticVariants, Rect, RenderDebug, RenderOptions,
+        colors, confirm_modal, helper_slider, input_percent, input_pos, push_alpha_change,
+        push_window_clip_rect_fullscreen, slider_percent, ComponentWise, EnumStaticVariants, Rect,
+        RenderDebug, RenderOptions,
     },
     serde::migrate,
     trigger::ProgressTrigger,
 };
 use nexus::imgui::{Condition, MenuItem, MouseButton, StyleVar, Ui, Window};
 use serde::{Deserialize, Serialize};
+use std::mem;
 
 // FIXME: common default is called twice when deserializing element/pack, generating unused ids
 
@@ -39,6 +41,9 @@ pub struct Common {
 
     #[serde(skip)]
     pub dragging: bool,
+
+    #[serde(skip)]
+    pub resize: f32,
 }
 
 impl Common {
@@ -218,6 +223,17 @@ impl Common {
             }
         }
     }
+
+    pub fn render_resize(&mut self, ui: &Ui, open: bool) -> Option<f32> {
+        let title = format!("Resize Element##reffect{}", self.id);
+        if open {
+            ui.open_popup(&title)
+        }
+        confirm_modal(ui, &title, || {
+            input_percent("Scale", &mut self.resize);
+        })
+        .then(|| mem::replace(&mut self.resize, 1.0))
+    }
 }
 
 impl RenderOptions for Common {
@@ -258,6 +274,7 @@ impl Default for Common {
             opacity: 1.0,
             trigger: ProgressTrigger::default(),
             dragging: false,
+            resize: 1.0,
         }
     }
 }
@@ -273,6 +290,7 @@ impl Clone for Common {
             opacity: self.opacity,
             trigger: self.trigger.clone(),
             dragging: false,
+            resize: 1.0,
         }
     }
 }

@@ -75,6 +75,12 @@ mod common {
     pub const DELETE_HOVER: Color = rgb(0.70, 0.21, 0.21);
 
     pub const DELETE_ACTIVE: Color = rgb(0.80, 0.16, 0.16);
+
+    pub const CONFIRM: Color = rgb(0.24, 0.60, 0.24);
+
+    pub const CONFIRM_HOVER: Color = rgb(0.21, 0.70, 0.21);
+
+    pub const CONFIRM_ACTIVE: Color = rgb(0.16, 0.80, 0.16);
 }
 
 mod expansion {

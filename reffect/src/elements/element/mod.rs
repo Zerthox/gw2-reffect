@@ -10,13 +10,11 @@ use crate::{
         colors, delete_confirm_modal, item_context_menu, style_disabled_if, tree_select_empty,
         Bounds, Rect, Render, RenderDebug, RenderOptions,
     },
-    tree::{Loader, TreeNode, VisitMut},
+    tree::{Loader, Resizer, TreeNode, VisitMut},
     trigger::{FilterTrigger, Trigger},
 };
 use nexus::imgui::{MenuItem, StyleColor, Ui};
 use serde::{Deserialize, Serialize};
-
-// TODO: anchor to parent vs screen
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(default)]
@@ -31,9 +29,6 @@ pub struct Element {
 
     #[serde(flatten)]
     pub kind: ElementType,
-
-    #[serde(skip)]
-    pub confirm_delete: bool,
 }
 
 impl Element {
@@ -86,8 +81,9 @@ impl Element {
         }
 
         let mut action = ElementAction::None;
+        let mut open_delete = false;
+        let mut open_resize = false;
 
-        let mut open = false;
         item_context_menu(&id, || {
             self.common.render_context_menu(ui, state, children);
 
@@ -106,11 +102,18 @@ impl Element {
             if MenuItem::new("Move Down").build(ui) {
                 action = ElementAction::Down;
             }
+            open_resize = MenuItem::new("Resize").build(ui);
+
             let _color = ui.push_style_color(StyleColor::HeaderHovered, colors::DELETE_HOVER);
-            open = MenuItem::new("Delete").build(ui);
+            open_delete = MenuItem::new("Delete").build(ui);
         });
+
+        if let Some(factor) = self.common.render_resize(ui, open_resize) {
+            Resizer::resize_element(self, factor);
+        }
+
         let title = format!("Confirm Delete##reffect{id}");
-        if open {
+        if open_delete {
             ui.open_popup(&title)
         }
         if delete_confirm_modal(ui, &title, || {

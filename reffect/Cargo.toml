@@ -5,7 +5,7 @@ authors = ["Zerthox"]
 edition = "2021"
 description = "Customizable effect & resource displays"
 repository = "https://github.com/zerthox/gw2-reffect"
-rust-version = "1.76.0"
+rust-version = "1.83.0"
 
 [dependencies]
 base64 = "0.22.1"
