@@ -75,7 +75,7 @@ impl Context {
                 let map_changed = self.map.update(mumble);
                 if map_changed {
                     self.updates.insert(ContextUpdate::Map);
-                    log::debug!("Updating slow triggers for map id {}", self.map.id);
+                    log::debug!("Updating for map id {}", self.map.id);
                 }
             }
         }

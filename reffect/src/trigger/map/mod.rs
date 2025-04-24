@@ -1,9 +1,9 @@
 pub mod legacy;
 
-use super::{check_bitflags, memo::MemoizedTrigger};
+use super::{check_bitflags, Trigger};
 use crate::{
     action::Action,
-    context::{Context, ContextUpdate, MapCategory},
+    context::{Context, MapCategory},
     render::{
         enum_combo_bitflags, helper, input_u32, item_context_menu, map_select, RenderOptions,
     },
@@ -25,23 +25,19 @@ pub struct MapTrigger {
     pub ids: Vec<u32>,
 
     #[serde(skip)]
-    pub memo: Option<bool>,
+    active: bool,
 }
 
 fn default_true() -> bool {
     true
 }
 
-impl MemoizedTrigger for MapTrigger {
-    fn needs_update(&self, ctx: &Context) -> bool {
-        ctx.has_update(ContextUpdate::Map)
+impl MapTrigger {
+    pub fn update(&mut self, ctx: &Context) {
+        self.active = self.resolve_active(ctx);
     }
 
-    fn memo(&mut self) -> &mut Option<bool> {
-        &mut self.memo
-    }
-
-    fn is_active_current(&mut self, ctx: &Context) -> bool {
+    fn resolve_active(&self, ctx: &Context) -> bool {
         check_bitflags(self.category, ctx.map.category)
             && (self.ids.is_empty() || {
                 let id_match = self.ids.iter().any(|id| ctx.map.is_on_map(*id));
@@ -54,11 +50,18 @@ impl MemoizedTrigger for MapTrigger {
     }
 }
 
-impl RenderOptions<bool> for MapTrigger {
-    fn render_options(&mut self, ui: &Ui, _ctx: &Context) -> bool {
-        let _id = ui.push_id("map");
+impl Trigger for MapTrigger {
+    fn is_active(&mut self, _ctx: &Context) -> bool {
+        self.active
+    }
+}
 
-        let mut changed = enum_combo_bitflags(
+impl RenderOptions<bool> for MapTrigger {
+    fn render_options(&mut self, ui: &Ui, ctx: &Context) -> bool {
+        let _id = ui.push_id("map");
+        let mut changed = false;
+
+        changed |= enum_combo_bitflags(
             ui,
             "Map Category",
             &mut self.category,
@@ -97,6 +100,11 @@ impl RenderOptions<bool> for MapTrigger {
             ui.text("Whether to use map ids as whitelist or blacklist")
         });
 
+        if changed {
+            // ensure fresh state after changed
+            self.update(ctx);
+        }
+
         changed
     }
 }
@@ -107,7 +115,7 @@ impl Default for MapTrigger {
             category: BitFlags::empty(),
             whitelist: true,
             ids: Vec::new(),
-            memo: None,
+            active: true,
         }
     }
 }

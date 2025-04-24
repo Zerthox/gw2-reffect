@@ -3,6 +3,7 @@ mod editor;
 mod options;
 
 use super::Addon;
+use crate::tree::FilterUpdater;
 use nexus::imgui::Ui;
 
 impl Addon {
@@ -25,6 +26,8 @@ impl Addon {
         if self.context.ui.should_show() || self.context.edit.is_editing() {
             let _font = self.context.settings.font.push();
             for pack in &mut self.packs {
+                FilterUpdater::update(&self.context, pack);
+
                 pack.render(ui, &self.context);
             }
         }

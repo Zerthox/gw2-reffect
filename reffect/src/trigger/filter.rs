@@ -1,10 +1,7 @@
-use super::{
-    map::legacy::MapTriggerLegacy, memo::MemoizedTrigger, MapTrigger, PlayerTrigger, Trigger,
-};
+use super::{map::legacy::MapTriggerLegacy, MapTrigger, PlayerTrigger, Trigger};
 use crate::{
     context::Context,
-    elements::RenderState,
-    render::{debug_optional, RenderDebug, RenderOptions},
+    render::{RenderDebug, RenderOptions},
     serde::migrate,
 };
 use nexus::imgui::Ui;
@@ -23,20 +20,16 @@ impl FilterTrigger {
     pub fn load(&mut self) {
         self.player.load();
     }
+
+    pub fn update(&mut self, ctx: &Context) {
+        self.player.traits.update(ctx);
+        self.map.update(ctx);
+    }
 }
 
 impl Trigger for FilterTrigger {
     fn is_active(&mut self, ctx: &Context) -> bool {
         self.player.is_active(ctx) && self.map.is_active(ctx)
-    }
-
-    fn is_active_or_edit(&mut self, ctx: &Context, state: &RenderState) -> bool {
-        if state.is_edit(ctx) {
-            self.map.update(ctx);
-            true
-        } else {
-            !ctx.edit.is_editing() && self.is_active(ctx)
-        }
     }
 }
 
@@ -45,17 +38,16 @@ impl RenderOptions for FilterTrigger {
         self.player.render_options(ui, ctx);
 
         ui.spacing();
-        let changed = self.map.render_options(ui, ctx);
-        if changed {
-            // map trigger changed, ensure fresh state next access
-            self.map.clear();
-        }
+        self.map.render_options(ui, ctx);
     }
 }
 
 impl RenderDebug for FilterTrigger {
-    fn render_debug(&mut self, ui: &Ui, _ctx: &Context) {
-        debug_optional(ui, "Trait filter", self.player.traits.get());
-        debug_optional(ui, "Map filter", self.map.get());
+    fn render_debug(&mut self, ui: &Ui, ctx: &Context) {
+        ui.text(format!(
+            "Trait filter: {}",
+            self.player.traits.is_active(ctx)
+        ));
+        ui.text(format!("Map filter: {}", self.map.is_active(ctx)));
     }
 }
