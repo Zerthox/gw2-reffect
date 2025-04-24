@@ -31,6 +31,13 @@ If your use case requires an element to be tied to an effect or specific ability
 Either can be pasted into Reffect's ID input ingame.
 Finding the right ID can sometimes be a difficult part about creating new displays.
 
+Note that Reffect does not support showing hidden effects with two exceptions: screen borders and squad highlights.
+Screen borders are colored textures around the edge of your screen, usually used by the game to notify the player they are targeted with a mechanic.
+As you can see your own screen border, hidden effects with an attached screen border are valid for use with your own character.
+Squad highlights are colored border around players in the squad UI.
+Effects with an attached squad highlight will be valid for use with all members of your squad.
+*(Support for group member effects is work in progress.)*
+
 ### Guild Wars 2 Wiki
 Chat links for effects & abilities contain their ID.
 For a lot of these the ID can be found on the [Guild Wars 2 Wiki](https://wiki.guildwars2.com).
