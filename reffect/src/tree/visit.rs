@@ -4,6 +4,12 @@ use crate::{
 };
 
 pub trait VisitMut {
+    fn visit_packs(&mut self, packs: &mut [Pack]) {
+        for pack in packs {
+            self.visit_pack(pack);
+        }
+    }
+
     fn visit_pack(&mut self, pack: &mut Pack) {
         self.visit_common(&mut pack.common);
         self.visit_elements(&mut pack.elements);

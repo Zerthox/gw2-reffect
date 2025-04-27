@@ -10,6 +10,8 @@ impl Addon {
     pub fn render(&mut self, ui: &Ui) {
         self.context.update(); // TODO: perform update in separate thread?
 
+        FilterUpdater::update(&self.context, &mut self.packs);
+
         self.render_displays(ui);
 
         if self.debug {
@@ -26,8 +28,6 @@ impl Addon {
         if self.context.ui.should_show() || self.context.edit.is_editing() {
             let _font = self.context.settings.font.push();
             for pack in &mut self.packs {
-                FilterUpdater::update(&self.context, pack);
-
                 pack.render(ui, &self.context);
             }
         }

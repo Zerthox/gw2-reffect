@@ -4,6 +4,7 @@ use crate::{
     internal::{Interface, Internal},
     settings::AddonSettings,
     texture_manager::TextureManager,
+    tree::FilterUpdater,
     util::file_name,
 };
 use nexus::{
@@ -88,8 +89,9 @@ impl Addon {
                     }
                 }
                 log::info!("Loaded {} packs", self.packs.len());
-            }
 
+                FilterUpdater::update(&self.context, &mut self.packs);
+            }
             Err(err) => log::error!("Failed to read pack directory: {err}"),
         }
     }
