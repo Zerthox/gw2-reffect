@@ -1,8 +1,9 @@
 mod active;
+mod info;
 mod source;
 mod threshold;
 
-pub use self::{active::*, source::*, threshold::*};
+pub use self::{active::*, info::*, source::*, threshold::*};
 
 use crate::{
     context::{Context, ContextUpdate},
@@ -74,6 +75,7 @@ impl ProgressTrigger {
 
 impl RenderOptions for ProgressTrigger {
     fn render_options(&mut self, ui: &Ui, ctx: &Context) {
+        let _id = ui.push_id("trigger");
         self.source.render_options(ui, ctx);
         if !self.source.no_threshold() {
             self.threshold.render_options(ui, ctx);
