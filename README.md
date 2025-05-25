@@ -15,7 +15,7 @@ Requires the [Nexus](https://github.com/RaidcoreGG/Nexus) addon manager ([websit
 - Ingame editor for display creation & configuration
 - Sharing created displays as individual packs
 - Effect stacks & durations mimicking ingame behavior
-- Abiltiy cooldowns mimicking ingame behavior
+- Ability cooldowns mimicking ingame behavior
 - Health, barrier, endurance, profession resources
 
 ## Installation
