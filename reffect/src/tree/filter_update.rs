@@ -1,9 +1,5 @@
 use super::VisitMut;
-use crate::{
-    context::{Context, ContextUpdate},
-    elements::Pack,
-    trigger::FilterTrigger,
-};
+use crate::{context::Context, elements::Pack, trigger::FilterTrigger};
 
 #[derive(Debug, Clone)]
 pub struct FilterUpdater<'ctx> {
@@ -12,11 +8,8 @@ pub struct FilterUpdater<'ctx> {
 
 impl<'ctx> FilterUpdater<'ctx> {
     pub fn update(ctx: &'ctx Context, packs: &mut [Pack]) {
-        // map change needs deep update
-        if ctx.has_update(ContextUpdate::Map) {
-            log::debug!("Updating filters for map id {}", ctx.map.id);
-            Self { ctx }.visit_packs(packs);
-        }
+        log::debug!("Updating filters for map id {}", ctx.map.id);
+        Self { ctx }.visit_packs(packs);
     }
 }
 

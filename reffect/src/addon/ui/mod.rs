@@ -3,14 +3,16 @@ mod editor;
 mod options;
 
 use super::Addon;
-use crate::tree::FilterUpdater;
+use crate::{context::ContextUpdate, tree::FilterUpdater};
 use nexus::imgui::Ui;
 
 impl Addon {
     pub fn render(&mut self, ui: &Ui) {
         self.context.update(); // TODO: perform update in separate thread?
 
-        FilterUpdater::update(&self.context, &mut self.packs);
+        if self.context.has_update(ContextUpdate::Map) {
+            FilterUpdater::update(&self.context, &mut self.packs);
+        }
 
         self.render_displays(ui);
 
