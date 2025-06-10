@@ -1,5 +1,7 @@
 use std::sync::Mutex;
 
+// TODO: use future instead?
+
 /// A thread-safe container for a single value entry with an associated retrieval key.
 #[derive(Debug)]
 pub struct Lockbox<K, V> {
