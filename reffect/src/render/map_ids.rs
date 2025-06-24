@@ -88,6 +88,7 @@ pub const FRACTALS: MapGroup = MapGroup::new(
         Map::new("Sunqua Peak", fractal::SUNQUA_PEAK),
         Map::new("Silent Surf", fractal::SILENT_SURF),
         Map::new("Lonely Tower", fractal::LONELY_TOWER),
+        Map::new("Kinfall", fractal::KINFALL),
     ],
 );
 
