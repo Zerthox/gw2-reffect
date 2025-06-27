@@ -40,7 +40,8 @@ pub struct Bar {
 
 impl Bar {
     fn process_value(&self, value: f32) -> f32 {
-        (value * self.props.progress_factor) - self.props.lower_bound
+        let scale = self.props.upper_bound - self.props.lower_bound;
+        (value - self.props.lower_bound) / scale
     }
 }
 
@@ -136,7 +137,7 @@ impl RenderOptions for Bar {
         input_percent("Lower bound", &mut self.props.base.lower_bound);
         helper(ui, || ui.text("Lower bound for progress in percent"));
 
-        input_percent_inverse("Upper bound", &mut self.props.base.progress_factor);
+        input_percent("Upper bound", &mut self.props.base.upper_bound);
         helper(ui, || ui.text("Upper bound for progress in percent"));
 
         enum_combo(ui, "Direction", &mut self.direction, ComboBoxFlags::empty());
@@ -227,8 +228,8 @@ impl RenderOptions for Bar {
 impl RenderDebug for Bar {
     fn render_debug(&mut self, ui: &Ui, _ctx: &Context) {
         ui.text(format!(
-            "Progress factor: {}",
-            self.props.base.progress_factor
+            "Progress scale: {}",
+            self.props.upper_bound - self.props.lower_bound
         ));
     }
 }

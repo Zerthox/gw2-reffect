@@ -2,8 +2,8 @@ use crate::{
     context::Context,
     elements::PartialProps,
     render::{
-        colors, input_color_alpha, input_optional, input_percent, input_percent_inverse,
-        input_positive_with_format, RenderOptions,
+        colors, input_color_alpha, input_optional, input_percent, input_positive_with_format,
+        RenderOptions,
     },
 };
 use nexus::imgui::{InputTextFlags, Ui};
@@ -15,7 +15,7 @@ use serde::{Deserialize, Serialize};
 #[serde(default)]
 pub struct BarProps {
     pub lower_bound: f32,
-    pub progress_factor: f32, // keep as factor to avoid divisions
+    pub upper_bound: f32,
 
     pub fill: [f32; 4],
     pub background: [f32; 4],
@@ -31,7 +31,7 @@ impl Default for BarProps {
     fn default() -> Self {
         Self {
             lower_bound: 0.0,
-            progress_factor: 1.0,
+            upper_bound: 1.0,
             fill: colors::GREEN,
             background: colors::TRANSPARENT,
             border_size: 1.0,
@@ -52,7 +52,7 @@ impl PartialProps<BarProps> for Partial<BarProps> {
     fn render_options(&mut self, ui: &Ui, base: &BarProps) {
         let Self {
             lower_bound,
-            progress_factor,
+            upper_bound,
             fill,
             background,
             border_size,
@@ -71,9 +71,9 @@ impl PartialProps<BarProps> for Partial<BarProps> {
         input_optional(
             ui,
             "Upper bound",
-            progress_factor,
-            || base.progress_factor,
-            |bound| input_percent_inverse("Upper bound", bound),
+            upper_bound,
+            || base.upper_bound,
+            |bound| input_percent("Upper bound", bound),
         );
 
         input_optional(
