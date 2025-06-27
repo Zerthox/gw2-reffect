@@ -9,11 +9,11 @@ use crate::{
     context::Context,
     render::{
         colors::with_alpha_factor, enum_combo, helper, helper_slider, input_color_alpha,
-        input_float_with_format, input_percent, input_percent_inverse, input_positive_with_format,
-        input_size, input_u32, slider_percent, Bounds, ComponentWise, Rect, Render, RenderDebug,
-        RenderOptions,
+        input_float_with_format, input_percent, input_positive_with_format, input_size, input_u32,
+        slider_percent, Bounds, ComponentWise, Rect, Render, RenderDebug, RenderOptions,
     },
     tree::TreeNode,
+    trigger::ProgressActive,
 };
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
@@ -39,6 +39,11 @@ pub struct Bar {
 }
 
 impl Bar {
+    fn calc_progress(&self, ctx: &Context, active: &ProgressActive) -> f32 {
+        let progress = self.progress_kind.calc_progress(ctx, active, self.max);
+        self.process_value(progress).clamp(0.0, 1.0)
+    }
+
     fn process_value(&self, value: f32) -> f32 {
         let scale = self.props.upper_bound - self.props.lower_bound;
         (value - self.props.lower_bound) / scale
@@ -53,43 +58,47 @@ impl Render for Bar {
         self.props.update(ctx, active);
 
         if let Some(active) = active {
-            let progress = self.progress_kind.calc_progress(ctx, active, self.max);
-            let progress = self.process_value(progress).clamp(0.0, 1.0);
+            let progress = self.calc_progress(ctx, active);
 
             let alpha = ui.clone_style().alpha;
             let (start, end) = self.bounds_with_offset(ui, ctx, state.pos);
+            let offset_2d = self.direction.offset_2d(self.size);
+
             let (offset_start, offset_end) =
                 self.direction.progress_rect_offset(self.size, progress);
             let fill_start = start.add(offset_start);
             let fill_end = start.add(offset_end);
 
+            let bg_color = with_alpha_factor(self.props.background, alpha);
+            let fill_color = with_alpha_factor(self.props.fill, alpha);
+
             let draw_list = ui.get_background_draw_list();
+            if start != fill_start {
+                draw_list
+                    .add_rect(start, fill_start.add(offset_2d), bg_color)
+                    .filled(true)
+                    .build();
+            }
+            if end != fill_end.add(offset_2d) {
+                draw_list
+                    .add_rect(fill_end, end, bg_color)
+                    .filled(true)
+                    .build();
+            }
             draw_list
-                .add_rect(start, end, with_alpha_factor(self.props.background, alpha))
-                .filled(true)
-                .build();
-            draw_list
-                .add_rect(
-                    fill_start,
-                    fill_end,
-                    with_alpha_factor(self.props.fill, alpha),
-                )
+                .add_rect(fill_start, fill_end.add(offset_2d), fill_color)
                 .filled(true)
                 .build();
 
             if self.props.border_size > 0.0 {
+                let border_color = with_alpha_factor(self.props.border_color, alpha);
                 draw_list
-                    .add_rect(
-                        start,
-                        end,
-                        with_alpha_factor(self.props.border_color, alpha),
-                    )
+                    .add_rect(start, end, border_color)
                     .thickness(self.props.border_size)
                     .build();
             }
 
             if self.props.tick_size > 0.0 {
-                let end_offset = self.direction.tick_end_offset(self.size);
                 let max = self.progress_kind.progress_max(active, self.max);
                 for tick in &self.ticks {
                     if let Some(progress) = self
@@ -101,9 +110,10 @@ impl Render for Bar {
                         // TODO: multiple ticks for horizontal/vertical?
                         let offset = self.direction.progress_value_offset(self.size, progress);
                         let start = start.add(offset);
-                        let end = start.add(end_offset);
+                        let end = start.add(offset_2d);
+                        let color = with_alpha_factor(self.props.tick_color, alpha);
                         draw_list
-                            .add_line(start, end, with_alpha_factor(self.props.tick_color, alpha))
+                            .add_line(start, end, color)
                             .thickness(self.props.tick_size)
                             .build();
                     }
