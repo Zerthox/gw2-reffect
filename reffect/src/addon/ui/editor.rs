@@ -85,7 +85,7 @@ impl Addon {
                 ui.same_line();
                 ChildWindow::new("element-options").build(ui, || {
                     let _style = small_padding(ui);
-                    let ctx = RenderCtx::create(ui, &ctx, &self.settings);
+                    let ctx = RenderCtx::create(ui, ctx, &self.settings);
                     for pack in &mut self.packs {
                         let rendered = pack.try_render_options(ui, &ctx);
                         if rendered {

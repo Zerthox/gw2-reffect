@@ -93,7 +93,7 @@ impl Addon {
                         ));
 
                         ui.spacing();
-                        debug_buffs(ui, &ctx, &buff_info.buffs)
+                        debug_buffs(ui, ctx, &buff_info.buffs)
                     },
                 );
                 debug_result_tree(
@@ -101,7 +101,7 @@ impl Addon {
                     "plskills",
                     "Player skillbar",
                     &ctx.player.skillbar,
-                    |skillbar| debug_skillbar(ui, &ctx, skillbar),
+                    |skillbar| debug_skillbar(ui, ctx, skillbar),
                 );
 
                 debug_result_tree(
@@ -115,7 +115,7 @@ impl Addon {
                     },
                 );
                 debug_result_tree(ui, "tgbuff", "Target buffs", &ctx.target.buffs, |buffs| {
-                    debug_buffs(ui, &ctx, buffs)
+                    debug_buffs(ui, ctx, buffs)
                 });
 
                 debug_result_tree(ui, "grp", "Group", &ctx.group, |group| {
