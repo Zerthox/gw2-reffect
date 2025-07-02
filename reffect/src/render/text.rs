@@ -1,4 +1,4 @@
-use nexus::imgui::{sys, ImColor32, Ui};
+use nexus::imgui::{ImColor32, Ui, sys};
 use std::{fmt, ptr};
 
 pub fn draw_text_bg(

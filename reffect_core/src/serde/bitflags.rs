@@ -1,5 +1,5 @@
 use enumflags2::{BitFlag, BitFlags};
-use serde::{de::DeserializeOwned, Deserialize, Deserializer, Serialize, Serializer};
+use serde::{Deserialize, Deserializer, Serialize, Serializer, de::DeserializeOwned};
 
 pub fn serialize<S, T>(flags: &BitFlags<T>, serializer: S) -> Result<S::Ok, S::Error>
 where

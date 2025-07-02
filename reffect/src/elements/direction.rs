@@ -1,4 +1,4 @@
-use super::{align::Align, Icon};
+use super::{Icon, align::Align};
 use crate::render::{ComponentWise, Rect};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, VariantArray};

@@ -1,6 +1,6 @@
 use nexus::imgui::{
-    sys::{self, ImDrawList},
     Ui,
+    sys::{self, ImDrawList},
 };
 use std::marker::PhantomData;
 

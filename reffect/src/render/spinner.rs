@@ -1,6 +1,6 @@
 use super::cycle_progress;
 use crate::util::non_zero_u32;
-use nexus::imgui::{sys, ImColor32, Ui};
+use nexus::imgui::{ImColor32, Ui, sys};
 use std::f32::consts::PI;
 
 pub fn draw_spinner_bg(

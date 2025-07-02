@@ -1,4 +1,4 @@
-use serde::{de, Deserialize, Deserializer, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, de};
 use std::{any::type_name, marker::PhantomData, ops};
 
 /// Helper to migrate data from an old serde format via `deserialize_with`.

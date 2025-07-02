@@ -1,6 +1,6 @@
 use super::{input_text_simple_menu, item_context_menu};
 use crate::chat_code::{decode_skill, decode_trait};
-use nexus::imgui::{sys, InputTextFlags, MenuItem, Ui};
+use nexus::imgui::{InputTextFlags, MenuItem, Ui, sys};
 use std::ffi::CString;
 
 pub fn input_u32(
