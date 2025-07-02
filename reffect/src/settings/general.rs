@@ -13,19 +13,17 @@ pub struct GeneralSettings {
     pub icon: IconSettings,
 }
 
-impl Default for GeneralSettings {
-    fn default() -> Self {
+impl GeneralSettings {
+    pub const fn new() -> Self {
         Self {
             save_on_unload: true,
             use_game_icons: false,
-            format: FormatSettings::default(),
+            format: FormatSettings::new(),
             font: LoadedFont::empty(),
-            icon: IconSettings::default(),
+            icon: IconSettings::new(),
         }
     }
-}
 
-impl GeneralSettings {
     pub fn render_options(&mut self, ui: &Ui) {
         let Self {
             save_on_unload,
@@ -47,6 +45,12 @@ impl GeneralSettings {
     }
 }
 
+impl Default for GeneralSettings {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct FormatSettings {
@@ -54,16 +58,14 @@ pub struct FormatSettings {
     pub millis_threshold: u32,
 }
 
-impl Default for FormatSettings {
-    fn default() -> Self {
+impl FormatSettings {
+    pub const fn new() -> Self {
         Self {
             minutes_threshold: 60_000,
             millis_threshold: 10_000,
         }
     }
-}
 
-impl FormatSettings {
     pub fn render_options(&mut self, ui: &Ui) {
         let Self {
             minutes_threshold,
@@ -80,5 +82,11 @@ impl FormatSettings {
             ui.text("Below how many seconds to display milliseconds");
             ui.text("MM:SS format always hides milliseconds");
         });
+    }
+}
+
+impl Default for FormatSettings {
+    fn default() -> Self {
+        Self::new()
     }
 }

@@ -1,149 +1,24 @@
 use super::Addon;
 use crate::{
-    context::Context,
-    internal::Resources,
-    internal::{BuffMap, Error, Interface, Internal},
-    render::colors::{self, Colored},
+    clipboard::Clipboard,
+    colors::{self, Colored},
+    context::{BuffMap, Context, SkillInfo, Slot},
+    error::Error,
+    internal::{Interface, Internal},
 };
-use nexus::imgui::{StyleColor, Ui, Window};
-use reffect_internal::{SkillInfo, Slot, State};
-use std::fmt;
+use nexus::imgui::{StyleColor, TreeNode, TreeNodeFlags, Ui, Window};
+use reffect_core::context::{PlayerResources, Skillbar};
+use std::{cmp::Ordering, fmt};
 use strum::IntoEnumIterator;
 
 impl Addon {
-    pub fn render_debug(&mut self, ui: &Ui) {
+    pub fn render_debug(&mut self, ui: &Ui, ctx: &Context) {
         Window::new("Reffect Debug")
             .collapsible(false)
             .always_auto_resize(true)
             .opened(&mut self.debug)
             .build(ui, || {
-                let ctx = &self.context;
-
                 ui.text(format!("Show elements: {}", ctx.ui.should_show()));
-
-                ui.text("Own weapons:");
-                ui.same_line();
-                debug_result_tooltip(ui, ctx.player.info.as_ref(), |info| {
-                    for weapon in info.weapons.iter() {
-                        ui.text(weapon);
-                    }
-                });
-
-                ui.text("Own traits:");
-                ui.same_line();
-                debug_result_tooltip(ui, ctx.player.info.as_ref(), |info| {
-                    let traits = &info.traits;
-                    for [a, b, c] in [
-                        [traits[0], traits[1], traits[2]],
-                        [traits[3], traits[4], traits[5]],
-                        [traits[6], traits[7], traits[8]],
-                    ] {
-                        ui.text(format!("{a: >4} {b: >4} {c: >4}"));
-                    }
-                });
-
-                let State {
-                    own_resources,
-                    own_skillbar,
-                    own_buffs,
-                    target_buffs,
-                    group_buffs,
-                } = &ctx.state;
-
-                ui.text("Own resources:");
-                ui.same_line();
-                debug_result_tooltip(ui, own_resources.as_ref(), |resources| {
-                    let Resources {
-                        health,
-                        barrier,
-                        endurance,
-                        primary,
-                        secondary,
-                    } = resources;
-                    ui.text(format!("Health: {}/{}", health.current, health.max));
-                    ui.text(format!("Barrier: {}/{}", barrier.current, barrier.max));
-                    ui.text(format!(
-                        "Endurance: {}/{}",
-                        endurance.current, endurance.max
-                    ));
-                    ui.text(format!("Primary: {}/{}", primary.current, primary.max));
-                    ui.text(format!(
-                        "Secondary: {}/{}",
-                        secondary.current, secondary.max
-                    ));
-                });
-
-                ui.text("Own skillbar:");
-                ui.same_line();
-                debug_result_tooltip(ui, own_skillbar.as_ref(), |skillbar| {
-                    let now = ctx.now;
-                    ui.text(format!("Bundle: {}", skillbar.has_bundle));
-                    for slot in Slot::iter() {
-                        if let Some(ability) = skillbar.slot(slot) {
-                            ui.text(format!("{slot:<14} = {}x {:>5}", ability.ammo, ability.id));
-
-                            let recharge = ability.recharge_remaining(now);
-                            if recharge > 0 {
-                                ui.same_line();
-                                ui.text(format!(
-                                    "{:.1}/{:.1}s {:.1}%",
-                                    to_secs(recharge),
-                                    to_secs(ability.recharge),
-                                    100.0 * ability.recharge_progress(now)
-                                ));
-                            }
-
-                            let ammo_recharge = ability.ammo_recharge_remaining(now);
-                            if ammo_recharge > 0 {
-                                ui.same_line();
-                                ui.text(format!(
-                                    "Ammo {:.1}/{:.1}s {:.1}%",
-                                    to_secs(ammo_recharge),
-                                    to_secs(ability.ammo_recharge),
-                                    100.0 * ability.ammo_recharge_progress(now)
-                                ));
-                            }
-                        }
-                    }
-                });
-
-                ui.text("Own buffs:");
-                ui.same_line();
-                debug_result_tooltip(ui, own_buffs.as_ref(), |buffs| {
-                    buffs_tooltip(ui, ctx, buffs)
-                });
-
-                ui.text("Last screen border:");
-                ui.same_line();
-                debug_result(ui, ctx.player.info.as_ref(), |info| {
-                    ui.text(info.last_screen_border.to_string());
-                });
-
-                ui.text("Last squad highlight:");
-                ui.same_line();
-                debug_result(ui, ctx.player.info.as_ref(), |info| {
-                    ui.text(info.last_squad_highlight.to_string());
-                });
-
-                ui.text("Target buffs:");
-                ui.same_line();
-                debug_result_tooltip(ui, target_buffs.as_ref(), |buffs| {
-                    buffs_tooltip(ui, ctx, buffs)
-                });
-
-                for i in 0..4 {
-                    ui.text(format!("Group Member {} buffs:", i + 1));
-                    ui.same_line();
-                    debug_result_tooltip(
-                        ui,
-                        group_buffs.as_ref().map(|group| &group[i]),
-                        |buffs| {
-                            if let Some(buffs) = buffs {
-                                buffs_tooltip(ui, ctx, buffs)
-                            }
-                        },
-                    );
-                }
 
                 ui.text(format!("Combat: {}", ctx.ui.combat));
 
@@ -169,37 +44,126 @@ impl Addon {
                 ui.text(format!("Map id: {}", ctx.map.id));
                 ui.text(format!("Map category: {}", ctx.map.category));
 
+                debug_result_tree(
+                    ui,
+                    "plweap",
+                    "Player weapons",
+                    &ctx.player.weapons,
+                    |weapons| {
+                        for weapon in weapons.iter() {
+                            ui.text(weapon);
+                        }
+                    },
+                );
+                debug_result_tree(
+                    ui,
+                    "pltrait",
+                    "Player traits",
+                    &ctx.player.traits,
+                    |traits| {
+                        for [adept, master, grandmaster] in [
+                            [traits[0], traits[1], traits[2]],
+                            [traits[3], traits[4], traits[5]],
+                            [traits[6], traits[7], traits[8]],
+                        ] {
+                            ui.text(format!("{adept: >4} {master: >4} {grandmaster: >4}"));
+                        }
+                    },
+                );
+                debug_result_tree(
+                    ui,
+                    "plres",
+                    "Player resources",
+                    &ctx.player.resources,
+                    |resources| debug_player_resources(ui, resources),
+                );
+                debug_result_tree(
+                    ui,
+                    "plbuffs",
+                    "Player buffs",
+                    &ctx.player.buff_info,
+                    |buff_info| {
+                        ui.text(format!(
+                            "Last screen border: {}",
+                            buff_info.last_screen_border
+                        ));
+                        ui.text(format!(
+                            "Last squad highlight: {}",
+                            buff_info.last_squad_highlight
+                        ));
+
+                        ui.spacing();
+                        debug_buffs(ui, &ctx, &buff_info.buffs)
+                    },
+                );
+                debug_result_tree(
+                    ui,
+                    "plskills",
+                    "Player skillbar",
+                    &ctx.player.skillbar,
+                    |skillbar| debug_skillbar(ui, &ctx, skillbar),
+                );
+
+                debug_result_tree(
+                    ui,
+                    "tgres",
+                    "Target resources",
+                    &ctx.target.resources,
+                    |resources| {
+                        ui.text(format!("Health: {}", 100.0 * resources.health));
+                        ui.text(format!("Barrier: {}", 100.0 * resources.barrier));
+                    },
+                );
+                debug_result_tree(ui, "tgbuff", "Target buffs", &ctx.target.buffs, |buffs| {
+                    debug_buffs(ui, &ctx, buffs)
+                });
+
+                debug_result_tree(ui, "grp", "Group", &ctx.group, |group| {
+                    ui.text(format!("Group Type: {}", group.group_type));
+
+                    for (i, member) in group.members.iter().enumerate() {
+                        ui.text(format!("Group Member {}:", i + 1));
+                        ui.same_line();
+                        if let Some(member) = member {
+                            ui.text(&member.name);
+                        } else {
+                            ui.text("-");
+                        }
+                    }
+                });
+
                 ui.spacing();
                 ui.separator();
                 ui.spacing();
 
-                self.context.edit.debug(ui);
+                ctx.edit.debug(ui);
+                Clipboard::debug(ui);
             });
     }
 }
 
-fn debug_result<T>(ui: &Ui, result: Result<&T, &Error>, body: impl FnOnce(&T)) {
-    match result {
-        Ok(value) => body(value),
-        Err(err) => {
-            ui.text_colored(colors::RED, "unavailable");
-            if ui.is_item_hovered() {
-                ui.tooltip_text(err.to_string());
-            }
-        }
-    }
+fn debug_player_resources(ui: &Ui, resources: &PlayerResources) {
+    let PlayerResources {
+        health,
+        barrier,
+        endurance,
+        primary,
+        secondary,
+    } = resources;
+    ui.text(format!("Health: {}/{}", health.current, health.max));
+    ui.text(format!("Barrier: {}/{}", barrier.current, barrier.max));
+    ui.text(format!(
+        "Endurance: {}/{}",
+        endurance.current, endurance.max
+    ));
+    ui.text(format!("Primary: {}/{}", primary.current, primary.max));
+    ui.text(format!(
+        "Secondary: {}/{}",
+        secondary.current, secondary.max
+    ));
 }
 
-fn debug_result_tooltip<T>(ui: &Ui, result: Result<&T, &Error>, tooltip: impl FnOnce(&T)) {
-    debug_result(ui, result, |value| {
-        ui.text_colored(colors::GREEN, "available");
-        if ui.is_item_hovered() {
-            ui.tooltip(|| tooltip(value));
-        }
-    })
-}
-
-fn buffs_tooltip(ui: &Ui, ctx: &Context, buffs: &BuffMap) {
+fn debug_buffs(ui: &Ui, ctx: &Context, buffs: &BuffMap) {
     for (id, buff) in buffs {
         ui.text(format!("{:>2}x {id:>5}", buff.stacks));
         if let Ok(SkillInfo::Buff { category, stacking }) = Internal::get_skill_info(*id) {
@@ -218,8 +182,72 @@ fn buffs_tooltip(ui: &Ui, ctx: &Context, buffs: &BuffMap) {
     }
 }
 
-fn to_secs(millisecs: u32) -> f32 {
-    millisecs as f32 / 1000.0
+fn debug_skillbar(ui: &Ui, ctx: &Context, skillbar: &Skillbar) {
+    ui.text(format!("Bundle: {}", skillbar.has_bundle));
+
+    for slot in Slot::iter() {
+        ui.text(format!("{slot:<14} ="));
+        if let Some(ability) = skillbar.slot(slot) {
+            let color = if !ability.is_available {
+                Some(ui.push_style_color(StyleColor::Text, colors::RED))
+            } else if ability.is_pressed {
+                Some(ui.push_style_color(StyleColor::Text, colors::BLUE))
+            } else if ability.is_pending {
+                Some(ui.push_style_color(StyleColor::Text, colors::YELLOW))
+            } else {
+                None
+            };
+
+            ui.same_line();
+            ui.text(format!("{}x {:>5}", ability.ammo, ability.id));
+            drop(color);
+
+            let _color = match ability.recharge_rate.total_cmp(&1.0) {
+                Ordering::Less => Some(ui.push_style_color(StyleColor::Text, colors::BLUE)),
+                Ordering::Equal => None,
+                Ordering::Greater => Some(ui.push_style_color(StyleColor::Text, colors::GREEN)),
+            };
+            let recharge = ability.recharge_remaining(ctx.now);
+            if recharge > 0 {
+                ui.same_line();
+                ui.text(format!(
+                    "{:.1}/{:.1}s {:.1}%",
+                    to_secs(recharge),
+                    to_secs(ability.recharge),
+                    100.0 * ability.recharge_progress(ctx.now)
+                ));
+            }
+
+            let ammo_recharge = ability.ammo_recharge_remaining(ctx.now);
+            if ammo_recharge > 0 {
+                ui.same_line();
+                ui.text(format!(
+                    "Ammo {:.1}/{:.1}s {:.1}%",
+                    to_secs(ammo_recharge),
+                    to_secs(ability.ammo_recharge),
+                    100.0 * ability.ammo_recharge_progress(ctx.now)
+                ));
+            }
+        }
+    }
+}
+
+fn debug_result_tree<T>(
+    ui: &Ui,
+    id: impl AsRef<str>,
+    label: impl AsRef<str>,
+    value: &Result<T, Error>,
+    body: impl FnOnce(&T),
+) {
+    TreeNode::new(id)
+        .label::<&str, _>(label.as_ref())
+        .flags(TreeNodeFlags::SPAN_AVAIL_WIDTH)
+        .build(ui, || match value {
+            Ok(value) => {
+                body(value);
+            }
+            Err(err) => ui.text_colored(colors::RED, format!("Error: {err}")),
+        });
 }
 
 fn name_or_unknown_id_colored<T, N>(ui: &Ui, value: Result<T, N>)
@@ -236,4 +264,8 @@ where
         }
         Err(id) => ui.text(format!("Unknown ({id})")),
     }
+}
+
+fn to_secs(millisecs: u32) -> f32 {
+    millisecs as f32 / 1000.0
 }

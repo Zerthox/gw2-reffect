@@ -1,8 +1,8 @@
 [package]
 name = "reffect_internal"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 authors = ["Zerthox"]
 
 [dependencies]
-reffect_api = { path = "../reffect_api" }
+reffect_core = { path = "../reffect_core" }

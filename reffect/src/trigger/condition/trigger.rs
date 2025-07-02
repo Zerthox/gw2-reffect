@@ -1,7 +1,7 @@
 use super::ProgressActive;
 use crate::{
     context::Context,
-    render::{enum_combo, impl_static_variants, RenderOptions},
+    render::{enum_combo, impl_static_variants},
     trigger::{MapTrigger, PlayerTrigger, ProgressThreshold, Trigger},
 };
 use nexus::imgui::{ComboBoxFlags, Ui};
@@ -51,12 +51,12 @@ impl fmt::Display for ConditionTrigger {
     }
 }
 
-impl RenderOptions for ConditionTrigger {
-    fn render_options(&mut self, ui: &Ui, ctx: &Context) {
+impl ConditionTrigger {
+    pub fn render_options(&mut self, ui: &Ui, ctx: &Context) {
         enum_combo(ui, "Condition", self, ComboBoxFlags::empty());
 
         match self {
-            Self::ProgressThreshold(threshold) => threshold.render_options(ui, ctx),
+            Self::ProgressThreshold(threshold) => threshold.render_options(ui),
             Self::Player(player) => player.render_options(ui, ctx),
             Self::Map(map) => {
                 map.render_options(ui, ctx);

@@ -1,8 +1,7 @@
 use crate::{
     action::Action,
-    context::{Context, ContextUpdate},
-    internal::Traits,
-    render::{helper, input_trait_id, RenderOptions},
+    context::{Context, Traits, Update},
+    render::{helper, input_trait_id},
     trigger::Trigger,
 };
 use nexus::imgui::{InputTextFlags, Ui};
@@ -24,23 +23,24 @@ impl TraitTrigger {
 
     fn resolve_active(&self, ctx: &Context) -> bool {
         ctx.player
-            .traits()
+            .traits
+            .as_ref()
             .map(|traits| self.traits.iter().all(|req| req.is_met(traits)))
-            .unwrap_or(false)
+            .unwrap_or(true)
     }
 }
 
 impl Trigger for TraitTrigger {
     fn is_active(&mut self, ctx: &Context) -> bool {
-        if ctx.has_update(ContextUpdate::Player) {
+        if ctx.has_update(Update::Identity) {
             self.update(ctx);
         }
         self.active
     }
 }
 
-impl RenderOptions<bool> for TraitTrigger {
-    fn render_options(&mut self, ui: &Ui, ctx: &Context) -> bool {
+impl TraitTrigger {
+    pub fn render_options(&mut self, ui: &Ui, ctx: &Context) -> bool {
         let _id = ui.push_id("trait");
         let mut changed = false;
 

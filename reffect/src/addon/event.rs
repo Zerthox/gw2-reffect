@@ -1,5 +1,6 @@
 use super::Addon;
 use crate::{
+    context::Context,
     elements::Pack,
     internal::{Interface, Internal},
     settings::AddonSettings,
@@ -9,7 +10,7 @@ use crate::{
 };
 use nexus::{
     font::{font_receive, get_font},
-    gui::{register_render, RenderType},
+    gui::{RenderType, register_render},
 };
 use rfd::FileDialog;
 use std::{fs, thread};
@@ -42,22 +43,26 @@ impl Addon {
 
         Self::create_dirs();
 
-        let mut plugin = Self::lock();
+        let mut addon = Self::lock();
         if let Some(settings) = AddonSettings::try_load() {
-            settings.apply(&mut plugin.context);
+            settings.apply(&mut addon.settings, &mut Context::lock());
         }
-        plugin.load_packs();
+        addon.worker = Context::create_worker(addon.links.clone());
+        addon.load_packs();
     }
 
     pub fn unload() {
         log::info!("Reffect v{VERSION} unload");
 
-        let plugin = Self::lock();
-        AddonSettings::new(&plugin.context).save();
-        if plugin.context.settings.save_on_unload {
-            plugin.save_packs();
+        let mut addon = Self::lock();
+        AddonSettings::new(&addon.settings, &Context::lock()).save();
+        if addon.settings.save_on_unload {
+            addon.save_packs();
         }
-        drop(plugin);
+        if let Some(worker) = addon.worker.take() {
+            worker.exit_and_wait();
+        }
+        drop(addon);
 
         Internal::deinit();
 
@@ -90,7 +95,7 @@ impl Addon {
                 }
                 log::info!("Loaded {} packs", self.packs.len());
 
-                FilterUpdater::update(&self.context, &mut self.packs);
+                FilterUpdater::update(&Context::lock(), &mut self.packs);
             }
             Err(err) => log::error!("Failed to read pack directory: {err}"),
         }
@@ -159,7 +164,7 @@ impl Addon {
     pub fn reload_fonts() {
         log::debug!("Reloading fonts");
         let mut addon = Self::lock();
-        addon.context.settings.font.reload();
+        addon.settings.font.reload();
         for pack in &mut addon.packs {
             pack.reload_fonts();
         }

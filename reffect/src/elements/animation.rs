@@ -1,6 +1,5 @@
 use crate::{
-    context::Context,
-    render::{cycle_progress, enum_combo, helper, input_seconds, push_alpha_change, RenderOptions},
+    render::{cycle_progress, enum_combo, helper, input_seconds, push_alpha_change},
     util::non_zero_u32,
 };
 use nexus::imgui::{ComboBoxFlags, Ui};
@@ -25,8 +24,8 @@ impl Animation {
     }
 }
 
-impl RenderOptions for Animation {
-    fn render_options(&mut self, ui: &Ui, _ctx: &Context) {
+impl Animation {
+    pub fn render_options(&mut self, ui: &Ui) {
         enum_combo(ui, "Animation", &mut self.kind, ComboBoxFlags::empty());
 
         let mut period = self.period.get();

@@ -4,14 +4,16 @@ mod layout;
 
 pub use self::{action::*, icon::*, layout::*};
 
-use super::{Direction, RenderState};
+use super::{Direction, RenderCtx};
 use crate::{
     action::DynAction,
+    clipboard::Clipboard,
+    colors,
     context::Context,
+    elements::Common,
     render::{
-        collapsing_header_same_line_end, colors, delete_confirm_modal, enum_combo,
-        input_float_with_format, input_size, item_context_menu, style_disabled_if, Bounds, Rect,
-        Render, RenderDebug, RenderOptions,
+        Bounds, Rect, collapsing_header_same_line_end, delete_confirm_modal, enum_combo,
+        input_float_with_format, input_size, item_context_menu, style_disabled_if,
     },
     tree::TreeNode,
 };
@@ -36,18 +38,19 @@ pub struct IconList {
 // technically there is children, but they are not full elements
 impl TreeNode for IconList {}
 
-impl Render for IconList {
-    fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
+impl IconList {
+    pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, common: &Common) {
         let render_icon = |icon: &mut ListIcon, i, len| {
             let offset = self.direction.list_item_offset(self.size, self.pad, i, len);
-            icon.render(ui, ctx, &state.with_offset(offset), self.size);
+            let _token = ctx.push_offset(offset);
+            icon.render(ui, ctx, self.size);
         };
 
         match self.layout {
             Layout::Dynamic => {
                 let mut filtered = Vec::new();
                 for icon in &mut self.icons {
-                    if icon.is_visible(ctx, state) {
+                    if icon.is_visible(ctx, common) {
                         filtered.push(icon);
                     }
                 }
@@ -60,25 +63,15 @@ impl Render for IconList {
             Layout::Static => {
                 let len = self.icons.len();
                 for (i, icon) in self.icons.iter_mut().enumerate() {
-                    if icon.is_visible(ctx, state) {
+                    if icon.is_visible(ctx, common) {
                         render_icon(icon, i, len);
                     }
                 }
             }
         };
     }
-}
 
-impl Bounds for IconList {
-    fn bounds(&self, _ui: &Ui, _ctx: &Context) -> Rect {
-        // calculate with all visible and at least 1 dummy
-        let len = self.icons.len().max(1);
-        self.direction.icon_list_bounds(self.size, self.pad, len)
-    }
-}
-
-impl RenderOptions for IconList {
-    fn render_options(&mut self, ui: &Ui, ctx: &Context) {
+    pub fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) {
         enum_combo(ui, "Layout", &mut self.layout, ComboBoxFlags::empty());
 
         enum_combo(ui, "Direction", &mut self.direction, ComboBoxFlags::empty());
@@ -114,7 +107,7 @@ impl RenderOptions for IconList {
 
             item_context_menu("##listiconctx", || {
                 if MenuItem::new("Paste")
-                    .enabled(ctx.edit.clipboard.has_icon())
+                    .enabled(Clipboard::has_icon())
                     .build(ui)
                 {
                     action = IconAction::Paste(i)
@@ -123,9 +116,7 @@ impl RenderOptions for IconList {
                     action = IconAction::Cut(i);
                 }
                 if MenuItem::new("Copy").build(ui) {
-                    ctx.edit
-                        .clipboard
-                        .set(list_icon.clone().into_element(self.size))
+                    Clipboard::set(list_icon.clone().into_element(self.size))
                 }
                 if MenuItem::new("Duplicate").build(ui) {
                     action = IconAction::Duplicate(i);
@@ -175,18 +166,18 @@ impl RenderOptions for IconList {
         }
         item_context_menu("##addiconctx", || {
             if MenuItem::new("Paste")
-                .enabled(ctx.edit.clipboard.has_icon())
+                .enabled(Clipboard::has_icon())
                 .build(ui)
             {
                 action = IconAction::Paste(self.icons.len());
             }
         });
 
-        action.perform(&mut self.icons, self.size, &ctx.edit);
+        action.perform(&mut self.icons, self.size);
         copy_action.apply_to_all(&mut self.icons);
     }
 
-    fn render_tabs(&mut self, ui: &Ui, ctx: &Context) {
+    pub fn render_tabs(&mut self, ui: &Ui, ctx: &Context) {
         if let Some(_token) = ui.tab_item("Condition") {
             const INDENT: f32 = 10.0;
             let mut action = DynAction::empty();
@@ -210,9 +201,7 @@ impl RenderOptions for IconList {
             );
         }
     }
-}
 
-impl IconList {
     pub fn render_filters(&mut self, ui: &Ui, ctx: &Context) {
         ui.spacing();
         for (i, icon) in self.icons.iter_mut().enumerate() {
@@ -225,10 +214,8 @@ impl IconList {
             }
         }
     }
-}
 
-impl RenderDebug for IconList {
-    fn render_debug(&mut self, ui: &Ui, ctx: &Context) {
+    pub fn render_debug(&mut self, ui: &Ui, ctx: &RenderCtx) {
         ui.text(format!("Icons: {}", self.icons.len()));
         for (i, icon) in self.icons.iter_mut().enumerate() {
             if CollapsingHeader::new(format!("{}###icon{i}", icon.name))
@@ -238,6 +225,14 @@ impl RenderDebug for IconList {
                 icon.render_debug(ui, ctx);
             }
         }
+    }
+}
+
+impl Bounds for IconList {
+    fn bounds(&self, _ui: &Ui, _ctx: &Context) -> Rect {
+        // calculate with all visible and at least 1 dummy
+        let len = self.icons.len().max(1);
+        self.direction.icon_list_bounds(self.size, self.pad, len)
     }
 }
 

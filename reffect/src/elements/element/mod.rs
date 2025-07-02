@@ -2,13 +2,13 @@ mod kind;
 
 pub use self::kind::*;
 
-use super::{Animation, Common, RenderState};
+use super::{Animation, Common, RenderCtx};
 use crate::{
     action::ElementAction,
+    colors,
     context::{Context, EditState},
     render::{
-        colors, delete_confirm_modal, item_context_menu, style_disabled_if, tree_select_empty,
-        Bounds, Rect, Render, RenderDebug, RenderOptions,
+        Bounds, Rect, delete_confirm_modal, item_context_menu, style_disabled_if, tree_select_empty,
     },
     tree::{Loader, Resizer, TreeNode, VisitMut},
     trigger::{FilterTrigger, Trigger},
@@ -42,21 +42,25 @@ impl Element {
     }
 
     /// Renders the element.
-    pub fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
-        self.common.render_child(ui, ctx, state, |state| {
-            if self.filter.is_active_or_edit(ctx, &state) {
-                let mut body = || self.kind.render(ui, ctx, &state);
+    pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, parent: &Common) {
+        if self.common.is_visible(ctx) {
+            let _token = ctx.push_element(ui, &self.common);
+            if self.filter.is_active_or_edit(ctx) {
+                let _style = self.common.push_style(ui);
+                self.common.update(ctx, parent.trigger.active());
+
+                let mut body = || self.kind.render(ui, ctx, &self.common);
                 if let Some(animation) = &mut self.animation {
                     animation.render(ui, body);
                 } else {
                     body();
                 }
             }
-        });
+        }
 
         if ctx.edit.is_edited(self.common.id) {
             let bounds = self.kind.bounds(ui, ctx);
-            self.common.render_edit_indicators(ui, state.pos, bounds);
+            self.common.render_edit_indicators(ui, ctx.pos(), bounds);
         }
     }
 
@@ -85,7 +89,7 @@ impl Element {
         let mut open_resize = false;
 
         item_context_menu(&id, || {
-            self.common.render_context_menu(ui, state, children);
+            self.common.render_context_menu(ui, children);
 
             if MenuItem::new("Cut").build(ui) {
                 action = ElementAction::Cut;
@@ -138,7 +142,7 @@ impl Element {
 
     /// Attempts to render options if selected.
     /// Returns `true` if the element or a child rendered.
-    pub fn try_render_options(&mut self, ui: &Ui, ctx: &Context) -> bool {
+    pub fn try_render_options(&mut self, ui: &Ui, ctx: &RenderCtx) -> bool {
         let id = self.common.id;
         if ctx.edit.is_selected(id) {
             self.render_options(ui, ctx);
@@ -154,10 +158,11 @@ impl Element {
     }
 
     /// Renders the element options.
-    fn render_options(&mut self, ui: &Ui, ctx: &Context) {
+    pub fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) {
         if let Some(_token) = ui.tab_bar(self.common.id_string()) {
+            let _token = ctx.push_element(ui, &self.common);
             if let Some(_token) = ui.tab_item(&self.kind) {
-                self.common.render_options(ui, ctx);
+                self.common.render_options(ui);
                 ui.spacing();
                 self.kind.render_options(ui, ctx);
             }
@@ -179,22 +184,16 @@ impl Element {
                 }
 
                 if let Some(animation) = &mut self.animation {
-                    animation.render_options(ui, ctx);
+                    animation.render_options(ui);
                 }
             }
 
             if let Some(_token) = ui.tab_item("?") {
-                self.render_debug(ui, ctx)
+                self.common.render_debug(ui);
+                self.filter.render_debug(ui, ctx);
+                self.kind.render_debug(ui, ctx);
             }
         }
-    }
-}
-
-impl RenderDebug for Element {
-    fn render_debug(&mut self, ui: &Ui, ctx: &Context) {
-        self.common.render_debug(ui, ctx);
-        self.filter.render_debug(ui, ctx);
-        self.kind.render_debug(ui, ctx);
     }
 }
 

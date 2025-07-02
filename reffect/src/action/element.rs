@@ -1,5 +1,5 @@
 use crate::{
-    context::EditState,
+    clipboard::Clipboard,
     elements::{Dnd, Element},
 };
 use std::ops;
@@ -29,18 +29,18 @@ impl ElementAction {
         }
     }
 
-    pub fn perform(self, children: &mut Vec<Element>, index: usize, edit: &mut EditState) {
+    pub fn perform(self, children: &mut Vec<Element>, index: usize) {
         match self {
             Self::None => {}
             Self::Cut => {
                 let child = children.remove(index);
                 log::debug!("Cut child {index} {}", child.kind.as_ref());
-                edit.clipboard.set(child);
+                Clipboard::set(child);
             }
             Self::Copy => {
                 let child = children[index].clone();
                 log::debug!("Copy child {index} {}", child.kind.as_ref());
-                edit.clipboard.set(child);
+                Clipboard::set(child);
             }
             Self::Duplicate => {
                 let child = children[index].clone();
@@ -105,8 +105,8 @@ impl ChildElementAction {
         }
     }
 
-    pub fn perform(self, children: &mut Vec<Element>, edit: &mut EditState) {
-        self.kind.perform(children, self.index, edit)
+    pub fn perform(self, children: &mut Vec<Element>) {
+        self.kind.perform(children, self.index)
     }
 }
 

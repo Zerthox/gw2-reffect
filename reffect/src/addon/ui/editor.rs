@@ -1,18 +1,19 @@
 use super::Addon;
 use crate::{
-    elements::ELEMENT_ID,
-    internal::Error,
-    internal::State,
-    render::{colors, next_window_size_constraints, small_padding},
+    colors,
+    context::Context,
+    elements::{ELEMENT_ID, RenderCtx},
+    error::Error,
+    render::{next_window_size_constraints, small_padding},
 };
 use nexus::imgui::{ChildWindow, StyleVar, Ui};
 
 impl Addon {
-    pub fn render_editor(&mut self, ui: &Ui) {
+    pub fn render_editor(&mut self, ui: &Ui, ctx: &mut Context) {
         if ui.button("Reload packs") {
             self.packs.clear();
-            self.context.edit = Default::default();
             ELEMENT_ID.reset();
+            ctx.edit.reset();
             self.load_packs();
         }
         if ui.is_item_hovered() {
@@ -69,7 +70,7 @@ impl Addon {
                             let _style = ui.push_style_var(StyleVar::IndentSpacing(10.0));
                             let mut remove = None;
                             for (i, pack) in self.packs.iter_mut().enumerate() {
-                                let deleted = pack.render_select_tree(ui, &mut self.context.edit);
+                                let deleted = pack.render_select_tree(ui, &mut ctx.edit);
                                 if deleted {
                                     remove = Some(i);
                                 }
@@ -84,8 +85,9 @@ impl Addon {
                 ui.same_line();
                 ChildWindow::new("element-options").build(ui, || {
                     let _style = small_padding(ui);
+                    let ctx = RenderCtx::create(ui, &ctx, &self.settings);
                     for pack in &mut self.packs {
-                        let rendered = pack.try_render_options(ui, &self.context);
+                        let rendered = pack.try_render_options(ui, &ctx);
                         if rendered {
                             // end after we find the element that has to render
                             break;
@@ -94,23 +96,12 @@ impl Addon {
                 });
             });
 
-        let State {
-            own_resources,
-            own_skillbar,
-            own_buffs,
-            target_buffs: _, // TODO: add after implementation completed
-            group_buffs: _,
-        } = &self.context.state;
-        let player = &self.context.player.info;
         render_errors(
             ui,
             [
-                ("Resources", own_resources.as_ref().err()),
-                ("Skills", own_skillbar.as_ref().err()),
-                ("Own Buffs", own_buffs.as_ref().err()),
-                // ("Target Buffs", target_buffs.as_ref().err()),
-                // ("Group Buffs", group_buffs.as_ref().err()),
-                ("Player", player.as_ref().err()),
+                ("Resources", ctx.player.resources.as_ref().err()),
+                ("Skills", ctx.player.skillbar.as_ref().err()),
+                ("Own Buffs", ctx.player.buff_info.as_ref().err()),
             ],
         );
     }

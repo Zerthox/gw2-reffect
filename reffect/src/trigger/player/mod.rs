@@ -3,11 +3,10 @@ mod traits;
 
 pub use self::{combat::*, traits::*};
 
-use super::{check_bitflags_optional, Trigger};
+use super::{Trigger, check_bitflags_optional};
 use crate::{
-    context::{Context, Mount, Profession, Specialization},
-    internal::Weapon,
-    render::{enum_combo_bitflags, RenderOptions},
+    context::{Context, Mount, Profession, Specialization, Weapon},
+    render::enum_combo_bitflags,
     serde::bitflags,
 };
 use enumflags2::BitFlags;
@@ -52,7 +51,7 @@ impl PlayerTrigger {
     }
 
     pub fn weapons_active(&self, ctx: &Context) -> bool {
-        check_bitflags_optional(self.weapons, ctx.player.weapons())
+        check_bitflags_optional(self.weapons, ctx.player.weapons.as_ref().ok().copied())
     }
 
     pub fn mounts_active(&self, ctx: &Context) -> bool {
@@ -70,9 +69,9 @@ impl Trigger for PlayerTrigger {
     }
 }
 
-impl RenderOptions for PlayerTrigger {
-    fn render_options(&mut self, ui: &Ui, ctx: &Context) {
-        self.combat.render_options(ui, ctx);
+impl PlayerTrigger {
+    pub fn render_options(&mut self, ui: &Ui, ctx: &Context) {
+        self.combat.render_options(ui);
 
         enum_combo_bitflags(
             ui,

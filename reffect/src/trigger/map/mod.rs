@@ -1,12 +1,10 @@
 pub mod legacy;
 
-use super::{check_bitflags, Trigger};
+use super::{Trigger, check_bitflags};
 use crate::{
     action::Action,
     context::{Context, MapCategory},
-    render::{
-        enum_combo_bitflags, helper, input_u32, item_context_menu, map_select, RenderOptions,
-    },
+    render::{enum_combo_bitflags, helper, input_u32, item_context_menu, map_select},
     serde::bitflags,
 };
 use enumflags2::BitFlags;
@@ -41,11 +39,7 @@ impl MapTrigger {
         check_bitflags(self.category, ctx.map.category)
             && (self.ids.is_empty() || {
                 let id_match = self.ids.iter().any(|id| ctx.map.is_on_map(*id));
-                if self.whitelist {
-                    id_match
-                } else {
-                    !id_match
-                }
+                if self.whitelist { id_match } else { !id_match }
             })
     }
 }
@@ -56,8 +50,8 @@ impl Trigger for MapTrigger {
     }
 }
 
-impl RenderOptions<bool> for MapTrigger {
-    fn render_options(&mut self, ui: &Ui, ctx: &Context) -> bool {
+impl MapTrigger {
+    pub fn render_options(&mut self, ui: &Ui, ctx: &Context) -> bool {
         let _id = ui.push_id("map");
         let mut changed = false;
 

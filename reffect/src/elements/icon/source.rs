@@ -1,14 +1,14 @@
 use crate::{
     action::DynAction,
     addon::Addon,
-    context::Context,
+    elements::RenderCtx,
+    internal::{Interface, Internal},
     lockbox::Lockbox,
-    render::{enum_combo, impl_static_variants, input_text_simple_menu, Validation},
+    render::{Validation, enum_combo, impl_static_variants, input_text_simple_menu},
     texture_manager::TextureManager,
     trigger::Skill,
 };
 use nexus::imgui::{ComboBoxFlags, TextureId, Ui};
-use reffect_internal::{Interface, Internal};
 use rfd::FileDialog;
 use serde::{Deserialize, Serialize};
 use std::{path::PathBuf, thread};
@@ -96,7 +96,7 @@ impl IconSource {
         }
     }
 
-    pub fn render_select(&mut self, ui: &Ui, ctx: &Context) -> DynAction<Self> {
+    pub fn render_select(&mut self, ui: &Ui, ctx: &RenderCtx) -> DynAction<Self> {
         let mut action = DynAction::empty();
 
         let validation = match self {

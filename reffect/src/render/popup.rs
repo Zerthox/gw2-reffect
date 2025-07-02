@@ -1,5 +1,5 @@
-use crate::render::colors;
-use nexus::imgui::{sys, StyleColor, Ui};
+use crate::colors;
+use nexus::imgui::{StyleColor, Ui, sys};
 use std::ffi::CString;
 
 pub fn item_context_menu(str_id: impl Into<String>, contents: impl FnOnce()) {

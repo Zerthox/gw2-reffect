@@ -1,7 +1,7 @@
 use crate::{
+    colors::{self, with_alpha},
     elements::text::TextDecoration,
     render::{
-        colors::{self, with_alpha},
         enum_combo, helper, input_color_alpha, input_float_with_format, input_percent, input_pos,
         input_seconds, input_u32,
     },
@@ -19,6 +19,17 @@ pub struct IconSettings {
     pub duration_bar: DurationBarSettings,
 }
 
+impl IconSettings {
+    #[inline]
+    pub const fn new() -> Self {
+        Self {
+            stack_text: StackTextSettings::new(),
+            duration_text: DurationTextSettings::new(),
+            duration_bar: DurationBarSettings::new(),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct StackTextSettings {
@@ -29,8 +40,9 @@ pub struct StackTextSettings {
     pub decoration: TextDecoration,
 }
 
-impl Default for StackTextSettings {
-    fn default() -> Self {
+impl StackTextSettings {
+    #[inline]
+    pub const fn new() -> Self {
         Self {
             threshold: 2,
             scale: 0.5,
@@ -39,9 +51,7 @@ impl Default for StackTextSettings {
             decoration: TextDecoration::Shadow,
         }
     }
-}
 
-impl StackTextSettings {
     pub fn render_options(&mut self, ui: &Ui) {
         let Self {
             threshold,
@@ -61,6 +71,12 @@ impl StackTextSettings {
     }
 }
 
+impl Default for StackTextSettings {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct DurationTextSettings {
@@ -77,6 +93,19 @@ pub struct DurationTextSettings {
 }
 
 impl DurationTextSettings {
+    #[inline]
+    pub const fn new() -> Self {
+        Self {
+            threshold_buff: 5000,
+            threshold_ability: u32::MAX,
+            scale: 0.5,
+            color: colors::WHITE,
+            color_fast: colors::GREEN,
+            color_slow: colors::CYAN,
+            decoration: TextDecoration::Outline,
+        }
+    }
+
     pub fn threshold(&self, active: &ProgressActive) -> u32 {
         match active {
             ProgressActive::Fixed { .. } => u32::MAX,
@@ -92,23 +121,7 @@ impl DurationTextSettings {
             Ordering::Greater => self.color_fast,
         }
     }
-}
 
-impl Default for DurationTextSettings {
-    fn default() -> Self {
-        Self {
-            threshold_buff: 5000,
-            threshold_ability: u32::MAX,
-            scale: 0.5,
-            color: colors::WHITE,
-            color_fast: colors::GREEN,
-            color_slow: colors::CYAN,
-            decoration: TextDecoration::Outline,
-        }
-    }
-}
-
-impl DurationTextSettings {
     pub fn render_options(&mut self, ui: &Ui) {
         let Self {
             threshold_buff,
@@ -138,6 +151,12 @@ impl DurationTextSettings {
     }
 }
 
+impl Default for DurationTextSettings {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct DurationBarSettings {
@@ -145,19 +164,24 @@ pub struct DurationBarSettings {
     pub color: [f32; 4],
 }
 
-impl Default for DurationBarSettings {
-    fn default() -> Self {
+impl DurationBarSettings {
+    #[inline]
+    pub const fn new() -> Self {
         Self {
             height: 2.0,
             color: colors::GREEN,
         }
     }
-}
 
-impl DurationBarSettings {
     pub fn render_options(&mut self, ui: &Ui) {
         let Self { height, color } = self;
         input_float_with_format("Height", height, 1.0, 10.0, "%.2f", InputTextFlags::empty());
         input_color_alpha(ui, "Color", color);
+    }
+}
+
+impl Default for DurationBarSettings {
+    fn default() -> Self {
+        Self::new()
     }
 }

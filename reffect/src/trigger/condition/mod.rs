@@ -3,7 +3,7 @@ mod trigger;
 pub use self::trigger::*;
 
 use super::ProgressActive;
-use crate::{context::Context, elements::PartialProps, render::RenderOptions};
+use crate::{context::Context, elements::PartialProps};
 use nexus::imgui::Ui;
 use partial::{IntoPartial, PartialOps};
 use serde::{Deserialize, Serialize};

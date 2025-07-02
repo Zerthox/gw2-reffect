@@ -3,14 +3,16 @@ mod props;
 
 pub use self::{progress::*, props::*};
 
-use super::{align::Align, Direction, Props, RenderState, Unit};
+use super::{Direction, Props, RenderCtx, Unit, align::Align};
 use crate::{
     action::Action,
+    colors::with_alpha_factor,
     context::Context,
+    elements::Common,
     render::{
-        colors::with_alpha_factor, enum_combo, helper, helper_slider, input_color_alpha,
+        Bounds, ComponentWise, Rect, enum_combo, helper, helper_slider, input_color_alpha,
         input_float_with_format, input_percent, input_positive_with_format, input_size, input_u32,
-        slider_percent, Bounds, ComponentWise, Rect, Render, RenderDebug, RenderOptions,
+        slider_percent,
     },
     tree::TreeNode,
     trigger::ProgressActive,
@@ -48,20 +50,16 @@ impl Bar {
         let scale = self.props.upper_bound - self.props.lower_bound;
         (value - self.props.lower_bound) / scale
     }
-}
 
-impl TreeNode for Bar {}
-
-impl Render for Bar {
-    fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
-        let active = state.trigger_active();
+    pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, common: &Common) {
+        let active = common.trigger.active();
         self.props.update(ctx, active);
 
         if let Some(active) = active {
             let progress = self.calc_progress(ctx, active);
 
             let alpha = ui.clone_style().alpha;
-            let (start, end) = self.bounds_with_offset(ui, ctx, state.pos);
+            let (start, end) = self.bounds_with_offset(ui, ctx, ctx.pos());
             let offset_2d = self.direction.offset_2d(self.size);
 
             let (offset_start, offset_end) =
@@ -121,17 +119,8 @@ impl Render for Bar {
             }
         }
     }
-}
 
-impl Bounds for Bar {
-    fn bounds(&self, _ui: &Ui, _ctx: &Context) -> Rect {
-        let start = self.align.offset(self.size);
-        (start, start.add(self.size))
-    }
-}
-
-impl RenderOptions for Bar {
-    fn render_options(&mut self, ui: &Ui, _ctx: &Context) {
+    pub fn render_options(&mut self, ui: &Ui, _ctx: &Context) {
         enum_combo(
             ui,
             "Progress",
@@ -228,19 +217,26 @@ impl RenderOptions for Bar {
         }
     }
 
-    fn render_tabs(&mut self, ui: &Ui, ctx: &Context) {
+    pub fn render_tabs(&mut self, ui: &Ui, ctx: &Context) {
         if let Some(_token) = ui.tab_item("Condition") {
             self.props.render_condition_options(ui, ctx);
         }
     }
-}
 
-impl RenderDebug for Bar {
-    fn render_debug(&mut self, ui: &Ui, _ctx: &Context) {
+    pub fn render_debug(&mut self, ui: &Ui, _ctx: &Context) {
         ui.text(format!(
             "Progress scale: {}",
             self.props.upper_bound - self.props.lower_bound
         ));
+    }
+}
+
+impl TreeNode for Bar {}
+
+impl Bounds for Bar {
+    fn bounds(&self, _ui: &Ui, _ctx: &Context) -> Rect {
+        let start = self.align.offset(self.size);
+        (start, start.add(self.size))
     }
 }
 

@@ -6,13 +6,13 @@ mod progress;
 
 pub use self::{condition::*, filter::*, map::*, player::*, progress::*};
 
-use crate::{context::Context, elements::RenderState};
+use crate::{context::Context, elements::RenderCtx};
 use enumflags2::{BitFlag, BitFlags};
 
 // TODO: parametric return type?
 pub trait Trigger {
-    fn is_active_or_edit(&mut self, ctx: &Context, state: &RenderState) -> bool {
-        state.is_edit(ctx) || (!ctx.edit.is_editing() && self.is_active(ctx))
+    fn is_active_or_edit(&mut self, ctx: &RenderCtx) -> bool {
+        ctx.is_edited() || (!ctx.edit.is_editing() && self.is_active(ctx))
     }
 
     fn is_active(&mut self, ctx: &Context) -> bool;

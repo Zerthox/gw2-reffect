@@ -1,6 +1,6 @@
 use super::ListIcon;
 use crate::{
-    context::EditState,
+    clipboard::Clipboard,
     elements::{Element, ElementType},
 };
 
@@ -21,7 +21,7 @@ impl IconAction {
         Self::None
     }
 
-    pub fn perform(self, children: &mut Vec<ListIcon>, size: [f32; 2], edit: &EditState) {
+    pub fn perform(self, children: &mut Vec<ListIcon>, size: [f32; 2]) {
         match self {
             Self::None => {}
             Self::Up(index) => {
@@ -44,8 +44,7 @@ impl IconAction {
                 children.remove(index);
             }
             Self::Cut(index) => {
-                edit.clipboard
-                    .set(children.remove(index).into_element(size));
+                Clipboard::set(children.remove(index).into_element(size));
             }
             Self::Paste(index) => {
                 if let Some(Element {
@@ -53,7 +52,7 @@ impl IconAction {
                     filter,
                     kind: ElementType::Icon(element),
                     ..
-                }) = edit.clipboard.take()
+                }) = Clipboard::take()
                 {
                     children.insert(index, ListIcon::from_element(common, element, filter));
                 } else {

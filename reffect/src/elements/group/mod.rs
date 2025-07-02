@@ -1,7 +1,8 @@
-use super::{Element, RenderState};
+use super::{Element, RenderCtx};
 use crate::{
     context::Context,
-    render::{Bounds, Rect, Render, RenderDebug, RenderOptions},
+    elements::Common,
+    render::{Bounds, Rect},
     tree::TreeNode,
 };
 use nexus::imgui::Ui;
@@ -19,26 +20,24 @@ impl TreeNode for Group {
     }
 }
 
-impl Render for Group {
-    fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
+impl Group {
+    pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, common: &Common) {
         for member in &mut self.members {
-            member.render(ui, ctx, state);
+            member.render(ui, ctx, common);
         }
+    }
+
+    pub fn render_options(&mut self, _ui: &Ui, _ctx: &RenderCtx) {}
+
+    pub fn render_tabs(&mut self, _ui: &Ui, _ctx: &RenderCtx) {}
+
+    pub fn render_debug(&mut self, ui: &Ui, _ctx: &RenderCtx) {
+        ui.text(format!("Members: {}", self.members.len()));
     }
 }
 
 impl Bounds for Group {
     fn bounds(&self, ui: &Ui, ctx: &Context) -> Rect {
         Bounds::combined_bounds(&self.members, ui, ctx)
-    }
-}
-
-impl RenderOptions for Group {
-    fn render_options(&mut self, _ui: &Ui, _ctx: &Context) {}
-}
-
-impl RenderDebug for Group {
-    fn render_debug(&mut self, ui: &Ui, _ctx: &Context) {
-        ui.text(format!("Members: {}", self.members.len()));
     }
 }

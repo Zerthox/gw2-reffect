@@ -1,6 +1,6 @@
 use crate::{
     context::Context,
-    render::{enum_combo, helper, input_float_with_format, RenderOptions},
+    render::{enum_combo, helper, input_float_with_format},
     trigger::{ProgressActive, ProgressValue},
 };
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Slider, SliderFlags, Ui};
@@ -119,8 +119,8 @@ impl AmountType {
     }
 }
 
-impl RenderOptions<Option<Self>> for AmountType {
-    fn render_options(&mut self, ui: &Ui, _ctx: &Context) -> Option<Self> {
+impl AmountType {
+    pub fn render_options(&mut self, ui: &Ui) -> Option<Self> {
         let result = enum_combo(ui, "Amount type", self, ComboBoxFlags::empty());
         helper(ui, || ui.text("Type of amount to check"));
         result

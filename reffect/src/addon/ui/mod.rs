@@ -3,34 +3,39 @@ mod editor;
 mod options;
 
 use super::Addon;
-use crate::{context::ContextUpdate, tree::FilterUpdater};
+use crate::{
+    context::{Context, Update},
+    elements::RenderCtx,
+    tree::FilterUpdater,
+};
 use nexus::imgui::Ui;
 
 impl Addon {
     pub fn render(&mut self, ui: &Ui) {
-        self.context.update(); // TODO: perform update in separate thread?
+        let mut ctx = Context::lock();
 
-        if self.context.has_update(ContextUpdate::Map) {
-            FilterUpdater::update(&self.context, &mut self.packs);
+        ctx.prepare_render(&self.links);
+        if ctx.has_update(Update::Map) {
+            FilterUpdater::update(&ctx, &mut self.packs);
         }
 
-        self.render_displays(ui);
+        self.render_displays(ui, &ctx);
 
         if self.debug {
-            self.render_debug(ui);
+            self.render_debug(ui, &ctx);
         }
 
         self.render_popups(ui);
-
-        self.context.edit.reset_allowed();
+        ctx.reset();
     }
 
-    pub fn render_displays(&mut self, ui: &Ui) {
+    pub fn render_displays(&mut self, ui: &Ui, ctx: &Context) {
         // TODO: profiling?
-        if self.context.ui.should_show() || self.context.edit.is_editing() {
-            let _font = self.context.settings.font.push();
+        if ctx.ui.should_show() || ctx.edit.is_editing() {
+            let _font = self.settings.font.push();
+            let ctx = RenderCtx::create(ui, ctx, &self.settings);
             for pack in &mut self.packs {
-                pack.render(ui, &self.context);
+                pack.render(ui, &ctx);
             }
         }
     }

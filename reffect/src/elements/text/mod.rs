@@ -1,13 +1,14 @@
 mod decoration;
 mod props;
 
-use super::{align::AlignHorizontal, Props, RenderState};
+use super::{Props, RenderCtx, align::AlignHorizontal};
 use crate::{
-    context::{Context, ContextUpdate},
+    context::{Context, Update},
+    elements::Common,
     fmt::Unit,
     render::{
-        debug_optional, draw_text_bg, helper, input_text_multi_with_menu, Bounds, ComponentWise,
-        LoadedFont, Rect, Render, RenderDebug, RenderOptions,
+        Bounds, ComponentWise, LoadedFont, Rect, debug_optional, draw_text_bg, helper,
+        input_text_multi_with_menu,
     },
     tree::TreeNode,
     trigger::{ProgressActive, ProgressValue},
@@ -38,12 +39,12 @@ pub struct Text {
 }
 
 impl Text {
-    pub fn update(&mut self, ctx: &Context, state: &RenderState) {
-        let active = state.trigger_active();
+    pub fn update(&mut self, ctx: &RenderCtx, common: &Common) {
+        let active = common.trigger.active();
         self.props.update(ctx, active);
-        if self.frequent || ctx.has_update_or_edit(ContextUpdate::State) {
+        if self.frequent || ctx.has_update_or_edit(Update::Game) {
             self.frequent = false; // reset frequent, only enable while active
-            self.text_memo = active.map(|active| self.process_text(active, ctx, state));
+            self.text_memo = active.map(|active| self.process_text(active, ctx, common));
         }
     }
 
@@ -54,8 +55,8 @@ impl Text {
     fn process_text(
         &mut self,
         active: &ProgressActive,
-        ctx: &Context,
-        state: &RenderState,
+        ctx: &RenderCtx,
+        common: &Common,
     ) -> String {
         const PREFIX: char = '%';
 
@@ -69,7 +70,7 @@ impl Text {
                     match next {
                         'n' => {
                             iter.next();
-                            result.push_str(&state.common.name);
+                            result.push_str(&common.name);
                         }
                         'i' | 's' => {
                             iter.next();
@@ -175,15 +176,15 @@ impl Text {
 
 impl TreeNode for Text {}
 
-impl Render for Text {
-    fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
-        self.update(ctx, state);
+impl Text {
+    pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, common: &Common) {
+        self.update(ctx, common);
 
         if let Some(text) = &self.text_memo {
             let _font = self.font.push();
             let font_scale = self.props.scale;
             let offset = self.calc_offset(ui, text);
-            let pos = state.pos.add(offset);
+            let pos = ctx.pos().add(offset);
             let [r, g, b, a] = self.props.color;
             let alpha = a * ui.clone_style().alpha;
             let color = [r, g, b, alpha];
@@ -210,8 +211,8 @@ impl Bounds for Text {
     }
 }
 
-impl RenderOptions for Text {
-    fn render_options(&mut self, ui: &Ui, ctx: &Context) {
+impl Text {
+    pub fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) {
         input_text_multi_with_menu(
             ui,
             "##text",
@@ -231,15 +232,15 @@ impl RenderOptions for Text {
         self.props.base.render_options(ui, ctx);
     }
 
-    fn render_tabs(&mut self, ui: &Ui, ctx: &Context) {
+    pub fn render_tabs(&mut self, ui: &Ui, ctx: &RenderCtx) {
         if let Some(_token) = ui.tab_item("Condition") {
             self.props.render_condition_options(ui, ctx);
         }
     }
 }
 
-impl RenderDebug for Text {
-    fn render_debug(&mut self, ui: &Ui, _ctx: &Context) {
+impl Text {
+    pub fn render_debug(&mut self, ui: &Ui, _ctx: &RenderCtx) {
         debug_optional(ui, "Font", self.font.as_font());
         ui.text(format!("Frequent: {}", self.frequent));
     }

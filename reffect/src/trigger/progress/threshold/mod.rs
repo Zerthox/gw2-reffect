@@ -6,7 +6,7 @@ pub use self::{amount_type::*, threshold_type::*};
 use super::ProgressActive;
 use crate::{
     context::Context,
-    render::{enum_combo, helper, RenderOptions},
+    render::{enum_combo, helper},
 };
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
@@ -57,8 +57,8 @@ impl fmt::Display for ProgressThreshold {
     }
 }
 
-impl RenderOptions for ProgressThreshold {
-    fn render_options(&mut self, ui: &Ui, ctx: &Context) {
+impl ProgressThreshold {
+    pub fn render_options(&mut self, ui: &Ui) {
         enum_combo(
             ui,
             "Threshold",
@@ -72,11 +72,11 @@ impl RenderOptions for ProgressThreshold {
             ThresholdType::Above(required)
             | ThresholdType::Below(required)
             | ThresholdType::Exact(required) => {
-                self.amount_type.render_options(ui, ctx);
+                self.amount_type.render_options(ui);
                 self.amount_type.render_input(ui, "Amount", required);
             }
             ThresholdType::Between(min, max) => {
-                self.amount_type.render_options(ui, ctx);
+                self.amount_type.render_options(ui);
                 self.amount_type.render_input(ui, "Min", min);
                 self.amount_type.render_input(ui, "Max", max);
             }

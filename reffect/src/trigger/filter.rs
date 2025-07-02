@@ -1,9 +1,5 @@
-use super::{map::legacy::MapTriggerLegacy, MapTrigger, PlayerTrigger, Trigger};
-use crate::{
-    context::Context,
-    render::{RenderDebug, RenderOptions},
-    serde::migrate,
-};
+use super::{MapTrigger, PlayerTrigger, Trigger, map::legacy::MapTriggerLegacy};
+use crate::{context::Context, serde::migrate};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
@@ -25,29 +21,25 @@ impl FilterTrigger {
         self.player.traits.update(ctx);
         self.map.update(ctx);
     }
-}
 
-impl Trigger for FilterTrigger {
-    fn is_active(&mut self, ctx: &Context) -> bool {
-        self.player.is_active(ctx) && self.map.is_active(ctx)
-    }
-}
-
-impl RenderOptions for FilterTrigger {
-    fn render_options(&mut self, ui: &Ui, ctx: &Context) {
+    pub fn render_options(&mut self, ui: &Ui, ctx: &Context) {
         self.player.render_options(ui, ctx);
 
         ui.spacing();
         self.map.render_options(ui, ctx);
     }
-}
 
-impl RenderDebug for FilterTrigger {
-    fn render_debug(&mut self, ui: &Ui, ctx: &Context) {
+    pub fn render_debug(&mut self, ui: &Ui, ctx: &Context) {
         ui.text(format!(
             "Trait filter: {}",
             self.player.traits.is_active(ctx)
         ));
         ui.text(format!("Map filter: {}", self.map.is_active(ctx)));
+    }
+}
+
+impl Trigger for FilterTrigger {
+    fn is_active(&mut self, ctx: &Context) -> bool {
+        self.player.is_active(ctx) && self.map.is_active(ctx)
     }
 }

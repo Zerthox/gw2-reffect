@@ -2,15 +2,15 @@ use crate::{addon::Addon, assets, elements::icon::IconSource};
 use nexus::{
     imgui::TextureId,
     texture::{
-        get_texture, load_texture_from_file, load_texture_from_memory, load_texture_from_url,
-        RawTextureReceiveCallback, Texture,
+        RawTextureReceiveCallback, Texture, get_texture, load_texture_from_file,
+        load_texture_from_memory, load_texture_from_url,
     },
     texture_receive,
 };
 use std::{
     collections::HashMap,
     path::Path,
-    sync::{mpsc, Mutex, MutexGuard, OnceLock},
+    sync::{Mutex, MutexGuard, OnceLock, mpsc},
     thread::{self, JoinHandle},
 };
 use url::Url;
@@ -230,8 +230,7 @@ struct TextureLoader {
 impl TextureLoader {
     fn spawn(callback: impl Fn(IconSource) -> bool + Send + 'static) -> Option<Self> {
         let (sender, receiver) = mpsc::channel();
-
-        let result = thread::Builder::new()
+        thread::Builder::new()
             .name("reffect-texture-loader".into())
             .spawn(move || {
                 log::debug!("Texture loader spawn");
@@ -242,9 +241,7 @@ impl TextureLoader {
                     }
                 }
                 log::debug!("Texture loader exit");
-            });
-
-        result
+            })
             .inspect_err(|err| log::error!("Failed to spawn texture loader: {err}"))
             .ok()
             .map(|handle| Self { sender, handle })

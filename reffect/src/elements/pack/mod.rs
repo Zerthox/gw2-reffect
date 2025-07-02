@@ -1,9 +1,11 @@
 use super::{Anchor, Common, Element, ScreenAnchor};
 use crate::{
-    context::{Context, EditState},
+    colors,
+    context::EditState,
+    elements::RenderCtx,
     render::{
-        colors, delete_confirm_modal, item_context_menu, style_disabled, style_disabled_if,
-        tree_select_empty, Bounds, RenderDebug, RenderOptions,
+        Bounds, delete_confirm_modal, item_context_menu, style_disabled, style_disabled_if,
+        tree_select_empty,
     },
     schema::Schema,
     tree::{FontReloader, Loader, Resizer, TreeNode, VisitMut},
@@ -59,13 +61,15 @@ impl Pack {
     }
 
     /// Renders the pack.
-    pub fn render(&mut self, ui: &Ui, ctx: &Context) {
-        let edit = ctx.edit.show_all && ctx.edit.is_edited_or_parent(self.common.id);
-        self.common.render_root(ui, ctx, edit, |state| {
+    pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx) {
+        if self.common.is_visible(ctx) {
+            let _token = ctx.push_element(ui, &self.common);
+            let _style = self.common.push_style(ui);
+            self.common.update(ctx, None);
             for element in &mut self.elements {
-                element.render(ui, ctx, &state);
+                element.render(ui, ctx, &self.common);
             }
-        });
+        }
 
         if ctx.edit.is_edited(self.common.id) {
             let bounds = Bounds::combined_bounds(self.elements.iter(), ui, ctx);
@@ -95,7 +99,7 @@ impl Pack {
         let mut open_resize = false;
 
         item_context_menu(&id, || {
-            self.common.render_context_menu(ui, state, Some(children));
+            self.common.render_context_menu(ui, Some(children));
 
             open_resize = MenuItem::new("Resize").build(ui);
 
@@ -127,10 +131,10 @@ impl Pack {
 
     /// Attempts to render options if selected.
     /// Returns `true` if the pack or a child rendered.
-    pub fn try_render_options(&mut self, ui: &Ui, ctx: &Context) -> bool {
+    pub fn try_render_options(&mut self, ui: &Ui, ctx: &RenderCtx) -> bool {
         let id = self.common.id;
         if ctx.edit.is_selected(id) {
-            self.render_options(ui, ctx);
+            self.render_options(ui);
             return true;
         } else if ctx.edit.is_selected_parent(id) {
             for child in &mut self.elements {
@@ -143,10 +147,10 @@ impl Pack {
     }
 
     /// Renders the pack options.
-    fn render_options(&mut self, ui: &Ui, ctx: &Context) {
+    fn render_options(&mut self, ui: &Ui) {
         if let Some(_token) = ui.tab_bar(self.common.id_string()) {
             if let Some(_token) = ui.tab_item("Pack") {
-                self.common.render_options(ui, ctx);
+                self.common.render_options(ui);
 
                 ui.spacing();
 
@@ -161,15 +165,13 @@ impl Pack {
                 }
             }
             if let Some(_token) = ui.tab_item("?") {
-                self.render_debug(ui, ctx);
+                self.render_debug(ui);
             }
         }
     }
-}
 
-impl RenderDebug for Pack {
-    fn render_debug(&mut self, ui: &Ui, ctx: &Context) {
-        self.common.render_debug(ui, ctx);
+    fn render_debug(&mut self, ui: &Ui) {
+        self.common.render_debug(ui);
 
         ui.text("File:");
         if let Some(file) = self.file.file_name().and_then(|file| file.to_str()) {

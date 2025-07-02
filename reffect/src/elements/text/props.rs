@@ -1,8 +1,8 @@
 use super::TextDecoration;
 use crate::{
-    context::Context,
-    elements::PartialProps,
-    render::{colors, input_color_alpha, input_optional, input_percent, RenderOptions},
+    colors,
+    elements::{PartialProps, RenderCtx},
+    render::{input_color_alpha, input_optional, input_percent},
 };
 use nexus::imgui::Ui;
 use partial::Partial;
@@ -28,8 +28,8 @@ impl Default for TextProps {
     }
 }
 
-impl RenderOptions for TextProps {
-    fn render_options(&mut self, ui: &Ui, _ctx: &Context) {
+impl TextProps {
+    pub fn render_options(&mut self, ui: &Ui, _ctx: &RenderCtx) {
         let Self {
             scale,
             color,

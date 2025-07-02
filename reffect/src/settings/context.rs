@@ -1,61 +1,46 @@
 use super::GeneralSettings;
-use crate::context::Context;
+use crate::context::{Context, EditSettings};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct ContextSettings {
     #[serde(flatten)]
     pub general: GeneralSettings,
 
-    pub edit_during_combat: bool,
-    pub edit_show_all: bool,
+    pub edit: EditSettings,
 
-    #[serde(alias = "combat_interval")]
-    #[serde(alias = "own_interval")]
-    #[serde(alias = "buffs_interval")]
-    pub state_interval: u32,
-
-    pub player_interval: u32,
-}
-
-impl Default for ContextSettings {
-    fn default() -> Self {
-        Self {
-            general: GeneralSettings::default(),
-            edit_during_combat: false,
-            edit_show_all: false,
-            state_interval: Context::DEFAULT_STATE_INTERVAL,
-            player_interval: Context::DEFAULT_PLAYER_INTERVAL,
-        }
-    }
-}
-
-impl From<&Context> for ContextSettings {
-    fn from(ctx: &Context) -> Self {
-        Self {
-            general: ctx.settings.clone(),
-            edit_during_combat: ctx.edit.during_combat,
-            edit_show_all: ctx.edit.show_all,
-            state_interval: ctx.state_interval.frequency,
-            player_interval: ctx.player_interval.frequency,
-        }
-    }
+    edit_during_combat: Option<bool>,
+    edit_show_all: Option<bool>,
 }
 
 impl ContextSettings {
-    pub fn apply(self, ctx: &mut Context) {
+    pub fn new(settings: &GeneralSettings, ctx: &Context) -> Self {
+        Self {
+            general: settings.clone(),
+            edit: ctx.edit.settings.clone(),
+            edit_during_combat: None,
+            edit_show_all: None,
+        }
+    }
+
+    pub fn apply(self, settings: &mut GeneralSettings, ctx: &mut Context) {
         let Self {
             general,
+            mut edit,
             edit_during_combat,
             edit_show_all,
-            state_interval,
-            player_interval,
         } = self;
-        ctx.settings = general;
-        ctx.edit.during_combat = edit_during_combat;
-        ctx.edit.show_all = edit_show_all;
-        ctx.state_interval.frequency = state_interval;
-        ctx.player_interval.frequency = player_interval;
+
+        // migrate old settings
+        if let Some(value) = edit_during_combat {
+            edit.during_combat = value;
+        }
+        if let Some(value) = edit_show_all {
+            edit.show_all = value;
+        }
+
+        *settings = general;
+        ctx.edit.settings = edit;
     }
 }

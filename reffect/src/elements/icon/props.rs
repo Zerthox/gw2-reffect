@@ -1,10 +1,10 @@
 use crate::{
     action::DynAction,
-    context::Context,
+    colors,
     elements::PartialProps,
     render::{
-        colors, helper, input_color_alpha, input_optional, input_percent_inverse,
-        input_positive_with_format, slider_percent_capped, RenderOptions,
+        helper, input_color_alpha, input_optional, input_percent_inverse,
+        input_positive_with_format, slider_percent_capped,
     },
     render_copy_field,
 };
@@ -37,8 +37,8 @@ impl Default for IconProps {
     }
 }
 
-impl RenderOptions<DynAction<IconProps>> for IconProps {
-    fn render_options(&mut self, ui: &Ui, _ctx: &Context) -> DynAction<Self> {
+impl IconProps {
+    pub fn render_options(&mut self, ui: &Ui) -> DynAction<Self> {
         let Self {
             tint,
             zoom,

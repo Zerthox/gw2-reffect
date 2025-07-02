@@ -13,7 +13,7 @@ mod element;
 mod group;
 mod pack;
 mod props;
-mod render_state;
+mod render_ctx;
 mod unit;
 
 pub use self::{
@@ -29,7 +29,7 @@ pub use self::{
     list::IconList,
     pack::*,
     props::*,
-    render_state::*,
+    render_ctx::*,
     text::Text,
     unit::*,
 };

@@ -1,8 +1,9 @@
 mod event;
 mod ui;
 
-use crate::{context::Context, elements::Pack};
+use crate::{elements::Pack, settings::GeneralSettings};
 use nexus::paths::get_addon_dir;
+use reffect_core::{links::Links, worker::StoppableWorker};
 use std::{
     path::PathBuf,
     sync::{Mutex, MutexGuard, OnceLock},
@@ -14,8 +15,10 @@ static ADDON: OnceLock<Mutex<Addon>> = OnceLock::new();
 pub struct Addon {
     debug: bool,
     create_error: bool,
+    links: Links,
     packs: Vec<Pack>,
-    context: Context,
+    settings: GeneralSettings,
+    worker: Option<StoppableWorker>,
 }
 
 impl Addon {
@@ -23,8 +26,10 @@ impl Addon {
         Self {
             debug: false,
             create_error: false,
+            links: Links::load(),
             packs: Vec::new(),
-            context: Context::default(),
+            settings: GeneralSettings::new(),
+            worker: None,
         }
     }
 

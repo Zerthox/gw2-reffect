@@ -1,5 +1,5 @@
 use super::Validation;
-use nexus::imgui::{sys, ComboBoxFlags, Selectable, SelectableFlags, Ui};
+use nexus::imgui::{ComboBoxFlags, Selectable, SelectableFlags, Ui, sys};
 use serde::{Deserialize, Serialize};
 use std::{
     borrow::Cow,
@@ -14,16 +14,18 @@ pub struct Font(pub NonNull<sys::ImFont>);
 
 impl Font {
     pub unsafe fn get_all() -> impl Iterator<Item = Self> {
-        let io = sys::igGetIO();
-        let atlas = (*io).Fonts;
-        let data = (*atlas).Fonts.Data;
-        let len = (*atlas).Fonts.Size;
+        unsafe {
+            let io = sys::igGetIO();
+            let atlas = (*io).Fonts;
+            let data = (*atlas).Fonts.Data;
+            let len = (*atlas).Fonts.Size;
 
-        slice::from_raw_parts(data, len as usize)
-            .iter()
-            .copied()
-            .filter_map(NonNull::new)
-            .map(Self)
+            slice::from_raw_parts(data, len as usize)
+                .iter()
+                .copied()
+                .filter_map(NonNull::new)
+                .map(Self)
+        }
     }
 
     pub fn try_from_name(name: impl AsRef<str>) -> Option<Self> {
@@ -54,7 +56,7 @@ impl Font {
     }
 
     pub unsafe fn name_raw<'a>(&self) -> &'a CStr {
-        CStr::from_ptr(sys::ImFont_GetDebugName(self.as_ptr()))
+        unsafe { CStr::from_ptr(sys::ImFont_GetDebugName(self.as_ptr())) }
     }
 
     pub fn name_owned(&self) -> String {
@@ -131,7 +133,7 @@ pub struct LoadedFont {
 }
 
 impl LoadedFont {
-    pub fn empty() -> Self {
+    pub const fn empty() -> Self {
         Self {
             name: None,
             loaded: None,

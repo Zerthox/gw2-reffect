@@ -1,12 +1,13 @@
 mod active;
+mod info;
 mod source;
 mod threshold;
 
-pub use self::{active::*, source::*, threshold::*};
+pub use self::{active::*, info::*, source::*, threshold::*};
 
 use crate::{
-    context::{Context, ContextUpdate},
-    render::{debug_optional, RenderDebug, RenderOptions},
+    context::{Context, Update},
+    render::debug_optional,
     serde::migrate,
 };
 use nexus::imgui::Ui;
@@ -42,7 +43,7 @@ impl ProgressTrigger {
     }
 
     pub fn update(&mut self, ctx: &Context, edited: bool, parent: Option<&ProgressActive>) {
-        if ctx.has_update_or_edit(ContextUpdate::State) {
+        if ctx.has_update_or_edit(Update::Game) {
             // TODO: end of edit causes memo to "flash", maybe flag to end edit mode?
             self.active_memo = self.active_updated(ctx, edited, parent);
         }
@@ -70,21 +71,17 @@ impl ProgressTrigger {
     pub fn active(&self) -> Option<&ProgressActive> {
         self.active_memo.as_ref()
     }
-}
 
-impl RenderOptions for ProgressTrigger {
-    fn render_options(&mut self, ui: &Ui, ctx: &Context) {
+    pub fn render_options(&mut self, ui: &Ui) {
         let _id = ui.push_id("trigger");
-        self.source.render_options(ui, ctx);
+        self.source.render_options(ui);
         if !self.source.no_threshold() {
-            self.threshold.render_options(ui, ctx);
+            self.threshold.render_options(ui);
             // TODO: we rely on interval refreshing the memo, render options might want context for updates
         }
     }
-}
 
-impl RenderDebug for ProgressTrigger {
-    fn render_debug(&mut self, ui: &Ui, _ctx: &Context) {
+    pub fn render_debug(&mut self, ui: &Ui) {
         debug_optional(ui, "Trigger", self.active());
     }
 }

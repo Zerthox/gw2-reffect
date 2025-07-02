@@ -4,15 +4,12 @@ mod source;
 
 pub use self::{element::*, props::*, source::*};
 
-use super::{align::AlignHorizontal, Props, RenderState};
+use super::{Props, RenderCtx, align::AlignHorizontal};
 use crate::{
     action::DynAction,
+    colors::{self, with_alpha, with_alpha_factor},
     context::Context,
-    render::{
-        colors::{self, with_alpha, with_alpha_factor},
-        debug_optional, draw_spinner_bg, draw_text_bg, ComponentWise, Rect, RenderDebug,
-        RenderOptions,
-    },
+    render::{ComponentWise, Rect, debug_optional, draw_spinner_bg, draw_text_bg},
     render_copy_field,
     settings::icon::{DurationBarSettings, DurationTextSettings, StackTextSettings},
     trigger::{ProgressActive, ProgressValue, Skill},
@@ -56,8 +53,7 @@ impl Icon {
     pub fn render(
         &mut self,
         ui: &Ui,
-        ctx: &Context,
-        state: &RenderState,
+        ctx: &RenderCtx,
         active: Option<&ProgressActive>,
         size: [f32; 2],
     ) {
@@ -73,8 +69,8 @@ impl Icon {
             });
 
             let (start, end) = Self::bounds(size);
-            let start = state.pos.add(start);
-            let end = state.pos.add(end);
+            let start = ctx.pos().add(start);
+            let end = ctx.pos().add(end);
             let round = self.props.round * small_size;
             let color @ [_, _, _, alpha] = self.texture_color(ui);
 
@@ -92,7 +88,7 @@ impl Icon {
             } else if !self.source.is_empty() {
                 draw_spinner_bg(
                     ui,
-                    state.pos,
+                    ctx.pos(),
                     0.4 * small_size,
                     with_alpha(colors::WHITE, alpha),
                     with_alpha(colors::WHITE, 0.3 * alpha),
@@ -188,7 +184,7 @@ impl Icon {
                         let font_size = scale * small_size;
                         let font_scale = font_size / ui.current_font_size();
                         let offset = AlignHorizontal::Center.text_offset(ui, &text, font_scale);
-                        let text_pos = state.pos.add(offset);
+                        let text_pos = ctx.pos().add(offset);
 
                         let color @ [_, _, _, alpha] = settings.color(active.progress_rate());
                         let decoration_color = with_alpha(colors::BLACK, alpha);
@@ -200,7 +196,7 @@ impl Icon {
         }
     }
 
-    pub fn render_options(&mut self, ui: &Ui, ctx: &Context) -> DynAction<Self> {
+    pub fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) -> DynAction<Self> {
         let mut action = DynAction::<Self>::empty();
 
         let source_action = self.source.render_select(ui, ctx);
@@ -208,7 +204,7 @@ impl Icon {
 
         ui.spacing();
 
-        let props_action = self.props.base.render_options(ui, ctx);
+        let props_action = self.props.base.render_options(ui);
         action.or(props_action.map(|icon: &mut Self| &mut icon.props.base));
 
         ui.checkbox("Show Duration Bar", &mut self.duration_bar);
@@ -232,10 +228,8 @@ impl Icon {
             DynAction::empty()
         }
     }
-}
 
-impl RenderDebug for Icon {
-    fn render_debug(&mut self, ui: &Ui, _ctx: &Context) {
+    pub fn render_debug(&mut self, ui: &Ui, _ctx: &RenderCtx) {
         debug_optional(
             ui,
             "Texture",

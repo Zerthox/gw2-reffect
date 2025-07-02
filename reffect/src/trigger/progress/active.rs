@@ -1,9 +1,9 @@
+use super::ProgressInfo;
 use crate::{
+    context::{Ability, Buff, Resource, Skillbar, Slot},
     fmt::{Time, Unit},
-    internal::{Ability, Buff, Resource},
     settings::FormatSettings,
 };
-use reffect_internal::{Skillbar, Slot};
 
 // TODO: add ability flags?
 #[derive(Debug, Clone)]
@@ -20,6 +20,7 @@ pub enum ProgressActive {
     },
     Ability {
         skill: Skill,
+        info: ProgressInfo,
         ammo: u32,
         rate: f32,
         recharge: u32,
@@ -74,6 +75,7 @@ impl ProgressActive {
         } = *ability;
         Self::Ability {
             skill,
+            info: ProgressInfo::from(ability),
             ammo,
             recharge,
             end: if recharge > 0 {
@@ -115,6 +117,7 @@ impl ProgressActive {
         let decreasing = 1.0 - progress;
         Self::Ability {
             skill,
+            info: ProgressInfo::new(),
             ammo: (5.0 * progress) as u32,
             recharge: 5000,
             end: now + (5000.0 * decreasing) as u32,

@@ -1,7 +1,8 @@
-use super::{Icon, RenderState};
+use super::{Icon, RenderCtx};
 use crate::{
     context::Context,
-    render::{input_size, Bounds, Rect, Render, RenderDebug, RenderOptions},
+    elements::Common,
+    render::{Bounds, Rect, input_size},
     tree::TreeNode,
 };
 use nexus::imgui::Ui;
@@ -17,34 +18,30 @@ pub struct IconElement {
 
 impl TreeNode for IconElement {}
 
-impl Render for IconElement {
-    fn render(&mut self, ui: &Ui, ctx: &Context, state: &RenderState) {
+impl IconElement {
+    pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, common: &Common) {
         self.icon
-            .render(ui, ctx, state, state.trigger_active(), self.size)
+            .render(ui, ctx, common.trigger.active(), self.size)
+    }
+
+    pub fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) {
+        input_size(&mut self.size);
+
+        self.icon.render_options(ui, ctx);
+    }
+
+    pub fn render_tabs(&mut self, ui: &Ui, ctx: &RenderCtx) {
+        self.icon.render_tabs(ui, ctx);
+    }
+
+    pub fn render_debug(&mut self, ui: &Ui, ctx: &RenderCtx) {
+        self.icon.render_debug(ui, ctx)
     }
 }
 
 impl Bounds for IconElement {
     fn bounds(&self, _ui: &Ui, _ctx: &Context) -> Rect {
         Icon::bounds(self.size)
-    }
-}
-
-impl RenderOptions for IconElement {
-    fn render_options(&mut self, ui: &Ui, ctx: &Context) {
-        input_size(&mut self.size);
-
-        self.icon.render_options(ui, ctx);
-    }
-
-    fn render_tabs(&mut self, ui: &Ui, ctx: &Context) {
-        self.icon.render_tabs(ui, ctx);
-    }
-}
-
-impl RenderDebug for IconElement {
-    fn render_debug(&mut self, ui: &Ui, ctx: &Context) {
-        self.icon.render_debug(ui, ctx)
     }
 }
 

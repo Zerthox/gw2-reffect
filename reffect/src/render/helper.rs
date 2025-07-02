@@ -1,4 +1,4 @@
-use crate::render::colors;
+use crate::colors;
 use nexus::imgui::{ColorStackToken, StyleColor, Ui};
 
 pub fn helper(ui: &Ui, contents: impl FnOnce()) {

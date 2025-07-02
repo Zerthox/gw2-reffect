@@ -1,13 +1,14 @@
 use super::{ProgressActive, Skill};
 use crate::{
     action::Action,
-    context::Context,
-    internal::{Buff, Category, Error, Interface, Internal, SkillInfo, Slot},
-    render::{enum_combo, helper, impl_static_variants, input_skill_id, RenderOptions, Validation},
+    context::{Buff, Category, Context, SkillInfo, Slot},
+    error::Error,
+    internal::{Interface, Internal},
+    render::{Validation, enum_combo, helper, impl_static_variants, input_skill_id},
 };
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
-use serde_with::{formats::PreferMany, serde_as, OneOrMany};
+use serde_with::{OneOrMany, formats::PreferMany, serde_as};
 use strum::{AsRefStr, EnumIter, IntoStaticStr};
 
 #[serde_as]
@@ -73,36 +74,59 @@ impl ProgressSource {
         match *self {
             Self::Inherit => parent.cloned(),
             Self::Always => Some(ProgressActive::dummy()),
-            Self::Buff(ref ids) => ctx.own_buffs().map(|buffs| {
+            Self::Buff(ref ids) => {
+                let buff_info = ctx.player.buff_info.as_ref().ok()?;
                 let mut combined = Buff::empty();
                 for id in ids {
-                    if let Some(buff) = buffs.get(id).filter(|buff| buff.runout_time > ctx.now) {
+                    if let Some(buff) = buff_info
+                        .buffs
+                        .get(id)
+                        .filter(|buff| buff.runout_time > ctx.now)
+                    {
                         combined.stacks += buff.stacks;
                         combined.apply_time = combined.apply_time.max(buff.apply_time);
                         combined.runout_time = combined.runout_time.max(buff.runout_time);
                     }
                 }
-                ProgressActive::from_buff(ids.first().copied().unwrap_or(0), &combined)
-            }),
+                Some(ProgressActive::from_buff(
+                    ids.first().copied().unwrap_or(0),
+                    &combined,
+                ))
+            }
             Self::SkillbarSlot(slot) => {
-                let skillbar = ctx.own_skillbar()?;
+                let skillbar = ctx.player.skillbar.as_ref().ok()?;
                 let ability = skillbar.slot(slot)?;
                 let skill = Skill::from_slot(skillbar, slot);
                 Some(ProgressActive::from_ability(skill, ability))
             }
             Self::Ability(ref ids) => {
-                let skillbar = ctx.own_skillbar()?;
+                let skillbar = ctx.player.skillbar.as_ref().ok()?;
                 ids.iter()
                     .copied()
                     .filter(|id| *id > 0)
                     .find_map(|id| skillbar.ability(id))
                     .map(|ability| ProgressActive::from_ability(ability.id.into(), ability))
             }
-            Self::Health => ctx.own_resources()?.health.clone().try_into().ok(),
-            Self::Barrier => ctx.own_resources()?.barrier.clone().try_into().ok(),
-            Self::Endurance => ctx.own_resources()?.endurance.clone().try_into().ok(),
-            Self::PrimaryResource => ctx.own_resources()?.primary.clone().try_into().ok(),
-            Self::SecondaryResource => ctx.own_resources()?.secondary.clone().try_into().ok(),
+            Self::Health => {
+                let resources = ctx.player.resources.as_ref().ok()?;
+                resources.health.clone().try_into().ok()
+            }
+            Self::Barrier => {
+                let resources = ctx.player.resources.as_ref().ok()?;
+                resources.barrier.clone().try_into().ok()
+            }
+            Self::Endurance => {
+                let resources = ctx.player.resources.as_ref().ok()?;
+                resources.endurance.clone().try_into().ok()
+            }
+            Self::PrimaryResource => {
+                let resources = ctx.player.resources.as_ref().ok()?;
+                resources.primary.clone().try_into().ok()
+            }
+            Self::SecondaryResource => {
+                let resources = ctx.player.resources.as_ref().ok()?;
+                resources.secondary.clone().try_into().ok()
+            }
         }
     }
 
@@ -124,7 +148,9 @@ impl ProgressSource {
             }
             Self::SkillbarSlot(slot) => {
                 let skill = ctx
-                    .own_skillbar()
+                    .player
+                    .skillbar
+                    .as_ref()
                     .map(|skillbar| Skill::from_slot(skillbar, slot))
                     .unwrap_or_default();
                 ProgressActive::edit_ability(skill, progress, ctx.now)
@@ -180,10 +206,8 @@ impl ProgressSource {
             ui.text("Supports pasting chat links");
         });
     }
-}
 
-impl RenderOptions for ProgressSource {
-    fn render_options(&mut self, ui: &Ui, _ctx: &Context) {
+    pub fn render_options(&mut self, ui: &Ui) {
         if let Some(prev) = enum_combo(ui, "Trigger", self, ComboBoxFlags::HEIGHT_LARGE) {
             match self {
                 Self::Buff(ids) => *ids = prev.into_ids(),

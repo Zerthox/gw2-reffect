@@ -1,7 +1,8 @@
 use crate::{
     action::{Action, DynAction},
+    colors,
     context::Context,
-    render::{collapsing_header_same_line_end, colors, delete_confirm_modal},
+    render::{collapsing_header_same_line_end, delete_confirm_modal},
     trigger::{Condition, ProgressActive},
 };
 use nexus::imgui::{CollapsingHeader, Direction, StyleColor, TreeNodeFlags, Ui};

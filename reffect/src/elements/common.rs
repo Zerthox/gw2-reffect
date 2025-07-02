@@ -1,15 +1,16 @@
-use super::{Anchor, Element, ElementType, RenderState, ScreenAnchor, ELEMENT_ID};
+use super::{Anchor, ELEMENT_ID, Element, ElementType, ScreenAnchor};
 use crate::{
     action::ChildElementAction,
+    clipboard::Clipboard,
+    colors,
     context::{Context, EditState},
     id::Id,
     render::{
-        colors, confirm_modal, helper_slider, input_percent, input_pos, push_alpha_change,
-        push_window_clip_rect_fullscreen, slider_percent, ComponentWise, EnumStaticVariants, Rect,
-        RenderDebug, RenderOptions,
+        ComponentWise, EnumStaticVariants, Rect, confirm_modal, helper_slider, input_percent,
+        input_pos, push_alpha_change, push_window_clip_rect_fullscreen, slider_percent,
     },
     serde::migrate,
-    trigger::ProgressTrigger,
+    trigger::{ProgressActive, ProgressTrigger},
 };
 use nexus::imgui::{Condition, MenuItem, MouseButton, StyleVar, Ui, Window};
 use serde::{Deserialize, Serialize};
@@ -51,7 +52,7 @@ impl Common {
         self.id.to_string()
     }
 
-    pub fn visible(&self, ctx: &Context) -> bool {
+    pub fn is_visible(&self, ctx: &Context) -> bool {
         self.enabled || ctx.edit.is_edited_or_parent(self.id)
     }
 
@@ -59,40 +60,25 @@ impl Common {
         self.anchor.pos(ui, parent_pos).add(self.pos)
     }
 
-    pub fn render_root(
-        &mut self,
-        ui: &Ui,
-        ctx: &Context,
-        edit: bool,
-        contents: impl FnOnce(RenderState),
-    ) {
-        if self.visible(ctx) {
-            let edit = edit || ctx.edit.is_edited(self.id);
-            self.trigger.update(ctx, edit, None);
+    pub fn pos_root(&self, ui: &Ui) -> [f32; 2] {
+        self.pos(ui, Anchor::root(ui))
+    }
 
-            let _style = push_alpha_change(ui, self.opacity);
-            let pos = self.pos(ui, Anchor::root(ui));
-            let state = RenderState::initial(edit, pos, self);
-            contents(state);
+    pub fn is_edit_visible(&self, ctx: &Context) -> bool {
+        if ctx.edit.settings.show_all {
+            ctx.edit.is_edited_or_parent(self.id)
+        } else {
+            ctx.edit.is_edited(self.id)
         }
     }
 
-    pub fn render_child(
-        &mut self,
-        ui: &Ui,
-        ctx: &Context,
-        parent: &RenderState,
-        contents: impl FnOnce(RenderState),
-    ) {
-        if self.visible(ctx) {
-            let edit = parent.is_edit(ctx) || ctx.edit.is_edited(self.id);
-            let parent_active = parent.common.trigger.active();
-            self.trigger.update(ctx, edit, parent_active);
+    pub fn update(&mut self, ctx: &Context, parent_active: Option<&ProgressActive>) {
+        self.trigger
+            .update(ctx, self.is_edit_visible(ctx), parent_active);
+    }
 
-            let _style = push_alpha_change(ui, self.opacity);
-            let state = parent.for_child(ui, ctx, self);
-            contents(state);
-        }
+    pub fn push_style<'ui>(&self, ui: &'ui Ui) -> impl Drop + 'ui {
+        push_alpha_change(ui, self.opacity)
     }
 
     /// Renders the element edit indicators.
@@ -192,17 +178,12 @@ impl Common {
                 selected = true;
             }
         }
-        action.perform(children, state);
+        action.perform(children);
         selected
     }
 
     /// Renders common context menu options.
-    pub fn render_context_menu(
-        &mut self,
-        ui: &Ui,
-        state: &mut EditState,
-        children: Option<&mut Vec<Element>>,
-    ) {
+    pub fn render_context_menu(&mut self, ui: &Ui, children: Option<&mut Vec<Element>>) {
         if let Some(children) = children {
             ui.menu("Create", || {
                 ElementType::with_variants(|variants| {
@@ -215,11 +196,12 @@ impl Common {
                     }
                 })
             });
+
             if MenuItem::new("Paste")
-                .enabled(state.clipboard.has_some())
+                .enabled(Clipboard::has_some())
                 .build(ui)
             {
-                children.push(state.clipboard.take().expect("paste without clipboard"))
+                children.push(Clipboard::take().expect("paste without clipboard"))
             }
         }
     }
@@ -234,10 +216,8 @@ impl Common {
         })
         .then(|| mem::replace(&mut self.resize, 1.0))
     }
-}
 
-impl RenderOptions for Common {
-    fn render_options(&mut self, ui: &Ui, ctx: &Context) {
+    pub fn render_options(&mut self, ui: &Ui) {
         ui.checkbox("Enabled", &mut self.enabled);
 
         ui.input_text("Name", &mut self.name).build();
@@ -250,16 +230,14 @@ impl RenderOptions for Common {
 
         ui.spacing();
 
-        self.trigger.render_options(ui, ctx);
+        self.trigger.render_options(ui);
     }
-}
 
-impl RenderDebug for Common {
-    fn render_debug(&mut self, ui: &Ui, ctx: &Context) {
+    pub fn render_debug(&mut self, ui: &Ui) {
         ui.text(format!("Id: {}", self.id));
-        ui.text(format!("Pos: {:?}", self.pos(ui, Anchor::root(ui))));
+        ui.text(format!("Pos: {:?}", self.pos_root(ui)));
 
-        self.trigger.render_debug(ui, ctx);
+        self.trigger.render_debug(ui);
     }
 }
 

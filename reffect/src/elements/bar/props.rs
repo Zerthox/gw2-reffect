@@ -1,10 +1,7 @@
 use crate::{
-    context::Context,
+    colors,
     elements::PartialProps,
-    render::{
-        colors, input_color_alpha, input_optional, input_percent, input_positive_with_format,
-        RenderOptions,
-    },
+    render::{input_color_alpha, input_optional, input_percent, input_positive_with_format},
 };
 use nexus::imgui::{InputTextFlags, Ui};
 use partial::Partial;
@@ -39,12 +36,6 @@ impl Default for BarProps {
             tick_size: 1.0,
             tick_color: colors::BLACK,
         }
-    }
-}
-
-impl RenderOptions for BarProps {
-    fn render_options(&mut self, _ui: &Ui, _ctx: &Context) {
-        // rendered by bar
     }
 }
 

@@ -1,4 +1,10 @@
-pub use reffect_api::*;
+use reffect_core::{
+    Texture,
+    context::SkillInfo,
+    error::{Error, Result},
+};
+
+pub use reffect_core::Interface;
 
 /// Use dummy as internal API.
 pub type Internal = Dummy;
@@ -9,14 +15,10 @@ pub struct Dummy;
 
 impl Interface for Dummy {
     #[inline]
-    fn update_state(state: &mut State) {
-        *state = State::disabled();
-    }
+    fn init() {}
 
     #[inline]
-    fn get_player_info() -> Result<PlayerInfo> {
-        Err(Error::Disabled)
-    }
+    fn deinit() {}
 
     #[inline]
     fn get_skill_info(_id: u32) -> Result<SkillInfo> {

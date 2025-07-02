@@ -1,3 +1,4 @@
+use crate::{colors::Colored, named::Named};
 use enumflags2::{BitFlag, BitFlags};
 use nexus::imgui::{ComboBoxFlags, Selectable, StyleColor, StyleVar, Ui};
 use std::mem;
@@ -32,8 +33,6 @@ macro_rules! impl_static_variants {
 }
 
 pub(crate) use impl_static_variants;
-
-use crate::{render::colors::Colored, util::ShortName};
 
 pub fn enum_combo<T>(
     ui: &Ui,
@@ -71,7 +70,7 @@ pub fn enum_combo_bitflags<T>(
     flags: ComboBoxFlags,
 ) -> bool
 where
-    T: Copy + PartialEq + Ord + AsRef<str> + BitFlag + VariantArray + ShortName + Colored,
+    T: Copy + PartialEq + Ord + AsRef<str> + BitFlag + VariantArray + Named + Colored,
     &'static str: From<T>,
 {
     let mut changed = false;
