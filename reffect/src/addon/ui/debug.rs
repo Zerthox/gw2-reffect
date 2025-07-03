@@ -110,8 +110,15 @@ impl Addon {
                     "Target resources",
                     &ctx.target.resources,
                     |resources| {
-                        ui.text(format!("Health: {}", 100.0 * resources.health));
-                        ui.text(format!("Barrier: {}", 100.0 * resources.barrier));
+                        ui.text(format!("Health: {:.2}", 100.0 * resources.health));
+                        ui.text(format!("Barrier: {:.2}", 100.0 * resources.barrier));
+
+                        ui.text("Defiance:");
+                        ui.same_line();
+                        match &resources.defiance {
+                            Some(defiance) => ui.text(format!("{:.2}", 100.0 * defiance)),
+                            None => ui.text("-"),
+                        }
                     },
                 );
                 debug_result_tree(ui, "tgbuff", "Target buffs", &ctx.target.buffs, |buffs| {
@@ -146,16 +153,27 @@ fn debug_player_resources(ui: &Ui, resources: &PlayerResources) {
     let PlayerResources {
         health,
         barrier,
+        defiance,
         endurance,
         primary,
         secondary,
     } = resources;
+
     ui.text(format!("Health: {}/{}", health.current, health.max));
     ui.text(format!("Barrier: {}/{}", barrier.current, barrier.max));
+
+    ui.text("Defiance:");
+    ui.same_line();
+    match defiance {
+        Some(defiance) => ui.text(format!("{:.2}", 100.0 * defiance)),
+        None => ui.text("-"),
+    }
+
     ui.text(format!(
         "Endurance: {}/{}",
         endurance.current, endurance.max
     ));
+
     ui.text(format!("Primary: {}/{}", primary.current, primary.max));
     ui.text(format!(
         "Secondary: {}/{}",

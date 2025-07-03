@@ -70,12 +70,12 @@ impl Context {
 
     /// Creates the context worker.
     pub fn create_worker(links: Links) -> Option<StoppableWorker> {
-        const INTERVAL: Duration = Duration::from_millis(500);
+        const SLEEP: Duration = Duration::from_millis(500);
 
         StoppableWorker::spawn("reffect-context-worker", move |token| {
             while !token.stop_requested() {
-                thread::sleep(INTERVAL);
                 Self::lock().update_slow(&links);
+                thread::sleep(SLEEP);
             }
         })
     }

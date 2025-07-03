@@ -9,6 +9,9 @@ pub struct PlayerResources {
     /// Barrier.
     pub barrier: Resource,
 
+    /// Defiance.
+    pub defiance: Option<f32>,
+
     /// Endurance.
     pub endurance: Resource,
 
@@ -27,6 +30,7 @@ impl PlayerResources {
         Self {
             health: Resource::empty(),
             barrier: Resource::empty(),
+            defiance: None,
             endurance: Resource::empty(),
             primary: Resource::empty(),
             secondary: Resource::empty(),

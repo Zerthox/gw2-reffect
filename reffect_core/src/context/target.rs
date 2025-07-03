@@ -34,6 +34,9 @@ pub struct TargetResources {
 
     /// Barrier.
     pub barrier: f32,
+
+    /// Defiance bar.
+    pub defiance: Option<f32>,
 }
 
 impl TargetResources {
@@ -43,6 +46,7 @@ impl TargetResources {
         Self {
             health: 0.0,
             barrier: 0.0,
+            defiance: None,
         }
     }
 }

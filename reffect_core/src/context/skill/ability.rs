@@ -128,6 +128,12 @@ impl Ability {
         self.recharge_remaining.saturating_sub(self.passed(now))
     }
 
+    /// Returns the end time for the recharge.
+    #[inline]
+    pub fn recharge_end(&self) -> u32 {
+        self.last_update + self.recharge_remaining
+    }
+
     /// Returns the recharge progress.
     #[inline]
     pub fn recharge_progress(&self, now: u32) -> f32 {
