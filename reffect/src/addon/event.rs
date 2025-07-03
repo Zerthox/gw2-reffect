@@ -96,7 +96,7 @@ impl Addon {
                 }
                 log::info!("Loaded {} packs", self.packs.len());
 
-                FilterUpdater::update(&ctx, &mut self.packs);
+                FilterUpdater::update(ctx, &mut self.packs);
             }
             Err(err) => log::error!("Failed to read pack directory: {err}"),
         }
