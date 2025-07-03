@@ -14,7 +14,7 @@ impl Addon {
             self.packs.clear();
             ELEMENT_ID.reset();
             ctx.edit.reset();
-            self.load_packs();
+            self.load_packs(ctx);
         }
         if ui.is_item_hovered() {
             ui.tooltip_text("Reloads from pack files on disk");
