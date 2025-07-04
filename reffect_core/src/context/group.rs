@@ -56,9 +56,40 @@ pub enum GroupType {
 /// Group member.
 #[derive(Debug, Clone)]
 pub struct GroupMember {
-    /// Group member name.
-    pub name: String,
+    /// Group member account name.
+    pub account: String,
+
+    /// Group member health.
+    pub resources: Result<GroupMemberResources, Error>,
 
     /// Group member buffs.
     pub buffs: Result<BuffMap, Error>,
+}
+
+impl GroupMember {
+    #[inline]
+    pub const fn new() -> Self {
+        Self {
+            account: String::new(),
+            resources: Err(Error::Disabled),
+            buffs: Err(Error::Disabled),
+        }
+    }
+}
+
+impl Default for GroupMember {
+    #[inline]
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Group member resources.
+#[derive(Debug, Clone)]
+pub struct GroupMemberResources {
+    /// Group member health.
+    pub health: f32,
+
+    /// Group member barrier.
+    pub barrier: f32,
 }

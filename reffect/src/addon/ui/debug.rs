@@ -132,7 +132,7 @@ impl Addon {
                         ui.text(format!("Group Member {}:", i + 1));
                         ui.same_line();
                         if let Some(member) = member {
-                            ui.text(&member.name);
+                            ui.text(member.account.strip_prefix(':').unwrap_or(&member.account));
                         } else {
                             ui.text("-");
                         }
