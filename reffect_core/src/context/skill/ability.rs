@@ -131,7 +131,7 @@ impl Ability {
     /// Returns the end time for the recharge.
     #[inline]
     pub fn recharge_end(&self) -> u32 {
-        self.last_update + self.recharge_remaining
+        self.last_update + (self.recharge_remaining as f32 / self.recharge_rate) as u32
     }
 
     /// Returns the recharge progress.
