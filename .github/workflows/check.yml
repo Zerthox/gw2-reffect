@@ -7,13 +7,13 @@ on:
       - main
     paths:
       - reffect/**
-      - reffect_api/**
+      - reffect_core/**
       - reffect_internal/**
       - Cargo.toml
   pull_request:
     paths:
       - reffect/**
-      - reffect_api/**
+      - reffect_core/**
       - reffect_internal/**
       - Cargo.toml
 
