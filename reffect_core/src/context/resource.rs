@@ -20,40 +20,6 @@ impl Resource {
     pub const fn new(current: u32, max: u32) -> Self {
         Self { current, max }
     }
-
-    /// Creates a resource from interpolated values (ceiling).
-    #[inline]
-    pub fn interpolated_ceil(amount: f32, max: f32, gain: f32, passed: u32) -> Resource {
-        let passed = passed as f32 / 1000.0;
-        let current = amount + passed * gain;
-        Resource::new(
-            if current < 0.0 {
-                0
-            } else if current > max {
-                max.ceil() as u32
-            } else {
-                current.ceil() as u32
-            },
-            max.ceil() as u32,
-        )
-    }
-
-    /// Creates a resource from interpolated values (flooring).
-    #[inline]
-    pub fn interpolated_floor(amount: f32, max: f32, gain: f32, passed: u32) -> Resource {
-        let passed = passed as f32 / 1000.0;
-        let current = amount + passed * gain;
-        Resource::new(
-            if current < 0.0 {
-                0
-            } else if current > max {
-                max.floor() as u32
-            } else {
-                current.floor() as u32
-            },
-            max.floor() as u32,
-        )
-    }
 }
 
 impl Default for Resource {
