@@ -60,14 +60,14 @@ impl Addon {
         if addon.settings.save_on_unload {
             addon.save_packs();
         }
-        if let Some(worker) = addon.worker.take() {
-            worker.exit_and_wait();
-        }
-        drop(addon);
 
         Internal::deinit();
 
         TextureManager::unload();
+
+        if let Some(worker) = addon.worker.take() {
+            worker.exit_and_wait();
+        }
     }
 
     pub fn create_dirs() {
