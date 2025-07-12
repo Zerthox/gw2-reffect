@@ -32,7 +32,7 @@ impl TraitTrigger {
 
 impl Trigger for TraitTrigger {
     fn is_active(&mut self, ctx: &Context) -> bool {
-        if ctx.has_update(Update::Identity) {
+        if ctx.has_update(Update::Traits) {
             self.update(ctx);
         }
         self.active

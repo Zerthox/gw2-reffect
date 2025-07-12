@@ -169,4 +169,7 @@ pub enum Update {
 
     /// Map update.
     Map = 1 << 2,
+
+    /// Traits update.
+    Traits = 1 << 3,
 }
