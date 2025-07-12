@@ -1,3 +1,4 @@
+use microseh::{Exception, ExceptionCode};
 use std::result;
 use thiserror::Error;
 
@@ -9,6 +10,9 @@ pub enum Error {
     #[default]
     #[error("Disabled")]
     Disabled,
+
+    #[error("No handler")]
+    NoHandler,
 
     #[error("No Mumble link")]
     NoMumble,
@@ -72,4 +76,22 @@ pub enum Error {
 
     #[error("Windows error: {0}")]
     Windows(windows::core::Error),
+
+    #[error("Exception at {address:?}: {code}")]
+    Exception {
+        code: ExceptionCode,
+        address: *mut (),
+    },
+}
+
+unsafe impl Send for Error {}
+
+impl From<Exception> for Error {
+    #[inline]
+    fn from(exception: Exception) -> Self {
+        Self::Exception {
+            code: exception.code(),
+            address: exception.address().cast(),
+        }
+    }
 }

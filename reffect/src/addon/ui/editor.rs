@@ -99,9 +99,11 @@ impl Addon {
         render_errors(
             ui,
             [
+                ("Weapons", ctx.player.weapons.as_ref().err()),
+                ("Traits", ctx.player.traits.as_ref().err()),
                 ("Resources", ctx.player.resources.as_ref().err()),
                 ("Skills", ctx.player.skillbar.as_ref().err()),
-                ("Own Buffs", ctx.player.buff_info.as_ref().err()),
+                ("Buffs", ctx.player.buff_info.as_ref().err()),
             ],
         );
     }

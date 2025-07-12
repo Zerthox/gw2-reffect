@@ -14,6 +14,7 @@ nexus = { git = "https://github.com/zerthox/nexus-rs", features = [
     "mumble_json",
 ] }
 num_enum = "0.7.1"
+microseh = { workspace = true }
 partial = { git = "https://github.com/zerthox/partial-rs" }
 serde = { workspace = true }
 serde_json = { workspace = true }
