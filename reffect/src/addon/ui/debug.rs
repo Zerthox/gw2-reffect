@@ -131,8 +131,8 @@ impl Addon {
                     for (i, member) in group.members.iter().enumerate() {
                         ui.text(format!("Group Member {}:", i + 1));
                         ui.same_line();
-                        if let Some(member) = member {
-                            ui.text(member.account.strip_prefix(':').unwrap_or(&member.account));
+                        if let Some(acc) = &member.account {
+                            ui.text(acc.strip_prefix(':').unwrap_or(acc));
                         } else {
                             ui.text("-");
                         }

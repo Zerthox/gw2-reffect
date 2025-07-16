@@ -9,7 +9,7 @@ pub struct GroupInfo {
     pub group_type: GroupType,
 
     /// Group members.
-    pub members: GroupMembers,
+    pub members: [GroupMember; 4],
 }
 
 impl GroupInfo {
@@ -21,13 +21,16 @@ impl GroupInfo {
     pub const fn empty() -> Self {
         Self {
             group_type: GroupType::Solo,
-            members: [const { None }; Self::MAX_MEMBERS],
+            members: [const { GroupMember::empty() }; Self::MAX_MEMBERS],
         }
     }
 }
 
-/// Group Members.
-pub type GroupMembers = [Option<GroupMember>; GroupInfo::MAX_MEMBERS];
+impl Default for GroupInfo {
+    fn default() -> Self {
+        Self::empty()
+    }
+}
 
 /// Group type.
 #[derive(
@@ -57,7 +60,7 @@ pub enum GroupType {
 #[derive(Debug, Clone)]
 pub struct GroupMember {
     /// Group member account name.
-    pub account: String,
+    pub account: Option<String>,
 
     /// Group member health.
     pub resources: Result<GroupMemberResources, Error>,
@@ -68,9 +71,9 @@ pub struct GroupMember {
 
 impl GroupMember {
     #[inline]
-    pub const fn new() -> Self {
+    pub const fn empty() -> Self {
         Self {
-            account: String::new(),
+            account: None,
             resources: Err(Error::Disabled),
             buffs: Err(Error::Disabled),
         }
@@ -80,7 +83,7 @@ impl GroupMember {
 impl Default for GroupMember {
     #[inline]
     fn default() -> Self {
-        Self::new()
+        Self::empty()
     }
 }
 
