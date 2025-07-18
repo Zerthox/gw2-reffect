@@ -172,4 +172,7 @@ pub enum Update {
 
     /// Traits update.
     Traits = 1 << 3,
+
+    /// Gear update.
+    Gear = 1 << 4,
 }
