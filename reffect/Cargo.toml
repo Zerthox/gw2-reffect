@@ -33,3 +33,6 @@ crate-type = ["cdylib"]
 [package.metadata.winresource]
 ProductName = "Reffect"
 OriginalFilename = "reffect.dll"
+
+[features]
+profile = ["reffect_core/profile", "reffect_internal/profile"]

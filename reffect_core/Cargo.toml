@@ -25,3 +25,6 @@ windows = { workspace = true, features = [
     "Win32_Media",
     "Win32_Graphics_Direct3D11",
 ] }
+
+[features]
+profile = []

@@ -1,5 +1,5 @@
 use super::VisitMut;
-use crate::{context::Context, elements::Pack, trigger::FilterTrigger};
+use crate::{context::Context, elements::Pack, profiling::measure, trigger::FilterTrigger};
 
 #[derive(Debug, Clone)]
 pub struct FilterUpdater<'ctx> {
@@ -9,7 +9,13 @@ pub struct FilterUpdater<'ctx> {
 impl<'ctx> FilterUpdater<'ctx> {
     pub fn update(ctx: &'ctx Context, packs: &mut [Pack]) {
         log::debug!("Updating filters for map id {}", ctx.map.id);
-        Self { ctx }.visit_packs(packs);
+
+        measure(
+            || Self { ctx }.visit_packs(packs),
+            |elapsed| {
+                log::debug!("Filter update took {elapsed:?}");
+            },
+        );
     }
 }
 

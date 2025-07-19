@@ -10,6 +10,7 @@ pub mod interval;
 pub mod links;
 pub mod lockbox;
 pub mod named;
+pub mod profiling;
 pub mod serde;
 pub mod util;
 pub mod worker;

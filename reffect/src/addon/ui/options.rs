@@ -52,6 +52,16 @@ impl Addon {
                 }
 
                 ui.checkbox("Debug window", &mut self.debug);
+
+                #[cfg(feature = "profile")]
+                {
+                    use reffect_core::profiling;
+
+                    let mut enabled = profiling::enabled();
+                    if ui.checkbox("Profiling", &mut enabled) {
+                        profiling::toggle(enabled);
+                    }
+                }
             }
         }
     }

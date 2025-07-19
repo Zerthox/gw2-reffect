@@ -9,7 +9,7 @@ mod ui;
 
 pub use self::{edit::*, group::*, map::*, player::*, resource::*, skill::*, target::*, ui::*};
 
-use crate::{error::Error, links::Links, worker::StoppableWorker};
+use crate::{error::Error, links::Links, profiling::measure, worker::StoppableWorker};
 use enumflags2::{BitFlags, bitflags};
 use std::{
     sync::{Mutex, MutexGuard},
@@ -92,23 +92,28 @@ impl Context {
 
     /// Performs a slow update.
     pub fn update_slow(&mut self, links: &Links) {
-        if let Some(mumble) = links.mumble() {
-            // only attempt to parse identity after first tick
-            if mumble.read_ui_tick() > 0 {
-                match mumble.parse_identity() {
-                    Ok(identity) => {
-                        self.updates.insert(Update::Identity);
-                        self.player.update_identity(identity);
-                    }
-                    Err(err) => log::error!("Failed to parse mumble identity: {err}"),
-                }
+        measure(
+            || {
+                if let Some(mumble) = links.mumble() {
+                    // only attempt to parse identity after first tick
+                    if mumble.read_ui_tick() > 0 {
+                        match mumble.parse_identity() {
+                            Ok(identity) => {
+                                self.updates.insert(Update::Identity);
+                                self.player.update_identity(identity);
+                            }
+                            Err(err) => log::error!("Failed to parse mumble identity: {err}"),
+                        }
 
-                let map_changed = self.map.update(mumble);
-                if map_changed {
-                    self.updates.insert(Update::Map);
+                        let map_changed = self.map.update(mumble);
+                        if map_changed {
+                            self.updates.insert(Update::Map);
+                        }
+                    }
                 }
-            }
-        }
+            },
+            |elapsed| log::debug!("Slow context update took {elapsed:?}"),
+        )
     }
 
     /// Resets the context.
