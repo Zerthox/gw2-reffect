@@ -99,7 +99,7 @@ impl ProgressActive {
     /// Creates a resource progress for edit mode.
     pub const fn edit_resource(progress: f32, max: f32) -> Self {
         Self::Fixed {
-            current: (progress * max as f32),
+            current: (progress * max),
             max,
         }
     }

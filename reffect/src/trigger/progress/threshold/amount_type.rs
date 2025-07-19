@@ -50,12 +50,12 @@ impl AmountType {
             Self::Intensity => active.intensity() as f32,
             Self::Duration => active
                 .current(ProgressValue::Primary, ctx.now)
-                .map(|current| current as f32 / 1000.0)
+                .map(|current| current / 1000.0)
                 .unwrap_or(f32::INFINITY),
             Self::Percent => 100.0 * active.progress_or_default(ProgressValue::Primary, ctx.now),
             Self::SecondaryDuration => active
                 .current(ProgressValue::Secondary, ctx.now)
-                .map(|current| current as f32 / 1000.0)
+                .map(|current| current / 1000.0)
                 .unwrap_or(f32::INFINITY),
             &Self::SecondaryPercent => {
                 100.0 * active.progress_or_default(ProgressValue::Secondary, ctx.now)
