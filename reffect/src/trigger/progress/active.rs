@@ -9,8 +9,8 @@ use crate::{
 #[derive(Debug, Clone)]
 pub enum ProgressActive {
     Fixed {
-        current: u32,
-        max: u32,
+        current: f32,
+        max: f32,
     },
     Buff {
         id: u32,
@@ -33,7 +33,10 @@ pub enum ProgressActive {
 impl ProgressActive {
     /// Creates a dummy active progress.
     pub const fn dummy() -> Self {
-        Self::Fixed { current: 1, max: 1 }
+        Self::Fixed {
+            current: 1.0,
+            max: 1.0,
+        }
     }
 
     /// Creates an empty timed active progress.
@@ -94,9 +97,9 @@ impl ProgressActive {
     }
 
     /// Creates a resource progress for edit mode.
-    pub const fn edit_resource(progress: f32, max: u32) -> Self {
+    pub const fn edit_resource(progress: f32, max: f32) -> Self {
         Self::Fixed {
-            current: (progress * max as f32) as u32,
+            current: (progress * max as f32),
             max,
         }
     }
@@ -149,7 +152,7 @@ impl ProgressActive {
     /// Returns the intensity (alternative progress).
     pub const fn intensity(&self) -> u32 {
         match *self {
-            Self::Fixed { current, .. } => current,
+            Self::Fixed { current, .. } => current as u32,
             Self::Buff { stacks, .. } => stacks,
             Self::Ability { ammo, .. } => ammo,
         }
@@ -167,10 +170,10 @@ impl ProgressActive {
     pub fn progress(&self, value: ProgressValue, now: u32) -> Option<f32> {
         self.current(value, now).map(|current| {
             match (current, self.max(value)) {
-                (0, 0) => 0.0, // treat 0/0 as 0% progress
-                (_, 0) => 1.0, // treat x/0 as 100% progress
+                (0.0, 0.0) => 0.0, // treat 0/0 as 0% progress
+                (_, 0.0) => 1.0,   // treat x/0 as 100% progress
                 (current, max) => {
-                    let progress = current as f32 / max as f32;
+                    let progress = current / max;
                     if self.is_inverted() {
                         1.0 - progress
                     } else {
@@ -187,20 +190,18 @@ impl ProgressActive {
     }
 
     /// Returns the current amount in its native unit.
-    pub fn current(&self, value: ProgressValue, now: u32) -> Option<u32> {
+    pub fn current(&self, value: ProgressValue, now: u32) -> Option<f32> {
         match *self {
             Self::Fixed { current, .. } => Some(current),
-            Self::Buff { end, .. } => (end != u32::MAX).then(|| Self::time_between(now, end)),
+            Self::Buff { end, .. } => {
+                (end != u32::MAX).then(|| Self::time_between(now, end) as f32)
+            }
             Self::Ability {
                 end,
                 ammo_end,
                 rate,
                 ..
-            } => Some(Self::time_between_scaled(
-                now,
-                value.pick(end, ammo_end),
-                rate,
-            )),
+            } => Some(Self::time_between_scaled(now, value.pick(end, ammo_end), rate) as f32),
         }
     }
 
@@ -234,15 +235,15 @@ impl ProgressActive {
     }
 
     /// Returns the maximum amount in its native unit.
-    pub fn max(&self, value: ProgressValue) -> u32 {
+    pub fn max(&self, value: ProgressValue) -> f32 {
         match *self {
             Self::Fixed { max, .. } => max,
-            Self::Buff { duration, .. } => duration,
+            Self::Buff { duration, .. } => duration as f32,
             Self::Ability {
                 recharge,
                 ammo_recharge,
                 ..
-            } => value.pick(recharge, ammo_recharge),
+            } => value.pick(recharge, ammo_recharge) as f32,
         }
     }
 
@@ -291,7 +292,7 @@ impl TryFrom<Resource> for ProgressActive {
 
     fn try_from(resource: Resource) -> Result<Self, Self::Error> {
         let Resource { current, max } = resource;
-        if max != 0 {
+        if max != 0.0 {
             Ok(Self::Fixed { current, max })
         } else {
             Err(())

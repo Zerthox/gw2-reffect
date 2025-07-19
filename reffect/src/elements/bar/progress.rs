@@ -32,11 +32,11 @@ pub enum Progress {
 }
 
 impl Progress {
-    pub fn calc_progress(&self, ctx: &Context, active: &ProgressActive, max: u32) -> f32 {
+    pub fn calc_progress(&self, ctx: &Context, active: &ProgressActive, max: f32) -> f32 {
         match self {
             Self::Intensity => {
-                if max > 0 {
-                    active.intensity() as f32 / max as f32
+                if max > 0.0 {
+                    active.intensity() as f32 / max
                 } else {
                     0.0
                 }
@@ -48,7 +48,7 @@ impl Progress {
         }
     }
 
-    pub fn progress_max(&self, active: &ProgressActive, max: u32) -> u32 {
+    pub fn progress_max(&self, active: &ProgressActive, max: f32) -> f32 {
         match self {
             Self::Intensity => max,
             Self::Duration => active.max(ProgressValue::Primary),

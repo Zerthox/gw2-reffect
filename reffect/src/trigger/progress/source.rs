@@ -121,8 +121,8 @@ impl ProgressSource {
             Self::Defiance => {
                 let resources = ctx.player.resources.as_ref().ok()?;
                 Some(ProgressActive::Fixed {
-                    current: resources.defiance? as u32,
-                    max: 100,
+                    current: resources.defiance?,
+                    max: 100.0,
                 })
             }
             Self::Endurance => {
@@ -165,11 +165,11 @@ impl ProgressSource {
                     .unwrap_or_default();
                 ProgressActive::edit_ability(skill, progress, ctx.now)
             }
-            Self::Health => ProgressActive::edit_resource(progress, 15_000),
-            Self::Barrier => ProgressActive::edit_resource(0.5 * progress, 15_000),
-            Self::Defiance | Self::Endurance => ProgressActive::edit_resource(progress, 100),
+            Self::Health => ProgressActive::edit_resource(progress, 15_000.0),
+            Self::Barrier => ProgressActive::edit_resource(0.5 * progress, 15_000.0),
+            Self::Defiance | Self::Endurance => ProgressActive::edit_resource(progress, 100.0),
             Self::PrimaryResource | Self::SecondaryResource => {
-                ProgressActive::edit_resource(progress, 30)
+                ProgressActive::edit_resource(progress, 30.0)
             }
         }
     }

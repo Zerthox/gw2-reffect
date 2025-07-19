@@ -173,7 +173,7 @@ impl Icon {
                     } = *settings;
 
                     let threshold = settings.threshold(active);
-                    if remain < threshold {
+                    if remain < threshold as f32 {
                         let text = active.current_text(
                             ProgressValue::Primary,
                             ctx.now,

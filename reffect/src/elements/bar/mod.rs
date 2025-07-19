@@ -11,7 +11,7 @@ use crate::{
     elements::Common,
     render::{
         Bounds, ComponentWise, Rect, enum_combo, helper, helper_slider, input_color_alpha,
-        input_float_with_format, input_percent, input_positive_with_format, input_size, input_u32,
+        input_float_with_format, input_percent, input_positive_with_format, input_size,
         slider_percent,
     },
     tree::TreeNode,
@@ -27,7 +27,7 @@ use serde::{Deserialize, Serialize};
 pub struct Bar {
     #[serde(alias = "progress")]
     pub progress_kind: Progress,
-    pub max: u32,
+    pub max: f32,
 
     #[serde(flatten)]
     pub props: Props<BarProps>,
@@ -129,7 +129,14 @@ impl Bar {
         );
 
         if let Progress::Intensity = self.progress_kind {
-            input_u32(ui, "Max", &mut self.max, 1, 10);
+            input_positive_with_format(
+                "Max",
+                &mut self.max,
+                1.0,
+                10.0,
+                "%.1f",
+                InputTextFlags::empty(),
+            );
             helper(ui, || ui.text("Maximum progress value"));
         }
 
@@ -244,7 +251,7 @@ impl Default for Bar {
     fn default() -> Self {
         Self {
             progress_kind: Progress::default(),
-            max: 25,
+            max: 25.0,
             props: Props::default(),
             align: Align::Center,
             size: [128.0, 12.0],
