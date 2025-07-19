@@ -47,6 +47,9 @@ pub enum ProgressSource {
     /// Barrier.
     Barrier,
 
+    // Defiance
+    Defiance,
+
     /// Endurance.
     Endurance,
 
@@ -115,6 +118,13 @@ impl ProgressSource {
                 let resources = ctx.player.resources.as_ref().ok()?;
                 resources.barrier.clone().try_into().ok()
             }
+            Self::Defiance => {
+                let resources = ctx.player.resources.as_ref().ok()?;
+                Some(ProgressActive::Fixed {
+                    current: resources.defiance? as u32,
+                    max: 100,
+                })
+            }
             Self::Endurance => {
                 let resources = ctx.player.resources.as_ref().ok()?;
                 resources.endurance.clone().try_into().ok()
@@ -157,7 +167,7 @@ impl ProgressSource {
             }
             Self::Health => ProgressActive::edit_resource(progress, 15_000),
             Self::Barrier => ProgressActive::edit_resource(0.5 * progress, 15_000),
-            Self::Endurance => ProgressActive::edit_resource(progress, 100),
+            Self::Defiance | Self::Endurance => ProgressActive::edit_resource(progress, 100),
             Self::PrimaryResource | Self::SecondaryResource => {
                 ProgressActive::edit_resource(progress, 30)
             }

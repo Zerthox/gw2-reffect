@@ -4,6 +4,7 @@ use nexus::imgui::{ComboBoxFlags, Selectable, StyleColor, StyleVar, Ui};
 use std::mem;
 use strum::VariantArray;
 
+// TODO: const with fixed size array for check
 pub trait EnumStaticVariants: Sized {
     fn with_variants<R>(action: impl FnOnce(&[Self]) -> R) -> R;
 }
