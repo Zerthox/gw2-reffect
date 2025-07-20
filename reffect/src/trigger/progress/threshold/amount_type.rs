@@ -80,7 +80,7 @@ impl AmountType {
                     InputTextFlags::empty(),
                 );
                 if changed {
-                    *value = value.round();
+                    *value = value.round_ties_even();
                 }
                 helper(ui, || {
                     ui.text("Intensity in stacks or resource units");

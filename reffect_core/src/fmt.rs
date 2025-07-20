@@ -84,18 +84,6 @@ impl<T> Unit<T> {
     {
         Self(value).to_string()
     }
-
-    pub fn format_if(value: T, unit: bool) -> String
-    where
-        T: fmt::Display,
-        Self: fmt::Display,
-    {
-        if unit {
-            Self::format(value)
-        } else {
-            value.to_string()
-        }
-    }
 }
 
 impl fmt::Display for Unit<f32> {
@@ -105,7 +93,7 @@ impl fmt::Display for Unit<f32> {
             Self::GIGA.. => write!(f, "{:.2}B", value / Self::GIGA),
             Self::MEGA.. => write!(f, "{:.2}M", value / Self::MEGA),
             Self::KILO.. => write!(f, "{:.1}k", value / Self::KILO),
-            _ => write!(f, "{value:.0}"),
+            _ => write!(f, "{:.}", (value * 10.0).round_ties_even() / 10.0),
         }
     }
 }

@@ -97,9 +97,9 @@ impl ProgressActive {
     }
 
     /// Creates a resource progress for edit mode.
-    pub const fn edit_resource(progress: f32, max: f32) -> Self {
+    pub fn edit_resource(progress: f32, max: f32) -> Self {
         Self::Fixed {
-            current: (progress * max),
+            current: (progress * max).round_ties_even(),
             max,
         }
     }
@@ -214,7 +214,13 @@ impl ProgressActive {
         settings: &FormatSettings,
     ) -> String {
         match *self {
-            Self::Fixed { current, .. } => Unit::format_if(current, unit),
+            Self::Fixed { current, .. } => {
+                if unit {
+                    Unit::format(current)
+                } else {
+                    current.round_ties_even().to_string()
+                }
+            }
             Self::Buff { end, .. } => {
                 if end == u32::MAX {
                     "?".into()
@@ -250,7 +256,13 @@ impl ProgressActive {
     /// Returns the maximum amount as text.
     pub fn max_text(&self, value: ProgressValue, unit: bool, settings: &FormatSettings) -> String {
         match *self {
-            Self::Fixed { max, .. } => Unit::format_if(max, unit),
+            Self::Fixed { max, .. } => {
+                if unit {
+                    Unit::format(max)
+                } else {
+                    max.round_ties_even().to_string()
+                }
+            }
             Self::Buff { duration, .. } => {
                 if duration != u32::MAX {
                     Self::duration_text(duration, settings)

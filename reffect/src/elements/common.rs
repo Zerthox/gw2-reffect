@@ -147,7 +147,7 @@ impl Common {
                 if self.dragging {
                     let change = ui.window_pos().sub(window_pos);
                     let [new_x, new_y] = self.pos.add(change);
-                    self.pos = [new_x.round(), new_y.round()];
+                    self.pos = [new_x.round_ties_even(), new_y.round_ties_even()];
                 }
             });
     }
