@@ -44,8 +44,8 @@ impl Element {
     /// Renders the element.
     pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, parent: &Common) {
         if self.common.is_visible(ctx) {
-            let _token = ctx.push_element(ui, &self.common);
-            if self.filter.is_active_or_edit(ctx) {
+            let _token = ctx.push_child(ui, &self.common);
+            if ctx.edit.is_editing() || self.filter.is_active(ctx) {
                 let _style = self.common.push_style(ui);
                 self.common.update(ctx, parent.trigger.active());
 
@@ -160,7 +160,7 @@ impl Element {
     /// Renders the element options.
     pub fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) {
         if let Some(_token) = ui.tab_bar(self.common.id_string()) {
-            let _token = ctx.push_element(ui, &self.common);
+            let _token = ctx.push_child(ui, &self.common);
             if let Some(_token) = ui.tab_item(&self.kind) {
                 self.common.render_options(ui);
                 ui.spacing();

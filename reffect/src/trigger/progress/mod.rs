@@ -42,30 +42,24 @@ impl ProgressTrigger {
         }
     }
 
-    pub fn update(&mut self, ctx: &Context, edited: bool, parent: Option<&ProgressActive>) {
+    pub fn update(&mut self, ctx: &Context, parent: Option<&ProgressActive>) {
         if ctx.has_update_or_edit(Update::Game) {
             // TODO: end of edit causes memo to "flash", maybe flag to end edit mode?
-            self.active_memo = self.active_updated(ctx, edited, parent);
+            self.active_memo = self.active_updated(ctx, parent);
         }
     }
 
     fn active_updated(
         &mut self,
         ctx: &Context,
-        edited: bool,
         parent: Option<&ProgressActive>,
     ) -> Option<ProgressActive> {
         if ctx.edit.is_editing() {
-            if edited {
-                Some(self.source.progress_edit(ctx, parent))
-            } else {
-                None
-            }
+            Some(self.source.progress_edit(ctx, parent))
         } else {
-            self.source
-                .progress(ctx, parent)
-                .filter(|active| self.source.no_threshold() || self.threshold.is_met(active, ctx))
+            self.source.progress(ctx, parent)
         }
+        .filter(|active| self.source.no_threshold() || self.threshold.is_met(active, ctx))
     }
 
     pub fn active(&self) -> Option<&ProgressActive> {

@@ -27,8 +27,12 @@ pub struct ListIcon {
 impl ListIcon {
     pub fn is_visible(&mut self, ctx: &RenderCtx, common: &Common) -> bool {
         let parent = common.trigger.active();
-        self.trigger.update(ctx, ctx.is_edited(), parent);
-        self.enabled && self.trigger.active().is_some() && self.filter.is_active_or_edit(ctx)
+        self.trigger.update(ctx, parent);
+        if ctx.edit.is_editing() {
+            self.enabled && ctx.is_edited()
+        } else {
+            self.enabled && self.trigger.active().is_some() && self.filter.is_active(ctx)
+        }
     }
 
     pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, size: [f32; 2]) {

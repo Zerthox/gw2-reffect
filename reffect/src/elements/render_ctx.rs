@@ -1,8 +1,7 @@
-use std::cell::Cell;
-
 use super::Common;
 use crate::{context::Context, elements::Anchor, render::ComponentWise, settings::GeneralSettings};
 use nexus::imgui::Ui;
+use std::{cell::Cell, ops::Deref};
 
 // TODO: add tint + opacity as color, scale, use instead of imgui globals?
 // TODO: add screen anchor, pos only relative, apply scale before final render?
@@ -36,11 +35,15 @@ impl<'a> RenderCtx<'a> {
         }
     }
 
-    /// Creates a new render context for an element.
-    pub fn push_element(&self, ui: &Ui, common: &Common) -> Token {
+    /// Creates a new render context for a child.
+    pub fn push_child(&self, ui: &Ui, common: &Common) -> Token {
         let token = Token::capture(self);
-        self.edit
-            .set(self.is_edited() | self.context.edit.is_edited_or_parent(common.id));
+        let edited = if self.context.edit.settings.show_all {
+            self.context.edit.is_edited_or_parent(common.id)
+        } else {
+            self.context.edit.is_edited(common.id)
+        };
+        self.edit.set(self.is_edited() || edited);
         self.pos.set(common.pos(ui, self.pos()));
         token
     }
@@ -63,7 +66,7 @@ impl<'a> RenderCtx<'a> {
     }
 }
 
-impl std::ops::Deref for RenderCtx<'_> {
+impl Deref for RenderCtx<'_> {
     type Target = Context;
 
     fn deref(&self) -> &Self::Target {

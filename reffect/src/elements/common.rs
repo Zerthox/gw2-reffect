@@ -3,7 +3,8 @@ use crate::{
     action::ChildElementAction,
     clipboard::Clipboard,
     colors,
-    context::{Context, EditState},
+    context::EditState,
+    elements::RenderCtx,
     id::Id,
     render::{
         ComponentWise, EnumStaticVariants, Rect, confirm_modal, helper_slider, input_percent,
@@ -52,8 +53,12 @@ impl Common {
         self.id.to_string()
     }
 
-    pub fn is_visible(&self, ctx: &Context) -> bool {
-        self.enabled || ctx.edit.is_edited_or_parent(self.id)
+    pub fn is_visible(&self, ctx: &RenderCtx) -> bool {
+        if ctx.edit.is_editing() {
+            (self.enabled && ctx.is_edited()) || ctx.edit.is_selected_or_parent(self.id)
+        } else {
+            self.enabled
+        }
     }
 
     pub fn pos(&self, ui: &Ui, parent_pos: [f32; 2]) -> [f32; 2] {
@@ -64,17 +69,8 @@ impl Common {
         self.pos(ui, Anchor::root(ui))
     }
 
-    pub fn is_edit_visible(&self, ctx: &Context) -> bool {
-        if ctx.edit.settings.show_all {
-            ctx.edit.is_edited_or_parent(self.id)
-        } else {
-            ctx.edit.is_edited(self.id)
-        }
-    }
-
-    pub fn update(&mut self, ctx: &Context, parent_active: Option<&ProgressActive>) {
-        self.trigger
-            .update(ctx, self.is_edit_visible(ctx), parent_active);
+    pub fn update(&mut self, ctx: &RenderCtx, parent_active: Option<&ProgressActive>) {
+        self.trigger.update(ctx, parent_active);
     }
 
     pub fn push_style<'ui>(&self, ui: &'ui Ui) -> impl Drop + 'ui {
