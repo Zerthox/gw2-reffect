@@ -4,6 +4,7 @@ use crate::{
     elements::{PartialProps, RenderCtx},
     render::{input_color_alpha, input_optional, input_percent},
 };
+use const_default::ConstDefault;
 use nexus::imgui::Ui;
 use partial::Partial;
 use serde::{Deserialize, Serialize};
@@ -18,13 +19,17 @@ pub struct TextProps {
     pub decoration: TextDecoration,
 }
 
+impl ConstDefault for TextProps {
+    const DEFAULT: Self = Self {
+        scale: 1.0,
+        color: colors::WHITE,
+        decoration: TextDecoration::DEFAULT,
+    };
+}
+
 impl Default for TextProps {
     fn default() -> Self {
-        Self {
-            scale: 1.0,
-            color: colors::WHITE,
-            decoration: TextDecoration::default(),
-        }
+        Self::DEFAULT
     }
 }
 

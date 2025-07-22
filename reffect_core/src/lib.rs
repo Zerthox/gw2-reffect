@@ -3,6 +3,7 @@
 pub mod chat_code;
 pub mod colors;
 pub mod context;
+pub mod enums;
 pub mod error;
 pub mod fmt;
 pub mod id;

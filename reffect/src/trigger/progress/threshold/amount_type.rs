@@ -3,13 +3,13 @@ use crate::{
     render::{enum_combo, helper, input_float_with_format},
     trigger::{ProgressActive, ProgressValue},
 };
+use const_default::ConstDefault;
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Slider, SliderFlags, Ui};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
 
 #[derive(
     Debug,
-    Default,
     Clone,
     Copy,
     PartialEq,
@@ -27,7 +27,6 @@ use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
 )]
 pub enum AmountType {
     /// Intensity.
-    #[default]
     Intensity,
 
     /// Duration.
@@ -42,6 +41,16 @@ pub enum AmountType {
 
     #[strum(serialize = "Secondary Progress %")]
     SecondaryPercent,
+}
+
+impl ConstDefault for AmountType {
+    const DEFAULT: Self = Self::Intensity;
+}
+
+impl Default for AmountType {
+    fn default() -> Self {
+        Self::DEFAULT
+    }
 }
 
 impl AmountType {
@@ -117,9 +126,7 @@ impl AmountType {
             }
         }
     }
-}
 
-impl AmountType {
     pub fn render_options(&mut self, ui: &Ui) -> Option<Self> {
         let result = enum_combo(ui, "Amount type", self, ComboBoxFlags::empty());
         helper(ui, || ui.text("Type of amount to check"));

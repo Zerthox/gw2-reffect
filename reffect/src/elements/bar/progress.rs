@@ -2,12 +2,12 @@ use crate::{
     context::Context,
     trigger::{ProgressActive, ProgressValue},
 };
+use const_default::ConstDefault;
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, VariantArray};
 
 #[derive(
     Debug,
-    Default,
     Clone,
     Copy,
     PartialEq,
@@ -24,11 +24,20 @@ use strum::{AsRefStr, EnumIter, VariantArray};
 pub enum Progress {
     Intensity,
 
-    #[default]
     Duration,
 
     #[strum(serialize = "Secondary Duration")]
     SecondaryDuration,
+}
+
+impl ConstDefault for Progress {
+    const DEFAULT: Self = Self::Duration;
+}
+
+impl Default for Progress {
+    fn default() -> Self {
+        Self::DEFAULT
+    }
 }
 
 impl Progress {

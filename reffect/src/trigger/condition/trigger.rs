@@ -1,15 +1,19 @@
 use super::ProgressActive;
 use crate::{
     context::Context,
-    render::{enum_combo, impl_static_variants},
+    enums::check_variant_array,
+    render::enum_combo,
     trigger::{MapTrigger, PlayerTrigger, ProgressThreshold, Trigger},
 };
+use const_default::ConstDefault;
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 use std::{fmt, mem};
-use strum::{AsRefStr, EnumIter, IntoStaticStr};
+use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 
-#[derive(Debug, Clone, PartialEq, AsRefStr, IntoStaticStr, EnumIter, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, PartialEq, AsRefStr, IntoStaticStr, EnumIter, EnumCount, Serialize, Deserialize,
+)]
 pub enum ConditionTrigger {
     #[strum(serialize = "Trigger Threshold")]
     ProgressThreshold(ProgressThreshold),
@@ -19,7 +23,25 @@ pub enum ConditionTrigger {
     Map(MapTrigger),
 }
 
-impl_static_variants!(ConditionTrigger);
+impl VariantArray for ConditionTrigger {
+    const VARIANTS: &'static [Self] = &[
+        Self::ProgressThreshold(ProgressThreshold::DEFAULT),
+        Self::Player(PlayerTrigger::DEFAULT),
+        Self::Map(MapTrigger::DEFAULT),
+    ];
+}
+
+const _: () = check_variant_array::<ConditionTrigger>();
+
+impl ConstDefault for ConditionTrigger {
+    const DEFAULT: Self = Self::ProgressThreshold(ProgressThreshold::DEFAULT);
+}
+
+impl Default for ConditionTrigger {
+    fn default() -> Self {
+        Self::DEFAULT
+    }
+}
 
 impl ConditionTrigger {
     pub fn is_active(&mut self, ctx: &Context, active: &ProgressActive) -> bool {
@@ -32,12 +54,6 @@ impl ConditionTrigger {
 
     pub fn is_same_type(&self, other: &Self) -> bool {
         mem::discriminant(self) == mem::discriminant(other)
-    }
-}
-
-impl Default for ConditionTrigger {
-    fn default() -> Self {
-        Self::ProgressThreshold(ProgressThreshold::default())
     }
 }
 

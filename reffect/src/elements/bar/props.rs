@@ -3,6 +3,7 @@ use crate::{
     elements::PartialProps,
     render::{input_color_alpha, input_optional, input_percent, input_positive_with_format},
 };
+use const_default::ConstDefault;
 use nexus::imgui::{InputTextFlags, Ui};
 use partial::Partial;
 use serde::{Deserialize, Serialize};
@@ -24,18 +25,22 @@ pub struct BarProps {
     pub tick_color: [f32; 4],
 }
 
+impl ConstDefault for BarProps {
+    const DEFAULT: Self = Self {
+        lower_bound: 0.0,
+        upper_bound: 1.0,
+        fill: colors::GREEN,
+        background: colors::TRANSPARENT,
+        border_size: 1.0,
+        border_color: colors::BLACK,
+        tick_size: 1.0,
+        tick_color: colors::BLACK,
+    };
+}
+
 impl Default for BarProps {
     fn default() -> Self {
-        Self {
-            lower_bound: 0.0,
-            upper_bound: 1.0,
-            fill: colors::GREEN,
-            background: colors::TRANSPARENT,
-            border_size: 1.0,
-            border_color: colors::BLACK,
-            tick_size: 1.0,
-            tick_color: colors::BLACK,
-        }
+        Self::DEFAULT
     }
 }
 

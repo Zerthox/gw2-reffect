@@ -5,6 +5,7 @@ use crate::{
     render::{Bounds, Rect, input_size},
     tree::TreeNode,
 };
+use const_default::ConstDefault;
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
@@ -45,11 +46,15 @@ impl Bounds for IconElement {
     }
 }
 
+impl ConstDefault for IconElement {
+    const DEFAULT: Self = Self {
+        icon: Icon::DEFAULT,
+        size: [32.0, 32.0],
+    };
+}
+
 impl Default for IconElement {
     fn default() -> Self {
-        Self {
-            icon: Icon::default(),
-            size: [32.0, 32.0],
-        }
+        Self::DEFAULT
     }
 }

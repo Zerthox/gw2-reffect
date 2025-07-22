@@ -7,6 +7,7 @@ use crate::{
     },
     trigger::ProgressActive,
 };
+use const_default::ConstDefault;
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
@@ -69,6 +70,10 @@ impl StackTextSettings {
         enum_combo(ui, "Decoration", decoration, ComboBoxFlags::empty());
         input_color_alpha(ui, "Color", color);
     }
+}
+
+impl ConstDefault for StackTextSettings {
+    const DEFAULT: Self = Self::new();
 }
 
 impl Default for StackTextSettings {
@@ -151,6 +156,10 @@ impl DurationTextSettings {
     }
 }
 
+impl ConstDefault for DurationTextSettings {
+    const DEFAULT: Self = Self::new();
+}
+
 impl Default for DurationTextSettings {
     fn default() -> Self {
         Self::new()
@@ -178,6 +187,10 @@ impl DurationBarSettings {
         input_float_with_format("Height", height, 1.0, 10.0, "%.2f", InputTextFlags::empty());
         input_color_alpha(ui, "Color", color);
     }
+}
+
+impl ConstDefault for DurationBarSettings {
+    const DEFAULT: Self = Self::new();
 }
 
 impl Default for DurationBarSettings {

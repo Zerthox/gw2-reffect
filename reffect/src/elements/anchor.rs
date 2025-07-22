@@ -1,7 +1,8 @@
-use crate::render::{enum_combo, impl_static_variants};
+use crate::{enums::check_variant_array, render::enum_combo};
+use const_default::ConstDefault;
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
-use strum::{AsRefStr, EnumIter, VariantArray};
+use strum::{AsRefStr, EnumCount, EnumIter, VariantArray};
 
 /// Anchor point.
 #[derive(
@@ -15,6 +16,7 @@ use strum::{AsRefStr, EnumIter, VariantArray};
     Ord,
     Hash,
     EnumIter,
+    EnumCount,
     AsRefStr,
     Serialize,
     Deserialize,
@@ -26,7 +28,11 @@ pub enum Anchor {
     Screen(ScreenAnchor),
 }
 
-impl_static_variants!(Anchor);
+impl VariantArray for Anchor {
+    const VARIANTS: &'static [Self] = &[Self::Parent, Self::Screen(ScreenAnchor::Center)];
+}
+
+const _: () = check_variant_array::<Anchor>();
 
 impl Anchor {
     /// Calculates the root position.
@@ -57,7 +63,6 @@ impl Anchor {
 /// Screen anchor point.
 #[derive(
     Debug,
-    Default,
     Clone,
     Copy,
     PartialEq,
@@ -84,7 +89,6 @@ pub enum ScreenAnchor {
     #[strum(serialize = "Left Center")]
     LeftCenter,
 
-    #[default]
     Center,
 
     #[strum(serialize = "Right Center")]
@@ -115,6 +119,16 @@ impl ScreenAnchor {
             Self::LeftCenter => [0.0, 0.5 * screen_y],
             Self::RightCenter => [screen_x, 0.5 * screen_y],
         }
+    }
+}
+
+impl ConstDefault for ScreenAnchor {
+    const DEFAULT: Self = Self::Center;
+}
+
+impl Default for ScreenAnchor {
+    fn default() -> Self {
+        Self::DEFAULT
     }
 }
 

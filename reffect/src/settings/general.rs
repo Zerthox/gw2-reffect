@@ -1,5 +1,6 @@
 use super::icon::IconSettings;
 use crate::render::{LoadedFont, helper, input_seconds};
+use const_default::ConstDefault;
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
@@ -45,6 +46,10 @@ impl GeneralSettings {
     }
 }
 
+impl ConstDefault for GeneralSettings {
+    const DEFAULT: Self = Self::new();
+}
+
 impl Default for GeneralSettings {
     fn default() -> Self {
         Self::new()
@@ -83,6 +88,10 @@ impl FormatSettings {
             ui.text("MM:SS format always hides milliseconds");
         });
     }
+}
+
+impl ConstDefault for FormatSettings {
+    const DEFAULT: Self = Self::new();
 }
 
 impl Default for FormatSettings {

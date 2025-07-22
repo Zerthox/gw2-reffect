@@ -4,6 +4,7 @@ use crate::{
     render::{helper, input_trait_id},
     trigger::Trigger,
 };
+use const_default::ConstDefault;
 use nexus::imgui::{InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
 
@@ -86,12 +87,16 @@ impl TraitTrigger {
     }
 }
 
+impl ConstDefault for TraitTrigger {
+    const DEFAULT: Self = Self {
+        traits: Vec::new(),
+        active: true,
+    };
+}
+
 impl Default for TraitTrigger {
     fn default() -> Self {
-        Self {
-            traits: Vec::new(),
-            active: true,
-        }
+        Self::DEFAULT
     }
 }
 
@@ -112,11 +117,15 @@ impl TraitRequirement {
     }
 }
 
+impl ConstDefault for TraitRequirement {
+    const DEFAULT: Self = Self {
+        id: 0,
+        present: true,
+    };
+}
+
 impl Default for TraitRequirement {
     fn default() -> Self {
-        Self {
-            id: 0,
-            present: true,
-        }
+        Self::DEFAULT
     }
 }

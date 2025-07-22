@@ -5,10 +5,11 @@ use crate::{
     colors,
     context::{Context, EditState},
     elements::RenderCtx,
+    enums::EnumStaticVariants,
     id::Id,
     render::{
-        ComponentWise, EnumStaticVariants, Rect, confirm_modal, helper_slider, input_percent,
-        input_pos, push_alpha_change, push_window_clip_rect_fullscreen, slider_percent,
+        ComponentWise, Rect, confirm_modal, helper_slider, input_percent, input_pos,
+        push_alpha_change, push_window_clip_rect_fullscreen, slider_percent,
     },
     serde::migrate,
     trigger::{FilterTrigger, ProgressActive, ProgressTrigger, Trigger},

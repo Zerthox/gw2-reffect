@@ -1,39 +1,8 @@
-use crate::{colors::Colored, named::Named};
+use crate::{colors::Colored, enums::EnumStaticVariants, named::Named};
 use enumflags2::{BitFlag, BitFlags};
 use nexus::imgui::{ComboBoxFlags, Selectable, StyleColor, StyleVar, Ui};
 use std::mem;
 use strum::VariantArray;
-
-// TODO: const with fixed size array for check
-pub trait EnumStaticVariants: Sized {
-    fn with_variants<R>(action: impl FnOnce(&[Self]) -> R) -> R;
-}
-
-impl<T> EnumStaticVariants for T
-where
-    T: VariantArray,
-{
-    fn with_variants<R>(action: impl FnOnce(&[Self]) -> R) -> R {
-        action(Self::VARIANTS)
-    }
-}
-
-/// Helper to implement [`EnumStaticVariants`] for enums already implementing [`IntoEnumIterator`].
-macro_rules! impl_static_variants {
-    ($ty:ty) => {
-        impl $crate::render::EnumStaticVariants for $ty {
-            fn with_variants<R>(action: impl FnOnce(&[Self]) -> R) -> R {
-                use ::std::thread_local;
-                use ::strum::IntoEnumIterator;
-
-                thread_local! { static VARIANTS: Vec<$ty> = <$ty as IntoEnumIterator>::iter().collect(); };
-                VARIANTS.with(|variants| action(variants))
-            }
-        }
-    };
-}
-
-pub(crate) use impl_static_variants;
 
 pub fn enum_combo<T>(
     ui: &Ui,

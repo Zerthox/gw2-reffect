@@ -13,6 +13,7 @@ use crate::{
     tree::TreeNode,
     trigger::{ProgressActive, ProgressValue},
 };
+use const_default::ConstDefault;
 use nexus::imgui::{InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
 use std::{iter::Peekable, str::Chars};
@@ -246,16 +247,20 @@ impl Text {
     }
 }
 
+impl ConstDefault for Text {
+    const DEFAULT: Self = Self {
+        text: String::new(),
+        align: AlignHorizontal::Center,
+        props: Props::DEFAULT,
+        font: LoadedFont::empty(),
+        frequent: false,
+        text_memo: None,
+    };
+}
+
 impl Default for Text {
     fn default() -> Self {
-        Self {
-            text: String::new(),
-            align: AlignHorizontal::Center,
-            props: Props::default(),
-            font: LoadedFont::empty(),
-            frequent: false,
-            text_memo: None,
-        }
+        Self::DEFAULT
     }
 }
 

@@ -7,6 +7,7 @@ use crate::{
     render::{enum_combo_bitflags, helper, input_u32, item_context_menu, map_select},
     serde::bitflags,
 };
+use const_default::ConstDefault;
 use enumflags2::BitFlags;
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
@@ -28,6 +29,21 @@ pub struct MapTrigger {
 
 fn default_true() -> bool {
     true
+}
+
+impl ConstDefault for MapTrigger {
+    const DEFAULT: Self = Self {
+        category: BitFlags::EMPTY,
+        whitelist: true,
+        ids: Vec::new(),
+        active: true,
+    };
+}
+
+impl Default for MapTrigger {
+    fn default() -> Self {
+        Self::DEFAULT
+    }
 }
 
 impl MapTrigger {
@@ -100,16 +116,5 @@ impl MapTrigger {
         }
 
         changed
-    }
-}
-
-impl Default for MapTrigger {
-    fn default() -> Self {
-        Self {
-            category: BitFlags::empty(),
-            whitelist: true,
-            ids: Vec::new(),
-            active: true,
-        }
     }
 }

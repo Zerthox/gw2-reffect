@@ -7,6 +7,7 @@ description = "Customizable effect & resource displays"
 repository = "https://github.com/zerthox/gw2-reffect"
 
 [dependencies]
+const-default = { version = "1.0.0", features = ["std", "derive"] }
 enumflags2 = { workspace = true }
 log = { workspace = true, features = ["release_max_level_debug"] }
 nexus = { git = "https://github.com/zerthox/nexus-rs", features = ["log"] }

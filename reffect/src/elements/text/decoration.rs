@@ -1,4 +1,5 @@
 use crate::render::{ComponentWise, draw_text_bg, enum_combo, helper_warn};
+use const_default::ConstDefault;
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, VariantArray};
@@ -7,7 +8,6 @@ use strum::{AsRefStr, EnumIter, VariantArray};
 
 #[derive(
     Debug,
-    Default,
     Clone,
     Copy,
     PartialEq,
@@ -22,7 +22,6 @@ use strum::{AsRefStr, EnumIter, VariantArray};
     Deserialize,
 )]
 pub enum TextDecoration {
-    #[default]
     None,
 
     Shadow,
@@ -34,6 +33,16 @@ pub enum TextDecoration {
 
     #[strum(serialize = "Outline (thick)")]
     OutlineDouble,
+}
+
+impl ConstDefault for TextDecoration {
+    const DEFAULT: Self = Self::None;
+}
+
+impl Default for TextDecoration {
+    fn default() -> Self {
+        Self::DEFAULT
+    }
 }
 
 impl TextDecoration {

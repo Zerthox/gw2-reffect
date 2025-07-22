@@ -2,24 +2,25 @@ use crate::{
     action::DynAction,
     addon::Addon,
     elements::RenderCtx,
+    enums::impl_static_variants,
     internal::{Interface, Internal},
     lockbox::Lockbox,
-    render::{Validation, enum_combo, impl_static_variants, input_text_simple_menu},
+    render::{Validation, enum_combo, input_text_simple_menu},
     texture_manager::TextureManager,
     trigger::Skill,
 };
+use const_default::ConstDefault;
 use nexus::imgui::{ComboBoxFlags, TextureId, Ui};
 use rfd::FileDialog;
 use serde::{Deserialize, Serialize};
 use std::{path::PathBuf, thread};
-use strum::{AsRefStr, EnumIter, IntoStaticStr};
+use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr};
 use windows::core::Interface as _;
 
 // TODO: id gen for loaded icons? handle duplicates on load?
 
 #[derive(
     Debug,
-    Default,
     Clone,
     PartialEq,
     Eq,
@@ -27,11 +28,11 @@ use windows::core::Interface as _;
     IntoStaticStr,
     AsRefStr,
     EnumIter,
+    EnumCount,
     Serialize,
     Deserialize,
 )]
 pub enum IconSource {
-    #[default]
     Unknown,
 
     Empty,
@@ -44,7 +45,17 @@ pub enum IconSource {
     File(PathBuf),
 }
 
-impl_static_variants!(IconSource);
+impl ConstDefault for IconSource {
+    const DEFAULT: Self = Self::Unknown;
+}
+
+impl Default for IconSource {
+    fn default() -> Self {
+        Self::DEFAULT
+    }
+}
+
+impl_static_variants!(IconSource); // TODO: move to const variant array when pathbuf new is const
 
 impl IconSource {
     pub const UNKNOWN_ID: &'static str = "REFFECT_ICON_UNKNOWN";

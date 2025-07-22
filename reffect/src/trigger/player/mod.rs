@@ -9,11 +9,12 @@ use crate::{
     render::enum_combo_bitflags,
     serde::bitflags,
 };
+use const_default::ConstDefault;
 use enumflags2::BitFlags;
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct PlayerTrigger {
     pub combat: CombatTrigger,
@@ -33,6 +34,23 @@ pub struct PlayerTrigger {
 
     #[serde(with = "bitflags")]
     pub mounts: BitFlags<Mount>,
+}
+
+impl ConstDefault for PlayerTrigger {
+    const DEFAULT: Self = Self {
+        combat: CombatTrigger::DEFAULT,
+        profs: BitFlags::EMPTY,
+        specs: BitFlags::EMPTY,
+        weapons: BitFlags::EMPTY,
+        traits: TraitTrigger::DEFAULT,
+        mounts: BitFlags::EMPTY,
+    };
+}
+
+impl Default for PlayerTrigger {
+    fn default() -> Self {
+        Self::DEFAULT
+    }
 }
 
 impl PlayerTrigger {

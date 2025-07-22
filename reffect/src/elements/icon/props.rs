@@ -8,6 +8,7 @@ use crate::{
     },
     render_copy_field,
 };
+use const_default::ConstDefault;
 use nexus::imgui::{InputTextFlags, Ui};
 use partial::Partial;
 use serde::{Deserialize, Serialize};
@@ -25,15 +26,19 @@ pub struct IconProps {
     pub border_color: [f32; 4],
 }
 
+impl ConstDefault for IconProps {
+    const DEFAULT: Self = Self {
+        tint: colors::WHITE,
+        zoom: 1.0,
+        round: 0.0,
+        border_size: 0.0,
+        border_color: colors::BLACK,
+    };
+}
+
 impl Default for IconProps {
     fn default() -> Self {
-        Self {
-            tint: colors::WHITE,
-            zoom: 1.0,
-            round: 0.0,
-            border_size: 0.0,
-            border_color: colors::BLACK,
-        }
+        Self::DEFAULT
     }
 }
 

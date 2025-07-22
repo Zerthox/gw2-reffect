@@ -2,18 +2,28 @@ use super::{ProgressActive, Skill};
 use crate::{
     action::Action,
     context::{Buff, Category, Context, SkillInfo, Slot},
+    enums::check_variant_array,
     error::Error,
     internal::{Interface, Internal},
-    render::{Validation, enum_combo, helper, impl_static_variants, input_skill_id},
+    render::{Validation, enum_combo, helper, input_skill_id},
 };
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
 use serde_with::{OneOrMany, formats::PreferMany, serde_as};
-use strum::{AsRefStr, EnumIter, IntoStaticStr};
+use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 
 #[serde_as]
 #[derive(
-    Debug, Default, Clone, PartialEq, AsRefStr, IntoStaticStr, EnumIter, Serialize, Deserialize,
+    Debug,
+    Default,
+    Clone,
+    PartialEq,
+    AsRefStr,
+    IntoStaticStr,
+    EnumIter,
+    EnumCount,
+    Serialize,
+    Deserialize,
 )]
 pub enum ProgressSource {
     /// Inherit from above.
@@ -62,7 +72,23 @@ pub enum ProgressSource {
     SecondaryResource,
 }
 
-impl_static_variants!(ProgressSource);
+impl VariantArray for ProgressSource {
+    const VARIANTS: &'static [Self] = &[
+        Self::Inherit,
+        Self::Always,
+        Self::Buff(Vec::new()),
+        Self::Ability(Vec::new()),
+        Self::SkillbarSlot(Slot::DEFAULT),
+        Self::Health,
+        Self::Barrier,
+        Self::Defiance,
+        Self::Endurance,
+        Self::PrimaryResource,
+        Self::SecondaryResource,
+    ];
+}
+
+const _: () = check_variant_array::<ProgressSource>();
 
 impl ProgressSource {
     pub fn no_threshold(&self) -> bool {

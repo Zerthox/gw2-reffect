@@ -1,22 +1,14 @@
+use crate::enums::check_variant_array;
+use const_default::ConstDefault;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 
 #[derive(
-    Debug,
-    Default,
-    Clone,
-    PartialEq,
-    AsRefStr,
-    IntoStaticStr,
-    EnumIter,
-    EnumCount,
-    Serialize,
-    Deserialize,
+    Debug, Clone, PartialEq, AsRefStr, IntoStaticStr, EnumIter, EnumCount, Serialize, Deserialize,
 )]
 pub enum ThresholdType {
     /// Always met.
-    #[default]
     Always,
 
     /// Must be present.
@@ -40,9 +32,13 @@ pub enum ThresholdType {
     Between(f32, f32),
 }
 
-impl ThresholdType {
-    pub fn no_amount(&self) -> bool {
-        matches!(self, Self::Always | Self::Present | Self::Missing)
+impl ConstDefault for ThresholdType {
+    const DEFAULT: Self = Self::Always;
+}
+
+impl Default for ThresholdType {
+    fn default() -> Self {
+        Self::DEFAULT
     }
 }
 
@@ -58,11 +54,13 @@ impl VariantArray for ThresholdType {
     ];
 }
 
-const _: () = {
-    if ThresholdType::VARIANTS.len() != ThresholdType::COUNT {
-        panic!("missing variant in variant array");
+const _: () = check_variant_array::<ThresholdType>();
+
+impl ThresholdType {
+    pub fn no_amount(&self) -> bool {
+        matches!(self, Self::Always | Self::Present | Self::Missing)
     }
-};
+}
 
 impl fmt::Display for ThresholdType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

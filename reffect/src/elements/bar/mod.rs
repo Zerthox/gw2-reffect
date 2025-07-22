@@ -17,6 +17,7 @@ use crate::{
     tree::TreeNode,
     trigger::ProgressActive,
 };
+use const_default::ConstDefault;
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
 
@@ -247,17 +248,21 @@ impl Bounds for Bar {
     }
 }
 
+impl ConstDefault for Bar {
+    const DEFAULT: Self = Self {
+        progress_kind: Progress::DEFAULT,
+        max: 25.0,
+        props: Props::DEFAULT,
+        align: Align::Center,
+        size: [128.0, 12.0],
+        direction: Direction::Right,
+        tick_unit: Unit::DEFAULT,
+        ticks: Vec::new(),
+    };
+}
+
 impl Default for Bar {
     fn default() -> Self {
-        Self {
-            progress_kind: Progress::default(),
-            max: 25.0,
-            props: Props::default(),
-            align: Align::Center,
-            size: [128.0, 12.0],
-            direction: Direction::Right,
-            tick_unit: Unit::default(),
-            ticks: Vec::new(),
-        }
+        Self::DEFAULT
     }
 }

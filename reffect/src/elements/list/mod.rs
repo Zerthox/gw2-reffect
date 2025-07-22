@@ -17,6 +17,7 @@ use crate::{
     },
     tree::TreeNode,
 };
+use const_default::ConstDefault;
 use nexus::imgui::{
     self as ig, CollapsingHeader, ComboBoxFlags, InputTextFlags, MenuItem, StyleColor,
     TreeNodeFlags, Ui,
@@ -246,14 +247,18 @@ impl Bounds for IconList {
     }
 }
 
+impl ConstDefault for IconList {
+    const DEFAULT: Self = Self {
+        layout: Layout::Dynamic,
+        direction: Direction::Right,
+        size: [32.0, 32.0],
+        pad: 2.0,
+        icons: Vec::new(),
+    };
+}
+
 impl Default for IconList {
     fn default() -> Self {
-        Self {
-            layout: Layout::Dynamic,
-            direction: Direction::Right,
-            size: [32.0, 32.0],
-            pad: 2.0,
-            icons: Vec::new(),
-        }
+        Self::DEFAULT
     }
 }

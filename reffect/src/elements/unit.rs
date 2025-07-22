@@ -1,9 +1,9 @@
+use const_default::ConstDefault;
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, VariantArray};
 
 #[derive(
     Debug,
-    Default,
     Clone,
     Copy,
     PartialEq,
@@ -18,9 +18,18 @@ use strum::{AsRefStr, EnumIter, VariantArray};
     Deserialize,
 )]
 pub enum Unit {
-    #[default]
     Percent,
     Absolute,
+}
+
+impl ConstDefault for Unit {
+    const DEFAULT: Self = Self::Percent;
+}
+
+impl Default for Unit {
+    fn default() -> Self {
+        Self::DEFAULT
+    }
 }
 
 impl Unit {

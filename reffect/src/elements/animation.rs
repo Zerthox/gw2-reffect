@@ -2,6 +2,7 @@ use crate::{
     render::{cycle_progress, enum_combo, helper, input_seconds, push_alpha_change},
     util::non_zero_u32,
 };
+use const_default::ConstDefault;
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 use std::num::NonZero;
@@ -36,12 +37,16 @@ impl Animation {
     }
 }
 
+impl ConstDefault for Animation {
+    const DEFAULT: Self = Self {
+        kind: AnimationKind::Pulse,
+        period: non_zero_u32!(3000),
+    };
+}
+
 impl Default for Animation {
     fn default() -> Self {
-        Self {
-            kind: AnimationKind::Pulse,
-            period: non_zero_u32!(3000),
-        }
+        Self::DEFAULT
     }
 }
 

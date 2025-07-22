@@ -1,3 +1,5 @@
+use const_default::ConstDefault;
+
 use super::ListIcon;
 use crate::{
     clipboard::Clipboard,
@@ -64,6 +66,10 @@ impl IconAction {
             }
         }
     }
+}
+
+impl ConstDefault for IconAction {
+    const DEFAULT: Self = Self::new();
 }
 
 impl Default for IconAction {

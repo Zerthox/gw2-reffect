@@ -1,4 +1,5 @@
 use crate::context::Ability;
+use const_default::ConstDefault;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -16,6 +17,10 @@ impl ProgressInfo {
             pending: false,
         }
     }
+}
+
+impl ConstDefault for ProgressInfo {
+    const DEFAULT: Self = Self::new();
 }
 
 impl Default for ProgressInfo {

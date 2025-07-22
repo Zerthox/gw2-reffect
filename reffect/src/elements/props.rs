@@ -5,12 +5,13 @@ use crate::{
     render::{collapsing_header_same_line_end, delete_confirm_modal},
     trigger::{Condition, ProgressActive},
 };
+use const_default::ConstDefault;
 use nexus::imgui::{CollapsingHeader, Direction, StyleColor, TreeNodeFlags, Ui};
 use partial::IntoPartial;
 use serde::{Deserialize, Serialize};
 use std::{fmt, ops};
 
-#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, ConstDefault, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Props<T>
 where

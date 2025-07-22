@@ -2,6 +2,7 @@ mod dynamic;
 mod element;
 
 use crate::render::{button_size_with_spacing, close_button};
+use const_default::ConstDefault;
 use nexus::imgui::{Direction, Ui};
 
 pub use self::{dynamic::*, element::*};
@@ -78,6 +79,10 @@ impl Action {
         let width = ui.calc_item_width() - 3.0 * button_size_with_spacing(ui);
         ui.set_next_item_width(width);
     }
+}
+
+impl ConstDefault for Action {
+    const DEFAULT: Self = Self::new();
 }
 
 impl Default for Action {

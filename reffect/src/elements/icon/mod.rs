@@ -14,6 +14,7 @@ use crate::{
     settings::icon::{DurationBarSettings, DurationTextSettings, StackTextSettings},
     trigger::{ProgressActive, ProgressValue, Skill},
 };
+use const_default::ConstDefault;
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
@@ -240,14 +241,18 @@ impl Icon {
     }
 }
 
+impl ConstDefault for Icon {
+    const DEFAULT: Self = Self {
+        source: IconSource::Unknown,
+        props: Props::DEFAULT,
+        duration_bar: false,
+        duration_text: false,
+        stacks_text: false,
+    };
+}
+
 impl Default for Icon {
     fn default() -> Self {
-        Self {
-            source: IconSource::Unknown,
-            props: Props::default(),
-            duration_bar: false,
-            duration_text: false,
-            stacks_text: false,
-        }
+        Self::DEFAULT
     }
 }

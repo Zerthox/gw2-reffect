@@ -157,7 +157,6 @@ impl Ability {
 /// Skillbar slot.
 #[derive(
     Debug,
-    Default,
     Clone,
     Copy,
     PartialEq,
@@ -175,7 +174,6 @@ impl Ability {
     Deserialize,
 )]
 pub enum Slot {
-    #[default]
     #[strum(serialize = "Weapon Swap")]
     WeaponSwap,
 
@@ -226,4 +224,14 @@ pub enum Slot {
     SpecialAction,
 
     Mount,
+}
+
+impl Slot {
+    pub const DEFAULT: Self = Self::WeaponSwap;
+}
+
+impl Default for Slot {
+    fn default() -> Self {
+        Self::DEFAULT
+    }
 }

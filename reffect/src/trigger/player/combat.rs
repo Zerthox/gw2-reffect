@@ -1,16 +1,19 @@
 use super::Trigger;
 use crate::context::Context;
+use const_default::ConstDefault;
 use nexus::imgui::{Selectable, Ui};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Default, ConstDefault, Clone, Copy, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 #[repr(transparent)]
 pub struct CombatTrigger(Option<bool>);
 
 impl CombatTrigger {
-    fn label(tristate: Option<bool>) -> &'static str {
-        match tristate {
+    pub const VALUES: &[Self] = &[Self(None), Self(Some(true)), Self(Some(false))];
+
+    pub fn label(&self) -> &'static str {
+        match self.0 {
             Some(true) => "In Combat",
             Some(false) => "Out of Combat",
             None => "Always",
@@ -26,16 +29,11 @@ impl Trigger for CombatTrigger {
 
 impl CombatTrigger {
     pub fn render_options(&mut self, ui: &Ui) {
-        if let Some(_token) = ui.begin_combo("Combat", Self::label(self.0)) {
-            const VALUES: &[Option<bool>] = &[None, Some(true), Some(false)];
-
-            for value in VALUES.iter().copied() {
-                let selected = value == self.0;
-                if Selectable::new(Self::label(value))
-                    .selected(selected)
-                    .build(ui)
-                {
-                    self.0 = value;
+        if let Some(_token) = ui.begin_combo("Combat", self.label()) {
+            for value in Self::VALUES.iter().copied() {
+                let selected = value == *self;
+                if Selectable::new(value.label()).selected(selected).build(ui) {
+                    *self = value;
                 }
                 if selected {
                     ui.set_item_default_focus();

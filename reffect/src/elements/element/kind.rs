@@ -2,14 +2,16 @@ use super::Element;
 use crate::{
     context::Context,
     elements::{Bar, Common, Group, IconElement, IconList, RenderCtx, Text},
-    render::{Bounds, Rect, impl_static_variants},
+    enums::check_variant_array,
+    render::{Bounds, Rect},
     tree::TreeNode,
 };
+use const_default::ConstDefault;
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
-use strum::{AsRefStr, EnumIter, IntoStaticStr};
+use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 
-#[derive(Debug, Clone, EnumIter, AsRefStr, IntoStaticStr, Serialize, Deserialize)]
+#[derive(Debug, Clone, EnumIter, EnumCount, AsRefStr, IntoStaticStr, Serialize, Deserialize)]
 #[serde(tag = "type")]
 pub enum ElementType {
     Group(Group),
@@ -25,7 +27,17 @@ pub enum ElementType {
     Bar(Bar),
 }
 
-impl_static_variants!(ElementType);
+impl VariantArray for ElementType {
+    const VARIANTS: &'static [Self] = &[
+        Self::Group(Group::DEFAULT),
+        Self::Icon(IconElement::DEFAULT),
+        Self::IconList(IconList::DEFAULT),
+        Self::Text(Text::DEFAULT),
+        Self::Bar(Bar::DEFAULT),
+    ];
+}
+
+const _: () = check_variant_array::<ElementType>();
 
 impl ElementType {
     pub fn is_passthrough(&self) -> bool {
