@@ -1,8 +1,9 @@
 use crate::{
     action::DynAction,
+    context::Context,
     elements::{Common, Element, ElementType, Icon, IconElement, RenderCtx},
     render::Rect,
-    trigger::{FilterTrigger, ProgressTrigger, Trigger},
+    trigger::{FilterTrigger, ProgressActive, ProgressTrigger, Trigger},
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
@@ -25,14 +26,17 @@ pub struct ListIcon {
 }
 
 impl ListIcon {
-    pub fn is_visible(&mut self, ctx: &RenderCtx, common: &Common) -> bool {
-        let parent = common.trigger.active();
-        self.trigger.update(ctx, parent);
-        if ctx.edit.is_editing() {
-            self.enabled && ctx.is_edited()
-        } else {
-            self.enabled && self.trigger.active().is_some() && self.filter.is_active(ctx)
-        }
+    pub fn is_visible(&mut self, ctx: &RenderCtx) -> bool {
+        self.enabled
+            && if ctx.edit.is_editing() {
+                ctx.is_edited()
+            } else {
+                self.filter.is_active(ctx)
+            }
+    }
+
+    pub fn update(&mut self, ctx: &Context, parent_active: Option<&ProgressActive>) -> bool {
+        self.trigger.update(ctx, parent_active)
     }
 
     pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, size: [f32; 2]) {
@@ -49,23 +53,23 @@ impl ListIcon {
                 enabled: self.enabled,
                 name: self.name,
                 trigger: self.trigger,
+                filter: self.filter,
                 ..Common::default()
             },
             kind: ElementType::Icon(IconElement {
                 icon: self.icon,
                 size,
             }),
-            filter: self.filter,
             ..Element::default()
         }
     }
 
-    pub fn from_element(common: Common, element: IconElement, filter: FilterTrigger) -> Self {
+    pub fn from_element(common: Common, element: IconElement) -> Self {
         Self {
             enabled: common.enabled,
             name: common.name,
             trigger: common.trigger,
-            filter,
+            filter: common.filter,
             icon: element.icon,
         }
     }

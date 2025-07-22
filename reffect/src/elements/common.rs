@@ -3,7 +3,7 @@ use crate::{
     action::ChildElementAction,
     clipboard::Clipboard,
     colors,
-    context::EditState,
+    context::{Context, EditState},
     elements::RenderCtx,
     id::Id,
     render::{
@@ -11,7 +11,7 @@ use crate::{
         input_pos, push_alpha_change, push_window_clip_rect_fullscreen, slider_percent,
     },
     serde::migrate,
-    trigger::{ProgressActive, ProgressTrigger},
+    trigger::{FilterTrigger, ProgressActive, ProgressTrigger, Trigger},
 };
 use nexus::imgui::{Condition, MenuItem, MouseButton, StyleVar, Ui, Window};
 use serde::{Deserialize, Serialize};
@@ -41,6 +41,8 @@ pub struct Common {
     #[serde(alias = "progress_trigger")]
     pub trigger: ProgressTrigger,
 
+    pub filter: FilterTrigger,
+
     #[serde(skip)]
     pub dragging: bool,
 
@@ -53,11 +55,11 @@ impl Common {
         self.id.to_string()
     }
 
-    pub fn is_visible(&self, ctx: &RenderCtx) -> bool {
+    pub fn is_visible(&mut self, ctx: &RenderCtx) -> bool {
         if ctx.edit.is_editing() {
             (self.enabled && ctx.is_edited()) || ctx.edit.is_selected_or_parent(self.id)
         } else {
-            self.enabled
+            self.enabled && self.filter.is_active(ctx)
         }
     }
 
@@ -69,8 +71,8 @@ impl Common {
         self.pos(ui, Anchor::root(ui))
     }
 
-    pub fn update(&mut self, ctx: &RenderCtx, parent_active: Option<&ProgressActive>) {
-        self.trigger.update(ctx, parent_active);
+    pub fn update(&mut self, ctx: &Context, parent_active: Option<&ProgressActive>) -> bool {
+        self.trigger.update(ctx, parent_active)
     }
 
     pub fn push_style<'ui>(&self, ui: &'ui Ui) -> impl Drop + 'ui {
@@ -229,11 +231,16 @@ impl Common {
         self.trigger.render_options(ui);
     }
 
-    pub fn render_debug(&mut self, ui: &Ui) {
+    pub fn render_filters(&mut self, ui: &Ui, ctx: &RenderCtx) {
+        self.filter.render_options(ui, ctx);
+    }
+
+    pub fn render_debug(&mut self, ui: &Ui, ctx: &RenderCtx) {
         ui.text(format!("Id: {}", self.id));
         ui.text(format!("Pos: {:?}", self.pos_root(ui)));
 
         self.trigger.render_debug(ui);
+        self.filter.render_debug(ui, ctx);
     }
 }
 
@@ -247,6 +254,7 @@ impl Default for Common {
             pos: [0.0, 0.0],
             opacity: 1.0,
             trigger: ProgressTrigger::default(),
+            filter: FilterTrigger::default(),
             dragging: false,
             resize: 1.0,
         }
@@ -263,6 +271,7 @@ impl Clone for Common {
             pos: self.pos,
             opacity: self.opacity,
             trigger: self.trigger.clone(),
+            filter: self.filter.clone(),
             dragging: false,
             resize: 1.0,
         }

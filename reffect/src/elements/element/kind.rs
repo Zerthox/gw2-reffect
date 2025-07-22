@@ -28,6 +28,10 @@ pub enum ElementType {
 impl_static_variants!(ElementType);
 
 impl ElementType {
+    pub fn is_passthrough(&self) -> bool {
+        matches!(self, Self::Group(_) | Self::IconList(_))
+    }
+
     pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, common: &Common) {
         match self {
             Self::Group(group) => group.render(ui, ctx, common),

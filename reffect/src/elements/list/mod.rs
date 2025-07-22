@@ -46,11 +46,13 @@ impl IconList {
             icon.render(ui, ctx, self.size);
         };
 
+        let parent_active = common.trigger.active();
+
         match self.layout {
             Layout::Dynamic => {
                 let mut filtered = Vec::new();
                 for icon in &mut self.icons {
-                    if icon.is_visible(ctx, common) {
+                    if icon.is_visible(ctx) && icon.update(ctx, parent_active) {
                         filtered.push(icon);
                     }
                 }
@@ -63,7 +65,7 @@ impl IconList {
             Layout::Static => {
                 let len = self.icons.len();
                 for (i, icon) in self.icons.iter_mut().enumerate() {
-                    if icon.is_visible(ctx, common) {
+                    if icon.is_visible(ctx) && icon.update(ctx, parent_active) {
                         render_icon(icon, i, len);
                     }
                 }

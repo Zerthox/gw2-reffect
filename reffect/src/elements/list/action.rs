@@ -49,12 +49,11 @@ impl IconAction {
             Self::Paste(index) => {
                 if let Some(Element {
                     common,
-                    filter,
                     kind: ElementType::Icon(element),
                     ..
                 }) = Clipboard::take()
                 {
-                    children.insert(index, ListIcon::from_element(common, element, filter));
+                    children.insert(index, ListIcon::from_element(common, element));
                 } else {
                     panic!("icon action paste without icon element");
                 }

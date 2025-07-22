@@ -1,6 +1,6 @@
 use crate::{
     elements::{Bar, Common, Element, ElementType, Group, IconElement, IconList, Pack, Text},
-    trigger::FilterTrigger,
+    trigger::{FilterTrigger, ProgressTrigger},
 };
 
 pub trait VisitMut {
@@ -12,6 +12,8 @@ pub trait VisitMut {
 
     fn visit_pack(&mut self, pack: &mut Pack) {
         self.visit_common(&mut pack.common);
+        self.visit_progress_trigger(&mut pack.common.trigger);
+        self.visit_filter_trigger(&mut pack.common.filter);
         self.visit_elements(&mut pack.elements);
     }
 
@@ -23,7 +25,8 @@ pub trait VisitMut {
 
     fn visit_element(&mut self, element: &mut Element) {
         self.visit_common(&mut element.common);
-        self.visit_filter_trigger(&mut element.filter);
+        self.visit_progress_trigger(&mut element.common.trigger);
+        self.visit_filter_trigger(&mut element.common.filter);
         self.visit_element_type(&mut element.kind);
     }
 
@@ -37,6 +40,7 @@ pub trait VisitMut {
             ElementType::IconList(list) => {
                 self.visit_icon_list(list);
                 for icon in &mut list.icons {
+                    self.visit_progress_trigger(&mut icon.trigger);
                     self.visit_filter_trigger(&mut icon.filter);
                 }
             }
@@ -46,6 +50,8 @@ pub trait VisitMut {
     }
 
     fn visit_common(&mut self, _common: &mut Common) {}
+
+    fn visit_progress_trigger(&mut self, _trigger: &mut ProgressTrigger) {}
 
     fn visit_filter_trigger(&mut self, _trigger: &mut FilterTrigger) {}
 

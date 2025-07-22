@@ -11,7 +11,6 @@ use crate::{
         Bounds, Rect, delete_confirm_modal, item_context_menu, style_disabled_if, tree_select_empty,
     },
     tree::{Loader, Resizer, TreeNode, VisitMut},
-    trigger::{FilterTrigger, Trigger},
 };
 use nexus::imgui::{MenuItem, StyleColor, Ui};
 use serde::{Deserialize, Serialize};
@@ -21,9 +20,6 @@ use serde::{Deserialize, Serialize};
 pub struct Element {
     #[serde(flatten)]
     pub common: Common,
-
-    // TODO: move filter, animation to common to allow on pack? need to figure out pack render conditions, debug tab
-    pub filter: FilterTrigger,
 
     pub animation: Option<Animation>,
 
@@ -44,10 +40,9 @@ impl Element {
     /// Renders the element.
     pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, parent: &Common) {
         if self.common.is_visible(ctx) {
-            let _token = ctx.push_child(ui, &self.common);
-            if ctx.edit.is_editing() || self.filter.is_active(ctx) {
+            if self.common.update(ctx, parent.trigger.active()) || self.kind.is_passthrough() {
+                let _token = ctx.push_child(ui, &self.common);
                 let _style = self.common.push_style(ui);
-                self.common.update(ctx, parent.trigger.active());
 
                 let mut body = || self.kind.render(ui, ctx, &self.common);
                 if let Some(animation) = &mut self.animation {
@@ -56,11 +51,11 @@ impl Element {
                     body();
                 }
             }
-        }
 
-        if ctx.edit.is_edited(self.common.id) {
-            let bounds = self.kind.bounds(ui, ctx);
-            self.common.render_edit_indicators(ui, ctx.pos(), bounds);
+            if ctx.edit.is_edited(self.common.id) {
+                let bounds = self.kind.bounds(ui, ctx);
+                self.common.render_edit_indicators(ui, ctx.pos(), bounds);
+            }
         }
     }
 
@@ -170,7 +165,7 @@ impl Element {
             self.kind.render_tabs(ui, ctx);
 
             if let Some(_token) = ui.tab_item("Filter") {
-                self.filter.render_options(ui, ctx);
+                self.common.render_filters(ui, ctx);
                 self.kind.render_filters(ui, ctx);
             }
 
@@ -189,8 +184,7 @@ impl Element {
             }
 
             if let Some(_token) = ui.tab_item("?") {
-                self.common.render_debug(ui);
-                self.filter.render_debug(ui, ctx);
+                self.common.render_debug(ui, ctx);
                 self.kind.render_debug(ui, ctx);
             }
         }

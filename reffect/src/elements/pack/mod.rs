@@ -63,18 +63,21 @@ impl Pack {
     /// Renders the pack.
     pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx) {
         if self.common.is_visible(ctx) {
-            let _token = ctx.push_child(ui, &self.common);
-            let _style = self.common.push_style(ui);
             self.common.update(ctx, None);
-            for element in &mut self.elements {
-                element.render(ui, ctx, &self.common);
-            }
-        }
+            {
+                let _token = ctx.push_child(ui, &self.common);
+                let _style = self.common.push_style(ui);
 
-        if ctx.edit.is_edited(self.common.id) {
-            let bounds = Bounds::combined_bounds(self.elements.iter(), ui, ctx);
-            self.common
-                .render_edit_indicators(ui, Anchor::root(ui), bounds)
+                for element in &mut self.elements {
+                    element.render(ui, ctx, &self.common);
+                }
+            }
+
+            if ctx.edit.is_edited(self.common.id) {
+                let bounds = Bounds::combined_bounds(self.elements.iter(), ui, ctx);
+                let pos = Anchor::root(ui);
+                self.common.render_edit_indicators(ui, pos, bounds)
+            }
         }
     }
 
@@ -134,7 +137,7 @@ impl Pack {
     pub fn try_render_options(&mut self, ui: &Ui, ctx: &RenderCtx) -> bool {
         let id = self.common.id;
         if ctx.edit.is_selected(id) {
-            self.render_options(ui);
+            self.render_options(ui, ctx);
             return true;
         } else if ctx.edit.is_selected_parent(id) {
             for child in &mut self.elements {
@@ -147,7 +150,7 @@ impl Pack {
     }
 
     /// Renders the pack options.
-    fn render_options(&mut self, ui: &Ui) {
+    fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) {
         if let Some(_token) = ui.tab_bar(self.common.id_string()) {
             if let Some(_token) = ui.tab_item("Pack") {
                 self.common.render_options(ui);
@@ -164,14 +167,19 @@ impl Pack {
                         .build();
                 }
             }
+
+            if let Some(_token) = ui.tab_item("Filter") {
+                self.common.render_filters(ui, ctx);
+            }
+
             if let Some(_token) = ui.tab_item("?") {
-                self.render_debug(ui);
+                self.render_debug(ui, ctx);
             }
         }
     }
 
-    fn render_debug(&mut self, ui: &Ui) {
-        self.common.render_debug(ui);
+    fn render_debug(&mut self, ui: &Ui, ctx: &RenderCtx) {
+        self.common.render_debug(ui, ctx);
 
         ui.text("File:");
         if let Some(file) = self.file.file_name().and_then(|file| file.to_str()) {
