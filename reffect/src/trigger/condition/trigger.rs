@@ -72,8 +72,12 @@ impl ConditionTrigger {
         enum_combo(ui, "Condition", self, ComboBoxFlags::empty());
 
         match self {
-            Self::ProgressThreshold(threshold) => threshold.render_options(ui),
-            Self::Player(player) => player.render_options(ui, ctx),
+            Self::ProgressThreshold(threshold) => {
+                threshold.render_options(ui);
+            }
+            Self::Player(player) => {
+                player.render_options(ui, ctx);
+            }
             Self::Map(map) => {
                 map.render_options(ui, ctx);
             }
