@@ -157,7 +157,7 @@ impl Element {
         if let Some(_token) = ui.tab_bar(self.common.id_string()) {
             let _token = ctx.push_child(ui, &self.common);
             if let Some(_token) = ui.tab_item(&self.kind) {
-                self.common.render_options(ui);
+                self.common.render_options(ui, ctx);
                 ui.spacing();
                 self.kind.render_options(ui, ctx);
             }

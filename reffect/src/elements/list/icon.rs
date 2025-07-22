@@ -82,7 +82,7 @@ impl ListIcon {
 
         ui.spacing();
 
-        self.trigger.render_options(ui);
+        self.trigger.render_options(ui, ctx);
 
         ui.spacing();
 

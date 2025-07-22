@@ -216,7 +216,7 @@ impl Common {
         .then(|| mem::replace(&mut self.resize, 1.0))
     }
 
-    pub fn render_options(&mut self, ui: &Ui) {
+    pub fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) {
         ui.checkbox("Enabled", &mut self.enabled);
 
         ui.input_text("Name", &mut self.name).build();
@@ -229,7 +229,7 @@ impl Common {
 
         ui.spacing();
 
-        self.trigger.render_options(ui);
+        self.trigger.render_options(ui, ctx);
     }
 
     pub fn render_filters(&mut self, ui: &Ui, ctx: &RenderCtx) {

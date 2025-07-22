@@ -243,8 +243,11 @@ impl ProgressSource {
         });
     }
 
-    pub fn render_options(&mut self, ui: &Ui) {
+    pub fn render_options(&mut self, ui: &Ui) -> bool {
+        let mut changed = false;
+
         if let Some(prev) = enum_combo(ui, "Trigger", self, ComboBoxFlags::HEIGHT_LARGE) {
+            changed = true;
             match self {
                 Self::Buff(ids) => *ids = prev.into_ids(),
                 Self::Ability(ids) => *ids = prev.into_ids(),
@@ -266,7 +269,7 @@ impl ProgressSource {
 
                     action.input_with_buttons(ui, i, || {
                         Self::buff_validate(*id).for_item(ui, || {
-                            input_skill_id(ui, "##id", id, InputTextFlags::empty());
+                            changed |= input_skill_id(ui, "##id", id, InputTextFlags::empty());
                         });
                     });
 
@@ -278,7 +281,7 @@ impl ProgressSource {
                     ids.push(0);
                 }
 
-                action.perform(ids);
+                changed |= action.perform(ids);
             }
             Self::Ability(ids) => {
                 let mut action = Action::new();
@@ -287,7 +290,7 @@ impl ProgressSource {
 
                     action.input_with_buttons(ui, i, || {
                         Self::ability_validate(*id).for_item(ui, || {
-                            input_skill_id(ui, "##id", id, InputTextFlags::empty());
+                            changed |= input_skill_id(ui, "##id", id, InputTextFlags::empty());
                         });
                     });
 
@@ -299,13 +302,15 @@ impl ProgressSource {
                     ids.push(0);
                 }
 
-                action.perform(ids);
+                changed |= action.perform(ids);
             }
             Self::SkillbarSlot(slot) => {
-                enum_combo(ui, "Slot", slot, ComboBoxFlags::HEIGHT_LARGEST);
+                changed |= enum_combo(ui, "Slot", slot, ComboBoxFlags::HEIGHT_LARGEST).is_some();
             }
             _ => {}
         }
+
+        changed
     }
 }
 

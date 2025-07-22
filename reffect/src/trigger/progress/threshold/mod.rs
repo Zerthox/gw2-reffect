@@ -59,13 +59,16 @@ impl fmt::Display for ProgressThreshold {
 }
 
 impl ProgressThreshold {
-    pub fn render_options(&mut self, ui: &Ui) {
-        enum_combo(
+    pub fn render_options(&mut self, ui: &Ui) -> bool {
+        let mut changed = false;
+
+        changed |= enum_combo(
             ui,
             "Threshold",
             &mut self.threshold_type,
             ComboBoxFlags::empty(),
-        );
+        )
+        .is_some();
         helper(ui, || ui.text("Threshold required to be met"));
 
         match &mut self.threshold_type {
@@ -73,15 +76,17 @@ impl ProgressThreshold {
             ThresholdType::Above(required)
             | ThresholdType::Below(required)
             | ThresholdType::Exact(required) => {
-                self.amount_type.render_options(ui);
-                self.amount_type.render_input(ui, "Amount", required);
+                changed |= self.amount_type.render_options(ui).is_some();
+                changed |= self.amount_type.render_input(ui, "Amount", required);
             }
             ThresholdType::Between(min, max) => {
-                self.amount_type.render_options(ui);
-                self.amount_type.render_input(ui, "Min", min);
-                self.amount_type.render_input(ui, "Max", max);
+                changed |= self.amount_type.render_options(ui).is_some();
+                changed |= self.amount_type.render_input(ui, "Min", min);
+                changed |= self.amount_type.render_input(ui, "Max", max);
             }
         }
+
+        changed
     }
 }
 

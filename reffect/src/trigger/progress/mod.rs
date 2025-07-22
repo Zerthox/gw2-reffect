@@ -67,12 +67,18 @@ impl ProgressTrigger {
         self.active_memo.as_ref()
     }
 
-    pub fn render_options(&mut self, ui: &Ui) {
+    pub fn render_options(&mut self, ui: &Ui, ctx: &Context) {
+        let mut changed = false;
         let _id = ui.push_id("trigger");
-        self.source.render_options(ui);
+
+        changed |= self.source.render_options(ui);
+
         if !self.source.no_threshold() {
-            self.threshold.render_options(ui);
-            // TODO: we rely on interval refreshing the memo, render options might want context for updates
+            changed |= self.threshold.render_options(ui);
+        }
+
+        if changed {
+            self.update(ctx, None); // TODO: access parent active?
         }
     }
 

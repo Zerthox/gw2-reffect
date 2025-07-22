@@ -155,7 +155,7 @@ impl Pack {
         let mut changed = false;
         if let Some(_token) = ui.tab_bar(self.common.id_string()) {
             if let Some(_token) = ui.tab_item("Pack") {
-                self.common.render_options(ui);
+                self.common.render_options(ui, ctx);
 
                 ui.spacing();
 
