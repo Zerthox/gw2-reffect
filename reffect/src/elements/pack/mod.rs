@@ -4,8 +4,7 @@ use crate::{
     context::EditState,
     elements::RenderCtx,
     render::{
-        Bounds, delete_confirm_modal, item_context_menu, style_disabled, style_disabled_if,
-        tree_select_empty,
+        Bounds, delete_confirm_modal, item_context_menu, style_disabled_if, tree_select_empty,
     },
     schema::Schema,
     tree::{FontReloader, Loader, Resizer, TreeNode, VisitMut},
@@ -133,39 +132,38 @@ impl Pack {
     }
 
     /// Attempts to render options if selected.
-    /// Returns `true` if the pack or a child rendered.
-    pub fn try_render_options(&mut self, ui: &Ui, ctx: &RenderCtx) -> bool {
+    ///
+    /// First value indicates if the pack or a child rendered.
+    /// Second value indicates if the pack layer changed.
+    pub fn try_render_options(&mut self, ui: &Ui, ctx: &RenderCtx) -> (bool, bool) {
         let id = self.common.id;
         if ctx.edit.is_selected(id) {
-            self.render_options(ui, ctx);
-            return true;
+            let reorder = self.render_options(ui, ctx);
+            return (true, reorder);
         } else if ctx.edit.is_selected_parent(id) {
             for child in &mut self.elements {
                 if child.try_render_options(ui, ctx) {
-                    return true;
+                    return (true, false);
                 }
             }
         }
-        false
+        (false, false)
     }
 
     /// Renders the pack options.
-    fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) {
+    fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) -> bool {
+        let mut changed = false;
         if let Some(_token) = ui.tab_bar(self.common.id_string()) {
             if let Some(_token) = ui.tab_item("Pack") {
                 self.common.render_options(ui);
 
                 ui.spacing();
 
-                {
-                    // TODO: layer input
-                    let _style = style_disabled(ui);
-                    ui.input_int("Layer", &mut self.layer)
-                        .step(1)
-                        .step_fast(10)
-                        .read_only(true)
-                        .build();
-                }
+                changed |= ui
+                    .input_int("Layer", &mut self.layer)
+                    .step(1)
+                    .step_fast(10)
+                    .build();
             }
 
             if let Some(_token) = ui.tab_item("Filter") {
@@ -176,6 +174,8 @@ impl Pack {
                 self.render_debug(ui, ctx);
             }
         }
+
+        changed
     }
 
     fn render_debug(&mut self, ui: &Ui, ctx: &RenderCtx) {

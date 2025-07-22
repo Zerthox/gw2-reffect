@@ -30,7 +30,6 @@ impl Addon {
     }
 
     pub fn render_displays(&mut self, ui: &Ui, ctx: &Context) {
-        // TODO: profiling?
         if ctx.ui.should_show() || ctx.edit.is_editing() {
             let _font = self.settings.font.push();
             let ctx = RenderCtx::create(ui, ctx, &self.settings);

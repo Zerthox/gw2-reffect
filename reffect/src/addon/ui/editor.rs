@@ -86,12 +86,17 @@ impl Addon {
                 ChildWindow::new("element-options").build(ui, || {
                     let _style = small_padding(ui);
                     let ctx = RenderCtx::create(ui, ctx, &self.settings);
+                    let mut reorder = false;
                     for pack in &mut self.packs {
-                        let rendered = pack.try_render_options(ui, &ctx);
+                        let (rendered, changed) = pack.try_render_options(ui, &ctx);
+                        reorder |= changed;
                         if rendered {
                             // end after we find the element that has to render
                             break;
                         }
+                    }
+                    if reorder {
+                        self.packs.sort_by_key(|pack| pack.layer);
                     }
                 });
             });
