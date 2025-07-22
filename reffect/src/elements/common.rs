@@ -78,7 +78,7 @@ impl Common {
         self.trigger.update(ctx, parent_active)
     }
 
-    pub fn push_style<'ui, 'ctx>(&mut self, ui: &'ui Ui, ctx: &RenderCtx) -> impl Drop + 'ui {
+    pub fn push_style<'ui>(&mut self, ui: &'ui Ui, ctx: &RenderCtx) -> impl Drop + 'ui {
         struct Token<T>(T);
 
         impl<T> Drop for Token<T> {

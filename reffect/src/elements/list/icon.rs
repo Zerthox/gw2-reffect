@@ -60,7 +60,6 @@ impl ListIcon {
                 icon: self.icon,
                 size,
             }),
-            ..Element::default()
         }
     }
 

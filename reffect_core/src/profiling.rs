@@ -17,13 +17,12 @@ pub fn toggle(enabled: bool) {
 }
 
 #[inline]
-pub fn measure<R>(work: impl FnOnce() -> R, log: impl FnOnce(Duration)) -> R {
-    #[cfg(feature = "profile")]
-    if enabled() {
-        return measure_always(work, log);
+pub fn measure<R>(work: impl FnOnce() -> R, _log: impl FnOnce(Duration)) -> R {
+    if cfg!(feature = "profile") {
+        measure_always(work, _log)
+    } else {
+        work()
     }
-
-    work()
 }
 
 #[inline]
