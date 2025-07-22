@@ -58,9 +58,10 @@ impl ProgressTrigger {
         if ctx.edit.is_editing() {
             Some(self.source.progress_edit(ctx, parent))
         } else {
-            self.source.progress(ctx, parent)
+            self.source
+                .progress(ctx, parent)
+                .filter(|active| self.source.no_threshold() || self.threshold.is_met(active, ctx))
         }
-        .filter(|active| self.source.no_threshold() || self.threshold.is_met(active, ctx))
     }
 
     pub fn active(&self) -> Option<&ProgressActive> {
