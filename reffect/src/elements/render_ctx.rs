@@ -35,9 +35,18 @@ impl<'a> RenderCtx<'a> {
         }
     }
 
-    /// Creates a new render context for a child.
+    /// Pushes a new state to the render context.
+    ///
+    /// Dropping the returned token reverts to the previous state.
+    pub fn push(&self) -> Token {
+        Token::capture(self)
+    }
+
+    /// Pushes a new child to the render context.
+    ///
+    /// Dropping the returned token reverts to the previous state.
     pub fn push_child(&self, ui: &Ui, common: &Common) -> Token {
-        let token = Token::capture(self);
+        let token = self.push();
         let edited = if self.context.edit.settings.show_all {
             self.context.edit.is_edited_or_parent(common.id)
         } else {
@@ -48,11 +57,18 @@ impl<'a> RenderCtx<'a> {
         token
     }
 
-    /// Creates a new render context with an offset.
+    /// Pushes a new offset to the new render context
+    ///
+    /// Dropping the returned token reverts to the previous state.
     pub fn push_offset(&self, offset: [f32; 2]) -> Token {
-        let token = Token::capture(self);
-        self.pos.set(self.pos().add(offset));
+        let token = self.push();
+        self.add_offset(offset);
         token
+    }
+
+    /// Adds an offset to the current position.
+    pub fn add_offset(&self, offset: [f32; 2]) {
+        self.pos.set(self.pos().add(offset))
     }
 
     /// Checks whether the current element is visible in edit mode.
@@ -75,14 +91,14 @@ impl Deref for RenderCtx<'_> {
 }
 
 #[derive(Debug)]
-pub struct Token<'a, 'b> {
-    ctx: &'a RenderCtx<'b>,
+pub struct Token<'r, 'a> {
+    ctx: &'r RenderCtx<'a>,
     edited: bool,
     pos: [f32; 2],
 }
 
 impl<'a, 'b> Token<'a, 'b> {
-    pub fn capture(ctx: &'a RenderCtx<'b>) -> Self {
+    fn capture(ctx: &'a RenderCtx<'b>) -> Self {
         Self {
             ctx,
             edited: ctx.is_edited(),

@@ -78,7 +78,7 @@ impl ProgressTrigger {
         }
 
         if changed {
-            self.update(ctx, None); // TODO: access parent active?
+            self.update(ctx, None);
         }
     }
 

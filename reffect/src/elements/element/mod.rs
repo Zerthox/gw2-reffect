@@ -2,7 +2,7 @@ mod kind;
 
 pub use self::kind::*;
 
-use super::{Animation, Common, RenderCtx};
+use super::{Common, RenderCtx};
 use crate::{
     action::ElementAction,
     colors,
@@ -20,8 +20,6 @@ use serde::{Deserialize, Serialize};
 pub struct Element {
     #[serde(flatten)]
     pub common: Common,
-
-    pub animation: Option<Animation>,
 
     #[serde(flatten)]
     pub kind: ElementType,
@@ -42,14 +40,8 @@ impl Element {
         if self.common.is_visible(ctx) {
             if self.common.update(ctx, parent.trigger.active()) || self.kind.is_passthrough() {
                 let _token = ctx.push_child(ui, &self.common);
-                let _style = self.common.push_style(ui);
-
-                let mut body = || self.kind.render(ui, ctx, &self.common);
-                if let Some(animation) = &mut self.animation {
-                    animation.render(ui, body);
-                } else {
-                    body();
-                }
+                let _style = self.common.push_style(ui, ctx);
+                self.kind.render(ui, ctx, &self.common);
             }
 
             if ctx.edit.is_edited(self.common.id) {
@@ -155,7 +147,6 @@ impl Element {
     /// Renders the element options.
     pub fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) {
         if let Some(_token) = ui.tab_bar(self.common.id_string()) {
-            let _token = ctx.push_child(ui, &self.common);
             if let Some(_token) = ui.tab_item(&self.kind) {
                 self.common.render_options(ui, ctx);
                 ui.spacing();
@@ -170,17 +161,7 @@ impl Element {
             }
 
             if let Some(_token) = ui.tab_item("Animation") {
-                if self.animation.is_some() {
-                    if ui.checkbox("Enabled", &mut true) {
-                        self.animation = None;
-                    }
-                } else if ui.checkbox("Enabled", &mut false) {
-                    self.animation = Some(Animation::default());
-                }
-
-                if let Some(animation) = &mut self.animation {
-                    animation.render_options(ui);
-                }
+                self.common.render_animation(ui);
             }
 
             if let Some(_token) = ui.tab_item("?") {

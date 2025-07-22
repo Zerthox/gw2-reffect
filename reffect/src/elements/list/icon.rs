@@ -73,9 +73,7 @@ impl ListIcon {
             icon: element.icon,
         }
     }
-}
 
-impl ListIcon {
     pub fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) -> DynAction<Self> {
         ui.checkbox("Enabled", &mut self.enabled);
         ui.input_text("Name", &mut self.name).build();

@@ -4,7 +4,7 @@ use crate::{
     clipboard::Clipboard,
     colors,
     context::{Context, EditState},
-    elements::RenderCtx,
+    elements::{Animation, RenderCtx},
     enums::EnumStaticVariants,
     id::Id,
     render::{
@@ -44,6 +44,8 @@ pub struct Common {
 
     pub filter: FilterTrigger,
 
+    pub animation: Option<Animation>,
+
     #[serde(skip)]
     pub dragging: bool,
 
@@ -76,8 +78,16 @@ impl Common {
         self.trigger.update(ctx, parent_active)
     }
 
-    pub fn push_style<'ui>(&self, ui: &'ui Ui) -> impl Drop + 'ui {
-        push_alpha_change(ui, self.opacity)
+    pub fn push_style<'ui, 'ctx>(&mut self, ui: &'ui Ui, ctx: &RenderCtx) -> impl Drop + 'ui {
+        struct Token<T>(T);
+
+        impl<T> Drop for Token<T> {
+            fn drop(&mut self) {}
+        }
+
+        let alpha = push_alpha_change(ui, self.opacity);
+        let anim = self.animation.as_mut().map(|anim| anim.animate(ui, ctx));
+        Token((anim, alpha))
     }
 
     /// Renders the element edit indicators.
@@ -236,6 +246,20 @@ impl Common {
         self.filter.render_options(ui, ctx);
     }
 
+    pub fn render_animation(&mut self, ui: &Ui) {
+        if self.animation.is_some() {
+            if ui.checkbox("Enabled", &mut true) {
+                self.animation = None;
+            }
+        } else if ui.checkbox("Enabled", &mut false) {
+            self.animation = Some(Animation::default());
+        }
+
+        if let Some(animation) = &mut self.animation {
+            animation.render_options(ui);
+        }
+    }
+
     pub fn render_debug(&mut self, ui: &Ui, ctx: &RenderCtx) {
         ui.text(format!("Id: {}", self.id));
         ui.text(format!("Pos: {:?}", self.pos_root(ui)));
@@ -256,6 +280,7 @@ impl Default for Common {
             opacity: 1.0,
             trigger: ProgressTrigger::default(),
             filter: FilterTrigger::default(),
+            animation: None,
             dragging: false,
             resize: 1.0,
         }
@@ -273,6 +298,7 @@ impl Clone for Common {
             opacity: self.opacity,
             trigger: self.trigger.clone(),
             filter: self.filter.clone(),
+            animation: self.animation.clone(),
             dragging: false,
             resize: 1.0,
         }

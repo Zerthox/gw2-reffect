@@ -65,7 +65,7 @@ impl Pack {
             self.common.update(ctx, None);
             {
                 let _token = ctx.push_child(ui, &self.common);
-                let _style = self.common.push_style(ui);
+                let _style = self.common.push_style(ui, ctx);
 
                 for element in &mut self.elements {
                     element.render(ui, ctx, &self.common);
@@ -168,6 +168,10 @@ impl Pack {
 
             if let Some(_token) = ui.tab_item("Filter") {
                 self.common.render_filters(ui, ctx);
+            }
+
+            if let Some(_token) = ui.tab_item("Animation") {
+                self.common.render_animation(ui);
             }
 
             if let Some(_token) = ui.tab_item("?") {
