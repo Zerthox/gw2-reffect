@@ -233,8 +233,16 @@ impl IconList {
 impl Bounds for IconList {
     fn bounds(&self, _ui: &Ui, _ctx: &Context) -> Rect {
         // calculate with all visible and at least 1 dummy
-        let len = self.icons.len().max(1);
-        self.direction.icon_list_bounds(self.size, self.pad, len)
+        let len = match self.layout {
+            Layout::Dynamic => self
+                .icons
+                .iter()
+                .filter(|icon| icon.enabled && icon.trigger.active().is_some())
+                .count(),
+            Layout::Static => self.icons.len(),
+        };
+        self.direction
+            .icon_list_bounds(self.size, self.pad, len.max(1))
     }
 }
 
