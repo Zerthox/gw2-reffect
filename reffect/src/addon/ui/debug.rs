@@ -165,7 +165,7 @@ fn debug_player_resources(ui: &Ui, resources: &PlayerResources) {
     ui.text("Defiance:");
     ui.same_line();
     match defiance {
-        Some(defiance) => ui.text(format!("{:.2}", 100.0 * defiance)),
+        Some(defiance) => ui.text(format!("{defiance:.2}")),
         None => ui.text("-"),
     }
 
