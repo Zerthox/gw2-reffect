@@ -231,13 +231,25 @@ impl Icon {
     }
 
     pub fn render_debug(&mut self, ui: &Ui, _ctx: &RenderCtx) {
+        const SIZE: [f32; 2] = [64.0, 64.0];
+
+        let texture = self.source.get_texture(Skill::Unknown);
         debug_optional(
             ui,
             "Texture",
-            self.source
-                .get_texture(Skill::Unknown)
-                .map(|texture| texture.id() as *mut ()),
+            texture.map(|texture| texture.id() as *mut ()),
         );
+        if let Some(texture) = texture {
+            if ui.is_item_hovered() {
+                ui.tooltip(|| {
+                    let pos = ui.cursor_screen_pos();
+                    ui.dummy(SIZE);
+                    ui.get_foreground_draw_list()
+                        .add_image(texture, pos, pos.add(SIZE))
+                        .build();
+                });
+            }
+        }
     }
 }
 
