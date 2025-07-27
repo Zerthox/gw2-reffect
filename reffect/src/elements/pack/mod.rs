@@ -8,6 +8,7 @@ use crate::{
     },
     schema::Schema,
     tree::{FontReloader, Loader, Resizer, TreeNode, VisitMut},
+    trigger::{FilterTrigger, MapTrigger},
 };
 use nexus::imgui::{MenuItem, StyleColor, Ui};
 use serde::{Deserialize, Serialize};
@@ -206,6 +207,10 @@ impl Default for Pack {
         Self {
             common: Common {
                 anchor: Anchor::Screen(ScreenAnchor::default()),
+                filter: FilterTrigger {
+                    map: MapTrigger::non_competitive(),
+                    ..FilterTrigger::default()
+                },
                 ..Common::default()
             },
             layer: 0,

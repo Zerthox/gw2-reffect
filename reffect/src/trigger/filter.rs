@@ -1,9 +1,10 @@
 use super::{MapTrigger, PlayerTrigger, Trigger, map::legacy::MapTriggerLegacy};
 use crate::{context::Context, serde::migrate};
+use const_default::ConstDefault;
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, ConstDefault, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct FilterTrigger {
     pub player: PlayerTrigger, // player not memoized due to combat & mount

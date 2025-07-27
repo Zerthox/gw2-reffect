@@ -2,7 +2,7 @@ use crate::{
     colors::{Color, Colored},
     named::Named,
 };
-use enumflags2::bitflags;
+use enumflags2::{BitFlags, bitflags};
 use nexus::data_link::mumble::{MumblePtr, map_type};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
@@ -98,6 +98,10 @@ impl MapCategory {
 
             _ => Self::Other,
         }
+    }
+
+    pub fn non_competitive() -> BitFlags<Self> {
+        Self::PvE | Self::Instance | Self::Other
     }
 }
 

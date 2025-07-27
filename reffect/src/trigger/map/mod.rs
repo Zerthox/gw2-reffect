@@ -47,6 +47,13 @@ impl Default for MapTrigger {
 }
 
 impl MapTrigger {
+    pub fn non_competitive() -> Self {
+        Self {
+            category: MapCategory::non_competitive(),
+            ..Self::default()
+        }
+    }
+
     pub fn update(&mut self, ctx: &Context) {
         self.active = self.resolve_active(ctx);
     }
