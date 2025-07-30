@@ -255,9 +255,9 @@ dependencies = [
 
 [[package]]
 name = "dyn-clone"
-version = "1.0.19"
+version = "1.0.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1c7a8fb8a9fbf66c1f703fe16184d10ca0ee9d23be5b4436400408ba54a95005"
+checksum = "d0881ea181b1df73ff77ffaaf9c7544ecc11e82fba9b5f27b262a3c73a332555"
 
 [[package]]
 name = "enumflags2"
@@ -617,7 +617,7 @@ dependencies = [
 [[package]]
 name = "nexus"
 version = "0.10.0"
-source = "git+https://github.com/zerthox/nexus-rs#0f24048de1e07033830b4989f690ea1dbc592747"
+source = "git+https://github.com/zerthox/nexus-rs#a7beaab2ac29cc8d78b6d2cd32e1bd8f920ac16f"
 dependencies = [
  "arcdps-imgui",
  "bitflags 2.9.1",
@@ -632,7 +632,7 @@ dependencies = [
 [[package]]
 name = "nexus_codegen"
 version = "0.3.0"
-source = "git+https://github.com/zerthox/nexus-rs#0f24048de1e07033830b4989f690ea1dbc592747"
+source = "git+https://github.com/zerthox/nexus-rs#a7beaab2ac29cc8d78b6d2cd32e1bd8f920ac16f"
 dependencies = [
  "cfg-if",
  "paste",
@@ -928,7 +928,7 @@ dependencies = [
 
 [[package]]
 name = "reffect"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "const-default",
  "enumflags2",
@@ -952,7 +952,7 @@ dependencies = [
 
 [[package]]
 name = "reffect_core"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "base64",
  "enumflags2",
