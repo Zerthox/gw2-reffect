@@ -1,5 +1,6 @@
 use super::GeneralSettings;
 use crate::context::{Context, EditSettings};
+use semver::Version;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
@@ -22,6 +23,10 @@ impl ContextSettings {
             edit_during_combat: None,
             edit_show_all: None,
         }
+    }
+
+    pub fn migrate(&mut self, version: &Version) -> bool {
+        self.general.migrate(version)
     }
 
     pub fn apply(self, settings: &mut GeneralSettings, ctx: &mut Context) {

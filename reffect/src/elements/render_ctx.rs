@@ -1,5 +1,5 @@
 use super::Common;
-use crate::{context::Context, elements::Anchor, render::ComponentWise, settings::GeneralSettings};
+use crate::{context::Context, elements::ElementAnchor, render::ComponentWise, settings::GeneralSettings};
 use nexus::imgui::Ui;
 use std::{cell::Cell, ops::Deref};
 
@@ -31,7 +31,7 @@ impl<'a> RenderCtx<'a> {
             context: game,
             settings,
             edit: Cell::new(false),
-            pos: Cell::new(Anchor::root(ui)),
+            pos: Cell::new(ElementAnchor::root(ui)),
         }
     }
 

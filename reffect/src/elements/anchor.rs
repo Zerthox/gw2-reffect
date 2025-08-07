@@ -1,10 +1,13 @@
-use crate::{enums::check_variant_array, render::enum_combo};
-use const_default::ConstDefault;
+use crate::{
+    enums::check_variant_array,
+    render::{ComponentWise, enum_combo},
+};
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
-use strum::{AsRefStr, EnumCount, EnumIter, VariantArray};
+use std::{iter::Copied, slice};
+use strum::{AsRefStr, EnumCount, EnumIter, IntoEnumIterator, VariantArray};
 
-/// Anchor point.
+/// Element anchor point.
 #[derive(
     Debug,
     Default,
@@ -15,36 +18,43 @@ use strum::{AsRefStr, EnumCount, EnumIter, VariantArray};
     PartialOrd,
     Ord,
     Hash,
-    EnumIter,
     EnumCount,
     AsRefStr,
     Serialize,
     Deserialize,
 )]
-pub enum Anchor {
+pub enum ElementAnchor {
     #[default]
     Parent,
 
-    Screen(ScreenAnchor),
+    Screen(Anchor),
 }
 
-impl VariantArray for Anchor {
-    const VARIANTS: &'static [Self] = &[Self::Parent, Self::Screen(ScreenAnchor::Center)];
+impl VariantArray for ElementAnchor {
+    const VARIANTS: &'static [Self] = &[Self::Parent, Self::Screen(Anchor::Center)];
 }
 
-const _: () = check_variant_array::<Anchor>();
+impl IntoEnumIterator for ElementAnchor {
+    type Iterator = Copied<slice::Iter<'static, Self>>;
 
-impl Anchor {
+    fn iter() -> Self::Iterator {
+        Self::VARIANTS.iter().copied()
+    }
+}
+
+const _: () = check_variant_array::<ElementAnchor>();
+
+impl ElementAnchor {
     /// Calculates the root position.
     pub fn root(ui: &Ui) -> [f32; 2] {
-        ScreenAnchor::Center.calc_pos(ui)
+        Anchor::Center.screen_pos(ui)
     }
 
     /// Calculates the anchor position.
     pub fn pos(&self, ui: &Ui, parent: [f32; 2]) -> [f32; 2] {
         match self {
             Self::Parent => parent,
-            Self::Screen(screen) => screen.calc_pos(ui),
+            Self::Screen(screen) => screen.screen_pos(ui),
         }
     }
 
@@ -60,7 +70,7 @@ impl Anchor {
     }
 }
 
-/// Screen anchor point.
+/// Fixed anchor point.
 #[derive(
     Debug,
     Clone,
@@ -76,7 +86,7 @@ impl Anchor {
     Serialize,
     Deserialize,
 )]
-pub enum ScreenAnchor {
+pub enum Anchor {
     #[strum(serialize = "Top Left")]
     TopLeft,
 
@@ -104,36 +114,38 @@ pub enum ScreenAnchor {
     BottomRight,
 }
 
-impl ScreenAnchor {
-    /// Calculates the screen position.
-    pub fn calc_pos(&self, ui: &Ui) -> [f32; 2] {
-        let [screen_x, screen_y] = ui.io().display_size;
+impl Anchor {
+    /// Calculates the anchor position.
+    pub fn pos(&self, size: [f32; 2]) -> [f32; 2] {
+        let [width, height] = size;
         match self {
             Self::TopLeft => [0.0, 0.0],
-            Self::TopRight => [screen_x, 0.0],
-            Self::BottomLeft => [0.0, screen_y],
-            Self::BottomRight => [screen_x, screen_y],
-            Self::Center => [0.5 * screen_x, 0.5 * screen_y],
-            Self::TopCenter => [0.5 * screen_x, 0.0],
-            Self::BottomCenter => [0.5 * screen_x, screen_y],
-            Self::LeftCenter => [0.0, 0.5 * screen_y],
-            Self::RightCenter => [screen_x, 0.5 * screen_y],
+            Self::TopRight => [width, 0.0],
+            Self::BottomLeft => [0.0, height],
+            Self::BottomRight => [width, height],
+            Self::Center => [0.5 * width, 0.5 * height],
+            Self::TopCenter => [0.5 * width, 0.0],
+            Self::BottomCenter => [0.5 * width, height],
+            Self::LeftCenter => [0.0, 0.5 * height],
+            Self::RightCenter => [width, 0.5 * height],
         }
     }
-}
 
-impl ConstDefault for ScreenAnchor {
-    const DEFAULT: Self = Self::Center;
-}
+    /// Calculates the screen position.
+    pub fn screen_pos(&self, ui: &Ui) -> [f32; 2] {
+        let size = ui.io().display_size;
+        self.pos(size)
+    }
 
-impl Default for ScreenAnchor {
-    fn default() -> Self {
-        Self::DEFAULT
+    /// Calculates the item alignment.
+    pub fn align(&self, size: [f32; 2]) -> [f32; 2] {
+        // align is inverse of pos
+        self.pos(size).neg()
     }
 }
 
-impl From<ScreenAnchor> for Anchor {
-    fn from(screen: ScreenAnchor) -> Self {
+impl From<Anchor> for ElementAnchor {
+    fn from(screen: Anchor) -> Self {
         Self::Screen(screen)
     }
 }

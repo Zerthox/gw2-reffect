@@ -6,6 +6,7 @@ pub mod icon;
 pub use self::{context::*, general::*};
 
 use crate::{addon::Addon, context::Context};
+use semver::Version;
 use serde::{Deserialize, Serialize};
 use std::{
     fs::File,
@@ -18,14 +19,14 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct AddonSettings {
-    pub version: String,
+    pub version: Option<String>,
     pub context: ContextSettings,
 }
 
 impl AddonSettings {
     pub fn new(settings: &GeneralSettings, ctx: &Context) -> Self {
         Self {
-            version: VERSION.into(),
+            version: Some(VERSION.into()),
             context: ContextSettings::new(settings, ctx),
         }
     }
@@ -36,22 +37,34 @@ impl AddonSettings {
 
     pub fn try_load() -> Option<Self> {
         let path = Self::file();
+        log::info!("Loading settings from \"{}\"", path.display());
         let file = File::open(&path)
             .inspect_err(|err| log::warn!("Failed to read settings file: {err}"))
             .ok()?;
         let reader = BufReader::new(file);
-        let settings = serde_json::from_reader(reader)
+        serde_json::from_reader(reader)
             .inspect_err(|err| log::warn!("Failed to parse settings file: {err}"))
-            .ok()?;
-        log::info!("Loaded settings from \"{}\"", path.display());
-        Some(settings)
+            .ok()
     }
 
     pub fn apply(self, settings: &mut GeneralSettings, ctx: &mut Context) {
         let Self {
-            version: _,
-            context,
+            version,
+            mut context,
         } = self;
+
+        match version.map(|string| Version::parse(&string)) {
+            Some(Ok(version)) => {
+                if context.migrate(&version) {
+                    log::info!("Migrated settings from v{version}")
+                } else {
+                    log::info!("Loaded settings from v{version}")
+                }
+            }
+            Some(Err(err)) => log::warn!("Invalid settings version: {err}"),
+            None => log::warn!("Settings are missing version"),
+        }
+
         context.apply(settings, ctx);
     }
 

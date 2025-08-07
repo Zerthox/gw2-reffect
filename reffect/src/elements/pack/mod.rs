@@ -1,4 +1,4 @@
-use super::{Anchor, Common, Element, ScreenAnchor};
+use super::{Anchor, Common, Element, ElementAnchor};
 use crate::{
     colors,
     context::EditState,
@@ -75,7 +75,7 @@ impl Pack {
 
             if ctx.edit.is_edited(self.common.id) {
                 let bounds = Bounds::combined_bounds(self.elements.iter(), ui, ctx);
-                let pos = Anchor::root(ui);
+                let pos = ElementAnchor::root(ui);
                 self.common.render_edit_indicators(ui, pos, bounds)
             }
         }
@@ -206,7 +206,7 @@ impl Default for Pack {
     fn default() -> Self {
         Self {
             common: Common {
-                anchor: Anchor::Screen(ScreenAnchor::default()),
+                anchor: ElementAnchor::Screen(Anchor::Center),
                 filter: FilterTrigger {
                     map: MapTrigger::non_competitive(),
                     ..FilterTrigger::default()

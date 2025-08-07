@@ -1,4 +1,4 @@
-use super::{Anchor, ELEMENT_ID, Element, ElementType, ScreenAnchor};
+use super::{Anchor, ELEMENT_ID, Element, ElementAnchor, ElementType};
 use crate::{
     action::ChildElementAction,
     clipboard::Clipboard,
@@ -31,8 +31,8 @@ pub struct Common {
 
     pub name: String,
 
-    #[serde(deserialize_with = "migrate::<_, _, ScreenAnchor>")]
-    pub anchor: Anchor,
+    #[serde(deserialize_with = "migrate::<_, _, Anchor>")]
+    pub anchor: ElementAnchor,
     pub pos: [f32; 2],
 
     pub opacity: f32,
@@ -71,7 +71,7 @@ impl Common {
     }
 
     pub fn pos_root(&self, ui: &Ui) -> [f32; 2] {
-        self.pos(ui, Anchor::root(ui))
+        self.pos(ui, ElementAnchor::root(ui))
     }
 
     pub fn update(&mut self, ctx: &Context, parent_active: Option<&ProgressActive>) -> bool {
@@ -275,7 +275,7 @@ impl Default for Common {
             enabled: true,
             id: ELEMENT_ID.generate(),
             name: "Unnamed".into(),
-            anchor: Anchor::default(),
+            anchor: ElementAnchor::default(),
             pos: [0.0, 0.0],
             opacity: 1.0,
             trigger: ProgressTrigger::default(),

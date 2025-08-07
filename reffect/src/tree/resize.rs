@@ -1,6 +1,6 @@
 use super::VisitMut;
 use crate::{
-    elements::{Anchor, Bar, Common, Element, IconElement, IconList, Pack, Text},
+    elements::{ElementAnchor, Bar, Common, Element, IconElement, IconList, Pack, Text},
     render::ComponentWise,
 };
 
@@ -28,7 +28,7 @@ impl Resizer {
 
 impl VisitMut for Resizer {
     fn visit_common(&mut self, common: &mut Common) {
-        if common.anchor == Anchor::Parent {
+        if common.anchor == ElementAnchor::Parent {
             common.pos = common.pos.mul_scalar(self.factor);
         }
     }

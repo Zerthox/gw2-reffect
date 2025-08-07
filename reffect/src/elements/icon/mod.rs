@@ -4,14 +4,14 @@ mod source;
 
 pub use self::{element::*, props::*, source::*};
 
-use super::{Props, RenderCtx, align::AlignHorizontal};
+use super::{Props, RenderCtx};
 use crate::{
     action::DynAction,
     colors::{self, with_alpha, with_alpha_factor},
     context::Context,
-    render::{ComponentWise, Rect, debug_optional, draw_spinner_bg, draw_text_bg},
+    render::{ComponentWise, Rect, debug_optional, draw_spinner_bg},
     render_copy_field,
-    settings::icon::{DurationBarSettings, DurationTextSettings, StackTextSettings},
+    settings::icon::DurationBarSettings,
     trigger::{ProgressActive, ProgressValue, Skill},
 };
 use const_default::ConstDefault;
@@ -131,31 +131,20 @@ impl Icon {
 
             // render stack count
             if self.stacks_text {
-                let StackTextSettings {
-                    threshold,
-                    scale,
-                    offset,
-                    color: color @ [_, _, _, alpha],
-                    decoration,
-                } = ctx.settings.icon.stack_text;
+                let settings = &ctx.settings.icon.stack_text;
 
                 let stacks = active.intensity();
-                if stacks >= threshold {
+                if stacks >= settings.threshold {
                     let text = if stacks > 99 {
                         "!"
                     } else {
                         &stacks.to_string()
                     };
 
-                    let font_size = scale * small_size;
-                    let font_scale = font_size / ui.current_font_size();
-                    let [x_offset, _] = AlignHorizontal::Right.text_offset(ui, text, font_scale);
-                    let line_height = font_scale * ui.text_line_height();
-                    let text_pos = end.add([x_offset, -line_height]).sub(offset);
-
-                    let decoration_color = with_alpha(colors::BLACK, alpha);
-                    decoration.render(ui, text, text_pos, font_scale, decoration_color);
-                    draw_text_bg(ui, text, text_pos, font_scale, color);
+                    let color = settings.text.color;
+                    settings
+                        .text
+                        .render(ui, start, size, color, small_size, text);
                 }
             }
 
@@ -163,17 +152,8 @@ impl Icon {
             if self.duration_text {
                 if let Some(remain) = active.current(ProgressValue::Primary, ctx.now) {
                     let settings = &ctx.settings.icon.duration_text;
-                    let DurationTextSettings {
-                        threshold_buff: _,
-                        threshold_ability: _,
-                        scale,
-                        color: _,
-                        color_fast: _,
-                        color_slow: _,
-                        decoration,
-                    } = *settings;
-
                     let threshold = settings.threshold(active);
+
                     if remain < threshold as f32 {
                         let text = active.current_text(
                             ProgressValue::Primary,
@@ -182,15 +162,10 @@ impl Icon {
                             &ctx.settings.format,
                         );
 
-                        let font_size = scale * small_size;
-                        let font_scale = font_size / ui.current_font_size();
-                        let offset = AlignHorizontal::Center.text_offset(ui, &text, font_scale);
-                        let text_pos = ctx.pos().add(offset);
-
-                        let color @ [_, _, _, alpha] = settings.color(active.progress_rate());
-                        let decoration_color = with_alpha(colors::BLACK, alpha);
-                        decoration.render(ui, &text, text_pos, font_scale, decoration_color);
-                        draw_text_bg(ui, &text, text_pos, font_scale, color);
+                        let color = settings.color(active.progress_rate());
+                        settings
+                            .text
+                            .render(ui, start, size, color, small_size, text);
                     }
                 }
             }

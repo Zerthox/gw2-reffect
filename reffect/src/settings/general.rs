@@ -1,7 +1,11 @@
 use super::icon::IconSettings;
-use crate::render::{LoadedFont, helper, input_seconds};
+use crate::{
+    render::{LoadedFont, helper, input_seconds},
+    settings::icon::StackTextSettings,
+};
 use const_default::ConstDefault;
 use nexus::imgui::Ui;
+use semver::Version;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -23,6 +27,20 @@ impl GeneralSettings {
             font: LoadedFont::empty(),
             icon: IconSettings::new(),
         }
+    }
+
+    pub fn migrate(&mut self, version: &Version) -> bool {
+        const ICON_TEXT_ANCHORS: Version = Version::new(0, 7, 0);
+
+        let mut migrated = false;
+
+        // adjust stack text offset for anchor addition
+        if version < &ICON_TEXT_ANCHORS {
+            self.icon.stack_text.text.offset = StackTextSettings::DEFAULT.text.offset;
+            migrated = true
+        }
+
+        migrated
     }
 
     pub fn render_options(&mut self, ui: &Ui) {
