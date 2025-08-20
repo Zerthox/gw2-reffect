@@ -14,7 +14,7 @@ macro_rules! non_zero_u32 {
 
 pub use non_zero_u32;
 
-pub fn file_name(path: &Path) -> Cow<str> {
+pub fn file_name(path: &Path) -> Cow<'_, str> {
     path.file_name()
         .map(|file| file.to_string_lossy())
         .unwrap_or_default()
