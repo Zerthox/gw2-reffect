@@ -1,6 +1,6 @@
 use super::VisitMut;
 use crate::{
-    elements::{ElementAnchor, Bar, Common, Element, IconElement, IconList, Pack, Text},
+    elements::{Bar, Common, Element, ElementAnchor, IconElement, IconList, Pack, Text},
     render::ComponentWise,
 };
 
