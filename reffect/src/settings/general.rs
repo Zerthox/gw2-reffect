@@ -30,7 +30,7 @@ impl GeneralSettings {
     }
 
     pub fn migrate(&mut self, version: &Version) -> bool {
-        const ICON_TEXT_ANCHORS: Version = Version::new(0, 7, 0);
+        const ICON_TEXT_ANCHORS: Version = Version::new(0, 6, 2);
 
         let mut migrated = false;
 
@@ -53,9 +53,9 @@ impl GeneralSettings {
         } = self;
         ui.checkbox("Save pack changes on addon unload", save_on_unload);
 
-        ui.checkbox("Reuse game icons (expertimental)", use_game_icons);
+        ui.checkbox("Reuse game icons (experimental)", use_game_icons);
         helper(ui, || {
-            ui.text("Expertimental, may cause memory leaks and/or crashes")
+            ui.text("Experimental, may cause memory leaks and/or crashes")
         });
 
         format.render_options(ui);
