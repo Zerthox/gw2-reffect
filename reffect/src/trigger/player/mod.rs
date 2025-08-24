@@ -128,10 +128,12 @@ mod tests {
                 | Specialization::Dragonhunter
                 | Specialization::Firebrand
                 | Specialization::Willbender
+                | Specialization::Luminary
                 | Specialization::Necromancer
                 | Specialization::Reaper
                 | Specialization::Scourge
                 | Specialization::Harbinger
+                | Specialization::Ritualist
         );
 
         let mut trigger = PlayerTrigger {
