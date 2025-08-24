@@ -67,54 +67,63 @@ impl Profession {
                     | Specialization::Dragonhunter
                     | Specialization::Firebrand
                     | Specialization::Willbender
+                    | Specialization::Luminary
             }
             Self::Warrior => {
                 Specialization::Warrior
                     | Specialization::Berserker
                     | Specialization::Spellbreaker
                     | Specialization::Bladesworn
+                    | Specialization::Paragon
             }
             Self::Revenant => {
                 Specialization::Revenant
                     | Specialization::Herald
                     | Specialization::Renegade
                     | Specialization::Vindicator
+                    | Specialization::Conduit
             }
             Self::Engineer => {
                 Specialization::Engineer
                     | Specialization::Scrapper
                     | Specialization::Holosmith
                     | Specialization::Mechanist
+                    | Specialization::Amalgam
             }
             Self::Ranger => {
                 Specialization::Ranger
                     | Specialization::Druid
                     | Specialization::Soulbeast
                     | Specialization::Untamed
+                    | Specialization::Galeshot
             }
             Self::Thief => {
                 Specialization::Thief
                     | Specialization::Daredevil
                     | Specialization::Deadeye
                     | Specialization::Specter
+                    | Specialization::Antiquary
             }
             Self::Elementalist => {
                 Specialization::Elementalist
                     | Specialization::Tempest
                     | Specialization::Weaver
                     | Specialization::Catalyst
+                    | Specialization::Evoker
             }
             Self::Mesmer => {
                 Specialization::Mesmer
                     | Specialization::Chronomancer
                     | Specialization::Mirage
                     | Specialization::Virtuoso
+                    | Specialization::Troubadour
             }
             Self::Necromancer => {
                 Specialization::Necromancer
                     | Specialization::Reaper
                     | Specialization::Scourge
                     | Specialization::Harbinger
+                    | Specialization::Ritualist
             }
         }
     }

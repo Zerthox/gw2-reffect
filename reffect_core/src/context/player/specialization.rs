@@ -32,54 +32,63 @@ pub enum Specialization {
     Dragonhunter = 1 << 1,
     Firebrand = 1 << 2,
     Willbender = 1 << 3,
+    Luminary = 1 << 4,
 
     #[strum(serialize = "Warrior (core)")]
     Warrior = 1 << 5,
     Berserker = 1 << 6,
     Spellbreaker = 1 << 7,
     Bladesworn = 1 << 8,
+    Paragon = 1 << 9,
 
     #[strum(serialize = "Revenant (core)")]
     Revenant = 1 << 10,
     Herald = 1 << 11,
     Renegade = 1 << 12,
     Vindicator = 1 << 13,
+    Conduit = 1 << 14,
 
     #[strum(serialize = "Engineer (core)")]
     Engineer = 1 << 15,
     Scrapper = 1 << 16,
     Holosmith = 1 << 17,
     Mechanist = 1 << 18,
+    Amalgam = 1 << 19,
 
     #[strum(serialize = "Ranger (core)")]
     Ranger = 1 << 20,
     Druid = 1 << 21,
     Soulbeast = 1 << 22,
     Untamed = 1 << 23,
+    Galeshot = 1 << 24,
 
     #[strum(serialize = "Thief (core)")]
     Thief = 1 << 25,
     Daredevil = 1 << 26,
     Deadeye = 1 << 27,
     Specter = 1 << 28,
+    Antiquary = 1 << 29,
 
     #[strum(serialize = "Elementalist (core)")]
     Elementalist = 1 << 30,
     Tempest = 1 << 31,
     Weaver = 1 << 32,
     Catalyst = 1 << 33,
+    Evoker = 1 << 34,
 
     #[strum(serialize = "Mesmer (core)")]
     Mesmer = 1 << 35,
     Chronomancer = 1 << 36,
     Mirage = 1 << 37,
     Virtuoso = 1 << 38,
+    Troubadour = 1 << 39,
 
     #[strum(serialize = "Necromancer (core)")]
     Necromancer = 1 << 40,
     Reaper = 1 << 41,
     Scourge = 1 << 42,
     Harbinger = 1 << 43,
+    Ritualist = 1 << 44,
 }
 
 impl Specialization {
@@ -112,33 +121,64 @@ impl Specialization {
             70 => Some(Self::Mechanist),
             71 => Some(Self::Specter),
             72 => Some(Self::Untamed),
+            73 => Some(Self::Troubadour),
+            74 => Some(Self::Paragon),
+            75 => Some(Self::Amalgam),
+            76 => Some(Self::Ritualist),
+            77 => Some(Self::Antiquary),
+            78 => Some(Self::Galeshot),
+            79 => Some(Self::Conduit),
+            80 => Some(Self::Evoker),
+            81 => Some(Self::Luminary),
             _ => prof.map(|prof| prof.into()),
         }
     }
 
-    pub fn profession(&self) -> Profession {
+    pub const fn profession(&self) -> Profession {
         match self {
-            Self::Guardian | Self::Dragonhunter | Self::Firebrand | Self::Willbender => {
-                Profession::Guardian
-            }
-            Self::Warrior | Self::Berserker | Self::Spellbreaker | Self::Bladesworn => {
-                Profession::Warrior
-            }
-            Self::Revenant | Self::Herald | Self::Renegade | Self::Vindicator => {
+            Self::Guardian
+            | Self::Dragonhunter
+            | Self::Firebrand
+            | Self::Willbender
+            | Self::Luminary => Profession::Guardian,
+
+            Self::Warrior
+            | Self::Berserker
+            | Self::Spellbreaker
+            | Self::Bladesworn
+            | Self::Paragon => Profession::Warrior,
+
+            Self::Revenant | Self::Herald | Self::Renegade | Self::Vindicator | Self::Conduit => {
                 Profession::Revenant
             }
-            Self::Engineer | Self::Scrapper | Self::Holosmith | Self::Mechanist => {
+
+            Self::Engineer | Self::Scrapper | Self::Holosmith | Self::Mechanist | Self::Amalgam => {
                 Profession::Engineer
             }
-            Self::Ranger | Self::Druid | Self::Soulbeast | Self::Untamed => Profession::Ranger,
-            Self::Thief | Self::Daredevil | Self::Deadeye | Self::Specter => Profession::Thief,
-            Self::Elementalist | Self::Tempest | Self::Weaver | Self::Catalyst => {
+
+            Self::Ranger | Self::Druid | Self::Soulbeast | Self::Untamed | Self::Galeshot => {
+                Profession::Ranger
+            }
+
+            Self::Thief | Self::Daredevil | Self::Deadeye | Self::Specter | Self::Antiquary => {
+                Profession::Thief
+            }
+
+            Self::Elementalist | Self::Tempest | Self::Weaver | Self::Catalyst | Self::Evoker => {
                 Profession::Elementalist
             }
-            Self::Mesmer | Self::Chronomancer | Self::Mirage | Self::Virtuoso => Profession::Mesmer,
-            Self::Necromancer | Self::Reaper | Self::Scourge | Self::Harbinger => {
-                Profession::Necromancer
-            }
+
+            Self::Mesmer
+            | Self::Chronomancer
+            | Self::Mirage
+            | Self::Virtuoso
+            | Self::Troubadour => Profession::Mesmer,
+
+            Self::Necromancer
+            | Self::Reaper
+            | Self::Scourge
+            | Self::Harbinger
+            | Self::Ritualist => Profession::Necromancer,
         }
     }
 }
@@ -170,46 +210,55 @@ impl Named for Specialization {
             Self::Dragonhunter => "Dgh",
             Self::Firebrand => "Fbd",
             Self::Willbender => "Wbd",
+            Self::Luminary => "Lum",
 
             Self::Warrior => "War",
             Self::Berserker => "Brs",
             Self::Spellbreaker => "Spb",
-            Self::Bladesworn => "Bls",
+            Self::Bladesworn => "Bsw",
+            Self::Paragon => "Par",
 
             Self::Revenant => "Rev",
             Self::Herald => "Her",
             Self::Renegade => "Ren",
             Self::Vindicator => "Vin",
+            Self::Conduit => "Con",
 
             Self::Engineer => "Eng",
             Self::Scrapper => "Scr",
             Self::Holosmith => "Hls",
             Self::Mechanist => "Mec",
+            Self::Amalgam => "Ama",
 
             Self::Ranger => "Rgr",
             Self::Druid => "Dru",
             Self::Soulbeast => "Slb",
             Self::Untamed => "Unt",
+            Self::Galeshot => "Gls",
 
             Self::Thief => "Thf",
             Self::Daredevil => "Dar",
             Self::Deadeye => "Ded",
             Self::Specter => "Spe",
+            Self::Antiquary => "Ant",
 
             Self::Elementalist => "Ele",
             Self::Tempest => "Tmp",
             Self::Weaver => "Wea",
             Self::Catalyst => "Cat",
+            Self::Evoker => "Evo",
 
             Self::Mesmer => "Mes",
             Self::Chronomancer => "Chr",
             Self::Mirage => "Mir",
             Self::Virtuoso => "Vir",
+            Self::Troubadour => "Trb",
 
             Self::Necromancer => "Nec",
             Self::Reaper => "Rea",
             Self::Scourge => "Scg",
             Self::Harbinger => "Har",
+            Self::Ritualist => "Rit",
         }
     }
 }
