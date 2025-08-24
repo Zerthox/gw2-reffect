@@ -40,14 +40,14 @@ impl<'a> RenderCtx<'a> {
     /// Pushes a new state to the render context.
     ///
     /// Dropping the returned token reverts to the previous state.
-    pub fn push(&self) -> Token {
+    pub fn push(&self) -> Token<'_, 'a> {
         Token::capture(self)
     }
 
     /// Pushes a new child to the render context.
     ///
     /// Dropping the returned token reverts to the previous state.
-    pub fn push_child(&self, ui: &Ui, common: &Common) -> Token {
+    pub fn push_child(&self, ui: &Ui, common: &Common) -> Token<'_, 'a> {
         let token = self.push();
         let edited = if self.context.edit.settings.show_all {
             self.context.edit.is_edited_or_parent(common.id)
@@ -62,7 +62,7 @@ impl<'a> RenderCtx<'a> {
     /// Pushes a new offset to the new render context
     ///
     /// Dropping the returned token reverts to the previous state.
-    pub fn push_offset(&self, offset: [f32; 2]) -> Token {
+    pub fn push_offset(&self, offset: [f32; 2]) -> Token<'_, 'a> {
         let token = self.push();
         self.add_offset(offset);
         token
