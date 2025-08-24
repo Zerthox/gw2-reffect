@@ -1,8 +1,9 @@
-use super::TextSettings;
+use super::{TextSettings, legacy::StackTextSettingsLegacy};
 use crate::{
     colors::{self, with_alpha},
     elements::{Anchor, text::TextDecoration},
     render::{helper, input_u32},
+    serde::migrate,
 };
 use const_default::ConstDefault;
 use nexus::imgui::Ui;
@@ -13,7 +14,7 @@ use serde::{Deserialize, Serialize};
 pub struct StackTextSettings {
     pub threshold: u32,
 
-    #[serde(flatten)]
+    #[serde(flatten, deserialize_with = "migrate::<_, _, StackTextSettingsLegacy>")]
     pub text: TextSettings,
 }
 

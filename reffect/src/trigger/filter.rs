@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Default, ConstDefault, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct FilterTrigger {
-    pub player: PlayerTrigger, // player not memoized due to combat & mount
+    pub player: PlayerTrigger,
 
     #[serde(deserialize_with = "migrate::<_, _, MapTriggerLegacy>")]
     pub map: MapTrigger,

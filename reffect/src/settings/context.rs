@@ -25,8 +25,8 @@ impl ContextSettings {
         }
     }
 
-    pub fn migrate(&mut self, version: &Version) -> bool {
-        self.general.migrate(version)
+    pub fn migrate(&mut self, _version: &Version) -> bool {
+        false
     }
 
     pub fn apply(self, settings: &mut GeneralSettings, ctx: &mut Context) {

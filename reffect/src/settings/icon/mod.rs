@@ -1,9 +1,10 @@
 mod bar;
 mod duration_text;
-mod stacks_text;
+mod legacy;
+mod stack_text;
 mod text;
 
-pub use self::{bar::*, duration_text::*, stacks_text::*, text::*};
+pub use self::{bar::*, duration_text::*, stack_text::*, text::*};
 
 use serde::{Deserialize, Serialize};
 

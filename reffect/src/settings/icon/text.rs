@@ -8,7 +8,7 @@ use nexus::imgui::{ComboBoxFlags, Ui};
 use reffect_core::colors::{self, with_alpha};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct TextSettings {
     pub scale: f32,
     pub anchor: Anchor,

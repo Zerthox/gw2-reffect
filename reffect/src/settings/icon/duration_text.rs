@@ -1,8 +1,9 @@
-use super::TextSettings;
+use super::{TextSettings, legacy::DurationTextSettingsLegacy};
 use crate::{
     colors,
     elements::{Anchor, text::TextDecoration},
     render::{helper, input_color_alpha, input_seconds},
+    serde::migrate,
     trigger::ProgressActive,
 };
 use const_default::ConstDefault;
@@ -18,7 +19,10 @@ pub struct DurationTextSettings {
 
     pub threshold_ability: u32,
 
-    #[serde(flatten)]
+    #[serde(
+        flatten,
+        deserialize_with = "migrate::<_, _, DurationTextSettingsLegacy>"
+    )]
     pub text: TextSettings,
 
     pub color_fast: [f32; 4],
