@@ -1,6 +1,6 @@
 [package]
 name = "reffect_core"
-version = "0.6.1"
+version = "0.7.0"
 authors = ["Zerthox"]
 edition = "2024"
 repository = "https://github.com/zerthox/gw2-reffect"
