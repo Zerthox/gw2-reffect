@@ -117,18 +117,11 @@ impl Text {
                                 &ctx.settings.format,
                             ));
                         }
-                        'p' => {
+                        'p' | 'P' => {
                             iter.next();
                             let progress =
                                 active.progress_or_default(Self::parse_value(&mut iter), ctx.now);
                             result.push_str(&format!("{:.1}", (100.0 * progress)));
-                            self.frequent = is_timed;
-                        }
-                        'P' => {
-                            iter.next();
-                            let progress =
-                                active.progress_or_default(Self::parse_value(&mut iter), ctx.now);
-                            result.push_str(&format!("{}", (100.0 * progress).round() as i32)); // TODO: round vs ceil vs floor
                             self.frequent = is_timed;
                         }
                         &PREFIX => {
@@ -172,7 +165,7 @@ impl Text {
             ui.text("%i for intensity");
             ui.text("%c for current amount");
             ui.text("%f for full/max amount");
-            ui.text("%p for progress percent (decimal), %P for integer percent");
+            ui.text("%p for progress percent");
             ui.text("%% for % sign");
         });
     }
