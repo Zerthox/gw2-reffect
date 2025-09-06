@@ -4,16 +4,21 @@ use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 
 #[derive(
-    Debug, Clone, PartialEq, AsRefStr, IntoStaticStr, EnumIter, EnumCount, Serialize, Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    AsRefStr,
+    IntoStaticStr,
+    EnumIter,
+    EnumCount,
+    VariantArray,
+    Serialize,
+    Deserialize,
 )]
 pub enum StateType {
     Available,
     Pressed,
     Pending,
-}
-
-impl VariantArray for StateType {
-    const VARIANTS: &'static [Self] = &[Self::Available, Self::Pressed, Self::Pending];
 }
 
 const _: () = check_variant_array::<StateType>();
