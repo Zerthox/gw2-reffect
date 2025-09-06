@@ -144,6 +144,14 @@ impl ProgressActive {
         matches!(self, Self::Buff { .. } | Self::Ability { .. })
     }
 
+    /// Returns (available, pressed, pending) state info.
+    pub const fn state_info(&self) -> (bool, bool, bool) {
+        match self {
+            Self::Fixed { .. } | Self::Buff { .. } => (true, false, false),
+            Self::Ability { info, .. } => (info.available, info.pressed, info.pending),
+        }
+    }
+
     /// Whether the progress is inverted.
     pub const fn is_inverted(&self) -> bool {
         matches!(self, Self::Ability { .. })

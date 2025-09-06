@@ -7,11 +7,8 @@ use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
     Debug, Clone, PartialEq, AsRefStr, IntoStaticStr, EnumIter, EnumCount, Serialize, Deserialize,
 )]
 pub enum StateType {
-    #[strum(serialize = "Available")]
     Available,
-    #[strum(serialize = "Pressed")]
     Pressed,
-    #[strum(serialize = "Pending")]
     Pending,
 }
 
