@@ -144,11 +144,28 @@ impl ProgressActive {
         matches!(self, Self::Buff { .. } | Self::Ability { .. })
     }
 
-    /// Returns (available, pressed, pending) state info.
-    pub const fn state_info(&self) -> (bool, bool, bool) {
+    /// Returns whether this ability is available to be casted (recharge == 0)
+    /// this does not consider targets nor range or any other character states preventing a cast.
+    pub const fn is_available(&self) -> bool {
         match self {
-            Self::Fixed { .. } | Self::Buff { .. } => (true, false, false),
-            Self::Ability { info, .. } => (info.available, info.pressed, info.pending),
+            Self::Fixed { .. } | Self::Buff { .. } => true,
+            Self::Ability { info, .. } => info.available,
+        }
+    }
+
+    /// Returns whether this ability is currently pressed.
+    pub const fn is_pressed(&self) -> bool {
+        match self {
+            Self::Fixed { .. } | Self::Buff { .. } => false,
+            Self::Ability { info, .. } => info.pressed,
+        }
+    }
+
+    /// Returns whether this ability is in a queued/pending state.
+    pub const fn is_pending(&self) -> bool {
+        match self {
+            Self::Fixed { .. } | Self::Buff { .. } => false,
+            Self::Ability { info, .. } => info.pending,
         }
     }
 

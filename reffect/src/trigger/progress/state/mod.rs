@@ -17,11 +17,10 @@ pub struct TriggerState {
 
 impl TriggerState {
     pub fn is_active(&self, active: &ProgressActive, _ctx: &Context) -> bool {
-        let (available, pressed, pending) = active.state_info();
         let state_value = match self.state_type {
-            StateType::Available => available,
-            StateType::Pressed => pressed,
-            StateType::Pending => pending,
+            StateType::Available => active.is_available(),
+            StateType::Pressed => active.is_pressed(),
+            StateType::Pending => active.is_pending(),
         };
         state_value == self.condition
     }
