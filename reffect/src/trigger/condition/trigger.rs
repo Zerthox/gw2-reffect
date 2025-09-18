@@ -3,7 +3,7 @@ use crate::{
     context::Context,
     enums::check_variant_array,
     render::enum_combo,
-    trigger::{MapTrigger, PlayerTrigger, ProgressThreshold, Trigger},
+    trigger::{MapTrigger, PlayerTrigger, ProgressThreshold, Trigger, TriggerState},
 };
 use const_default::ConstDefault;
 use nexus::imgui::{ComboBoxFlags, Ui};
@@ -18,6 +18,9 @@ pub enum ConditionTrigger {
     #[strum(serialize = "Trigger Threshold")]
     ProgressThreshold(ProgressThreshold),
 
+    #[strum(serialize = "Trigger State")]
+    TriggerState(TriggerState),
+
     Player(PlayerTrigger),
 
     Map(MapTrigger),
@@ -26,6 +29,7 @@ pub enum ConditionTrigger {
 impl VariantArray for ConditionTrigger {
     const VARIANTS: &'static [Self] = &[
         Self::ProgressThreshold(ProgressThreshold::DEFAULT),
+        Self::TriggerState(TriggerState::DEFAULT),
         Self::Player(PlayerTrigger::DEFAULT),
         Self::Map(MapTrigger::DEFAULT),
     ];
@@ -47,6 +51,7 @@ impl ConditionTrigger {
     pub fn is_active(&mut self, ctx: &Context, active: &ProgressActive) -> bool {
         match self {
             Self::ProgressThreshold(threshold) => threshold.is_met(active, ctx),
+            Self::TriggerState(state) => state.is_active(active, ctx),
             Self::Player(player) => player.is_active(ctx),
             Self::Map(map) => map.is_active(ctx),
         }
@@ -61,6 +66,7 @@ impl fmt::Display for ConditionTrigger {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::ProgressThreshold(threshold) => threshold.fmt(f),
+            Self::TriggerState(state) => write!(f, "State {}", state),
             Self::Player(_) => write!(f, "Player"),
             Self::Map(_) => write!(f, "Map"),
         }
@@ -74,6 +80,9 @@ impl ConditionTrigger {
         match self {
             Self::ProgressThreshold(threshold) => {
                 threshold.render_options(ui);
+            }
+            Self::TriggerState(state) => {
+                state.render_options(ui);
             }
             Self::Player(player) => {
                 player.render_options(ui, ctx);
