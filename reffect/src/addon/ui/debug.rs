@@ -201,8 +201,6 @@ fn debug_buffs(ui: &Ui, ctx: &Context, buffs: &BuffMap) {
 }
 
 fn debug_skillbar(ui: &Ui, ctx: &Context, skillbar: &Skillbar) {
-    ui.text(format!("Bundle: {}", skillbar.has_bundle));
-
     for slot in Slot::iter() {
         ui.text(format!("{slot:<14} ="));
         if let Some(ability) = skillbar.slot(slot) {
@@ -217,7 +215,7 @@ fn debug_skillbar(ui: &Ui, ctx: &Context, skillbar: &Skillbar) {
             };
 
             ui.same_line();
-            ui.text(format!("{}x {:>5}", ability.ammo, ability.id));
+            ui.text(format!("{}x {}", ability.ammo, ability.id));
             drop(color);
 
             let _color = match ability.recharge_rate.total_cmp(&1.0) {

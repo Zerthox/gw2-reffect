@@ -5,6 +5,45 @@ pub use self::{ability::*, buff::*};
 
 use strum::{AsRefStr, Display, IntoStaticStr};
 
+/// Skill identifier.
+#[derive(
+    Debug,
+    Default,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    AsRefStr,
+    Display,
+    IntoStaticStr,
+)]
+pub enum SkillId {
+    #[default]
+    Unknown,
+
+    #[strum(serialize = "Weapon Swap")]
+    WeaponSwap,
+
+    #[strum(serialize = "Bundle Drop")]
+    BundleDrop,
+
+    #[strum(serialize = "Pet Swap")]
+    PetSwap,
+
+    #[strum(serialize = "{0:>5}")]
+    Id(u32),
+}
+
+impl From<u32> for SkillId {
+    #[inline]
+    fn from(id: u32) -> Self {
+        Self::Id(id)
+    }
+}
+
 /// Information about a skill.
 #[derive(Debug, Clone)]
 pub enum SkillInfo {

@@ -1,4 +1,4 @@
-use super::{ProgressActive, Skill};
+use super::ProgressActive;
 use crate::{
     action::Action,
     context::{Buff, Category, Context, SkillInfo, Slot},
@@ -125,8 +125,7 @@ impl ProgressSource {
             Self::SkillbarSlot(slot) => {
                 let skillbar = ctx.player.skillbar.as_ref().ok()?;
                 let ability = skillbar.slot(slot)?;
-                let skill = Skill::from_slot(skillbar, slot);
-                Some(ProgressActive::from_ability(skill, ability))
+                Some(ProgressActive::from_ability(ability))
             }
             Self::Ability(ref ids) => {
                 let skillbar = ctx.player.skillbar.as_ref().ok()?;
@@ -134,7 +133,7 @@ impl ProgressSource {
                     .copied()
                     .filter(|id| *id > 0)
                     .find_map(|id| skillbar.ability(id))
-                    .map(|ability| ProgressActive::from_ability(ability.id.into(), ability))
+                    .map(|ability| ProgressActive::from_ability(ability))
             }
             Self::Health => {
                 let resources = ctx.player.resources.as_ref().ok()?;
@@ -187,7 +186,9 @@ impl ProgressSource {
                     .player
                     .skillbar
                     .as_ref()
-                    .map(|skillbar| Skill::from_slot(skillbar, slot))
+                    .ok()
+                    .and_then(|skillbar| skillbar.slot(slot))
+                    .map(|ability| ability.id)
                     .unwrap_or_default();
                 ProgressActive::edit_ability(skill, progress, ctx.now)
             }

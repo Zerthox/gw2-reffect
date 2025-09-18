@@ -1,3 +1,4 @@
+use super::SkillId;
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, Display, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 
@@ -6,9 +7,6 @@ pub type SkillSlots = [Option<Ability>; Slot::COUNT];
 /// Character skillbar.
 #[derive(Debug, Default, Clone)]
 pub struct Skillbar {
-    /// Whether the player is carrying a bundle.
-    pub has_bundle: bool,
-
     /// Skill entries.
     pub skills: SkillSlots,
 }
@@ -20,9 +18,10 @@ impl Skillbar {
         self.skills[slot as usize].as_ref()
     }
 
-    /// Returns the ability with the given id.
+    /// Returns the ability with the given identifier.
     #[inline]
-    pub fn ability(&self, id: u32) -> Option<&Ability> {
+    pub fn ability(&self, id: impl Into<SkillId>) -> Option<&Ability> {
+        let id = id.into();
         self.skills.iter().flatten().find(|ablity| ablity.id == id)
     }
 
@@ -36,8 +35,8 @@ impl Skillbar {
 /// Ability.
 #[derive(Debug, Clone)]
 pub struct Ability {
-    /// Skill id.
-    pub id: u32,
+    /// Ability identifier.
+    pub id: SkillId,
 
     /// Ammunition count.
     pub ammo: u32,
@@ -73,8 +72,8 @@ pub struct Ability {
 impl Ability {
     /// Creates a new ability without cooldowns.
     #[inline]
-    pub const fn new(
-        id: u32,
+    pub fn new(
+        id: impl Into<SkillId>,
         ammo: u32,
         last_update: u32,
         recharge_rate: f32,
@@ -83,7 +82,7 @@ impl Ability {
         is_pending: bool,
     ) -> Self {
         Self {
-            id,
+            id: id.into(),
             ammo,
             last_update,
             recharge_rate,
@@ -99,9 +98,9 @@ impl Ability {
 
     /// Creates a new ability with simple recharge.
     #[inline]
-    pub const fn simple(id: u32, last_update: u32, recharge: u32) -> Self {
+    pub fn simple(id: impl Into<SkillId>, last_update: u32, recharge: u32) -> Self {
         Self {
-            id,
+            id: id.into(),
             ammo: if recharge == 0 { 1 } else { 0 },
             last_update,
             recharge_rate: 1.0,

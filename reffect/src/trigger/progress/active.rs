@@ -1,11 +1,10 @@
 use super::ProgressInfo;
 use crate::{
-    context::{Ability, Buff, Resource, Skillbar, Slot},
+    context::{Ability, Buff, Resource, SkillId},
     fmt::{Time, Unit},
     settings::FormatSettings,
 };
 
-// TODO: add ability flags?
 #[derive(Debug, Clone)]
 pub enum ProgressActive {
     Fixed {
@@ -19,7 +18,7 @@ pub enum ProgressActive {
         end: u32,
     },
     Ability {
-        skill: Skill,
+        id: SkillId,
         info: ProgressInfo,
         ammo: u32,
         rate: f32,
@@ -64,9 +63,9 @@ impl ProgressActive {
     }
 
     /// Creates new timed active progress from an ability.
-    pub fn from_ability(skill: Skill, ability: &Ability) -> Self {
+    pub fn from_ability(ability: &Ability) -> Self {
         let Ability {
-            id: _,
+            id,
             ammo,
             last_update,
             recharge_rate,
@@ -77,7 +76,7 @@ impl ProgressActive {
             ..
         } = *ability;
         Self::Ability {
-            skill,
+            id,
             info: ProgressInfo::from(ability),
             ammo,
             recharge,
@@ -116,10 +115,10 @@ impl ProgressActive {
     }
 
     /// Creates an ability progress for edit mode.
-    pub const fn edit_ability(skill: Skill, progress: f32, now: u32) -> Self {
+    pub const fn edit_ability(id: SkillId, progress: f32, now: u32) -> Self {
         let decreasing = 1.0 - progress;
         Self::Ability {
-            skill,
+            id,
             info: ProgressInfo::new(),
             ammo: (5.0 * progress) as u32,
             recharge: 5000,
@@ -131,11 +130,11 @@ impl ProgressActive {
     }
 
     /// Returns the assoicated skill.
-    pub const fn skill(&self) -> Skill {
+    pub const fn skill(&self) -> SkillId {
         match *self {
-            Self::Fixed { .. } => Skill::Unknown,
-            Self::Buff { id, .. } => Skill::Id(id),
-            Self::Ability { skill, .. } => skill,
+            Self::Fixed { .. } => SkillId::Unknown,
+            Self::Buff { id, .. } => SkillId::Id(id),
+            Self::Ability { id, .. } => id,
         }
     }
 
@@ -340,37 +339,5 @@ impl ProgressValue {
                 }
             }
         }
-    }
-}
-
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum Skill {
-    #[default]
-    Unknown,
-    WeaponSwap,
-    BundleDrop,
-    Id(u32),
-}
-
-impl Skill {
-    pub fn from_slot(skillbar: &Skillbar, slot: Slot) -> Self {
-        if slot == Slot::WeaponSwap {
-            if skillbar.has_bundle {
-                Skill::BundleDrop
-            } else {
-                Skill::WeaponSwap
-            }
-        } else {
-            skillbar
-                .slot(slot)
-                .map(|ability| ability.id.into())
-                .unwrap_or_default()
-        }
-    }
-}
-
-impl From<u32> for Skill {
-    fn from(id: u32) -> Self {
-        Self::Id(id)
     }
 }

@@ -1,13 +1,13 @@
 use crate::{
     action::DynAction,
     addon::Addon,
+    context::SkillId,
     elements::RenderCtx,
     enums::impl_static_variants,
     internal::{Interface, Internal},
     lockbox::Lockbox,
     render::{Validation, enum_combo, input_text_simple_menu},
     texture_manager::TextureManager,
-    trigger::Skill,
 };
 use const_default::ConstDefault;
 use nexus::imgui::{ComboBoxFlags, TextureId, Ui};
@@ -72,14 +72,14 @@ impl IconSource {
         TextureManager::add_source(self)
     }
 
-    pub fn get_texture(&self, skill: Skill) -> Option<TextureId> {
+    pub fn get_texture(&self, skill: SkillId) -> Option<TextureId> {
         match self {
             Self::Empty => None,
             Self::Automatic => match skill {
-                Skill::Unknown => TextureManager::get_texture(&IconSource::Unknown),
-                Skill::WeaponSwap => TextureManager::get_weapon_swap(),
-                Skill::BundleDrop => TextureManager::get_bundle_drop(),
-                Skill::Id(id) => match Internal::get_skill_icon(id) {
+                SkillId::Unknown => TextureManager::get_texture(&IconSource::Unknown),
+                SkillId::WeaponSwap | SkillId::PetSwap => TextureManager::get_weapon_swap(),
+                SkillId::BundleDrop => TextureManager::get_bundle_drop(),
+                SkillId::Id(id) => match Internal::get_skill_icon(id) {
                     Some(tex) => Some(tex.as_raw().into()),
                     None => TextureManager::get_texture(&IconSource::Unknown),
                 },

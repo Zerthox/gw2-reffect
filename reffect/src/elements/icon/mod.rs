@@ -8,11 +8,11 @@ use super::{Props, RenderCtx};
 use crate::{
     action::DynAction,
     colors::{self, with_alpha, with_alpha_factor},
-    context::Context,
+    context::{Context, SkillId},
     render::{ComponentWise, Rect, debug_optional, draw_spinner_bg},
     render_copy_field,
     settings::icon::DurationBarSettings,
-    trigger::{ProgressActive, ProgressValue, Skill},
+    trigger::{ProgressActive, ProgressValue},
 };
 use const_default::ConstDefault;
 use nexus::imgui::Ui;
@@ -66,7 +66,7 @@ impl Icon {
             let texture = self.source.get_texture(if ctx.settings.use_game_icons {
                 active.skill()
             } else {
-                Skill::Unknown
+                SkillId::Unknown
             });
 
             let (start, end) = Self::bounds(size);
@@ -208,7 +208,7 @@ impl Icon {
     pub fn render_debug(&mut self, ui: &Ui, _ctx: &RenderCtx) {
         const SIZE: [f32; 2] = [64.0, 64.0];
 
-        let texture = self.source.get_texture(Skill::Unknown);
+        let texture = self.source.get_texture(SkillId::Unknown);
         debug_optional(
             ui,
             "Texture",
