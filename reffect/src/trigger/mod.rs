@@ -1,10 +1,11 @@
+mod ability;
 mod condition;
 mod filter;
 mod map;
 mod player;
 mod progress;
 
-pub use self::{condition::*, filter::*, map::*, player::*, progress::*};
+pub use self::{ability::*, condition::*, filter::*, map::*, player::*, progress::*};
 
 use crate::context::Context;
 use enumflags2::{BitFlag, BitFlags};
