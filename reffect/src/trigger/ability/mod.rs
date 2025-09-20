@@ -42,9 +42,9 @@ impl fmt::Display for AbilityStateTrigger {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
-            "{:?} is {}",
-            self.ability_state,
-            if self.condition { "True" } else { "False" }
+            "Ability {} {:?}",
+            if self.condition { "is" } else { "is not" },
+            self.ability_state
         )
     }
 }
@@ -53,7 +53,8 @@ impl AbilityStateTrigger {
     pub fn render_options(&mut self, ui: &Ui) -> bool {
         let mut changed = false;
 
-        changed |= enum_combo(ui, "State", &mut self.ability_state, ComboBoxFlags::empty()).is_some();
+        changed |=
+            enum_combo(ui, "State", &mut self.ability_state, ComboBoxFlags::empty()).is_some();
         helper(ui, || {
             ui.text("Must use `Ability Recharge` Trigger");
             ui.text("");
@@ -61,8 +62,10 @@ impl AbilityStateTrigger {
             ui.text("Pending: this ability is in a queued/pending state");
         });
 
-
-        changed |= ui.checkbox("Required", &mut self.condition);
+        changed |= ui.checkbox("Active", &mut self.condition);
+        helper(ui, || {
+            ui.text("Check this if the condition should trigger when the state is active. Leave unchecked if it should trigger when the state is not active.");
+        });
 
         changed
     }
