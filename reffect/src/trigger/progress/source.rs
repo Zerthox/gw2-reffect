@@ -5,11 +5,11 @@ use crate::{
     enums::check_variant_array,
     error::Error,
     internal::{Interface, Internal},
-    render::{enum_combo, helper, input_skill_id, Validation},
+    render::{Validation, enum_combo, helper, input_skill_id},
 };
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
-use serde_with::{formats::PreferMany, serde_as, OneOrMany};
+use serde_with::{OneOrMany, formats::PreferMany, serde_as};
 use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 
 #[serde_as]
