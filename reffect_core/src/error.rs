@@ -20,6 +20,9 @@ pub enum Error {
     #[error("Unavailable in competitive mode")]
     CompetitiveMode,
 
+    #[error("Main thread not found")]
+    MainThreadNotFound,
+
     #[error("Context not found")]
     ContextNotFound,
 

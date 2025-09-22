@@ -51,12 +51,14 @@ impl IconList {
 
         match self.layout {
             Layout::Dynamic => {
-                let mut filtered = Vec::new();
-                for icon in &mut self.icons {
-                    if icon.is_visible(ctx) && icon.update(ctx, parent_active) {
-                        filtered.push(icon);
-                    }
-                }
+                let filtered = self
+                    .icons
+                    .iter_mut()
+                    .filter_map(|icon| {
+                        let visible = icon.is_visible(ctx) && icon.update(ctx, parent_active);
+                        visible.then_some(icon)
+                    })
+                    .collect::<Vec<_>>();
                 let len = filtered.len();
 
                 for (i, icon) in filtered.into_iter().enumerate() {
