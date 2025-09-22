@@ -5,11 +5,11 @@ use crate::{
     enums::check_variant_array,
     error::Error,
     internal::{Interface, Internal},
-    render::{Validation, enum_combo, helper, input_skill_id},
+    render::{enum_combo, helper, input_skill_id, Validation},
 };
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
-use serde_with::{OneOrMany, formats::PreferMany, serde_as};
+use serde_with::{formats::PreferMany, serde_as, OneOrMany};
 use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 
 #[serde_as]
@@ -133,7 +133,7 @@ impl ProgressSource {
                     .copied()
                     .filter(|id| *id > 0)
                     .find_map(|id| skillbar.ability(id))
-                    .map(|ability| ProgressActive::from_ability(ability))
+                    .map(ProgressActive::from_ability)
             }
             Self::Health => {
                 let resources = ctx.player.resources.as_ref().ok()?;
