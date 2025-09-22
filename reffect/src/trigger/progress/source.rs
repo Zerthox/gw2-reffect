@@ -133,7 +133,7 @@ impl ProgressSource {
                     .copied()
                     .filter(|id| *id > 0)
                     .find_map(|id| skillbar.ability(id))
-                    .map(|ability| ProgressActive::from_ability(ability))
+                    .map(ProgressActive::from_ability)
             }
             Self::Health => {
                 let resources = ctx.player.resources.as_ref().ok()?;
