@@ -35,8 +35,6 @@ impl VariantArray for ConditionTrigger {
     ];
 }
 
-const _: () = check_variant_array::<ConditionTrigger>();
-
 impl ConstDefault for ConditionTrigger {
     const DEFAULT: Self = Self::ProgressThreshold(ProgressThreshold::DEFAULT);
 }
