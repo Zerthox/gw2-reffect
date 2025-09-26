@@ -1,5 +1,5 @@
 use super::ProgressActive;
-use crate::render::enum_combo_where;
+use crate::render::{enum_combo, error_text};
 use crate::trigger::ProgressSource;
 use crate::{
     context::Context,
@@ -73,18 +73,13 @@ impl fmt::Display for ConditionTrigger {
 
 impl ConditionTrigger {
     pub fn render_options(&mut self, ui: &Ui, ctx: &Context, source: &ProgressSource) {
-        enum_combo_where(
-            ui,
-            "Condition",
-            self,
-            ComboBoxFlags::empty(),
-            |variant| match variant {
-                ConditionTrigger::AbilityState(_) => {
-                    matches!(source, &ProgressSource::Ability(_))
-                }
-                _ => true,
-            },
-        );
+        enum_combo(ui, "Condition", self, ComboBoxFlags::empty());
+        if !source.supports_condition_trigger(self) {
+            error_text(
+                ui,
+                "(!) This condition is not compatible with the selected trigger.",
+            )
+        }
 
         match self {
             Self::ProgressThreshold(threshold) => {
