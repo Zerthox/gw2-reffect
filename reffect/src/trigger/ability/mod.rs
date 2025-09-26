@@ -1,7 +1,10 @@
 use super::ProgressActive;
-use crate::render::{enum_combo, helper};
+use crate::render::{enum_combo_bitflags, helper};
+use crate::serde::bitflags;
 use const_default::ConstDefault;
+use enumflags2::BitFlags;
 use nexus::imgui::{ComboBoxFlags, Ui};
+use reffect_core::named::Named;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
@@ -9,25 +12,30 @@ mod state;
 
 pub use self::state::*;
 
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct AbilityStateTrigger {
-    pub ability_state: AbilityState,
+    #[serde(with = "bitflags")]
+    pub ability_state: BitFlags<AbilityState>,
+
     pub condition: bool,
 }
 
 impl AbilityStateTrigger {
     pub fn is_active(&self, active: &ProgressActive) -> bool {
-        let state_value = match self.ability_state {
-            AbilityState::Pressed => active.is_ability_pressed(),
-            AbilityState::Pending => active.is_ability_pending(),
-        };
-        state_value == self.condition
+        let mut flags = BitFlags::empty();
+        if active.is_ability_pressed() {
+            flags |= AbilityState::Pressed;
+        }
+        if active.is_ability_pending() {
+            flags |= AbilityState::Pending;
+        }
+        self.ability_state.intersects(flags) == self.condition
     }
 }
 
 impl ConstDefault for AbilityStateTrigger {
     const DEFAULT: Self = Self {
-        ability_state: AbilityState::DEFAULT,
+        ability_state: BitFlags::EMPTY,
         condition: true,
     };
 }
@@ -40,11 +48,16 @@ impl Default for AbilityStateTrigger {
 
 impl fmt::Display for AbilityStateTrigger {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let states: Vec<&str> = self.ability_state.iter().map(|s| s.name()).collect();
         write!(
             f,
-            "Ability {} {:?}",
-            if self.condition { "is" } else { "is not" },
-            self.ability_state
+            "State {} {}",
+            if self.condition { "=" } else { "!=" },
+            if states.is_empty() {
+                "None".to_string()
+            } else {
+                states.join(", ")
+            }
         )
     }
 }
@@ -54,10 +67,9 @@ impl AbilityStateTrigger {
         let mut changed = false;
 
         changed |=
-            enum_combo(ui, "State", &mut self.ability_state, ComboBoxFlags::empty()).is_some();
+            enum_combo_bitflags(ui, "State", &mut self.ability_state, ComboBoxFlags::empty());
+
         helper(ui, || {
-            ui.text("Must use `Ability Recharge` Trigger");
-            ui.text("");
             ui.text("Pressed: this ability is currently pressed");
             ui.text("Pending: this ability is in a queued/pending state");
         });

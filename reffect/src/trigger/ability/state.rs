@@ -1,33 +1,47 @@
-use crate::enums::check_variant_array;
-use const_default::ConstDefault;
+use enumflags2::bitflags;
+use reffect_core::colors::{Color, Colored};
+use reffect_core::named::Named;
 use serde::{Deserialize, Serialize};
-use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
+use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
 
 #[derive(
     Debug,
+    Default,
     Clone,
+    Copy,
     PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
     AsRefStr,
     IntoStaticStr,
+    Display,
     EnumIter,
-    EnumCount,
     VariantArray,
     Serialize,
     Deserialize,
 )]
+#[repr(u8)]
+#[bitflags]
 pub enum AbilityState {
-    Pressed,
-    Pending,
+    #[default]
+    Pressed = 1 << 0,
+
+    Pending = 1 << 1,
 }
 
-const _: () = check_variant_array::<AbilityState>();
-
-impl ConstDefault for AbilityState {
-    const DEFAULT: Self = Self::Pressed;
+impl Named for AbilityState {
+    fn name(&self) -> &'static str {
+        match self {
+            Self::Pressed => "Pressed",
+            Self::Pending => "Pending",
+        }
+    }
 }
 
-impl Default for AbilityState {
-    fn default() -> Self {
-        Self::DEFAULT
+impl Colored for AbilityState {
+    fn colored(&self) -> Option<Color> {
+        None
     }
 }
