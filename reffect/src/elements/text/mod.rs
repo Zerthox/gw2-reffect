@@ -233,9 +233,10 @@ impl Text {
         self.props.base.render_options(ui, ctx);
     }
 
-    pub fn render_tabs(&mut self, ui: &Ui, ctx: &RenderCtx) {
+    pub fn render_tabs(&mut self, ui: &Ui, ctx: &RenderCtx, common: &Common) {
         if let Some(_token) = ui.tab_item("Condition") {
-            self.props.render_condition_options(ui, ctx);
+            self.props
+                .render_condition_options(ui, ctx, &common.trigger.source);
         }
     }
 }

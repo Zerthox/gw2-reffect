@@ -1,8 +1,8 @@
 use super::ProgressActive;
+use crate::render::enum_combo_where;
+use crate::trigger::ProgressSource;
 use crate::{
     context::Context,
-    enums::check_variant_array,
-    render::enum_combo,
     trigger::{AbilityStateTrigger, MapTrigger, PlayerTrigger, ProgressThreshold, Trigger},
 };
 use const_default::ConstDefault;
@@ -72,8 +72,19 @@ impl fmt::Display for ConditionTrigger {
 }
 
 impl ConditionTrigger {
-    pub fn render_options(&mut self, ui: &Ui, ctx: &Context) {
-        enum_combo(ui, "Condition", self, ComboBoxFlags::empty());
+    pub fn render_options(&mut self, ui: &Ui, ctx: &Context, source: &ProgressSource) {
+        enum_combo_where(
+            ui,
+            "Condition",
+            self,
+            ComboBoxFlags::empty(),
+            |variant| match variant {
+                ConditionTrigger::AbilityState(_) => {
+                    matches!(source, &ProgressSource::Ability(_))
+                }
+                _ => true,
+            },
+        );
 
         match self {
             Self::ProgressThreshold(threshold) => {

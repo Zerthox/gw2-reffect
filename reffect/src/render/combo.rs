@@ -4,6 +4,53 @@ use nexus::imgui::{ComboBoxFlags, Selectable, StyleColor, StyleVar, Ui};
 use std::mem;
 use strum::VariantArray;
 
+pub fn enum_combo_where<T, F>(
+    ui: &Ui,
+    label: impl AsRef<str>,
+    current: &mut T,
+    flags: ComboBoxFlags,
+    mut filter: F,
+) -> Option<T>
+where
+    T: Clone + AsRef<str> + EnumStaticVariants + 'static,
+    F: FnMut(&T) -> bool,
+{
+    let mut allowed: Vec<T> = Vec::new();
+    T::with_variants(|variants| {
+        for v in variants {
+            if filter(v) {
+                allowed.push(v.clone());
+            }
+        }
+    });
+
+    // default to first allowed when switching
+    if !allowed.is_empty()
+        && !allowed
+            .iter()
+            .any(|v| mem::discriminant(v) == mem::discriminant(current))
+    {
+        *current = allowed[0].clone();
+    }
+
+    let mut replaced = None;
+    if let Some(_token) = ui.begin_combo_with_flags(label, current.as_ref(), flags) {
+        for entry in &allowed {
+            // distinguish only discriminants
+            let selected = mem::discriminant(entry) == mem::discriminant(current);
+            if Selectable::new(entry).selected(selected).build(ui) {
+                replaced = Some(mem::replace(current, entry.clone()));
+            }
+
+            // handle focus
+            if selected {
+                ui.set_item_default_focus();
+            }
+        }
+    }
+    replaced
+}
+
 pub fn enum_combo<T>(
     ui: &Ui,
     label: impl AsRef<str>,
@@ -13,24 +60,7 @@ pub fn enum_combo<T>(
 where
     T: Clone + AsRef<str> + EnumStaticVariants + 'static,
 {
-    let mut replaced = None;
-    if let Some(_token) = ui.begin_combo_with_flags(label, current.as_ref(), flags) {
-        T::with_variants(|variants| {
-            for entry in variants {
-                // distinguish only discriminants
-                let selected = mem::discriminant(entry) == mem::discriminant(current);
-                if Selectable::new(entry).selected(selected).build(ui) {
-                    replaced = Some(mem::replace(current, entry.clone()));
-                }
-
-                // handle focus
-                if selected {
-                    ui.set_item_default_focus();
-                }
-            }
-        });
-    }
-    replaced
+    enum_combo_where(ui, label, current, flags, |_| true)
 }
 
 pub fn enum_combo_bitflags<T>(

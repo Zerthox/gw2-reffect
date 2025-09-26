@@ -180,7 +180,7 @@ impl IconList {
         copy_action.apply_to_all(&mut self.icons);
     }
 
-    pub fn render_tabs(&mut self, ui: &Ui, ctx: &Context) {
+    pub fn render_tabs(&mut self, ui: &Ui, ctx: &Context, common: &Common) {
         if let Some(_token) = ui.tab_item("Condition") {
             const INDENT: f32 = 10.0;
             let mut action = DynAction::empty();
@@ -192,7 +192,11 @@ impl IconList {
                     .begin(ui);
                 if open {
                     ui.indent_by(INDENT);
-                    action.or(list_icon.icon.props.render_condition_options(ui, ctx));
+                    action.or(list_icon.icon.props.render_condition_options(
+                        ui,
+                        ctx,
+                        &common.trigger.source,
+                    ));
                     ui.unindent_by(INDENT);
                 }
             }

@@ -31,8 +31,8 @@ impl IconElement {
         self.icon.render_options(ui, ctx);
     }
 
-    pub fn render_tabs(&mut self, ui: &Ui, ctx: &RenderCtx) {
-        self.icon.render_tabs(ui, ctx);
+    pub fn render_tabs(&mut self, ui: &Ui, ctx: &RenderCtx, common: &Common) {
+        self.icon.render_tabs(ui, ctx, common);
     }
 
     pub fn render_debug(&mut self, ui: &Ui, ctx: &RenderCtx) {

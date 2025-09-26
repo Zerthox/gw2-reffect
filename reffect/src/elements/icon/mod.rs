@@ -4,7 +4,7 @@ mod source;
 
 pub use self::{element::*, props::*, source::*};
 
-use super::{Props, RenderCtx};
+use super::{Common, Props, RenderCtx};
 use crate::{
     action::DynAction,
     colors::{self, with_alpha, with_alpha_factor},
@@ -195,10 +195,10 @@ impl Icon {
         action
     }
 
-    pub fn render_tabs(&mut self, ui: &Ui, ctx: &Context) -> DynAction<Self> {
+    pub fn render_tabs(&mut self, ui: &Ui, ctx: &Context, common: &Common) -> DynAction<Self> {
         if let Some(_token) = ui.tab_item("Condition") {
             self.props
-                .render_condition_options(ui, ctx)
+                .render_condition_options(ui, ctx, &common.trigger.source)
                 .map(|icon: &mut Self| &mut icon.props)
         } else {
             DynAction::empty()

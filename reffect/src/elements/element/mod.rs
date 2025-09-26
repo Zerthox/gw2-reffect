@@ -153,7 +153,7 @@ impl Element {
                 self.kind.render_options(ui, ctx);
             }
 
-            self.kind.render_tabs(ui, ctx);
+            self.kind.render_tabs(ui, ctx, &self.common);
 
             if let Some(_token) = ui.tab_item("Filter") {
                 self.common.render_filters(ui, ctx);
