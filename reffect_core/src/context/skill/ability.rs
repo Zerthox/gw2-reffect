@@ -1,36 +1,11 @@
 use super::SkillId;
+use crate::{
+    colors::{Color, Colored},
+    named::Named,
+};
+use enumflags2::{BitFlags, bitflags};
 use serde::{Deserialize, Serialize};
-use strum::{AsRefStr, Display, EnumCount, EnumIter, IntoStaticStr, VariantArray};
-
-pub type SkillSlots = [Option<Ability>; Slot::COUNT];
-
-/// Character skillbar.
-#[derive(Debug, Default, Clone)]
-pub struct Skillbar {
-    /// Skill entries.
-    pub skills: SkillSlots,
-}
-
-impl Skillbar {
-    /// Returns the ability in the given slot.
-    #[inline]
-    pub fn slot(&self, slot: Slot) -> Option<&Ability> {
-        self.skills[slot as usize].as_ref()
-    }
-
-    /// Returns the ability with the given identifier.
-    #[inline]
-    pub fn ability(&self, id: impl Into<SkillId>) -> Option<&Ability> {
-        let id = id.into();
-        self.skills.iter().flatten().find(|ablity| ablity.id == id)
-    }
-
-    /// Sets the ability in the given slot.
-    #[inline]
-    pub fn set_slot(&mut self, slot: Slot, ability: Option<Ability>) {
-        self.skills[slot as usize] = ability;
-    }
-}
+use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
 
 /// Ability.
 #[derive(Debug, Clone)]
@@ -59,28 +34,14 @@ pub struct Ability {
     /// Remining ammo recharge in milliseconds.
     pub ammo_recharge_remaining: u32,
 
-    /// Whether the ability can be cast.
-    pub is_available: bool,
-
-    /// Whether the ability is pressed.
-    pub is_pressed: bool,
-
-    /// Whether the ability is casted or queued.
-    pub is_pending: bool,
+    /// Ability state information.
+    pub state: BitFlags<AbilityState>,
 }
 
 impl Ability {
     /// Creates a new ability without cooldowns.
     #[inline]
-    pub fn new(
-        id: impl Into<SkillId>,
-        ammo: u32,
-        last_update: u32,
-        recharge_rate: f32,
-        is_available: bool,
-        is_pressed: bool,
-        is_pending: bool,
-    ) -> Self {
+    pub fn new(id: impl Into<SkillId>, ammo: u32, last_update: u32, recharge_rate: f32) -> Self {
         Self {
             id: id.into(),
             ammo,
@@ -90,9 +51,7 @@ impl Ability {
             recharge_remaining: 0,
             ammo_recharge: 0,
             ammo_recharge_remaining: 0,
-            is_available,
-            is_pressed,
-            is_pending,
+            state: BitFlags::empty(),
         }
     }
 
@@ -108,9 +67,7 @@ impl Ability {
             recharge_remaining: recharge,
             ammo_recharge: 0,
             ammo_recharge_remaining: 0,
-            is_available: recharge == 0,
-            is_pressed: false,
-            is_pending: false,
+            state: BitFlags::empty(),
         }
     }
 
@@ -151,9 +108,15 @@ impl Ability {
     pub fn ammo_recharge_progress(&self, now: u32) -> f32 {
         self.ammo_recharge_remaining(self.passed(now)) as f32 / self.ammo_recharge as f32
     }
+
+    /// Updates the ability state.
+    #[inline]
+    pub fn set_state(&mut self, _available: bool, pending: bool, pressed: bool) {
+        self.state.set(AbilityState::Pending, pending);
+        self.state.set(AbilityState::Pressed, pressed);
+    }
 }
 
-/// Skillbar slot.
 #[derive(
     Debug,
     Clone,
@@ -163,74 +126,39 @@ impl Ability {
     PartialOrd,
     Ord,
     Hash,
-    Display,
     AsRefStr,
     IntoStaticStr,
-    EnumCount,
+    Display,
     EnumIter,
     VariantArray,
     Serialize,
     Deserialize,
 )]
-pub enum Slot {
-    #[strum(serialize = "Weapon Swap")]
-    WeaponSwap,
+#[repr(u8)]
+#[bitflags]
+pub enum AbilityState {
+    /// Ability is queued or casting.
+    Pending = 1 << 0,
 
-    #[strum(serialize = "Weapon 1")]
-    Weapon1,
-
-    #[strum(serialize = "Weapon 2")]
-    Weapon2,
-
-    #[strum(serialize = "Weapon 3")]
-    Weapon3,
-
-    #[strum(serialize = "Weapon 4")]
-    Weapon4,
-
-    #[strum(serialize = "Weapon 5")]
-    Weapon5,
-
-    Heal,
-
-    #[strum(serialize = "Utility 1")]
-    Utility1,
-
-    #[strum(serialize = "Utility 2")]
-    Utility2,
-
-    #[strum(serialize = "Utility 3")]
-    Utility3,
-
-    Elite,
-
-    #[strum(serialize = "Profession 1")]
-    Profession1,
-
-    #[strum(serialize = "Profession 2")]
-    Profession2,
-
-    #[strum(serialize = "Profession 3")]
-    Profession3,
-
-    #[strum(serialize = "Profession 4")]
-    Profession4,
-
-    #[strum(serialize = "Profession 5")]
-    Profession5,
-
-    #[strum(serialize = "Special Action")]
-    SpecialAction,
-
-    Mount,
+    /// Ability is pressed.
+    Pressed = 1 << 1,
 }
 
-impl Slot {
-    pub const DEFAULT: Self = Self::WeaponSwap;
+impl Named for AbilityState {
+    fn name(&self) -> &'static str {
+        self.into()
+    }
+
+    fn short_name(&self) -> &'static str {
+        match self {
+            Self::Pressed => "Press",
+            Self::Pending => "Pend",
+        }
+    }
 }
 
-impl Default for Slot {
-    fn default() -> Self {
-        Self::DEFAULT
+impl Colored for AbilityState {
+    fn colored(&self) -> Option<Color> {
+        None
     }
 }

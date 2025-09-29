@@ -1,4 +1,5 @@
 use std::collections::BTreeMap;
+use strum::{AsRefStr, Display, IntoStaticStr};
 
 pub type BuffMap = BTreeMap<u32, Buff>;
 
@@ -56,4 +57,44 @@ impl Buff {
     pub const fn progress(&self, now: u32) -> f32 {
         self.remaining(now) as f32 / self.duration() as f32
     }
+}
+
+/// Category of the buff.
+///
+/// Any category except for Boon and Condition is mapped to [`Category::Effect`].
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Display, AsRefStr, IntoStaticStr,
+)]
+pub enum Category {
+    /// Buff is a Boon.
+    Boon,
+
+    /// Buff is an uncategorized effect.
+    Effect,
+
+    /// Buff is a Condition.
+    Condition,
+
+    /// Buff is hidden but gives a screen border.
+    #[strum(serialize = "Screen Border")]
+    ScreenBorder,
+
+    /// Buff is hidden but highlights player in squad.
+    #[strum(serialize = "Squad Highlight")]
+    SquadHighlight,
+}
+
+/// Stacking behavior of the buff.
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Display, AsRefStr, IntoStaticStr,
+)]
+pub enum Stacking {
+    // Other/unknown stacking type.
+    Other,
+
+    /// Buff stacks in intenstity.
+    Intensity,
+
+    /// Buff stacks in duration.
+    Duration,
 }

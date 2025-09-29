@@ -107,12 +107,14 @@ impl MapCategory {
 
 impl Named for MapCategory {
     fn name(&self) -> &'static str {
+        self.into()
+    }
+
+    fn short_name(&self) -> &'static str {
         match self {
-            Self::PvE => "PvE",
-            Self::PvP => "PvP",
-            Self::WvW => "WvW",
-            Self::Instance => "Inst",
-            Self::Other => "Other",
+            MapCategory::PvE | MapCategory::PvP | MapCategory::WvW => self.name(),
+            MapCategory::Instance => "Inst",
+            MapCategory::Other => "Other",
         }
     }
 }

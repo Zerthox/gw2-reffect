@@ -1,7 +1,8 @@
 mod ability;
 mod buff;
+mod skillbar;
 
-pub use self::{ability::*, buff::*};
+pub use self::{ability::*, buff::*, skillbar::*};
 
 use strum::{AsRefStr, Display, IntoStaticStr};
 
@@ -61,44 +62,4 @@ pub enum SkillInfo {
         /// Stacking behavior of the buff.
         stacking: Stacking,
     },
-}
-
-/// Category of the buff.
-///
-/// Any category except for Boon and Condition is mapped to [`Category::Effect`].
-#[derive(
-    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Display, AsRefStr, IntoStaticStr,
-)]
-pub enum Category {
-    /// Buff is a Boon.
-    Boon,
-
-    /// Buff is an uncategorized effect.
-    Effect,
-
-    /// Buff is a Condition.
-    Condition,
-
-    /// Buff is hidden but gives a screen border.
-    #[strum(serialize = "Screen Border")]
-    ScreenBorder,
-
-    /// Buff is hidden but highlights player in squad.
-    #[strum(serialize = "Squad Highlight")]
-    SquadHighlight,
-}
-
-/// Stacking behavior of the buff.
-#[derive(
-    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Display, AsRefStr, IntoStaticStr,
-)]
-pub enum Stacking {
-    // Other/unknown stacking type.
-    Other,
-
-    /// Buff stacks in intenstity.
-    Intensity,
-
-    /// Buff stacks in duration.
-    Duration,
 }
