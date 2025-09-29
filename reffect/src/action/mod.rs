@@ -15,6 +15,7 @@ pub enum Action {
     None,
     Up(usize),
     Down(usize),
+    Duplicate(usize),
     Delete(usize),
 }
 
@@ -23,7 +24,10 @@ impl Action {
         Self::None
     }
 
-    pub fn perform<T>(self, children: &mut Vec<T>) -> bool {
+    pub fn perform<T>(self, children: &mut Vec<T>) -> bool
+    where
+        T: Clone,
+    {
         match self {
             Self::None => false,
             Self::Up(index) => {
@@ -42,6 +46,13 @@ impl Action {
                 } else {
                     children.swap(index, index + 1);
                 };
+                true
+            }
+            Self::Duplicate(index) => {
+                let el = children
+                    .get(index)
+                    .expect("action duplicate with empty vec");
+                children.insert(index, el.clone());
                 true
             }
             Self::Delete(index) => {

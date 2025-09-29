@@ -6,11 +6,11 @@ use crate::{
     enums::impl_static_variants,
     internal::{Interface, Internal},
     lockbox::Lockbox,
-    render::{Validation, enum_combo, input_text_simple_menu},
+    render::{Validation, enum_combo, input_text_simple_menu, item_context_menu},
     texture_manager::TextureManager,
 };
 use const_default::ConstDefault;
-use nexus::imgui::{ComboBoxFlags, TextureId, Ui};
+use nexus::imgui::{ComboBoxFlags, MenuItem, TextureId, Ui};
 use rfd::FileDialog;
 use serde::{Deserialize, Serialize};
 use std::{path::PathBuf, thread};
@@ -117,8 +117,11 @@ impl IconSource {
             _ => Validation::Ok,
         };
         validation.for_item(ui, || enum_combo(ui, "Icon", self, ComboBoxFlags::empty()));
-        action.render_copy_all_cloned(ui, "iconsrc", self, |target, source| {
-            *target = source.clone()
+        item_context_menu("iconsrc", || {
+            if MenuItem::new("Copy to all siblings").build(ui) {
+                let source = self.clone();
+                action.set(move |target| *target = source.clone());
+            }
         });
 
         // we assume this stays in place, otherwise we consider the file dialog invalidated

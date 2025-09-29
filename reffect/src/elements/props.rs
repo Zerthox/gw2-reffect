@@ -2,11 +2,11 @@ use crate::{
     action::{Action, DynAction},
     colors,
     context::Context,
-    render::{collapsing_header_same_line_end, delete_confirm_modal},
+    render::{collapsing_header_same_line_end, delete_confirm_modal, item_context_menu},
     trigger::{Condition, ProgressActive, ProgressSource},
 };
 use const_default::ConstDefault;
-use nexus::imgui::{CollapsingHeader, Direction, StyleColor, TreeNodeFlags, Ui};
+use nexus::imgui::{CollapsingHeader, Direction, MenuItem, StyleColor, TreeNodeFlags, Ui};
 use partial::IntoPartial;
 use serde::{Deserialize, Serialize};
 use std::{fmt, ops};
@@ -82,13 +82,21 @@ where
                 .begin_with_close_button(ui, &mut remains);
 
             let cloned = condition.clone();
-            copy_action.render_copy_all(ui, label, move |props| {
-                if props.conditions.len() == len
-                    && props.conditions[i].trigger.is_same_type(&cloned.trigger)
-                {
-                    props.conditions[i] = cloned.clone();
-                } else {
-                    props.conditions.push(cloned.clone());
+            item_context_menu(label, || {
+                if MenuItem::new("Duplicate").build(ui) {
+                    action = Action::Duplicate(i)
+                }
+
+                if MenuItem::new("Copy to all siblings").build(ui) {
+                    copy_action.set(move |props| {
+                        if props.conditions.len() == len
+                            && props.conditions[i].trigger.is_same_type(&cloned.trigger)
+                        {
+                            props.conditions[i] = cloned.clone();
+                        } else {
+                            props.conditions.push(cloned.clone());
+                        }
+                    });
                 }
             });
 
