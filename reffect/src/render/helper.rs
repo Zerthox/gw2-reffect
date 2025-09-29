@@ -26,6 +26,10 @@ pub fn helper_error(ui: &Ui, tooltip: impl FnOnce()) {
     }
 }
 
+pub fn error_text(ui: &Ui, text: impl AsRef<str>) {
+    ui.text_colored(colors::RED, text);
+}
+
 pub fn helper_slider(ui: &Ui) {
     helper(ui, || ui.text("Ctrl+click to type a number"))
 }

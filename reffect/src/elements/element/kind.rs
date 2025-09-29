@@ -64,13 +64,13 @@ impl ElementType {
         }
     }
 
-    pub fn render_tabs(&mut self, ui: &Ui, ctx: &RenderCtx) {
+    pub fn render_tabs(&mut self, ui: &Ui, ctx: &RenderCtx, common: &Common) {
         match self {
             Self::Group(group) => group.render_tabs(ui, ctx),
-            Self::Icon(icon) => icon.render_tabs(ui, ctx),
-            Self::IconList(list) => list.render_tabs(ui, ctx),
-            Self::Text(text) => text.render_tabs(ui, ctx),
-            Self::Bar(bar) => bar.render_tabs(ui, ctx),
+            Self::Icon(icon) => icon.render_tabs(ui, ctx, common),
+            Self::IconList(list) => list.render_tabs(ui, ctx, common),
+            Self::Text(text) => text.render_tabs(ui, ctx, common),
+            Self::Bar(bar) => bar.render_tabs(ui, ctx, common),
         }
     }
 

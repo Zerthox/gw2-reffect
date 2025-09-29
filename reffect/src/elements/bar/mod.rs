@@ -225,9 +225,10 @@ impl Bar {
         }
     }
 
-    pub fn render_tabs(&mut self, ui: &Ui, ctx: &Context) {
+    pub fn render_tabs(&mut self, ui: &Ui, ctx: &Context, common: &Common) {
         if let Some(_token) = ui.tab_item("Condition") {
-            self.props.render_condition_options(ui, ctx);
+            self.props
+                .render_condition_options(ui, ctx, &common.trigger.source);
         }
     }
 

@@ -148,6 +148,22 @@ impl ProgressActive {
         matches!(self, Self::Ability { .. })
     }
 
+    /// Returns whether this ability is currently pressed.
+    pub const fn is_ability_pressed(&self) -> bool {
+        match self {
+            Self::Fixed { .. } | Self::Buff { .. } => false,
+            Self::Ability { info, .. } => info.pressed,
+        }
+    }
+
+    /// Returns whether this ability is in a queued/pending state.
+    pub const fn is_ability_pending(&self) -> bool {
+        match self {
+            Self::Fixed { .. } | Self::Buff { .. } => false,
+            Self::Ability { info, .. } => info.pending,
+        }
+    }
+
     /// Returns the intensity (alternative progress).
     pub const fn intensity(&self) -> u32 {
         match *self {

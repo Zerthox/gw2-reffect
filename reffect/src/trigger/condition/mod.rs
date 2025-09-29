@@ -2,7 +2,7 @@ mod trigger;
 
 pub use self::trigger::*;
 
-use super::ProgressActive;
+use super::{ProgressActive, ProgressSource};
 use crate::{context::Context, elements::PartialProps};
 use nexus::imgui::Ui;
 use partial::{IntoPartial, PartialOps};
@@ -31,11 +31,11 @@ where
         }
     }
 
-    pub fn render_options(&mut self, ui: &Ui, ctx: &Context, base: &T)
+    pub fn render_options(&mut self, ui: &Ui, ctx: &Context, source: &ProgressSource, base: &T)
     where
         T::Partial: PartialProps<T>,
     {
-        self.trigger.render_options(ui, ctx);
+        self.trigger.render_options(ui, ctx, source);
         ui.spacing();
         self.properties.render_options(ui, base);
         ui.spacing();
