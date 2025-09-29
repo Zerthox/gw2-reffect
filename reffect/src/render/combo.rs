@@ -1,55 +1,9 @@
 use crate::{colors::Colored, enums::EnumStaticVariants, named::Named};
 use enumflags2::{BitFlag, BitFlags};
+use itertools::Itertools;
 use nexus::imgui::{ComboBoxFlags, Selectable, StyleColor, StyleVar, Ui};
 use std::mem;
 use strum::VariantArray;
-
-pub fn enum_combo_where<T, F>(
-    ui: &Ui,
-    label: impl AsRef<str>,
-    current: &mut T,
-    flags: ComboBoxFlags,
-    mut filter: F,
-) -> Option<T>
-where
-    T: Clone + AsRef<str> + EnumStaticVariants + 'static,
-    F: FnMut(&T) -> bool,
-{
-    let mut allowed: Vec<T> = Vec::new();
-    T::with_variants(|variants| {
-        for v in variants {
-            if filter(v) {
-                allowed.push(v.clone());
-            }
-        }
-    });
-
-    // default to first allowed when switching
-    if !allowed.is_empty()
-        && !allowed
-            .iter()
-            .any(|v| mem::discriminant(v) == mem::discriminant(current))
-    {
-        *current = allowed[0].clone();
-    }
-
-    let mut replaced = None;
-    if let Some(_token) = ui.begin_combo_with_flags(label, current.as_ref(), flags) {
-        for entry in &allowed {
-            // distinguish only discriminants
-            let selected = mem::discriminant(entry) == mem::discriminant(current);
-            if Selectable::new(entry).selected(selected).build(ui) {
-                replaced = Some(mem::replace(current, entry.clone()));
-            }
-
-            // handle focus
-            if selected {
-                ui.set_item_default_focus();
-            }
-        }
-    }
-    replaced
-}
 
 pub fn enum_combo<T>(
     ui: &Ui,
@@ -60,7 +14,35 @@ pub fn enum_combo<T>(
 where
     T: Clone + AsRef<str> + EnumStaticVariants + 'static,
 {
-    enum_combo_where(ui, label, current, flags, |_| true)
+    T::with_variants(|iter| enum_combo_iter(ui, label, current, flags, iter))
+}
+
+pub fn enum_combo_iter<'i, T>(
+    ui: &Ui,
+    label: impl AsRef<str>,
+    current: &mut T,
+    flags: ComboBoxFlags,
+    iter: impl IntoIterator<Item = &'i T>,
+) -> Option<T>
+where
+    T: Clone + AsRef<str> + EnumStaticVariants + 'static,
+{
+    let mut replaced = None;
+    if let Some(_token) = ui.begin_combo_with_flags(label, current.as_ref(), flags) {
+        for variant in iter {
+            // distinguish only discriminants
+            let selected = mem::discriminant(variant) == mem::discriminant(current);
+            if Selectable::new(variant).selected(selected).build(ui) {
+                replaced = Some(mem::replace(current, variant.clone()));
+            }
+
+            // handle focus
+            if selected {
+                ui.set_item_default_focus();
+            }
+        }
+    }
+    replaced
 }
 
 pub fn enum_combo_bitflags<T>(
@@ -74,14 +56,9 @@ where
     &'static str: From<T>,
 {
     let mut changed = false;
-
-    let mut iter = current.iter();
-    let preview = if let Some(first) = iter.next() {
-        let string = iter
-            .clone()
-            .take(4)
-            .map(|el| el.short_name())
-            .fold(first.short_name().to_string(), |acc, el| acc + "," + el);
+    let preview = if !current.is_empty() {
+        let mut iter = current.iter();
+        let string = iter.clone().take(4).map(|el| el.short_name()).join(",");
         if iter.nth(4).is_some() {
             string + ",..."
         } else {

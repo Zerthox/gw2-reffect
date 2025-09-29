@@ -17,17 +17,12 @@ pub fn helper_warn(ui: &Ui, tooltip: impl FnOnce()) {
     }
 }
 
-#[allow(unused)]
 pub fn helper_error(ui: &Ui, tooltip: impl FnOnce()) {
     ui.same_line();
     ui.text_colored(colors::RED, "(!)");
     if ui.is_item_hovered() {
         ui.tooltip(tooltip);
     }
-}
-
-pub fn error_text(ui: &Ui, text: impl AsRef<str>) {
-    ui.text_colored(colors::RED, text);
 }
 
 pub fn helper_slider(ui: &Ui) {
@@ -74,12 +69,22 @@ impl<T> Validation<T> {
         }
     }
 
+    #[allow(unused)]
+    pub fn helper(&self, ui: &Ui)
+    where
+        T: AsRef<str>,
+    {
+        helper_error(ui, || self.render_tooltip(ui));
+    }
+
     pub fn for_item<R>(&self, ui: &Ui, item: impl FnOnce() -> R) -> R
     where
         T: AsRef<str>,
     {
-        let _color = self.push_color(ui);
-        let result = item();
+        let result = ui.group(|| {
+            let _color = self.push_color(ui);
+            item()
+        });
         self.render_tooltip(ui);
         result
     }

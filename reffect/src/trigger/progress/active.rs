@@ -1,9 +1,10 @@
-use super::ProgressInfo;
 use crate::{
     context::{Ability, Buff, Resource, SkillId},
     fmt::{Time, Unit},
     settings::FormatSettings,
 };
+use enumflags2::BitFlags;
+use reffect_core::context::AbilityState;
 
 #[derive(Debug, Clone)]
 pub enum ProgressActive {
@@ -19,13 +20,13 @@ pub enum ProgressActive {
     },
     Ability {
         id: SkillId,
-        info: ProgressInfo,
         ammo: u32,
         rate: f32,
         recharge: u32,
         end: u32,
         ammo_recharge: u32,
         ammo_end: u32,
+        state: BitFlags<AbilityState>,
     },
 }
 
@@ -73,11 +74,11 @@ impl ProgressActive {
             recharge_remaining,
             ammo_recharge,
             ammo_recharge_remaining,
+            state,
             ..
         } = *ability;
         Self::Ability {
             id,
-            info: ProgressInfo::from(ability),
             ammo,
             recharge,
             end: if recharge > 0 {
@@ -92,6 +93,7 @@ impl ProgressActive {
                 0
             },
             rate: recharge_rate,
+            state,
         }
     }
 
@@ -119,13 +121,13 @@ impl ProgressActive {
         let decreasing = 1.0 - progress;
         Self::Ability {
             id,
-            info: ProgressInfo::new(),
             ammo: (5.0 * progress) as u32,
             recharge: 5000,
             end: now + (5000.0 * decreasing) as u32,
             rate: 1.0,
             ammo_recharge: 5000,
             ammo_end: now + (5000.0 * decreasing) as u32,
+            state: BitFlags::EMPTY,
         }
     }
 
@@ -146,22 +148,6 @@ impl ProgressActive {
     /// Whether the progress is inverted.
     pub const fn is_inverted(&self) -> bool {
         matches!(self, Self::Ability { .. })
-    }
-
-    /// Returns whether this ability is currently pressed.
-    pub const fn is_ability_pressed(&self) -> bool {
-        match self {
-            Self::Fixed { .. } | Self::Buff { .. } => false,
-            Self::Ability { info, .. } => info.pressed,
-        }
-    }
-
-    /// Returns whether this ability is in a queued/pending state.
-    pub const fn is_ability_pending(&self) -> bool {
-        match self {
-            Self::Fixed { .. } | Self::Buff { .. } => false,
-            Self::Ability { info, .. } => info.pending,
-        }
     }
 
     /// Returns the intensity (alternative progress).
@@ -290,6 +276,14 @@ impl ProgressActive {
                 ammo_recharge,
                 ..
             } => Self::duration_text(value.pick(recharge, ammo_recharge), settings),
+        }
+    }
+
+    /// Retruns the external state associated with the progress.
+    pub const fn extra_state(&self) -> BitFlags<AbilityState> {
+        match *self {
+            Self::Fixed { .. } | Self::Buff { .. } => BitFlags::EMPTY,
+            Self::Ability { state, .. } => state,
         }
     }
 

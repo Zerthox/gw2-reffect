@@ -182,7 +182,7 @@ impl IconList {
         copy_action.apply_to_all(&mut self.icons);
     }
 
-    pub fn render_tabs(&mut self, ui: &Ui, ctx: &Context, common: &Common) {
+    pub fn render_tabs(&mut self, ui: &Ui, ctx: &Context, _common: &Common) {
         if let Some(_token) = ui.tab_item("Condition") {
             const INDENT: f32 = 10.0;
             let mut action = DynAction::empty();
@@ -197,7 +197,7 @@ impl IconList {
                     action.or(list_icon.icon.props.render_condition_options(
                         ui,
                         ctx,
-                        &common.trigger.source,
+                        &list_icon.trigger.source,
                     ));
                     ui.unindent_by(INDENT);
                 }

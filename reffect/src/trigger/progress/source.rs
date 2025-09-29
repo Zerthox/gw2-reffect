@@ -1,5 +1,4 @@
 use super::ProgressActive;
-use crate::trigger::ConditionTrigger;
 use crate::{
     action::Action,
     context::{Buff, Category, Context, SkillInfo, Slot},
@@ -313,16 +312,6 @@ impl ProgressSource {
         }
 
         changed
-    }
-
-    pub fn supports_condition_trigger(&self, condition_trigger: &ConditionTrigger) -> bool {
-        match condition_trigger {
-            ConditionTrigger::AbilityState(_) => matches!(
-                self,
-                ProgressSource::Ability(_) | ProgressSource::SkillbarSlot(_)
-            ),
-            _ => true,
-        }
     }
 }
 

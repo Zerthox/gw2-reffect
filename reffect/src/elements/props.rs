@@ -1,10 +1,9 @@
-use crate::trigger::ProgressSource;
 use crate::{
     action::{Action, DynAction},
     colors,
     context::Context,
     render::{collapsing_header_same_line_end, delete_confirm_modal},
-    trigger::{Condition, ProgressActive},
+    trigger::{Condition, ProgressActive, ProgressSource},
 };
 use const_default::ConstDefault;
 use nexus::imgui::{CollapsingHeader, Direction, StyleColor, TreeNodeFlags, Ui};

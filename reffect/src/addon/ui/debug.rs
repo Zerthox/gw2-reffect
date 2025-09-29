@@ -2,12 +2,11 @@ use super::Addon;
 use crate::{
     clipboard::Clipboard,
     colors::{self, Colored},
-    context::{BuffMap, Context, SkillInfo, Slot},
+    context::{AbilityState, BuffMap, Context, PlayerResources, SkillInfo, Skillbar, Slot},
     error::Error,
     internal::{Interface, Internal},
 };
 use nexus::imgui::{StyleColor, TreeNode, TreeNodeFlags, Ui, Window};
-use reffect_core::context::{PlayerResources, Skillbar};
 use std::{cmp::Ordering, fmt};
 use strum::IntoEnumIterator;
 
@@ -204,11 +203,9 @@ fn debug_skillbar(ui: &Ui, ctx: &Context, skillbar: &Skillbar) {
     for slot in Slot::iter() {
         ui.text(format!("{slot:<14} ="));
         if let Some(ability) = skillbar.slot(slot) {
-            let color = if !ability.is_available {
-                Some(ui.push_style_color(StyleColor::Text, colors::RED))
-            } else if ability.is_pressed {
+            let color = if ability.state.contains(AbilityState::Pressed) {
                 Some(ui.push_style_color(StyleColor::Text, colors::BLUE))
-            } else if ability.is_pending {
+            } else if ability.state.contains(AbilityState::Pending) {
                 Some(ui.push_style_color(StyleColor::Text, colors::YELLOW))
             } else {
                 None
