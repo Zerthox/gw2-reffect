@@ -17,14 +17,14 @@ mod value;
 pub use self::value::*;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct AbilityInfoTrigger {
+pub struct AbilityStateTrigger {
     #[serde(with = "bitflags")]
     pub states: BitFlags<AbilityState>,
 
     pub condition: Value,
 }
 
-impl AbilityInfoTrigger {
+impl AbilityStateTrigger {
     pub fn is_active(&self, active: &ProgressActive) -> bool {
         self.condition.check(active.extra_state(), self.states)
     }
@@ -44,20 +44,20 @@ impl AbilityInfoTrigger {
     }
 }
 
-impl ConstDefault for AbilityInfoTrigger {
+impl ConstDefault for AbilityStateTrigger {
     const DEFAULT: Self = Self {
         states: make_bitflags!(AbilityState::Pending),
         condition: Value::Any,
     };
 }
 
-impl Default for AbilityInfoTrigger {
+impl Default for AbilityStateTrigger {
     fn default() -> Self {
         Self::DEFAULT
     }
 }
 
-impl fmt::Display for AbilityInfoTrigger {
+impl fmt::Display for AbilityStateTrigger {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let states = if !self.states.is_empty() {
             self.states.iter().map(|state| state.short_name()).join(",")

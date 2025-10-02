@@ -3,7 +3,7 @@ use crate::{
     context::Context,
     render::{Validation, enum_combo},
     trigger::{
-        AbilityInfoTrigger, MapTrigger, PlayerTrigger, ProgressSource, ProgressThreshold, Trigger,
+        AbilityStateTrigger, MapTrigger, PlayerTrigger, ProgressSource, ProgressThreshold, Trigger,
     },
 };
 use const_default::ConstDefault;
@@ -21,7 +21,7 @@ pub enum ConditionTrigger {
     ProgressThreshold(ProgressThreshold),
 
     #[strum(serialize = "Ability State")]
-    AbilityInfo(AbilityInfoTrigger),
+    AbilityState(AbilityStateTrigger),
 
     Player(PlayerTrigger),
 
@@ -31,7 +31,7 @@ pub enum ConditionTrigger {
 impl VariantArray for ConditionTrigger {
     const VARIANTS: &'static [Self] = &[
         Self::ProgressThreshold(ProgressThreshold::DEFAULT),
-        Self::AbilityInfo(AbilityInfoTrigger::DEFAULT),
+        Self::AbilityState(AbilityStateTrigger::DEFAULT),
         Self::Player(PlayerTrigger::DEFAULT),
         Self::Map(MapTrigger::DEFAULT),
     ];
@@ -53,7 +53,7 @@ impl ConditionTrigger {
     pub fn is_active(&mut self, ctx: &Context, active: &ProgressActive) -> bool {
         match self {
             Self::ProgressThreshold(threshold) => threshold.is_met(active, ctx),
-            Self::AbilityInfo(ability_state) => ability_state.is_active(active),
+            Self::AbilityState(ability_state) => ability_state.is_active(active),
             Self::Player(player) => player.is_active(ctx),
             Self::Map(map) => map.is_active(ctx),
         }
@@ -65,7 +65,7 @@ impl ConditionTrigger {
 
     pub fn validate_source(&self, source: &ProgressSource) -> Validation<&'static str> {
         match self {
-            Self::AbilityInfo(_) => match source {
+            Self::AbilityState(_) => match source {
                 ProgressSource::Ability(_) | ProgressSource::SkillbarSlot(_) => Validation::Ok,
                 ProgressSource::Inherit => {
                     Validation::Warn("Inherited trigger source must be ability-like")
@@ -95,7 +95,7 @@ impl ConditionTrigger {
             Self::ProgressThreshold(threshold) => {
                 threshold.render_options(ui);
             }
-            Self::AbilityInfo(ability_state) => {
+            Self::AbilityState(ability_state) => {
                 ability_state.render_options(ui);
             }
             Self::Player(player) => {
@@ -112,7 +112,7 @@ impl fmt::Display for ConditionTrigger {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::ProgressThreshold(threshold) => threshold.fmt(f),
-            Self::AbilityInfo(ability_state) => ability_state.fmt(f),
+            Self::AbilityState(ability_state) => ability_state.fmt(f),
             Self::Player(_) => write!(f, "Player"),
             Self::Map(_) => write!(f, "Map"),
         }
