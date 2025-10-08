@@ -17,6 +17,7 @@ mod value;
 pub use self::value::*;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
 pub struct AbilityStateTrigger {
     #[serde(with = "bitflags")]
     pub states: BitFlags<AbilityState>,
@@ -34,6 +35,7 @@ impl AbilityStateTrigger {
 
         changed |= enum_combo_bitflags(ui, "State", &mut self.states, ComboBoxFlags::empty());
         helper(ui, || {
+            ui.text("Auto Attack: ability is set to auto-attack");
             ui.text("Pressed: ability is pressed");
             ui.text("Pending: ability is casting or queued");
         });

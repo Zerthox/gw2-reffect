@@ -20,6 +20,7 @@ pub enum ConditionTrigger {
     #[strum(serialize = "Trigger Threshold")]
     ProgressThreshold(ProgressThreshold),
 
+    #[serde(alias = "AbilityInfo")]
     #[strum(serialize = "Ability State")]
     AbilityState(AbilityStateTrigger),
 

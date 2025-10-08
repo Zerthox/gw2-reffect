@@ -108,13 +108,6 @@ impl Ability {
     pub fn ammo_recharge_progress(&self, now: u32) -> f32 {
         self.ammo_recharge_remaining(self.passed(now)) as f32 / self.ammo_recharge as f32
     }
-
-    /// Updates the ability state.
-    #[inline]
-    pub fn set_state(&mut self, _available: bool, pending: bool, pressed: bool) {
-        self.state.set(AbilityState::Pending, pending);
-        self.state.set(AbilityState::Pressed, pressed);
-    }
 }
 
 #[derive(
@@ -137,11 +130,15 @@ impl Ability {
 #[repr(u8)]
 #[bitflags]
 pub enum AbilityState {
+    /// Ability is auto-attack.
+    #[strum(serialize = "Auto Attack")]
+    AutoAttack = 1 << 0,
+
     /// Ability is queued or casting.
-    Pending = 1 << 0,
+    Pending = 1 << 1,
 
     /// Ability is pressed.
-    Pressed = 1 << 1,
+    Pressed = 1 << 2,
 }
 
 impl Named for AbilityState {
@@ -151,6 +148,7 @@ impl Named for AbilityState {
 
     fn short_name(&self) -> &'static str {
         match self {
+            Self::AutoAttack => "Auto",
             Self::Pressed => "Press",
             Self::Pending => "Pend",
         }
