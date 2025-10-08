@@ -40,6 +40,10 @@ impl Addon {
             .unwrap()
     }
 
+    pub fn release(&mut self) {
+        *self = Self::new();
+    }
+
     pub fn addon_dir() -> PathBuf {
         get_addon_dir("reffect").expect("invalid addon directory")
     }

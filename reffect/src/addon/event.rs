@@ -68,6 +68,9 @@ impl Addon {
         if let Some(worker) = addon.worker.take() {
             worker.exit_and_wait();
         }
+
+        addon.release();
+        Context::unload();
     }
 
     pub fn create_dirs() {

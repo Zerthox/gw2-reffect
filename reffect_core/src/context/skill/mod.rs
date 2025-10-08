@@ -50,8 +50,17 @@ impl From<u32> for SkillId {
 pub enum SkillInfo {
     /// Ability.
     Ability {
-        /// Whether the ability is an ammunition skill.
+        /// Whether the ability is instant cast.
+        is_instant: bool,
+
+        /// Whether the ability has ammunition.
         is_ammo: bool,
+
+        /// Whether the ability is ground targeted.
+        is_ground_targeted: bool,
+
+        /// Whether the ability is a stunbreak.
+        is_stunbreak: bool,
     },
 
     /// Buff.

@@ -63,9 +63,14 @@ impl Context {
     /// Returns the context.
     #[inline]
     pub fn lock() -> MutexGuard<'static, Self> {
-        static DATA: Mutex<Context> = Mutex::new(Context::new());
+        static CTX: Mutex<Context> = Mutex::new(Context::new());
 
-        DATA.lock().unwrap()
+        CTX.lock().unwrap()
+    }
+
+    #[inline]
+    pub fn unload() {
+        *Self::lock() = Self::new();
     }
 
     /// Creates the context worker.
