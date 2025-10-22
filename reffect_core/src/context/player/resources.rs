@@ -1,16 +1,10 @@
-use crate::context::resource::Resource;
+use crate::context::{CombatantResources, resource::Resource};
 
 /// Information about player resources.
 #[derive(Debug, Clone)]
 pub struct PlayerResources {
-    /// Health.
-    pub health: Resource,
-
-    /// Barrier.
-    pub barrier: Resource,
-
-    /// Defiance.
-    pub defiance: Option<f32>,
+    /// Generic combatant resources.
+    pub combatant: CombatantResources,
 
     /// Endurance.
     pub endurance: Resource,
@@ -28,9 +22,7 @@ impl PlayerResources {
     #[inline]
     pub const fn empty() -> Self {
         Self {
-            health: Resource::empty(),
-            barrier: Resource::empty(),
-            defiance: None,
+            combatant: CombatantResources::empty(),
             endurance: Resource::empty(),
             primary: Resource::empty(),
             secondary: Resource::empty(),

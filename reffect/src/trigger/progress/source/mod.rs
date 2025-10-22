@@ -1,3 +1,8 @@
+mod combatant;
+mod legacy;
+
+pub use self::combatant::*;
+
 use super::ProgressActive;
 use crate::{
     action::Action,
@@ -7,12 +12,11 @@ use crate::{
     internal::{Interface, Internal},
     render::{Validation, enum_combo, helper, input_skill_id},
 };
+use const_default::ConstDefault;
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
-use serde_with::{OneOrMany, formats::PreferMany, serde_as};
 use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 
-#[serde_as]
 #[derive(
     Debug,
     Default,
@@ -25,6 +29,7 @@ use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
     Serialize,
     Deserialize,
 )]
+#[serde(tag = "type")]
 pub enum ProgressSource {
     /// Inherit from above.
     #[default]
@@ -41,24 +46,45 @@ pub enum ProgressSource {
     #[serde(alias = "AnyBuff")]
     #[serde(alias = "Effect")]
     #[strum(serialize = "Effect")]
-    Buff(#[serde_as(as = "OneOrMany<_, PreferMany>")] Vec<u32>),
+    Buff {
+        #[serde(default)]
+        combatant: Combatant,
+
+        #[serde(default)]
+        ids: Vec<u32>,
+    },
 
     /// Ability ids, first match is used.
     #[strum(serialize = "Ability Recharge")]
-    Ability(Vec<u32>),
+    Ability {
+        #[serde(default)]
+        ids: Vec<u32>,
+    },
 
     /// Skillbar slot.
     #[strum(serialize = "Slot Recharge")]
-    SkillbarSlot(Slot),
+    SkillbarSlot {
+        #[serde(default)]
+        slot: Slot,
+    },
 
     /// Health.
-    Health,
+    Health {
+        #[serde(default)]
+        combatant: Combatant,
+    },
 
     /// Barrier.
-    Barrier,
+    Barrier {
+        #[serde(default)]
+        combatant: Combatant,
+    },
 
     // Defiance
-    Defiance,
+    Defiance {
+        #[serde(default)]
+        combatant: Combatant,
+    },
 
     /// Endurance.
     Endurance,
@@ -76,12 +102,23 @@ impl VariantArray for ProgressSource {
     const VARIANTS: &'static [Self] = &[
         Self::Inherit,
         Self::Always,
-        Self::Buff(Vec::new()),
-        Self::Ability(Vec::new()),
-        Self::SkillbarSlot(Slot::DEFAULT),
-        Self::Health,
-        Self::Barrier,
-        Self::Defiance,
+        Self::Buff {
+            combatant: Combatant::DEFAULT,
+            ids: Vec::new(),
+        },
+        Self::Ability { ids: Vec::new() },
+        Self::SkillbarSlot {
+            slot: Slot::DEFAULT,
+        },
+        Self::Health {
+            combatant: Combatant::DEFAULT,
+        },
+        Self::Barrier {
+            combatant: Combatant::DEFAULT,
+        },
+        Self::Defiance {
+            combatant: Combatant::DEFAULT,
+        },
         Self::Endurance,
         Self::PrimaryResource,
         Self::SecondaryResource,
@@ -103,31 +140,23 @@ impl ProgressSource {
         match *self {
             Self::Inherit => parent.cloned(),
             Self::Always => Some(ProgressActive::dummy()),
-            Self::Buff(ref ids) => {
-                let buff_info = ctx.player.buff_info.as_ref().ok()?;
+            Self::Buff { combatant, ref ids } => {
+                let buffs = combatant.buffs(ctx)?;
                 let mut combined = Buff::empty();
+                let mut found_id = 0;
                 for id in ids {
-                    if let Some(buff) = buff_info
-                        .buffs
-                        .get(id)
-                        .filter(|buff| buff.runout_time > ctx.now)
-                    {
+                    if let Some(buff) = buffs.get(id).filter(|buff| buff.runout_time > ctx.now) {
                         combined.stacks += buff.stacks;
                         combined.apply_time = combined.apply_time.max(buff.apply_time);
                         combined.runout_time = combined.runout_time.max(buff.runout_time);
+                        if found_id == 0 {
+                            found_id = *id;
+                        }
                     }
                 }
-                Some(ProgressActive::from_buff(
-                    ids.first().copied().unwrap_or(0),
-                    &combined,
-                ))
+                Some(ProgressActive::from_buff(found_id, &combined))
             }
-            Self::SkillbarSlot(slot) => {
-                let skillbar = ctx.player.skillbar.as_ref().ok()?;
-                let ability = skillbar.slot(slot)?;
-                Some(ProgressActive::from_ability(ability))
-            }
-            Self::Ability(ref ids) => {
+            Self::Ability { ref ids } => {
                 let skillbar = ctx.player.skillbar.as_ref().ok()?;
                 ids.iter()
                     .copied()
@@ -135,16 +164,21 @@ impl ProgressSource {
                     .find_map(|id| skillbar.ability(id))
                     .map(ProgressActive::from_ability)
             }
-            Self::Health => {
-                let resources = ctx.player.resources.as_ref().ok()?;
+            Self::SkillbarSlot { slot } => {
+                let skillbar = ctx.player.skillbar.as_ref().ok()?;
+                let ability = skillbar.slot(slot)?;
+                Some(ProgressActive::from_ability(ability))
+            }
+            Self::Health { combatant } => {
+                let resources = combatant.resources(ctx)?;
                 resources.health.clone().try_into().ok()
             }
-            Self::Barrier => {
-                let resources = ctx.player.resources.as_ref().ok()?;
+            Self::Barrier { combatant } => {
+                let resources = combatant.resources(ctx)?;
                 resources.barrier.clone().try_into().ok()
             }
-            Self::Defiance => {
-                let resources = ctx.player.resources.as_ref().ok()?;
+            Self::Defiance { combatant } => {
+                let resources = combatant.resources(ctx)?;
                 Some(ProgressActive::Fixed {
                     current: resources.defiance?,
                     max: 100.0,
@@ -173,15 +207,15 @@ impl ProgressSource {
         match *self {
             Self::Inherit => parent.cloned().unwrap_or(ProgressActive::dummy()),
             Self::Always => ProgressActive::dummy(),
-            Self::Buff(ref ids) => {
+            Self::Buff { ref ids, .. } => {
                 let id = ids.first().copied().unwrap_or(0);
                 ProgressActive::edit_buff(id, progress, ctx.now)
             }
-            Self::Ability(ref ids) => {
+            Self::Ability { ref ids } => {
                 let id = ids.first().copied().unwrap_or(0);
                 ProgressActive::edit_ability(id.into(), progress, ctx.now)
             }
-            Self::SkillbarSlot(slot) => {
+            Self::SkillbarSlot { slot } => {
                 let skill = ctx
                     .player
                     .skillbar
@@ -192,9 +226,11 @@ impl ProgressSource {
                     .unwrap_or_default();
                 ProgressActive::edit_ability(skill, progress, ctx.now)
             }
-            Self::Health => ProgressActive::edit_resource(progress, 15_000.0),
-            Self::Barrier => ProgressActive::edit_resource(0.5 * progress, 15_000.0),
-            Self::Defiance | Self::Endurance => ProgressActive::edit_resource(progress, 100.0),
+            Self::Health { .. } => ProgressActive::edit_resource(progress, 15_000.0),
+            Self::Barrier { .. } => ProgressActive::edit_resource(0.5 * progress, 15_000.0),
+            Self::Defiance { .. } | Self::Endurance => {
+                ProgressActive::edit_resource(progress, 100.0)
+            }
             Self::PrimaryResource | Self::SecondaryResource => {
                 ProgressActive::edit_resource(progress, 30.0)
             }
@@ -203,9 +239,28 @@ impl ProgressSource {
 
     pub fn into_ids(self) -> Vec<u32> {
         match self {
-            Self::Buff(ids) => ids,
-            Self::Ability(ids) => ids,
+            Self::Buff { ids, .. } | Self::Ability { ids } => ids,
             _ => Vec::new(),
+        }
+    }
+
+    pub fn combatant(&self) -> Option<&Combatant> {
+        match self {
+            Self::Buff { combatant, .. }
+            | Self::Health { combatant }
+            | Self::Barrier { combatant }
+            | Self::Defiance { combatant } => Some(combatant),
+            _ => None,
+        }
+    }
+
+    pub fn combatant_mut(&mut self) -> Option<&mut Combatant> {
+        match self {
+            Self::Buff { combatant, .. }
+            | Self::Health { combatant }
+            | Self::Barrier { combatant }
+            | Self::Defiance { combatant } => Some(combatant),
+            _ => None,
         }
     }
 
@@ -223,7 +278,7 @@ impl ProgressSource {
                 }
             },
             Ok(SkillInfo::Ability { .. }) => Validation::Error(format!("Id {id} is an ability")),
-            Err(Error::SkillNotFound) => Validation::Error(format!("Id {id} is invalid or hidden")),
+            Err(Error::Skill) => Validation::Error(format!("Id {id} is invalid or hidden")),
             Err(_) => Validation::Ok,
         }
     }
@@ -232,7 +287,7 @@ impl ProgressSource {
         match Internal::get_skill_info(id) {
             Ok(SkillInfo::Ability { .. }) => Validation::Confirm(format!("Ability {id} is valid")),
             Ok(SkillInfo::Buff { .. }) => Validation::Error(format!("Id {id} is an effect")),
-            Err(Error::SkillNotFound) => Validation::Error(format!("Id {id} is invalid or hidden")),
+            Err(Error::Skill) => Validation::Error(format!("Id {id} is invalid or hidden")),
             Err(_) => Validation::Ok,
         }
     }
@@ -250,8 +305,7 @@ impl ProgressSource {
         if let Some(prev) = enum_combo(ui, "Trigger", self, ComboBoxFlags::HEIGHT_LARGE) {
             changed = true;
             match self {
-                Self::Buff(ids) => *ids = prev.into_ids(),
-                Self::Ability(ids) => *ids = prev.into_ids(),
+                Self::Buff { ids, .. } | Self::Ability { ids } => *ids = prev.into_ids(),
                 _ => {}
             }
         }
@@ -262,8 +316,12 @@ impl ProgressSource {
             ui.text("For group no effect on visibility, only passed down for inherit");
         });
 
+        if let Some(combatant) = self.combatant_mut() {
+            changed |= combatant.render_options(ui);
+        }
+
         match self {
-            Self::Buff(ids) => {
+            Self::Buff { ids, .. } => {
                 let mut action = Action::new();
                 for (i, id) in ids.iter_mut().enumerate() {
                     let _id = ui.push_id(i as i32);
@@ -284,7 +342,7 @@ impl ProgressSource {
 
                 changed |= action.perform(ids);
             }
-            Self::Ability(ids) => {
+            Self::Ability { ids } => {
                 let mut action = Action::new();
                 for (i, id) in ids.iter_mut().enumerate() {
                     let _id = ui.push_id(i as i32);
@@ -305,24 +363,12 @@ impl ProgressSource {
 
                 changed |= action.perform(ids);
             }
-            Self::SkillbarSlot(slot) => {
+            Self::SkillbarSlot { slot } => {
                 changed |= enum_combo(ui, "Slot", slot, ComboBoxFlags::HEIGHT_LARGEST).is_some();
             }
             _ => {}
         }
 
         changed
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn migrate() {
-        let json = r#"{ "Buff": 123 }"#;
-        let result = serde_json::from_str::<ProgressSource>(&json).expect("failed to deserialize");
-        assert_eq!(result, ProgressSource::Buff(vec![123]));
     }
 }

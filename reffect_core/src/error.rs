@@ -12,70 +12,70 @@ pub enum Error {
     Disabled,
 
     #[error("No handler")]
-    NoHandler,
+    Handler,
 
     #[error("No Mumble link")]
-    NoMumble,
+    Mumble,
 
     #[error("Unavailable in competitive mode")]
     CompetitiveMode,
 
     #[error("Main thread not found")]
-    MainThreadNotFound,
+    MainThread,
 
     #[error("Context not found")]
-    ContextNotFound,
+    Context,
 
     #[error("World not found")]
-    WorldNotFound,
+    World,
 
     #[error("Content not found")]
-    ContentNotFound,
+    Content,
 
     #[error("Skill not found")]
-    SkillNotFound,
+    Skill,
 
     #[error("Failed to get user")]
-    UserNotFound,
+    User,
 
-    #[error("No character")]
-    NoCharacter,
+    #[error("Character not found")]
+    Character,
 
     #[error("Unavailable for character state")]
     CharacterState,
 
     #[error("Character buffs not found")]
-    BuffsNotFound,
+    Buffs,
 
     #[error("Character skillbar not found")]
-    SkillbarNotFound,
+    Skillbar,
 
     #[error("Character health not found")]
-    HealthNotFound,
+    Health,
 
     #[error("Character endurance not found")]
-    EnduranceNotFound,
+    Endurance,
 
     #[error("Character inventory not found")]
-    InventoryNotFound,
+    Inventory,
 
     #[error("Character profession not found")]
-    ProfNotFound,
+    Profession,
 
     #[error("Character specialization not found")]
-    SpecNotFound,
+    Specialization,
 
     #[error("Kennel not found")]
-    KennelNotFound,
+    Kennel,
 
-    #[error("No target")]
-    NoTarget,
+    #[error("Target not found")]
+    Target,
 
     #[error("Unavailable for target state")]
     TargetState,
 
     #[error("Group not found")]
-    GroupNotFound,
+    Group,
 
     #[error("Windows error: {0}")]
     Windows(windows::core::Error),

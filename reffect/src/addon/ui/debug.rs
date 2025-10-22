@@ -109,8 +109,8 @@ impl Addon {
                     "Target resources",
                     &ctx.target.resources,
                     |resources| {
-                        ui.text(format!("Health: {:.2}", 100.0 * resources.health));
-                        ui.text(format!("Barrier: {:.2}", 100.0 * resources.barrier));
+                        ui.text(format!("Health: {:.2}", resources.health));
+                        ui.text(format!("Barrier: {:.2}", resources.barrier));
 
                         ui.text("Defiance:");
                         ui.same_line();
@@ -150,20 +150,18 @@ impl Addon {
 
 fn debug_player_resources(ui: &Ui, resources: &PlayerResources) {
     let PlayerResources {
-        health,
-        barrier,
-        defiance,
+        combatant,
         endurance,
         primary,
         secondary,
     } = resources;
 
-    ui.text(format!("Health: {}/{}", health.current, health.max));
-    ui.text(format!("Barrier: {}/{}", barrier.current, barrier.max));
+    ui.text(format!("Health: {:.0}", combatant.health));
+    ui.text(format!("Barrier: {:.0}", combatant.barrier));
 
     ui.text("Defiance:");
     ui.same_line();
-    match defiance {
+    match combatant.defiance {
         Some(defiance) => ui.text(format!("{defiance:.2}")),
         None => ui.text("-"),
     }

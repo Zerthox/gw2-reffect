@@ -1,3 +1,4 @@
+mod combatant;
 mod edit;
 mod group;
 mod map;
@@ -7,7 +8,9 @@ mod skill;
 mod target;
 mod ui;
 
-pub use self::{edit::*, group::*, map::*, player::*, resource::*, skill::*, target::*, ui::*};
+pub use self::{
+    combatant::*, edit::*, group::*, map::*, player::*, resource::*, skill::*, target::*, ui::*,
+};
 
 use crate::{error::Error, links::Links, profiling::measure, worker::StoppableWorker};
 use enumflags2::{BitFlags, bitflags};

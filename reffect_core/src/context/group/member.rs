@@ -1,30 +1,35 @@
 use crate::{
-    context::{CombatantResources, skill::BuffMap},
+    context::{BuffMap, CombatantResources},
     error::Error,
 };
 
-/// Target info.
+/// Group member.
 #[derive(Debug, Clone)]
-pub struct TargetInfo {
+pub struct GroupMember {
+    /// Group member account name.
+    pub account: Option<String>,
+
     /// Generic combatant resources.
     pub resources: Result<CombatantResources, Error>,
 
-    /// Target buffs.
+    /// Group member buffs.
     pub buffs: Result<BuffMap, Error>,
 }
 
-impl TargetInfo {
+impl GroupMember {
     #[inline]
     pub const fn empty() -> Self {
         Self {
+            account: None,
             resources: Err(Error::Disabled),
             buffs: Err(Error::Disabled),
         }
     }
+}
 
+impl Default for GroupMember {
     #[inline]
-    pub fn set_err(&mut self, error: Error) {
-        self.resources = Err(error.clone());
-        self.buffs = Err(error.clone());
+    fn default() -> Self {
+        Self::empty()
     }
 }

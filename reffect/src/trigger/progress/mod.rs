@@ -1,4 +1,5 @@
 mod active;
+
 mod source;
 mod threshold;
 
@@ -32,7 +33,10 @@ pub struct ProgressTrigger {
 impl ProgressTrigger {
     pub fn buff() -> Self {
         Self {
-            source: ProgressSource::Buff(vec![0]),
+            source: ProgressSource::Buff {
+                combatant: Combatant::default(),
+                ids: vec![0],
+            },
             threshold: ProgressThreshold {
                 threshold_type: ThresholdType::Present,
                 amount_type: AmountType::default(),

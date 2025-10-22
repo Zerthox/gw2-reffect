@@ -1,3 +1,5 @@
+use std::fmt;
+
 /// Information about a resource.
 #[derive(Debug, Clone)]
 pub struct Resource {
@@ -26,5 +28,13 @@ impl Default for Resource {
     #[inline]
     fn default() -> Self {
         Self::empty()
+    }
+}
+
+impl fmt::Display for Resource {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let Self { current, max } = self;
+        write!(f, "{current}/{max}")
     }
 }

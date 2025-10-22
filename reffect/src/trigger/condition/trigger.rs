@@ -67,15 +67,17 @@ impl ConditionTrigger {
     pub fn validate_source(&self, source: &ProgressSource) -> Validation<&'static str> {
         match self {
             Self::AbilityState(_) => match source {
-                ProgressSource::Ability(_) | ProgressSource::SkillbarSlot(_) => Validation::Ok,
+                ProgressSource::Ability { .. } | ProgressSource::SkillbarSlot { .. } => {
+                    Validation::Ok
+                }
                 ProgressSource::Inherit => {
                     Validation::Warn("Inherited trigger source must be ability-like")
                 }
                 ProgressSource::Always
-                | ProgressSource::Buff(_)
-                | ProgressSource::Health
-                | ProgressSource::Barrier
-                | ProgressSource::Defiance
+                | ProgressSource::Buff { .. }
+                | ProgressSource::Health { .. }
+                | ProgressSource::Barrier { .. }
+                | ProgressSource::Defiance { .. }
                 | ProgressSource::Endurance
                 | ProgressSource::PrimaryResource
                 | ProgressSource::SecondaryResource => {
