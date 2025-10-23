@@ -242,26 +242,6 @@ impl ProgressSource {
         }
     }
 
-    pub fn combatant(&self) -> Option<&Combatant> {
-        match self {
-            Self::Buff { combatant, .. }
-            | Self::Health { combatant }
-            | Self::Barrier { combatant }
-            | Self::Defiance { combatant } => Some(combatant),
-            _ => None,
-        }
-    }
-
-    pub fn combatant_mut(&mut self) -> Option<&mut Combatant> {
-        match self {
-            Self::Buff { combatant, .. }
-            | Self::Health { combatant }
-            | Self::Barrier { combatant }
-            | Self::Defiance { combatant } => Some(combatant),
-            _ => None,
-        }
-    }
-
     fn buff_validate(id: u32) -> Validation<impl AsRef<str>> {
         match Internal::get_skill_info(id) {
             Ok(SkillInfo::Buff { category, .. }) => match category {
@@ -311,15 +291,14 @@ impl ProgressSource {
             ui.text("Source of information");
             ui.text("Effect merges all matches");
             ui.text("Ability uses first match");
-            ui.text("For group no effect on visibility, only passed down for inherit");
+            ui.text("Does not affect group visibility, only passed down for inherit");
         });
 
-        if let Some(combatant) = self.combatant_mut() {
-            changed |= combatant.render_options(ui);
-        }
-
         match self {
-            Self::Buff { ids, .. } => {
+            Self::Buff { combatant, ids } => {
+                let validation = combatant.validate_buff();
+                changed |= combatant.render_options(ui, validation);
+
                 let mut action = Action::new();
                 for (i, id) in ids.iter_mut().enumerate() {
                     let _id = ui.push_id(i as i32);
@@ -363,6 +342,14 @@ impl ProgressSource {
             }
             Self::SkillbarSlot { slot } => {
                 changed |= enum_combo(ui, "Slot", slot, ComboBoxFlags::HEIGHT_LARGEST).is_some();
+            }
+            Self::Health { combatant } | Self::Barrier { combatant } => {
+                let validation = combatant.validate_health_barrier();
+                changed |= combatant.render_options(ui, validation);
+            }
+            Self::Defiance { combatant } => {
+                let validation = combatant.validate_defiance();
+                changed |= combatant.render_options(ui, validation);
             }
             _ => {}
         }

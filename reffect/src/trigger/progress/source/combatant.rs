@@ -1,9 +1,9 @@
-use crate::render::{enum_combo, helper};
+use crate::render::{Validation, enum_combo, helper};
 use const_default::ConstDefault;
 use nexus::imgui::{ComboBoxFlags, Ui};
 use reffect_core::context::{BuffMap, CombatantResources, Context};
 use serde::{Deserialize, Serialize};
-use strum::{AsRefStr, EnumIter, VariantArray};
+use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
 
 #[derive(
     Debug,
@@ -16,7 +16,9 @@ use strum::{AsRefStr, EnumIter, VariantArray};
     Hash,
     EnumIter,
     VariantArray,
+    Display,
     AsRefStr,
+    IntoStaticStr,
     Serialize,
     Deserialize,
 )]
@@ -82,12 +84,46 @@ impl Combatant {
         }
     }
 
-    pub fn render_options(&mut self, ui: &Ui) -> bool {
+    pub fn validate_buff(&self) -> Validation<impl AsRef<str> + 'static> {
+        match self {
+            Self::Player | Self::Target => Validation::Ok,
+            Self::GroupMember1 | Self::GroupMember2 | Self::GroupMember3 | Self::GroupMember4 => {
+                Validation::Warn("Group member only supports boon & condition effects")
+            }
+            Self::Pet => Validation::Error("Pet does not support effects"),
+        }
+    }
+
+    pub fn validate_health_barrier(&self) -> Validation<impl AsRef<str> + 'static> {
+        match self {
+            Self::Player | Self::Pet => Validation::Ok,
+            Self::Target => Validation::Warn("Target only supports normalized health/barrier"),
+            Self::GroupMember1 | Self::GroupMember2 | Self::GroupMember3 | Self::GroupMember4 => {
+                Validation::Warn("Group member only supports normalized health/barrier")
+            }
+        }
+    }
+
+    pub fn validate_defiance(&self) -> Validation<impl AsRef<str> + 'static> {
+        match self {
+            Self::Player | Self::Target => Validation::Ok,
+            Self::Pet => Validation::Error("Pet does not support defiance"),
+            Self::GroupMember1 | Self::GroupMember2 | Self::GroupMember3 | Self::GroupMember4 => {
+                Validation::Error("Group member does not support defiance")
+            }
+        }
+    }
+
+    pub fn render_options(&mut self, ui: &Ui, validation: Validation<impl AsRef<str>>) -> bool {
         let mut changed = false;
 
-        changed |= enum_combo(ui, "Combatant", self, ComboBoxFlags::empty()).is_some();
+        changed |= validation
+            .for_item(ui, || {
+                enum_combo(ui, "Combatant", self, ComboBoxFlags::empty())
+            })
+            .is_some();
         helper(ui, || {
-            ui.text("Combatant character to use");
+            ui.text("Combatant to use");
             ui.text("Player: controlled character");
             ui.text("Pet: Ranger pet or Mechanist mech");
         });
