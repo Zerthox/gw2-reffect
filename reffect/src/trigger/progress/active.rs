@@ -49,6 +49,14 @@ impl ProgressActive {
         }
     }
 
+    /// Creates simple progress percent.
+    pub const fn percent(current: f32) -> Self {
+        Self::Fixed {
+            current,
+            max: 100.0,
+        }
+    }
+
     /// Creates new timed active progress from a buff.
     pub fn from_buff(id: u32, buff: &Buff) -> Self {
         Self::Buff {

@@ -7,6 +7,7 @@ use crate::{
     internal::{Interface, Internal},
 };
 use nexus::imgui::{StyleColor, TreeNode, TreeNodeFlags, Ui, Window};
+use reffect_core::context::{CombatantResources, Defiance};
 use std::{cmp::Ordering, fmt};
 use strum::IntoEnumIterator;
 
@@ -108,17 +109,7 @@ impl Addon {
                     "tgres",
                     "Target resources",
                     &ctx.target.resources,
-                    |resources| {
-                        ui.text(format!("Health: {:.2}", resources.health));
-                        ui.text(format!("Barrier: {:.2}", resources.barrier));
-
-                        ui.text("Defiance:");
-                        ui.same_line();
-                        match &resources.defiance {
-                            Some(defiance) => ui.text(format!("{:.2}", 100.0 * defiance)),
-                            None => ui.text("-"),
-                        }
-                    },
+                    |resources| debug_combatant_resources(ui, resources),
                 );
                 debug_result_tree(ui, "tgbuff", "Target buffs", &ctx.target.buffs, |buffs| {
                     debug_buffs(ui, ctx, buffs)
@@ -148,6 +139,26 @@ impl Addon {
     }
 }
 
+fn debug_combatant_resources(ui: &Ui, resources: &CombatantResources) {
+    let CombatantResources {
+        health,
+        barrier,
+        defiance,
+    } = resources;
+
+    ui.text(format!("Health: {health}"));
+    ui.text(format!("Barrier: {barrier}"));
+
+    ui.text("Defiance:");
+    ui.same_line();
+    match defiance {
+        Defiance::None => ui.text("-"),
+        Defiance::Immune => ui.text("immune"),
+        Defiance::Active(percent) => ui.text(format!("active {percent:.2}%")),
+        Defiance::Recover(percent) => ui.text(format!("recover {percent:.2}%")),
+    }
+}
+
 fn debug_player_resources(ui: &Ui, resources: &PlayerResources) {
     let PlayerResources {
         combatant,
@@ -156,15 +167,7 @@ fn debug_player_resources(ui: &Ui, resources: &PlayerResources) {
         secondary,
     } = resources;
 
-    ui.text(format!("Health: {:.0}", combatant.health));
-    ui.text(format!("Barrier: {:.0}", combatant.barrier));
-
-    ui.text("Defiance:");
-    ui.same_line();
-    match combatant.defiance {
-        Some(defiance) => ui.text(format!("{defiance:.2}")),
-        None => ui.text("-"),
-    }
+    debug_combatant_resources(ui, combatant);
 
     ui.text(format!(
         "Endurance: {}/{}",

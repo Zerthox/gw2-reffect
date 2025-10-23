@@ -10,7 +10,7 @@ pub struct CombatantResources {
     pub barrier: Resource,
 
     /// Defiance.
-    pub defiance: Option<f32>,
+    pub defiance: Defiance,
 }
 
 impl CombatantResources {
@@ -20,7 +20,7 @@ impl CombatantResources {
         Self {
             health: Resource::empty(),
             barrier: Resource::empty(),
-            defiance: None,
+            defiance: Defiance::None,
         }
     }
 }
@@ -29,5 +29,25 @@ impl Default for CombatantResources {
     #[inline]
     fn default() -> Self {
         Self::empty()
+    }
+}
+
+#[derive(Debug, Default, Clone, PartialEq)]
+pub enum Defiance {
+    #[default]
+    None,
+    Immune,
+    Active(f32),
+    Recover(f32),
+}
+
+impl Defiance {
+    #[inline]
+    pub fn percent(&self) -> Option<f32> {
+        match *self {
+            Self::None => None,
+            Self::Immune => Some(100.0),
+            Self::Active(percent) | Self::Recover(percent) => Some(percent),
+        }
     }
 }

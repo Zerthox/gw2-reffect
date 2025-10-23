@@ -179,10 +179,8 @@ impl ProgressSource {
             }
             Self::Defiance { combatant } => {
                 let resources = combatant.resources(ctx)?;
-                Some(ProgressActive::Fixed {
-                    current: resources.defiance?,
-                    max: 100.0,
-                })
+                let current = resources.defiance.percent()?;
+                Some(ProgressActive::percent(current))
             }
             Self::Endurance => {
                 let resources = ctx.player.resources.as_ref().ok()?;
