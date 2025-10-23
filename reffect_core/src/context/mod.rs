@@ -158,7 +158,7 @@ impl Context {
     #[inline]
     pub fn set_error(&mut self, error: Error) {
         self.player.set_error(error.clone());
-        self.target.set_err(error.clone());
+        self.target.set_error(error.clone());
         self.group = Err(error);
     }
 }

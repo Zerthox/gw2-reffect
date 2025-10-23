@@ -86,17 +86,19 @@ impl Combatant {
 
     pub fn validate_buff(&self) -> Validation<impl AsRef<str> + 'static> {
         match self {
-            Self::Player | Self::Target => Validation::Ok,
+            Self::Player => Validation::Ok,
+            Self::Pet => Validation::Error("Pet does not support effects"),
+            Self::Target => Validation::Warn("Target effects not yet implemented"),
             Self::GroupMember1 | Self::GroupMember2 | Self::GroupMember3 | Self::GroupMember4 => {
                 Validation::Warn("Group member only supports boon & condition effects")
             }
-            Self::Pet => Validation::Error("Pet does not support effects"),
         }
     }
 
     pub fn validate_health_barrier(&self) -> Validation<impl AsRef<str> + 'static> {
         match self {
-            Self::Player | Self::Pet => Validation::Ok,
+            Self::Player => Validation::Ok,
+            Self::Pet => Validation::Warn("Pet health/barrier not yet implemented"),
             Self::Target => Validation::Warn("Target only supports normalized health/barrier"),
             Self::GroupMember1 | Self::GroupMember2 | Self::GroupMember3 | Self::GroupMember4 => {
                 Validation::Warn("Group member only supports normalized health/barrier")

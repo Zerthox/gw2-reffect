@@ -14,13 +14,37 @@ pub struct CombatantResources {
 }
 
 impl CombatantResources {
-    /// Creates empty resources.
+    /// Creates empty combatant resources.
     #[inline]
     pub const fn empty() -> Self {
         Self {
             health: Resource::empty(),
             barrier: Resource::empty(),
-            defiance: Defiance::None,
+            defiance: Defiance::DEFAULT,
+        }
+    }
+
+    /// Creates new combatant resources.
+    #[inline]
+    pub const fn new(
+        current_health: f32,
+        current_barrier: f32,
+        max_health: f32,
+        normalize: bool,
+        defiance: Defiance,
+    ) -> Self {
+        if !normalize {
+            Self {
+                health: Resource::new(current_health, max_health),
+                barrier: Resource::new(current_barrier, max_health),
+                defiance,
+            }
+        } else {
+            Self {
+                health: Resource::new(100.0 * current_health / max_health, 100.0),
+                barrier: Resource::new(100.0 * current_barrier / max_health, 100.0),
+                defiance,
+            }
         }
     }
 }
@@ -42,6 +66,8 @@ pub enum Defiance {
 }
 
 impl Defiance {
+    pub const DEFAULT: Self = Self::None;
+
     #[inline]
     pub fn percent(&self) -> Option<f32> {
         match *self {

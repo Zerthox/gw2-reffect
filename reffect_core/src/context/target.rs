@@ -23,7 +23,7 @@ impl TargetInfo {
     }
 
     #[inline]
-    pub fn set_err(&mut self, error: Error) {
+    pub fn set_error(&mut self, error: Error) {
         self.resources = Err(error.clone());
         self.buffs = Err(error.clone());
     }
