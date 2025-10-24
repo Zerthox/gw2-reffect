@@ -1,5 +1,4 @@
 mod active;
-
 mod source;
 mod threshold;
 
@@ -18,6 +17,7 @@ use serde::{Deserialize, Serialize};
 pub struct ProgressTrigger {
     /// Progress source.
     #[serde(alias = "id")] // TODO: remove backwards compat
+    #[serde(deserialize_with = "migrate::<_, _, ProgressSourceLegacy>")]
     pub source: ProgressSource,
 
     /// Threshold requirement.

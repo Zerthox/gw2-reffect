@@ -158,7 +158,7 @@ impl ProgressActive {
         matches!(self, Self::Ability { .. })
     }
 
-    /// Returns the intensity (alternative progress).
+    /// Returns the intensity (stacks/ammo).
     pub const fn intensity(&self) -> u32 {
         match *self {
             Self::Fixed { current, .. } => current as u32,

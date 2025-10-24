@@ -1,7 +1,7 @@
 mod combatant;
 mod legacy;
 
-pub use self::combatant::*;
+pub use self::{combatant::*, legacy::*};
 
 use super::ProgressActive;
 use crate::{
