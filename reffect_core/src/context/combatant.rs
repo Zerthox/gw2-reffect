@@ -3,6 +3,9 @@ use crate::context::Resource;
 /// Generic combatant resources.
 #[derive(Debug, Clone)]
 pub struct CombatantResources {
+    /// Whether the resources are normalized.
+    pub normalized: bool,
+
     /// Health.
     pub health: Resource,
 
@@ -16,8 +19,9 @@ pub struct CombatantResources {
 impl CombatantResources {
     /// Creates empty combatant resources.
     #[inline]
-    pub const fn empty() -> Self {
+    pub const fn empty(normalized: bool) -> Self {
         Self {
+            normalized,
             health: Resource::empty(),
             barrier: Resource::empty(),
             defiance: Defiance::DEFAULT,
@@ -27,20 +31,22 @@ impl CombatantResources {
     /// Creates new combatant resources.
     #[inline]
     pub const fn new(
+        normalize: bool,
         current_health: f32,
         current_barrier: f32,
         max_health: f32,
-        normalize: bool,
         defiance: Defiance,
     ) -> Self {
         if !normalize {
             Self {
+                normalized: false,
                 health: Resource::new(current_health, max_health),
                 barrier: Resource::new(current_barrier, max_health),
                 defiance,
             }
         } else {
             Self {
+                normalized: true,
                 health: Resource::new(100.0 * current_health / max_health, 100.0),
                 barrier: Resource::new(100.0 * current_barrier / max_health, 100.0),
                 defiance,
@@ -52,7 +58,7 @@ impl CombatantResources {
 impl Default for CombatantResources {
     #[inline]
     fn default() -> Self {
-        Self::empty()
+        Self::empty(true)
     }
 }
 

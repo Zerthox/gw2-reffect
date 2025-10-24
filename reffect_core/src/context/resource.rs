@@ -33,8 +33,10 @@ impl Default for Resource {
 
 impl fmt::Display for Resource {
     #[inline]
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         let Self { current, max } = self;
-        write!(f, "{current}/{max}")
+        current.fmt(formatter)?;
+        formatter.write_str("/")?;
+        max.fmt(formatter)
     }
 }

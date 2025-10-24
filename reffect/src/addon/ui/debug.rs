@@ -119,13 +119,30 @@ impl Addon {
                     ui.text(format!("Group Type: {}", group.group_type));
 
                     for (i, member) in group.members.iter().enumerate() {
-                        ui.text(format!("Group Member {}:", i + 1));
-                        ui.same_line();
-                        if let Some(acc) = &member.account {
-                            ui.text(acc.strip_prefix(':').unwrap_or(acc));
-                        } else {
-                            ui.text("-");
-                        }
+                        let label = format!(
+                            "Member {}: {}",
+                            i + 1,
+                            if let Some(acc) = &member.account {
+                                acc.strip_prefix(':').unwrap_or(acc)
+                            } else {
+                                "-"
+                            }
+                        );
+                        TreeNode::new(i.to_string())
+                            .label::<String, _>(label)
+                            .flags(TreeNodeFlags::SPAN_AVAIL_WIDTH)
+                            .build(ui, || {
+                                debug_result_tree(
+                                    ui,
+                                    "res",
+                                    "Resources",
+                                    &member.resources,
+                                    |resources| debug_combatant_resources(ui, resources),
+                                );
+                                debug_result_tree(ui, "buffs", "Buffs", &member.buffs, |buffs| {
+                                    debug_buffs(ui, ctx, buffs)
+                                });
+                            });
                     }
                 });
 
@@ -141,21 +158,23 @@ impl Addon {
 
 fn debug_combatant_resources(ui: &Ui, resources: &CombatantResources) {
     let CombatantResources {
+        normalized,
         health,
         barrier,
         defiance,
     } = resources;
 
-    ui.text(format!("Health: {health}"));
-    ui.text(format!("Barrier: {barrier}"));
+    let precision = if *normalized { 1 } else { 0 };
+    ui.text(format!("Health: {health:.*}", precision));
+    ui.text(format!("Barrier: {barrier:.*}", precision));
 
     ui.text("Defiance:");
     ui.same_line();
     match defiance {
         Defiance::None => ui.text("-"),
         Defiance::Immune => ui.text("immune"),
-        Defiance::Active(percent) => ui.text(format!("active {percent:.2}%")),
-        Defiance::Recover(percent) => ui.text(format!("recover {percent:.2}%")),
+        Defiance::Active(percent) => ui.text(format!("active {percent:.1}%")),
+        Defiance::Recover(percent) => ui.text(format!("recover {percent:.1}%")),
     }
 }
 

@@ -22,7 +22,7 @@ impl PlayerResources {
     #[inline]
     pub const fn empty() -> Self {
         Self {
-            combatant: CombatantResources::empty(),
+            combatant: CombatantResources::empty(false),
             endurance: Resource::empty(),
             primary: Resource::empty(),
             secondary: Resource::empty(),
