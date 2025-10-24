@@ -110,7 +110,7 @@ impl Addon {
                     &ctx.player.resources,
                     |resources| {
                         if let Some(pet) = &resources.pet {
-                            debug_combatant_resources(ui, pet);
+                            debug_combatant_resources(ui, pet, false);
                         } else {
                             ui.text("No pet");
                         }
@@ -122,7 +122,7 @@ impl Addon {
                     "tgres",
                     "Target resources",
                     &ctx.target.resources,
-                    |resources| debug_combatant_resources(ui, resources),
+                    |resources| debug_combatant_resources(ui, resources, true),
                 );
                 debug_result_tree(ui, "tgbuff", "Target buffs", &ctx.target.buffs, |buffs| {
                     debug_buffs(ui, ctx, buffs)
@@ -150,7 +150,7 @@ impl Addon {
                                     "res",
                                     "Resources",
                                     &member.resources,
-                                    |resources| debug_combatant_resources(ui, resources),
+                                    |resources| debug_combatant_resources(ui, resources, true),
                                 );
                                 debug_result_tree(ui, "buffs", "Buffs", &member.buffs, |buffs| {
                                     debug_buffs(ui, ctx, buffs)
@@ -169,15 +169,14 @@ impl Addon {
     }
 }
 
-fn debug_combatant_resources(ui: &Ui, resources: &CombatantResources) {
+fn debug_combatant_resources(ui: &Ui, resources: &CombatantResources, normalized: bool) {
     let CombatantResources {
-        normalized,
         health,
         barrier,
         defiance,
     } = resources;
 
-    let precision = if *normalized { 1 } else { 0 };
+    let precision = if normalized { 1 } else { 0 };
     ui.text(format!("Health: {health:.*}", precision));
     ui.text(format!("Barrier: {barrier:.*}", precision));
 
@@ -200,7 +199,7 @@ fn debug_player_resources(ui: &Ui, resources: &PlayerResources) {
         pet: _,
     } = resources;
 
-    debug_combatant_resources(ui, combatant);
+    debug_combatant_resources(ui, combatant, false);
 
     ui.text(format!(
         "Endurance: {}/{}",
