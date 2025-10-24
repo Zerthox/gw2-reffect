@@ -75,7 +75,7 @@ impl Combatant {
     pub fn resources<'ctx>(&self, ctx: &'ctx Context) -> Option<&'ctx CombatantResources> {
         match self {
             Self::Player => Some(&ctx.player.resources.as_ref().ok()?.combatant),
-            Self::Pet => None,
+            Self::Pet => ctx.player.resources.as_ref().ok()?.pet.as_ref(),
             Self::Target => ctx.target.resources.as_ref().ok(),
             Self::GroupMember1 => ctx.group.as_ref().ok()?.members[0].resources.as_ref().ok(),
             Self::GroupMember2 => ctx.group.as_ref().ok()?.members[1].resources.as_ref().ok(),
@@ -97,8 +97,7 @@ impl Combatant {
 
     pub fn validate_health_barrier(&self) -> Validation<impl AsRef<str> + 'static> {
         match self {
-            Self::Player => Validation::Ok,
-            Self::Pet => Validation::Warn("Pet health/barrier not yet implemented"),
+            Self::Player | Self::Pet => Validation::Ok,
             Self::Target => Validation::Warn("Target only supports normalized health/barrier"),
             Self::GroupMember1 | Self::GroupMember2 | Self::GroupMember3 | Self::GroupMember4 => {
                 Validation::Warn("Group member only supports normalized health/barrier")

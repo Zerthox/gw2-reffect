@@ -6,7 +6,10 @@ mod specialization;
 mod weapon;
 
 use crate::{
-    context::skill::{BuffMap, Skillbar},
+    context::{
+        CombatantResources,
+        skill::{BuffMap, Skillbar},
+    },
     error::Error,
 };
 use nexus::data_link::mumble::{Identity, MumblePtr};

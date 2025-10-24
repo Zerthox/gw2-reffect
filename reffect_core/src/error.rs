@@ -68,6 +68,9 @@ pub enum Error {
     #[error("Kennel not found")]
     Kennel,
 
+    #[error("Pet not found")]
+    Pet,
+
     #[error("Owner not found")]
     Owner,
 

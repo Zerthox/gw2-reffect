@@ -6,6 +6,9 @@ pub struct PlayerResources {
     /// Generic combatant resources.
     pub combatant: CombatantResources,
 
+    /// Pet resources.
+    pub pet: Option<CombatantResources>,
+
     /// Endurance.
     pub endurance: Resource,
 
@@ -23,6 +26,7 @@ impl PlayerResources {
     pub const fn empty() -> Self {
         Self {
             combatant: CombatantResources::empty(false),
+            pet: None,
             endurance: Resource::empty(),
             primary: Resource::empty(),
             secondary: Resource::empty(),

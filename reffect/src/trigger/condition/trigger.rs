@@ -13,6 +13,8 @@ use serde::{Deserialize, Serialize};
 use std::{fmt, mem};
 use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 
+// TODO: add target affinity (target triggers only)
+// TODO: add defiance state (defiance triggers only)
 #[derive(
     Debug, Clone, PartialEq, AsRefStr, IntoStaticStr, EnumIter, EnumCount, Serialize, Deserialize,
 )]

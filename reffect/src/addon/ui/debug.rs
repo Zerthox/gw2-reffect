@@ -103,6 +103,19 @@ impl Addon {
                     &ctx.player.skillbar,
                     |skillbar| debug_skillbar(ui, ctx, skillbar),
                 );
+                debug_result_tree(
+                    ui,
+                    "ptres",
+                    "Pet resources",
+                    &ctx.player.resources,
+                    |resources| {
+                        if let Some(pet) = &resources.pet {
+                            debug_combatant_resources(ui, pet);
+                        } else {
+                            ui.text("No pet");
+                        }
+                    },
+                );
 
                 debug_result_tree(
                     ui,
@@ -184,6 +197,7 @@ fn debug_player_resources(ui: &Ui, resources: &PlayerResources) {
         endurance,
         primary,
         secondary,
+        pet: _,
     } = resources;
 
     debug_combatant_resources(ui, combatant);
