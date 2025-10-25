@@ -16,7 +16,7 @@ Requires the [Nexus](https://github.com/RaidcoreGG/Nexus) addon manager ([websit
 - Sharing created displays as individual packs
 - Effect stacks & durations mimicking ingame behavior
 - Ability cooldowns mimicking ingame behavior
-- Health, barrier, endurance, profession resources
+- Health, barrier, endurance, defiance, profession resources
 
 ## Installation
 1. Install the [Nexus](https://github.com/RaidcoreGG/Nexus) addon manager ([website](https://raidcore.gg/Nexus)).
@@ -45,7 +45,7 @@ The information is retrieved with the following policy in mind:
 - No information about ability cooldowns when hidden from the player.
 
 ## Building from source
-Reffect is *partially* open source: while the major part of the addon is open source, there is a closed source portion which is responsible for memory reading information from the game.
+Reffect is *partially* open source: while a major part of the addon is open source, there is a closed source portion which is responsible for memory reading information from the game.
 
 When building from source this closed source portion is substituted with a dummy implementation, disabling all features that require memory reading capabilities.
 Contributors can request full builds with memory reading for their pull requests when necessary.

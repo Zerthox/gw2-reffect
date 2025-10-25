@@ -2,10 +2,16 @@
 
 ## Trigger
 Triggers are the source of information used by the element.
-A variety of sources is supported:
-- Your own effects
-- Your own abilities by slot or ID
-- Your own health, barrier, endurance and profession resources
+A variety of sources are supported:
+- Your own character's health, barrier, endurance, defiance
+- Your own character's profession resources (Adrenaline, Energy, Initiative, Life Force, Heat, Pages etc.)
+- Your own character's effects
+- Your own character's abilities by slot or ID
+- Your pet/mech's health, barrier
+- Your target's health, barrier, defiance (normalized)
+- Your target's effects
+- Other group member's health, barrier (normalized)
+- Other group member's effects (boons & conditions only)
 
 Triggers can either be inherited from parent elements or set on the element itself.
 An additional threshold can be set to determine when the trigger should be considered active.  
