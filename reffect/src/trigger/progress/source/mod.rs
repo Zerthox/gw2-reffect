@@ -1,8 +1,10 @@
 mod combatant;
 mod legacy;
+mod transfer;
 
 pub use self::{combatant::*, legacy::*};
 
+use self::transfer::Transfer;
 use super::ProgressActive;
 use crate::{
     action::Action,
@@ -235,13 +237,6 @@ impl ProgressSource {
         }
     }
 
-    pub fn into_ids(self) -> Vec<u32> {
-        match self {
-            Self::Buff { ids, .. } | Self::Ability { ids } => ids,
-            _ => Vec::new(),
-        }
-    }
-
     fn buff_validate(id: u32) -> Validation<impl AsRef<str>> {
         match Internal::get_skill_info(id) {
             Ok(SkillInfo::Buff { category, .. }) => match category {
@@ -281,11 +276,8 @@ impl ProgressSource {
         let mut changed = false;
 
         if let Some(prev) = enum_combo(ui, "Trigger", self, ComboBoxFlags::HEIGHT_LARGE) {
+            Transfer::transfer(prev, self);
             changed = true;
-            match self {
-                Self::Buff { ids, .. } | Self::Ability { ids } => *ids = prev.into_ids(),
-                _ => {}
-            }
         }
         helper(ui, || {
             ui.text("Source of information");
