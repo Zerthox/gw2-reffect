@@ -145,18 +145,18 @@ impl ProgressSource {
             Self::Buff { combatant, ref ids } => {
                 let buffs = combatant.buffs(ctx)?;
                 let mut combined = Buff::empty();
-                let mut found_id = 0;
+                let mut progress_id = ids.first().copied().unwrap_or_default();
                 for id in ids {
                     if let Some(buff) = buffs.get(id).filter(|buff| buff.runout_time > ctx.now) {
                         combined.stacks += buff.stacks;
                         combined.apply_time = combined.apply_time.max(buff.apply_time);
                         combined.runout_time = combined.runout_time.max(buff.runout_time);
-                        if found_id == 0 {
-                            found_id = *id;
+                        if progress_id == 0 {
+                            progress_id = *id;
                         }
                     }
                 }
-                Some(ProgressActive::from_buff(found_id, &combined))
+                Some(ProgressActive::from_buff(progress_id, &combined))
             }
             Self::Ability { ref ids } => {
                 let skillbar = ctx.player.skillbar.as_ref().ok()?;
