@@ -1,7 +1,9 @@
-use crate::render::{Validation, enum_combo, helper};
+use crate::{
+    context::{BuffMap, CombatantResources, Context},
+    render::{Validation, enum_combo, helper},
+};
 use const_default::ConstDefault;
 use nexus::imgui::{ComboBoxFlags, Ui};
-use reffect_core::context::{BuffMap, CombatantResources, Context};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
 

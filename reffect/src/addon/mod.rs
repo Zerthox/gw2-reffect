@@ -1,9 +1,8 @@
 mod event;
 mod ui;
 
-use crate::{elements::Pack, settings::GeneralSettings};
+use crate::{elements::Pack, links::Links, settings::GeneralSettings, worker::StoppableWorker};
 use nexus::paths::get_addon_dir;
-use reffect_core::{links::Links, worker::StoppableWorker};
 use std::{
     path::PathBuf,
     sync::{Mutex, MutexGuard, OnceLock},

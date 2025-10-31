@@ -55,7 +55,7 @@ impl Addon {
 
                 #[cfg(feature = "profile")]
                 {
-                    use reffect_core::profiling;
+                    use crate::profiling;
 
                     let mut enabled = profiling::enabled();
                     if ui.checkbox("Profiling", &mut enabled) {

@@ -1,5 +1,6 @@
 use crate::{
     elements::RenderCtx,
+    enums::check_variant_array,
     render::{
         cycle_progress, enum_combo, helper, input_float_with_format, input_seconds,
         push_alpha_change,
@@ -8,7 +9,6 @@ use crate::{
 };
 use const_default::ConstDefault;
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, StyleStackToken, Ui};
-use reffect_core::enums::check_variant_array;
 use serde::{Deserialize, Serialize};
 use std::num::NonZero;
 use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};

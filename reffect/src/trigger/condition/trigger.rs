@@ -1,6 +1,7 @@
 use super::ProgressActive;
 use crate::{
     context::Context,
+    enums::check_variant_array,
     render::{Validation, enum_combo},
     trigger::{
         AbilityStateTrigger, MapTrigger, PlayerTrigger, ProgressSource, ProgressThreshold, Trigger,
@@ -8,7 +9,6 @@ use crate::{
 };
 use const_default::ConstDefault;
 use nexus::imgui::{ComboBoxFlags, Ui};
-use reffect_core::enums::check_variant_array;
 use serde::{Deserialize, Serialize};
 use std::{fmt, mem};
 use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};

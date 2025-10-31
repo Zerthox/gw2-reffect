@@ -1,6 +1,7 @@
 use super::ProgressActive;
 use crate::{
     context::AbilityState,
+    named::Named,
     render::{enum_combo, enum_combo_bitflags, helper},
     serde::bitflags,
 };
@@ -8,7 +9,6 @@ use const_default::ConstDefault;
 use enumflags2::{BitFlags, make_bitflags};
 use itertools::Itertools;
 use nexus::imgui::{ComboBoxFlags, Ui};
-use reffect_core::named::Named;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 

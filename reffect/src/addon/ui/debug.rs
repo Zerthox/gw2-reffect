@@ -2,12 +2,14 @@ use super::Addon;
 use crate::{
     clipboard::Clipboard,
     colors::{self, Colored},
-    context::{AbilityState, BuffMap, Context, PlayerResources, SkillInfo, Skillbar, Slot},
+    context::{
+        AbilityState, BuffMap, CombatantResources, Context, Defiance, PlayerResources, SkillInfo,
+        Skillbar, Slot,
+    },
     error::Error,
     internal::{Interface, Internal},
 };
 use nexus::imgui::{StyleColor, TreeNode, TreeNodeFlags, Ui, Window};
-use reffect_core::context::{CombatantResources, Defiance};
 use std::{cmp::Ordering, fmt};
 use strum::IntoEnumIterator;
 
