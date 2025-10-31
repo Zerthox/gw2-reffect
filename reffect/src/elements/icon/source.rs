@@ -3,7 +3,7 @@ use crate::{
     addon::Addon,
     context::SkillId,
     elements::RenderCtx,
-    enums::impl_static_variants,
+    enums::check_variant_array,
     internal::{Interface, Internal},
     lockbox::Lockbox,
     render::{Validation, enum_combo, input_text_simple_menu, item_context_menu},
@@ -14,7 +14,7 @@ use nexus::imgui::{ComboBoxFlags, MenuItem, TextureId, Ui};
 use rfd::FileDialog;
 use serde::{Deserialize, Serialize};
 use std::{path::PathBuf, thread};
-use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr};
+use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 use windows::core::Interface as _;
 
 // TODO: id gen for loaded icons? handle duplicates on load?
@@ -55,7 +55,17 @@ impl Default for IconSource {
     }
 }
 
-impl_static_variants!(IconSource); // TODO: move to const variant array when pathbuf new is const
+impl VariantArray for IconSource {
+    const VARIANTS: &'static [Self] = &[
+        Self::Unknown,
+        Self::Empty,
+        Self::Automatic,
+        Self::Url(String::new()),
+        Self::File(PathBuf::new()),
+    ];
+}
+
+const _: () = check_variant_array::<IconSource>();
 
 impl IconSource {
     pub const UNKNOWN_ID: &'static str = "REFFECT_ICON_UNKNOWN";

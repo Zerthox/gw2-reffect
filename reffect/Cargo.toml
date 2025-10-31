@@ -5,6 +5,7 @@ authors = ["Zerthox"]
 edition = "2024"
 description = "Customizable effect & resource displays"
 repository = "https://github.com/zerthox/gw2-reffect"
+rust-version = "1.91"
 
 [dependencies]
 const-default = { version = "1.0.0", features = ["std", "derive"] }
