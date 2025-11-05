@@ -195,6 +195,7 @@ fn debug_combatant_resources(ui: &Ui, resources: &CombatantResources, normalized
 fn debug_player_resources(ui: &Ui, resources: &PlayerResources) {
     let PlayerResources {
         combatant,
+        health_reduction,
         endurance,
         primary,
         secondary,
@@ -202,6 +203,11 @@ fn debug_player_resources(ui: &Ui, resources: &PlayerResources) {
     } = resources;
 
     debug_combatant_resources(ui, combatant, false);
+
+    ui.text(format!(
+        "Health reduction: {}/{}",
+        health_reduction.current, health_reduction.max
+    ));
 
     ui.text(format!(
         "Endurance: {}/{}",

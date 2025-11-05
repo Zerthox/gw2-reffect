@@ -8,6 +8,7 @@ use nexus::imgui::Ui;
 use partial::{IntoPartial, PartialOps};
 use serde::{Deserialize, Serialize};
 
+// TODO: add common props: pos, opacity, animation
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Condition<T>

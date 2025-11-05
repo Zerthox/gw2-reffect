@@ -78,6 +78,7 @@ impl ConditionTrigger {
                 ProgressSource::Always
                 | ProgressSource::Buff { .. }
                 | ProgressSource::Health { .. }
+                | ProgressSource::HealthReduction
                 | ProgressSource::Barrier { .. }
                 | ProgressSource::Defiance { .. }
                 | ProgressSource::Endurance

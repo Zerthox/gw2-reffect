@@ -33,6 +33,7 @@ impl From<ProgressSource> for Transfer {
             ProgressSource::Inherit
             | ProgressSource::Always
             | ProgressSource::SkillbarSlot { .. }
+            | ProgressSource::HealthReduction
             | ProgressSource::Endurance
             | ProgressSource::PrimaryResource
             | ProgressSource::SecondaryResource => Self::default(),
@@ -58,6 +59,7 @@ impl Transfer {
             ProgressSource::Inherit
             | ProgressSource::Always
             | ProgressSource::SkillbarSlot { .. }
+            | ProgressSource::HealthReduction
             | ProgressSource::Endurance
             | ProgressSource::PrimaryResource
             | ProgressSource::SecondaryResource => {}

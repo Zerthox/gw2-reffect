@@ -76,6 +76,9 @@ pub enum ProgressSource {
         combatant: Combatant,
     },
 
+    #[strum(serialize = "Health Reduction")]
+    HealthReduction,
+
     /// Barrier.
     Barrier {
         #[serde(default)]
@@ -115,6 +118,7 @@ impl VariantArray for ProgressSource {
         Self::Health {
             combatant: Combatant::DEFAULT,
         },
+        Self::HealthReduction,
         Self::Barrier {
             combatant: Combatant::DEFAULT,
         },
@@ -175,6 +179,10 @@ impl ProgressSource {
                 let resources = combatant.resources(ctx)?;
                 resources.health.clone().try_into().ok()
             }
+            Self::HealthReduction => {
+                let resources = ctx.player.resources.as_ref().ok()?;
+                resources.health_reduction.clone().try_into().ok()
+            }
             Self::Barrier { combatant } => {
                 let resources = combatant.resources(ctx)?;
                 resources.barrier.clone().try_into().ok()
@@ -226,7 +234,9 @@ impl ProgressSource {
                     .unwrap_or_default();
                 ProgressActive::edit_ability(skill, progress, ctx.now)
             }
-            Self::Health { .. } => ProgressActive::edit_resource(progress, 15_000.0),
+            Self::Health { .. } | Self::HealthReduction => {
+                ProgressActive::edit_resource(progress, 15_000.0)
+            }
             Self::Barrier { .. } => ProgressActive::edit_resource(0.5 * progress, 15_000.0),
             Self::Defiance { .. } | Self::Endurance => {
                 ProgressActive::edit_resource(progress, 100.0)
