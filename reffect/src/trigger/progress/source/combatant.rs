@@ -1,5 +1,7 @@
 use crate::{
-    context::{BuffMap, CombatantResources, Context},
+    context::{BuffMap, Category, CombatantResources, Context, SkillInfo},
+    error::Error,
+    internal::{Interface, Internal},
     render::{Validation, enum_combo, helper},
 };
 use const_default::ConstDefault;
@@ -94,6 +96,45 @@ impl Combatant {
             Self::GroupMember1 | Self::GroupMember2 | Self::GroupMember3 | Self::GroupMember4 => {
                 Validation::Warn("Group member only supports boon & condition effects")
             }
+        }
+    }
+
+    pub fn supports_buff(&self, category: Category) -> bool {
+        match category {
+            Category::Boon | Category::Condition => matches!(
+                self,
+                Self::Player
+                    | Self::Target
+                    | Self::GroupMember1
+                    | Self::GroupMember2
+                    | Self::GroupMember3
+                    | Self::GroupMember4,
+            ),
+            Category::Effect => matches!(self, Self::Player | Self::Target),
+            Category::ScreenBorder => matches!(self, Self::Player),
+            Category::SquadHighlight => matches!(
+                self,
+                Self::Player
+                    | Self::GroupMember1
+                    | Self::GroupMember2
+                    | Self::GroupMember3
+                    | Self::GroupMember4,
+            ),
+        }
+    }
+
+    pub fn validate_buff_id(&self, id: u32) -> Validation<impl AsRef<str> + 'static> {
+        match Internal::get_skill_info(id) {
+            Ok(SkillInfo::Buff { category, .. }) => {
+                if self.supports_buff(category) {
+                    Validation::Confirm(format!("{category} {id} is valid for {self}"))
+                } else {
+                    Validation::Error(format!("{category} {id} is invalid for {self}"))
+                }
+            }
+            Ok(SkillInfo::Ability { .. }) => Validation::Error(format!("Id {id} is an ability")),
+            Err(Error::Skill) => Validation::Error(format!("Id {id} is invalid or hidden")),
+            Err(_) => Validation::Ok,
         }
     }
 

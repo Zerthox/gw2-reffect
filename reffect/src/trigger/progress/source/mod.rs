@@ -8,7 +8,7 @@ use self::transfer::Transfer;
 use super::ProgressActive;
 use crate::{
     action::Action,
-    context::{Buff, Category, Context, SkillInfo, Slot},
+    context::{Buff, Context, SkillInfo, Slot},
     enums::check_variant_array,
     error::Error,
     internal::{Interface, Internal},
@@ -247,25 +247,6 @@ impl ProgressSource {
         }
     }
 
-    fn buff_validate(id: u32) -> Validation<impl AsRef<str>> {
-        match Internal::get_skill_info(id) {
-            Ok(SkillInfo::Buff { category, .. }) => match category {
-                Category::Boon | Category::Condition | Category::Effect => {
-                    Validation::Confirm(format!("{category} {id} is valid"))
-                }
-                Category::ScreenBorder => {
-                    Validation::Warn(format!("Screen border {id} is only valid for yourself"))
-                }
-                Category::SquadHighlight => {
-                    Validation::Warn(format!("Squad highlight {id} is only valid for your squad"))
-                }
-            },
-            Ok(SkillInfo::Ability { .. }) => Validation::Error(format!("Id {id} is an ability")),
-            Err(Error::Skill) => Validation::Error(format!("Id {id} is invalid or hidden")),
-            Err(_) => Validation::Ok,
-        }
-    }
-
     fn ability_validate(id: u32) -> Validation<impl AsRef<str>> {
         match Internal::get_skill_info(id) {
             Ok(SkillInfo::Ability { .. }) => Validation::Confirm(format!("Ability {id} is valid")),
@@ -306,7 +287,7 @@ impl ProgressSource {
                     let _id = ui.push_id(i as i32);
 
                     action.input_with_buttons(ui, i, || {
-                        Self::buff_validate(*id).for_item(ui, || {
+                        combatant.validate_buff_id(*id).for_item(ui, || {
                             changed |= input_skill_id(ui, "##id", id, InputTextFlags::empty());
                         });
                     });
