@@ -27,7 +27,7 @@ pub struct AbilityStateTrigger {
 
 impl AbilityStateTrigger {
     pub fn is_active(&self, active: &ProgressActive) -> bool {
-        self.condition.check(active.extra_state(), self.states)
+        self.condition.check(active.ability_state(), self.states)
     }
 
     pub fn render_options(&mut self, ui: &Ui) -> bool {

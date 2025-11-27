@@ -49,7 +49,7 @@ impl DurationTextSettings {
 
     pub fn threshold(&self, active: &ProgressActive) -> u32 {
         match active {
-            ProgressActive::Fixed { .. } => u32::MAX,
+            ProgressActive::Resource { .. } => u32::MAX,
             ProgressActive::Buff { .. } => self.threshold_buff,
             ProgressActive::Ability { .. } => self.threshold_ability,
         }

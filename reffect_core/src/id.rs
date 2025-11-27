@@ -28,6 +28,16 @@ impl IdGen {
     pub fn reset(&self) {
         self.0.store(Self::INITIAL, Ordering::Relaxed)
     }
+
+    /// Attempts to reclaim the id.
+    /// Returns `true` on success.
+    #[inline]
+    pub fn try_reclaim(&self, id: Id) -> bool {
+        let Id(val) = id;
+        self.0
+            .compare_exchange(val + 1, val, Ordering::Relaxed, Ordering::Relaxed)
+            .is_ok()
+    }
 }
 
 impl Default for IdGen {

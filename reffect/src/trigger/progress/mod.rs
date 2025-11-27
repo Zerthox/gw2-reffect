@@ -1,8 +1,9 @@
 mod active;
 mod source;
 mod threshold;
+mod value;
 
-pub use self::{active::*, source::*, threshold::*};
+pub use self::{active::*, source::*, threshold::*, value::*};
 
 use crate::{
     context::{Context, Update},

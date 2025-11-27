@@ -1,4 +1,4 @@
-use crate::context::Resource;
+use crate::context::{Resource, ResourceType};
 
 /// Generic combatant resources.
 #[derive(Debug, Clone)]
@@ -73,6 +73,16 @@ impl Defiance {
         match *self {
             Self::None | Self::Immune => None, // TODO: treat immune as 100% when defiance state conditions implemented
             Self::Active(percent) | Self::Recover(percent) => Some(percent),
+        }
+    }
+
+    #[inline]
+    pub fn resource_type(&self) -> ResourceType {
+        match *self {
+            Self::None => ResourceType::Generic,
+            Self::Immune => ResourceType::DefianceImmune,
+            Self::Active(_) => ResourceType::DefianceActive,
+            Self::Recover(_) => ResourceType::DefianceRecover,
         }
     }
 }

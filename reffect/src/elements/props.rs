@@ -30,7 +30,7 @@ where
 impl<T> Props<T>
 where
     T: Clone + IntoPartial,
-    T::Partial: Clone + fmt::Debug + Serialize + for<'de> Deserialize<'de>,
+    T::Partial: Clone + fmt::Debug + Serialize + for<'d> Deserialize<'d>,
 {
     pub fn update(&mut self, ctx: &Context, active: Option<&ProgressActive>) {
         if ctx.has_any_update_or_edit() {
@@ -47,7 +47,7 @@ where
 impl<T> ops::Deref for Props<T>
 where
     T: Clone + IntoPartial,
-    T::Partial: Clone + fmt::Debug + Serialize + for<'de> Deserialize<'de>,
+    T::Partial: Clone + fmt::Debug + Serialize + for<'d> Deserialize<'d>,
 {
     type Target = T;
 

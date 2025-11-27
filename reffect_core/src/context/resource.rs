@@ -1,4 +1,6 @@
+use serde::{Deserialize, Serialize};
 use std::fmt;
+use strum::{AsRefStr, Display, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 
 /// Information about a resource.
 #[derive(Debug, Clone)]
@@ -38,5 +40,52 @@ impl fmt::Display for Resource {
         current.fmt(formatter)?;
         formatter.write_str("/")?;
         max.fmt(formatter)
+    }
+}
+
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Display,
+    AsRefStr,
+    IntoStaticStr,
+    EnumCount,
+    EnumIter,
+    VariantArray,
+    Serialize,
+    Deserialize,
+)]
+pub enum ResourceType {
+    Generic,
+
+    Health,
+    Barrier,
+    Profession,
+    Endurance,
+
+    #[strum(serialize = "Defiance Immune")]
+    DefianceImmune,
+
+    #[strum(serialize = "Defiance Active")]
+    DefianceActive,
+
+    #[strum(serialize = "Defiance Recover")]
+    DefianceRecover,
+}
+
+impl ResourceType {
+    pub const DEFAULT: Self = Self::Generic;
+}
+
+impl Default for ResourceType {
+    #[inline]
+    fn default() -> Self {
+        Self::DEFAULT
     }
 }

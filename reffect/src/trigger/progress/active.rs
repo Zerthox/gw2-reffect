@@ -1,15 +1,18 @@
+use super::ProgressValue;
 use crate::{
     context::{Ability, AbilityState, Buff, Resource, SkillId},
     fmt::{Time, Unit},
     settings::FormatSettings,
 };
 use enumflags2::BitFlags;
+use reffect_core::context::ResourceType;
 
 #[derive(Debug, Clone)]
 pub enum ProgressActive {
-    Fixed {
+    Resource {
         current: f32,
         max: f32,
+        resource: ResourceType,
     },
     Buff {
         id: u32,
@@ -30,11 +33,12 @@ pub enum ProgressActive {
 }
 
 impl ProgressActive {
-    /// Creates a dummy active progress.
-    pub const fn dummy() -> Self {
-        Self::Fixed {
+    /// Creates a dummy active progress for always trigger.
+    pub const fn always() -> Self {
+        Self::Resource {
             current: 1.0,
             max: 1.0,
+            resource: ResourceType::DEFAULT,
         }
     }
 
@@ -49,10 +53,25 @@ impl ProgressActive {
     }
 
     /// Creates simple progress percent.
-    pub const fn percent(current: f32) -> Self {
-        Self::Fixed {
+    pub const fn percent(current: f32, resource_type: ResourceType) -> Self {
+        Self::Resource {
             current,
             max: 100.0,
+            resource: resource_type,
+        }
+    }
+
+    /// Creates simple progress percent.
+    pub const fn from_resource(resource: &Resource, resource_type: ResourceType) -> Option<Self> {
+        let Resource { current, max } = *resource;
+        if max != 0.0 {
+            Some(Self::Resource {
+                current,
+                max,
+                resource: resource_type,
+            })
+        } else {
+            None
         }
     }
 
@@ -105,10 +124,11 @@ impl ProgressActive {
     }
 
     /// Creates a resource progress for edit mode.
-    pub fn edit_resource(progress: f32, max: f32) -> Self {
-        Self::Fixed {
+    pub fn edit_resource(progress: f32, max: f32, resource_type: ResourceType) -> Self {
+        Self::Resource {
             current: (progress * max).round_ties_even(),
             max,
+            resource: resource_type,
         }
     }
 
@@ -141,7 +161,7 @@ impl ProgressActive {
     /// Returns the assoicated skill.
     pub const fn skill(&self) -> SkillId {
         match *self {
-            Self::Fixed { .. } => SkillId::Unknown,
+            Self::Resource { .. } => SkillId::Unknown,
             Self::Buff { id, .. } => SkillId::Id(id),
             Self::Ability { id, .. } => id,
         }
@@ -160,7 +180,7 @@ impl ProgressActive {
     /// Returns the intensity (stacks/ammo).
     pub const fn intensity(&self) -> u32 {
         match *self {
-            Self::Fixed { current, .. } => current as u32,
+            Self::Resource { current, .. } => current as u32,
             Self::Buff { stacks, .. } => stacks,
             Self::Ability { ammo, .. } => ammo,
         }
@@ -169,7 +189,7 @@ impl ProgressActive {
     /// Returns the current progress rate.
     pub const fn progress_rate(&self) -> f32 {
         match *self {
-            Self::Fixed { .. } | Self::Buff { .. } => 1.0,
+            Self::Resource { .. } | Self::Buff { .. } => 1.0,
             Self::Ability { rate, .. } => rate,
         }
     }
@@ -200,7 +220,7 @@ impl ProgressActive {
     /// Returns the current amount in its native unit.
     pub fn current(&self, value: ProgressValue, now: u32) -> Option<f32> {
         match *self {
-            Self::Fixed { current, .. } => Some(current),
+            Self::Resource { current, .. } => Some(current),
             Self::Buff { end, .. } => {
                 (end != u32::MAX).then(|| Self::time_between(now, end) as f32)
             }
@@ -222,7 +242,7 @@ impl ProgressActive {
         settings: &FormatSettings,
     ) -> String {
         match *self {
-            Self::Fixed { current, .. } => {
+            Self::Resource { current, .. } => {
                 if unit {
                     Unit::format(current)
                 } else {
@@ -251,7 +271,7 @@ impl ProgressActive {
     /// Returns the maximum amount in its native unit.
     pub fn max(&self, value: ProgressValue) -> f32 {
         match *self {
-            Self::Fixed { max, .. } => max,
+            Self::Resource { max, .. } => max,
             Self::Buff { duration, .. } => duration as f32,
             Self::Ability {
                 recharge,
@@ -264,7 +284,7 @@ impl ProgressActive {
     /// Returns the maximum amount as text.
     pub fn max_text(&self, value: ProgressValue, unit: bool, settings: &FormatSettings) -> String {
         match *self {
-            Self::Fixed { max, .. } => {
+            Self::Resource { max, .. } => {
                 if unit {
                     Unit::format(max)
                 } else {
@@ -286,11 +306,19 @@ impl ProgressActive {
         }
     }
 
-    /// Retruns the external state associated with the progress.
-    pub const fn extra_state(&self) -> BitFlags<AbilityState> {
+    /// Retruns the resource type for the progress.
+    pub const fn resource_type(&self) -> ResourceType {
         match *self {
-            Self::Fixed { .. } | Self::Buff { .. } => BitFlags::EMPTY,
+            Self::Resource { resource, .. } => resource,
+            _ => ResourceType::DEFAULT,
+        }
+    }
+
+    /// Retruns the ability state for the progress.
+    pub const fn ability_state(&self) -> BitFlags<AbilityState> {
+        match *self {
             Self::Ability { state, .. } => state,
+            _ => BitFlags::EMPTY,
         }
     }
 
@@ -311,50 +339,6 @@ impl ProgressActive {
             Time::format(time, settings.minutes_threshold, settings.millis_threshold)
         } else {
             String::new()
-        }
-    }
-}
-
-impl TryFrom<Resource> for ProgressActive {
-    type Error = ();
-
-    fn try_from(resource: Resource) -> Result<Self, Self::Error> {
-        let Resource { current, max } = resource;
-        if max != 0.0 {
-            Ok(Self::Fixed { current, max })
-        } else {
-            Err(())
-        }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum ProgressValue {
-    Primary,
-    Secondary,
-    PreferPrimary,
-    PreferSecondary,
-}
-
-impl ProgressValue {
-    pub fn pick(&self, primary: u32, secondary: u32) -> u32 {
-        match self {
-            Self::Primary => primary,
-            Self::Secondary => secondary,
-            Self::PreferPrimary => {
-                if primary > 0 {
-                    primary
-                } else {
-                    secondary
-                }
-            }
-            Self::PreferSecondary => {
-                if secondary > 0 {
-                    secondary
-                } else {
-                    primary
-                }
-            }
         }
     }
 }

@@ -8,7 +8,7 @@ use self::transfer::Transfer;
 use super::ProgressActive;
 use crate::{
     action::Action,
-    context::{Buff, Context, SkillInfo, Slot},
+    context::{Buff, Context, ResourceType, SkillInfo, Slot},
     enums::check_variant_array,
     error::Error,
     internal::{Interface, Internal},
@@ -145,21 +145,18 @@ impl ProgressSource {
     ) -> Option<ProgressActive> {
         match *self {
             Self::Inherit => parent.cloned(),
-            Self::Always => Some(ProgressActive::dummy()),
+            Self::Always => Some(ProgressActive::always()),
             Self::Buff { combatant, ref ids } => {
                 let buffs = combatant.buffs(ctx)?;
                 let mut combined = Buff::empty();
-                let mut progress_id = ids.first().copied().unwrap_or_default();
                 for id in ids {
                     if let Some(buff) = buffs.get(id).filter(|buff| buff.runout_time > ctx.now) {
                         combined.stacks += buff.stacks;
                         combined.apply_time = combined.apply_time.max(buff.apply_time);
                         combined.runout_time = combined.runout_time.max(buff.runout_time);
-                        if progress_id == 0 {
-                            progress_id = *id;
-                        }
                     }
                 }
+                let progress_id = ids.first().copied().unwrap_or_default();
                 Some(ProgressActive::from_buff(progress_id, &combined))
             }
             Self::Ability { ref ids } => {
@@ -177,32 +174,33 @@ impl ProgressSource {
             }
             Self::Health { combatant } => {
                 let resources = combatant.resources(ctx)?;
-                resources.health.clone().try_into().ok()
+                ProgressActive::from_resource(&resources.health, ResourceType::Health)
             }
             Self::HealthReduction => {
                 let resources = ctx.player.resources.as_ref().ok()?;
-                resources.health_reduction.clone().try_into().ok()
+                ProgressActive::from_resource(&resources.health_reduction, ResourceType::Health)
             }
             Self::Barrier { combatant } => {
                 let resources = combatant.resources(ctx)?;
-                resources.barrier.clone().try_into().ok()
+                ProgressActive::from_resource(&resources.barrier, ResourceType::Barrier)
             }
             Self::Defiance { combatant } => {
-                let resources = combatant.resources(ctx)?;
-                let current = resources.defiance.percent()?;
-                Some(ProgressActive::percent(current))
+                let defiance = &combatant.resources(ctx)?.defiance;
+                let current = defiance.percent()?;
+                let resource_type = defiance.resource_type();
+                Some(ProgressActive::percent(current, resource_type))
             }
             Self::Endurance => {
                 let resources = ctx.player.resources.as_ref().ok()?;
-                resources.endurance.clone().try_into().ok()
+                ProgressActive::from_resource(&resources.endurance, ResourceType::Endurance)
             }
             Self::PrimaryResource => {
                 let resources = ctx.player.resources.as_ref().ok()?;
-                resources.primary.clone().try_into().ok()
+                ProgressActive::from_resource(&resources.primary, ResourceType::Profession)
             }
             Self::SecondaryResource => {
                 let resources = ctx.player.resources.as_ref().ok()?;
-                resources.secondary.clone().try_into().ok()
+                ProgressActive::from_resource(&resources.secondary, ResourceType::Profession)
             }
         }
     }
@@ -213,8 +211,8 @@ impl ProgressSource {
         let passed = ctx.now % CYCLE;
         let progress = passed as f32 / CYCLE as f32;
         match *self {
-            Self::Inherit => parent.cloned().unwrap_or(ProgressActive::dummy()),
-            Self::Always => ProgressActive::dummy(),
+            Self::Inherit => parent.cloned().unwrap_or(ProgressActive::always()),
+            Self::Always => ProgressActive::always(),
             Self::Buff { ref ids, .. } => {
                 let id = ids.first().copied().unwrap_or(0);
                 ProgressActive::edit_buff(id, progress, ctx.now)
@@ -235,14 +233,19 @@ impl ProgressSource {
                 ProgressActive::edit_ability(skill, progress, ctx.now)
             }
             Self::Health { .. } | Self::HealthReduction => {
-                ProgressActive::edit_resource(progress, 15_000.0)
+                ProgressActive::edit_resource(progress, 15_000.0, ResourceType::Health)
             }
-            Self::Barrier { .. } => ProgressActive::edit_resource(0.5 * progress, 15_000.0),
-            Self::Defiance { .. } | Self::Endurance => {
-                ProgressActive::edit_resource(progress, 100.0)
+            Self::Barrier { .. } => {
+                ProgressActive::edit_resource(0.5 * progress, 15_000.0, ResourceType::Barrier)
+            }
+            Self::Endurance => {
+                ProgressActive::edit_resource(progress, 100.0, ResourceType::Endurance)
+            }
+            Self::Defiance { .. } => {
+                ProgressActive::edit_resource(progress, 100.0, ResourceType::DefianceActive)
             }
             Self::PrimaryResource | Self::SecondaryResource => {
-                ProgressActive::edit_resource(progress, 30.0)
+                ProgressActive::edit_resource(progress, 30.0, ResourceType::Profession)
             }
         }
     }

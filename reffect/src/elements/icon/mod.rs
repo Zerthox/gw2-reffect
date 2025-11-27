@@ -25,7 +25,7 @@ pub struct Icon {
     pub source: IconSource,
 
     #[serde(flatten)]
-    pub props: Props<IconProps>,
+    pub props: Props<IconProps>, // TODO: move to element/list icon to allow common conditions
 
     #[serde(alias = "duration")]
     pub duration_bar: bool,
