@@ -1,6 +1,6 @@
 use reffect_core::{
     Texture,
-    context::SkillInfo,
+    context::{ItemInfo, SkillInfo},
     error::{Error, Result},
 };
 
@@ -19,6 +19,11 @@ impl Interface for Dummy {
 
     #[inline]
     fn deinit() {}
+
+    #[inline]
+    fn get_item_info(_id: u32) -> Result<ItemInfo> {
+        Err(Error::Disabled)
+    }
 
     #[inline]
     fn get_skill_info(_id: u32) -> Result<SkillInfo> {

@@ -16,7 +16,10 @@ pub mod serde;
 pub mod util;
 pub mod worker;
 
-use crate::{context::SkillInfo, error::Result};
+use crate::{
+    context::{ItemInfo, SkillInfo},
+    error::Result,
+};
 use windows::Win32::Graphics::Direct3D11::ID3D11ShaderResourceView;
 
 pub type Texture = ID3D11ShaderResourceView;
@@ -28,6 +31,9 @@ pub trait Interface {
 
     /// Deinitializes the API.
     fn deinit();
+
+    /// Retrieves item information.
+    fn get_item_info(id: u32) -> Result<ItemInfo>;
 
     /// Retrieves skill information.
     fn get_skill_info(id: u32) -> Result<SkillInfo>;

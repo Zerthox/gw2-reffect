@@ -1,6 +1,7 @@
 mod combatant;
 mod edit;
 mod group;
+mod item;
 mod map;
 mod player;
 mod resource;
@@ -9,7 +10,8 @@ mod target;
 mod ui;
 
 pub use self::{
-    combatant::*, edit::*, group::*, map::*, player::*, resource::*, skill::*, target::*, ui::*,
+    combatant::*, edit::*, group::*, item::*, map::*, player::*, resource::*, skill::*, target::*,
+    ui::*,
 };
 
 use crate::{error::Error, links::Links, profiling::measure, worker::StoppableWorker};

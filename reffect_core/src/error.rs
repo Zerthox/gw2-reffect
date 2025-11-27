@@ -35,6 +35,9 @@ pub enum Error {
     #[error("Skill not found")]
     Skill,
 
+    #[error("Item not found")]
+    Item,
+
     #[error("Failed to get user")]
     User,
 
