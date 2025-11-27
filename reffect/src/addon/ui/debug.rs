@@ -10,6 +10,7 @@ use crate::{
     internal::{Interface, Internal},
 };
 use nexus::imgui::{StyleColor, TreeNode, TreeNodeFlags, Ui, Window};
+use reffect_core::context::{Build, Gear};
 use std::{cmp::Ordering, fmt};
 use strum::IntoEnumIterator;
 
@@ -46,32 +47,41 @@ impl Addon {
                 ui.text(format!("Map id: {}", ctx.map.id));
                 ui.text(format!("Map category: {}", ctx.map.category));
 
-                debug_result_tree(
-                    ui,
-                    "plweap",
-                    "Player weapons",
-                    &ctx.player.weapons,
-                    |weapons| {
-                        for weapon in weapons.iter() {
-                            ui.text(weapon);
-                        }
-                    },
-                );
-                debug_result_tree(
-                    ui,
-                    "pltrait",
-                    "Player traits",
-                    &ctx.player.traits,
-                    |traits| {
-                        for [adept, master, grandmaster] in [
-                            [traits[0], traits[1], traits[2]],
-                            [traits[3], traits[4], traits[5]],
-                            [traits[6], traits[7], traits[8]],
-                        ] {
-                            ui.text(format!("{adept: >4} {master: >4} {grandmaster: >4}"));
-                        }
-                    },
-                );
+                debug_result_tree(ui, "plgearp", "Player gear", &ctx.player.gear, |gear| {
+                    let Gear {
+                        weapons,
+                        sigils,
+                        relic,
+                    } = gear;
+
+                    ui.text("Sigils:");
+                    for sigil in sigils {
+                        ui.same_line();
+                        ui.text(format!("{sigil: >5}"));
+                    }
+                    ui.text(format!("Relic: {relic: >5}"));
+
+                    ui.text("Weapons:");
+                    ui.indent();
+                    for weapon in weapons.iter() {
+                        ui.text(weapon);
+                    }
+                    ui.unindent();
+                });
+                debug_result_tree(ui, "pltbuild", "Player build", &ctx.player.build, |build| {
+                    let Build { traits } = build;
+
+                    ui.text("Traits:");
+                    ui.indent();
+                    for [adept, master, grandmaster] in [
+                        [traits[0], traits[1], traits[2]],
+                        [traits[3], traits[4], traits[5]],
+                        [traits[6], traits[7], traits[8]],
+                    ] {
+                        ui.text(format!("{adept: >4} {master: >4} {grandmaster: >4}"));
+                    }
+                    ui.unindent();
+                });
                 debug_result_tree(
                     ui,
                     "plres",
@@ -204,21 +214,10 @@ fn debug_player_resources(ui: &Ui, resources: &PlayerResources) {
 
     debug_combatant_resources(ui, combatant, false);
 
-    ui.text(format!(
-        "Health reduction: {}/{}",
-        health_reduction.current, health_reduction.max
-    ));
-
-    ui.text(format!(
-        "Endurance: {}/{}",
-        endurance.current, endurance.max
-    ));
-
-    ui.text(format!("Primary: {}/{}", primary.current, primary.max));
-    ui.text(format!(
-        "Secondary: {}/{}",
-        secondary.current, secondary.max
-    ));
+    ui.text(format!("Health reduction: {health_reduction}"));
+    ui.text(format!("Endurance: {endurance}",));
+    ui.text(format!("Primary: {primary}"));
+    ui.text(format!("Secondary: {secondary}"));
 }
 
 fn debug_buffs(ui: &Ui, ctx: &Context, buffs: &BuffMap) {

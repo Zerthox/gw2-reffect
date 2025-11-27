@@ -6,8 +6,32 @@ use enumflags2::{BitFlags, bitflags};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
 
-/// Player weapon sets.
-pub type Weapons = BitFlags<Weapon>;
+#[derive(Debug, Clone)]
+pub struct Gear {
+    /// Equipped weapon types.
+    pub weapons: BitFlags<Weapon>,
+
+    /// Sigil buffs.
+    ///
+    /// We use buff ids since they are shared among all item variants.
+    pub sigils: [u32; 4],
+
+    /// Relic buff.
+    ///
+    /// We use buff ids since they are shared among all item variants.
+    pub relic: u32,
+}
+
+impl Gear {
+    #[inline]
+    pub const fn empty() -> Self {
+        Self {
+            weapons: BitFlags::EMPTY,
+            sigils: [0; 4],
+            relic: 0,
+        }
+    }
+}
 
 #[derive(
     Debug,
@@ -76,12 +100,14 @@ pub enum Weapon {
 }
 
 impl Named for Weapon {
+    #[inline]
     fn name(&self) -> &'static str {
         self.into()
     }
 }
 
 impl Colored for Weapon {
+    #[inline]
     fn colored(&self) -> Option<Color> {
         None
     }

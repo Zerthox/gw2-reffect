@@ -23,10 +23,11 @@ impl TraitTrigger {
     }
 
     fn resolve_active(&self, ctx: &Context) -> bool {
+        // TODO: all vs any mode
         ctx.player
-            .traits
+            .build
             .as_ref()
-            .map(|traits| self.traits.iter().all(|req| req.is_met(traits)))
+            .map(|build| self.traits.iter().all(|req| req.is_met(&build.traits)))
             .unwrap_or(true)
     }
 }

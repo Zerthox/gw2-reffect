@@ -69,7 +69,8 @@ impl PlayerTrigger {
     }
 
     pub fn weapons_active(&self, ctx: &Context) -> bool {
-        check_bitflags_optional(self.weapons, ctx.player.weapons.as_ref().ok().copied())
+        let weapons = ctx.player.gear.as_ref().map(|gear| gear.weapons).ok();
+        check_bitflags_optional(self.weapons, weapons)
     }
 
     pub fn mounts_active(&self, ctx: &Context) -> bool {

@@ -1,9 +1,10 @@
+mod build;
+mod gear;
 mod mount;
 mod profession;
 mod race;
 mod resources;
 mod specialization;
-mod weapon;
 
 use crate::{
     context::skill::{BuffMap, Skillbar},
@@ -11,7 +12,9 @@ use crate::{
 };
 use nexus::data_link::mumble::{Identity, MumblePtr};
 
-pub use self::{mount::*, profession::*, race::*, resources::*, specialization::*, weapon::*};
+pub use self::{
+    build::*, gear::*, mount::*, profession::*, race::*, resources::*, specialization::*,
+};
 
 #[derive(Debug, Clone)]
 pub struct PlayerInfo {
@@ -27,11 +30,11 @@ pub struct PlayerInfo {
     /// Player mount.
     pub mount: Result<Mount, u8>,
 
-    /// Current equipped weapons.
-    pub weapons: Result<Weapons, Error>,
+    /// Player equipped gear.
+    pub gear: Result<Gear, Error>,
 
-    /// Current selected traits.
-    pub traits: Result<Traits, Error>,
+    /// Player selected build.
+    pub build: Result<Build, Error>,
 
     /// Player resources.
     pub resources: Result<PlayerResources, Error>,
@@ -51,8 +54,8 @@ impl PlayerInfo {
             spec: Err(0),
             race: Err(0),
             mount: Err(0),
-            weapons: Err(Error::Disabled),
-            traits: Err(Error::Disabled),
+            gear: Err(Error::Disabled),
+            build: Err(Error::Disabled),
             resources: Err(Error::Disabled),
             buff_info: Err(Error::Disabled),
             skillbar: Err(Error::Disabled),
@@ -73,16 +76,13 @@ impl PlayerInfo {
 
     #[inline]
     pub fn set_error(&mut self, error: Error) {
-        self.weapons = Err(error.clone());
-        self.traits = Err(error.clone());
+        self.gear = Err(error.clone());
+        self.build = Err(error.clone());
         self.resources = Err(error.clone());
         self.buff_info = Err(error.clone());
         self.skillbar = Err(error);
     }
 }
-
-/// Player traits.
-pub type Traits = [u32; 9];
 
 #[derive(Debug, Clone, Default)]
 pub struct PlayerBuffInfo {
