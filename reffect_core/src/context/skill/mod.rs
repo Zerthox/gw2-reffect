@@ -4,6 +4,7 @@ mod skillbar;
 
 pub use self::{ability::*, buff::*, skillbar::*};
 
+use enumflags2::{BitFlags, bitflags};
 use strum::{AsRefStr, Display, IntoStaticStr};
 
 /// Skill identifier.
@@ -70,5 +71,27 @@ pub enum SkillInfo {
 
         /// Stacking behavior of the buff.
         stacking: Stacking,
+
+        /// Visibility of the buff.
+        visibility: BitFlags<Visibility>,
     },
+}
+
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, AsRefStr, IntoStaticStr, Display,
+)]
+#[repr(u8)]
+#[bitflags]
+pub enum Visibility {
+    /// Visible for player character.
+    Player = 1 << 0,
+
+    /// Visible for non-hostile target.
+    TargetNonHostile = 1 << 1,
+
+    /// Visible for hostile target.
+    TargetHostile = 1 << 2,
+
+    /// Visible for group member.
+    Group = 1 << 3,
 }

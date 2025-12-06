@@ -1,10 +1,11 @@
 use crate::{
-    context::{BuffMap, Category, CombatantResources, Context, SkillInfo},
+    context::{BuffMap, CombatantResources, Context, SkillInfo, Visibility},
     error::Error,
     internal::{Interface, Internal},
     render::{Validation, enum_combo, helper},
 };
 use const_default::ConstDefault;
+use enumflags2::BitFlags;
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
@@ -99,34 +100,27 @@ impl Combatant {
         }
     }
 
-    pub fn supports_buff(&self, category: Category) -> bool {
-        match category {
-            Category::Boon | Category::Condition => matches!(
-                self,
-                Self::Player
-                    | Self::Target
-                    | Self::GroupMember1
-                    | Self::GroupMember2
-                    | Self::GroupMember3
-                    | Self::GroupMember4,
-            ),
-            Category::Effect => matches!(self, Self::Player | Self::Target),
-            Category::ScreenBorder => matches!(self, Self::Player),
-            Category::SquadHighlight => matches!(
-                self,
-                Self::Player
-                    | Self::GroupMember1
-                    | Self::GroupMember2
-                    | Self::GroupMember3
-                    | Self::GroupMember4,
-            ),
+    pub fn supports_visibility(&self, visibility: BitFlags<Visibility>) -> bool {
+        match self {
+            Self::Player => visibility.intersects(Visibility::Player),
+            Self::Pet => false,
+            Self::Target => {
+                visibility.intersects(Visibility::TargetNonHostile | Visibility::TargetHostile)
+            }
+            Self::GroupMember1 | Self::GroupMember2 | Self::GroupMember3 | Self::GroupMember4 => {
+                visibility.intersects(Visibility::Group)
+            }
         }
     }
 
     pub fn validate_buff_id(&self, id: u32) -> Validation<impl AsRef<str> + 'static> {
         match Internal::get_skill_info(id) {
-            Ok(SkillInfo::Buff { category, .. }) => {
-                if self.supports_buff(category) {
+            Ok(SkillInfo::Buff {
+                category,
+                visibility,
+                ..
+            }) => {
+                if self.supports_visibility(visibility) {
                     Validation::Confirm(format!("{category} {id} is valid for {self}"))
                 } else {
                     Validation::Error(format!("{category} {id} is invalid for {self}"))

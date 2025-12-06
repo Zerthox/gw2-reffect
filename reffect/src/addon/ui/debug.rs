@@ -222,19 +222,35 @@ fn debug_player_resources(ui: &Ui, resources: &PlayerResources) {
 
 fn debug_buffs(ui: &Ui, ctx: &Context, buffs: &BuffMap) {
     for (id, buff) in buffs {
-        ui.text(format!("{:>2}x {id:>5}", buff.stacks));
-        if let Ok(SkillInfo::Buff { category, stacking }) = Internal::get_skill_info(*id) {
-            ui.same_line();
-            ui.text(format!("{category} {stacking}"));
-        }
-        if !buff.is_infinite() {
-            ui.same_line();
-            ui.text(format!(
-                "{:.1}/{:.1}s {:.1}%",
-                to_secs(buff.remaining(ctx.now)),
-                to_secs(buff.duration()),
-                100.0 * buff.progress(ctx.now),
-            ));
+        let id = *id;
+        ui.group(|| {
+            let category = match Internal::get_skill_info(id) {
+                Ok(SkillInfo::Buff { category, .. }) => category.to_string(),
+                _ => "Invalid".into(),
+            };
+
+            ui.text(format!("{:>2}x {id:>5} {category}", buff.stacks));
+
+            if !buff.is_infinite() {
+                ui.same_line();
+                ui.text(format!(
+                    "{:.1}/{:.1}s {:.1}%",
+                    to_secs(buff.remaining(ctx.now)),
+                    to_secs(buff.duration()),
+                    100.0 * buff.progress(ctx.now),
+                ));
+            }
+        });
+
+        if ui.is_item_hovered() {
+            if let Ok(SkillInfo::Buff {
+                stacking,
+                visibility,
+                ..
+            }) = Internal::get_skill_info(id)
+            {
+                ui.tooltip_text(format!("Stacking {stacking}\nVisible for {visibility}"));
+            }
         }
     }
 }
