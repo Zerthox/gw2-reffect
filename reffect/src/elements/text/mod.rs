@@ -67,13 +67,14 @@ impl Text {
         let mut iter = self.text.chars().peekable();
         while let Some(el) = iter.next() {
             if el == PREFIX {
-                if let Some(next) = iter.peek() {
+                if let Some(next) = iter.peek().copied() {
                     match next {
                         'n' => {
                             iter.next();
                             result.push_str(&common.name);
                         }
                         'i' | 's' => {
+                            // backwards compat for %s stacks
                             iter.next();
                             result.push_str(&active.intensity().to_string());
                         }
@@ -81,50 +82,35 @@ impl Text {
                             iter.next();
                             result.push_str(&Unit::format(active.intensity()));
                         }
-                        'c' | 'r' => {
+                        'c' | 'r' | 'C' => {
+                            // backwards compat for %r remaining
                             iter.next();
+                            let value = Self::parse_value(&mut iter);
+                            let pretty = next.is_ascii_uppercase();
                             result.push_str(&active.current_text(
-                                Self::parse_value(&mut iter),
+                                value,
                                 ctx.now,
-                                false,
+                                pretty,
                                 &ctx.settings.format,
                             ));
                             self.frequent = is_timed;
                         }
-                        'C' => {
+                        'f' | 'F' => {
                             iter.next();
-                            result.push_str(&active.current_text(
-                                Self::parse_value(&mut iter),
-                                ctx.now,
-                                true,
-                                &ctx.settings.format,
-                            ));
-                            self.frequent = is_timed;
-                        }
-                        'f' => {
-                            iter.next();
-                            result.push_str(&active.max_text(
-                                Self::parse_value(&mut iter),
-                                false,
-                                &ctx.settings.format,
-                            ));
-                        }
-                        'F' => {
-                            iter.next();
-                            result.push_str(&active.max_text(
-                                Self::parse_value(&mut iter),
-                                true,
-                                &ctx.settings.format,
-                            ));
+                            let value = Self::parse_value(&mut iter);
+                            let pretty = next.is_ascii_uppercase();
+                            result.push_str(&active.max_text(value, pretty, &ctx.settings.format));
                         }
                         'p' | 'P' => {
                             iter.next();
-                            let progress =
-                                active.progress_or_default(Self::parse_value(&mut iter), ctx.now);
-                            result.push_str(&format!("{:.1}", (100.0 * progress)));
+                            let value = Self::parse_value(&mut iter);
+                            let pretty = next.is_ascii_uppercase();
+                            let progress = 100.0 * active.progress_or_default(value, ctx.now);
+                            let precision = if pretty { 1 } else { 0 };
+                            result.push_str(&format!("{progress:.precision$}"));
                             self.frequent = is_timed;
                         }
-                        &PREFIX => {
+                        PREFIX => {
                             iter.next();
                             result.push(PREFIX);
                         }
