@@ -36,7 +36,10 @@ pub fn map_select(ui: &Ui) -> Option<&'static [Map]> {
                 selected = Some(group.maps);
             }
             for map in group.maps {
-                if MenuItem::new(map.name).build(ui) {
+                if MenuItem::new(map.name)
+                    .shortcut(map.id.to_string())
+                    .build(ui)
+                {
                     selected = Some(slice::from_ref(map));
                 }
             }
