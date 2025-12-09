@@ -26,7 +26,7 @@ impl Interface for Dummy {
     }
 
     #[inline]
-    fn get_item_from_buff(id: u32) -> Result<u32> {
+    fn get_item_from_buff(_id: u32) -> Result<u32> {
         Err(Error::Disabled)
     }
 
