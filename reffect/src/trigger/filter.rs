@@ -19,7 +19,7 @@ impl FilterTrigger {
     }
 
     pub fn update(&mut self, ctx: &Context) {
-        self.player.traits.update(ctx);
+        self.player.update(ctx);
         self.map.update(ctx);
     }
 
@@ -31,9 +31,10 @@ impl FilterTrigger {
     }
 
     pub fn render_debug(&mut self, ui: &Ui, ctx: &Context) {
+        ui.text(format!("Gear filter: {}", self.player.gear.is_active(ctx)));
         ui.text(format!(
-            "Trait filter: {}",
-            self.player.traits.is_active(ctx)
+            "Build filter: {}",
+            self.player.build.is_active(ctx)
         ));
         ui.text(format!("Map filter: {}", self.map.is_active(ctx)));
     }

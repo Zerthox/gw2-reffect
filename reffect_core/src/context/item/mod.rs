@@ -13,3 +13,12 @@ pub enum ItemInfo {
         buff: u32,
     },
 }
+
+impl ItemInfo {
+    #[inline]
+    pub const fn buff(&self) -> Option<u32> {
+        match *self {
+            Self::Sigil { buff } | Self::Relic { buff } => Some(buff),
+        }
+    }
+}

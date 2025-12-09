@@ -1,5 +1,5 @@
 use super::input_text_simple_menu;
-use crate::chatlink::{decode_skill, decode_trait};
+use crate::chatlink::{decode_item, decode_skill, decode_trait};
 use nexus::imgui::{InputTextFlags, Ui};
 
 pub fn input_chatlink(
@@ -24,6 +24,10 @@ pub fn input_chatlink(
     }
     input_text_simple_menu(ui, format!("##{label}ctx"), &mut text);
     changed
+}
+
+pub fn input_item_id(ui: &Ui, label: impl AsRef<str>, id: &mut u32, flags: InputTextFlags) -> bool {
+    input_chatlink(ui, label, id, flags, decode_item)
 }
 
 pub fn input_skill_id(

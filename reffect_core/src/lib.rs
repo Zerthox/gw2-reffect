@@ -35,6 +35,9 @@ pub trait Interface {
     /// Retrieves item information.
     fn get_item_info(id: u32) -> Result<ItemInfo>;
 
+    /// Retrieves item id from buff id.
+    fn get_item_from_buff(id: u32) -> Result<u32>;
+
     /// Retrieves skill information.
     fn get_skill_info(id: u32) -> Result<SkillInfo>;
 

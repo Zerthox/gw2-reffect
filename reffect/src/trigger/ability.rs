@@ -2,8 +2,9 @@ use super::ProgressActive;
 use crate::{
     context::AbilityState,
     named::Named,
-    render::{enum_combo, enum_combo_bitflags, helper},
+    render::{enum_combo_bitflags, helper},
     serde::bitflags,
+    trigger::Mode,
 };
 use const_default::ConstDefault;
 use enumflags2::{BitFlags, make_bitflags};
@@ -12,22 +13,19 @@ use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
-mod value;
-
-pub use self::value::*;
-
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct AbilityStateTrigger {
     #[serde(with = "bitflags")]
     pub states: BitFlags<AbilityState>,
 
-    pub condition: Value,
+    #[serde(alias = "condition")]
+    pub mode: Mode,
 }
 
 impl AbilityStateTrigger {
     pub fn is_active(&self, active: &ProgressActive) -> bool {
-        self.condition.check(active.ability_state(), self.states)
+        self.mode.check_flags(self.states, active.ability_state())
     }
 
     pub fn render_options(&mut self, ui: &Ui) -> bool {
@@ -40,7 +38,7 @@ impl AbilityStateTrigger {
             ui.text("Pending: ability is casting or queued");
         });
 
-        changed |= enum_combo(ui, "Value", &mut self.condition, ComboBoxFlags::empty()).is_some();
+        changed |= self.mode.render_options(ui, "Mode");
 
         changed
     }
@@ -49,7 +47,7 @@ impl AbilityStateTrigger {
 impl ConstDefault for AbilityStateTrigger {
     const DEFAULT: Self = Self {
         states: make_bitflags!(AbilityState::Pending),
-        condition: Value::Any,
+        mode: Mode::Any,
     };
 }
 
@@ -66,6 +64,6 @@ impl fmt::Display for AbilityStateTrigger {
         } else {
             "...".into()
         };
-        write!(f, "State is {} {states}", self.condition.as_ref())
+        write!(f, "State is {} {states}", self.mode.as_ref())
     }
 }
