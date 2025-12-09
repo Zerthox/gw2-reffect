@@ -118,10 +118,10 @@ impl Element {
             self.common.render_tree_label(ui, kind);
         }
 
-        if token.is_some() {
-            if let Some(children) = self.kind.children() {
-                selected |= self.common.render_tree_children(ui, state, children);
-            }
+        if token.is_some()
+            && let Some(children) = self.kind.children()
+        {
+            selected |= self.common.render_tree_children(ui, state, children);
         }
 
         (selected, action)

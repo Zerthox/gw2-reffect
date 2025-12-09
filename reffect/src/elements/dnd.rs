@@ -35,13 +35,12 @@ impl Dnd {
     }
 
     pub fn render_drop(ui: &Ui) -> Option<Element> {
-        if let Some(target) = DragDropTarget::new(ui) {
-            if target
+        if let Some(target) = DragDropTarget::new(ui)
+            && target
                 .accept_payload_empty(Self::ID, DragDropFlags::ACCEPT_NO_DRAW_DEFAULT_RECT)
                 .is_some()
-            {
-                return unsafe { DRAGGED.take() };
-            }
+        {
+            return unsafe { DRAGGED.take() };
         }
         None
     }

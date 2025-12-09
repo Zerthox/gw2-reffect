@@ -109,24 +109,24 @@ impl Icon {
             }
 
             // render duration bar
-            if self.duration_bar {
-                if let Some(progress) = active.progress(ProgressValue::PreferSecondary, ctx.now) {
-                    let DurationBarSettings { height, color } = ctx.settings.icon.duration_bar;
+            if self.duration_bar
+                && let Some(progress) = active.progress(ProgressValue::PreferSecondary, ctx.now)
+            {
+                let DurationBarSettings { height, color } = ctx.settings.icon.duration_bar;
 
-                    let [start_x, _] = start;
-                    let [end_x, end_y] = end;
+                let [start_x, _] = start;
+                let [end_x, end_y] = end;
 
-                    let x1 = start_x;
-                    let x2 = end_x;
-                    let x_mid = x1 + progress * (x2 - x1);
-                    let y1 = end_y - height;
-                    let y2 = end_y;
+                let x1 = start_x;
+                let x2 = end_x;
+                let x_mid = x1 + progress * (x2 - x1);
+                let y1 = end_y - height;
+                let y2 = end_y;
 
-                    ui.get_background_draw_list()
-                        .add_rect([x1, y1], [x_mid, y2], with_alpha_factor(color, alpha))
-                        .filled(true)
-                        .build();
-                }
+                ui.get_background_draw_list()
+                    .add_rect([x1, y1], [x_mid, y2], with_alpha_factor(color, alpha))
+                    .filled(true)
+                    .build();
             }
 
             // render stack count
@@ -149,24 +149,24 @@ impl Icon {
             }
 
             // render duration text
-            if self.duration_text {
-                if let Some(remain) = active.current(ProgressValue::Primary, ctx.now) {
-                    let settings = &ctx.settings.icon.duration_text;
-                    let threshold = settings.threshold(active);
+            if self.duration_text
+                && let Some(remain) = active.current(ProgressValue::Primary, ctx.now)
+            {
+                let settings = &ctx.settings.icon.duration_text;
+                let threshold = settings.threshold(active);
 
-                    if remain < threshold as f32 {
-                        let text = active.current_text(
-                            ProgressValue::Primary,
-                            ctx.now,
-                            false,
-                            &ctx.settings.format,
-                        );
+                if remain < threshold as f32 {
+                    let text = active.current_text(
+                        ProgressValue::Primary,
+                        ctx.now,
+                        false,
+                        &ctx.settings.format,
+                    );
 
-                        let color = settings.color(active.progress_rate());
-                        settings
-                            .text
-                            .render(ui, start, size, color, small_size, text);
-                    }
+                    let color = settings.color(active.progress_rate());
+                    settings
+                        .text
+                        .render(ui, start, size, color, small_size, text);
                 }
             }
         }
@@ -214,16 +214,16 @@ impl Icon {
             "Texture",
             texture.map(|texture| texture.id() as *mut ()),
         );
-        if let Some(texture) = texture {
-            if ui.is_item_hovered() {
-                ui.tooltip(|| {
-                    let pos = ui.cursor_screen_pos();
-                    ui.dummy(SIZE);
-                    ui.get_foreground_draw_list()
-                        .add_image(texture, pos, pos.add(SIZE))
-                        .build();
-                });
-            }
+        if ui.is_item_hovered()
+            && let Some(texture) = texture
+        {
+            ui.tooltip(|| {
+                let pos = ui.cursor_screen_pos();
+                ui.dummy(SIZE);
+                ui.get_foreground_draw_list()
+                    .add_image(texture, pos, pos.add(SIZE))
+                    .build();
+            });
         }
     }
 }

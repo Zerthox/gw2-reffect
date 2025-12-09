@@ -242,15 +242,14 @@ fn debug_buffs(ui: &Ui, ctx: &Context, buffs: &BuffMap) {
             }
         });
 
-        if ui.is_item_hovered() {
-            if let Ok(SkillInfo::Buff {
+        if ui.is_item_hovered()
+            && let Ok(SkillInfo::Buff {
                 stacking,
                 visibility,
                 ..
             }) = Internal::get_skill_info(id)
-            {
-                ui.tooltip_text(format!("Stacking {stacking}\nVisible for {visibility}"));
-            }
+        {
+            ui.tooltip_text(format!("Stacking {stacking}\nVisible for {visibility}"));
         }
     }
 }

@@ -3,16 +3,16 @@ use nexus::imgui::{StyleColor, Ui, sys};
 use std::ffi::CString;
 
 pub fn item_context_menu(str_id: impl Into<String>, contents: impl FnOnce()) {
-    if let Ok(str_id) = CString::new(str_id.into()) {
-        if unsafe {
+    if let Ok(str_id) = CString::new(str_id.into())
+        && unsafe {
             sys::igBeginPopupContextItem(
                 str_id.as_ptr(),
                 sys::ImGuiPopupFlags_MouseButtonRight as _,
             )
-        } {
-            contents();
-            unsafe { sys::igEndPopup() };
         }
+    {
+        contents();
+        unsafe { sys::igEndPopup() };
     }
 }
 

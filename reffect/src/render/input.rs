@@ -1,5 +1,4 @@
-use super::{input_text_simple_menu, item_context_menu};
-use crate::chat_code::{decode_skill, decode_trait};
+use super::item_context_menu;
 use nexus::imgui::{InputTextFlags, MenuItem, Ui, sys};
 use std::ffi::CString;
 
@@ -16,13 +15,13 @@ pub fn input_u32(
         .step(step as _)
         .step_fast(step_fast as _)
         .build()
+        && let Ok(new) = u32::try_from(int)
     {
-        if let Ok(new) = u32::try_from(int) {
-            *value = new;
-            return true;
-        }
+        *value = new;
+        true
+    } else {
+        false
     }
-    false
 }
 
 pub fn input_float_with_format(
@@ -33,7 +32,9 @@ pub fn input_float_with_format(
     format: impl AsRef<str>,
     flags: InputTextFlags,
 ) -> bool {
-    if let (Ok(label), Ok(format)) = (CString::new(label.as_ref()), CString::new(format.as_ref())) {
+    if let Ok(label) = CString::new(label.as_ref())
+        && let Ok(format) = CString::new(format.as_ref())
+    {
         unsafe {
             sys::igInputFloat(
                 label.as_ptr(),
@@ -125,48 +126,6 @@ pub fn input_seconds(ui: &Ui, label: impl AsRef<str>, ms: &mut u32) -> bool {
     });
 
     changed
-}
-
-pub fn input_chatcode(
-    ui: &Ui,
-    label: impl AsRef<str>,
-    id: &mut u32,
-    flags: InputTextFlags,
-    decode: impl FnOnce(&str) -> Option<u32>,
-) -> bool {
-    let label = label.as_ref();
-    let mut text = id.to_string(); // TODO: switch to faster int/float to string conversion libraries
-    let changed = ui
-        .input_text(label, &mut text)
-        .flags(flags | InputTextFlags::AUTO_SELECT_ALL | InputTextFlags::CALLBACK_RESIZE)
-        .build();
-    if changed {
-        if let Ok(new) = text.parse() {
-            *id = new;
-        } else if let Some(new) = decode(text.trim()) {
-            *id = new;
-        }
-    }
-    input_text_simple_menu(ui, format!("##{label}ctx"), &mut text);
-    changed
-}
-
-pub fn input_skill_id(
-    ui: &Ui,
-    label: impl AsRef<str>,
-    id: &mut u32,
-    flags: InputTextFlags,
-) -> bool {
-    input_chatcode(ui, label, id, flags, decode_skill)
-}
-
-pub fn input_trait_id(
-    ui: &Ui,
-    label: impl AsRef<str>,
-    id: &mut u32,
-    flags: InputTextFlags,
-) -> bool {
-    input_chatcode(ui, label, id, flags, decode_trait)
 }
 
 pub fn input_optional<T, R>(

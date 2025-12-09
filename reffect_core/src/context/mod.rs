@@ -104,21 +104,21 @@ impl Context {
     pub fn update_slow(&mut self, links: &Links) {
         measure(
             || {
-                if let Some(mumble) = links.mumble() {
-                    // only attempt to parse identity after first tick
-                    if mumble.read_ui_tick() > 0 {
-                        match mumble.parse_identity() {
-                            Ok(identity) => {
-                                self.updates.insert(Update::Identity);
-                                self.player.update_identity(identity);
-                            }
-                            Err(err) => log::error!("Failed to parse mumble identity: {err}"),
+                // only attempt to update mumble data after first tick
+                if let Some(mumble) = links.mumble()
+                    && mumble.read_ui_tick() > 0
+                {
+                    match mumble.parse_identity() {
+                        Ok(identity) => {
+                            self.updates.insert(Update::Identity);
+                            self.player.update_identity(identity);
                         }
+                        Err(err) => log::error!("Failed to parse mumble identity: {err}"),
+                    }
 
-                        let map_changed = self.map.update(mumble);
-                        if map_changed {
-                            self.updates.insert(Update::Map);
-                        }
+                    let map_changed = self.map.update(mumble);
+                    if map_changed {
+                        self.updates.insert(Update::Map);
                     }
                 }
             },
