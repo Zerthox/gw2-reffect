@@ -1,6 +1,6 @@
-#![allow(clippy::missing_safety_doc, clippy::collapsible_if)]
+#![allow(clippy::missing_safety_doc)]
 
-pub mod chat_code;
+pub mod chatlink;
 pub mod colors;
 pub mod context;
 pub mod enums;

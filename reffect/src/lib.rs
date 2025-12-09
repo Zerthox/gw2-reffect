@@ -1,5 +1,3 @@
-#![allow(clippy::collapsible_if)]
-
 mod action;
 mod addon;
 mod assets;

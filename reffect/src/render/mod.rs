@@ -7,6 +7,7 @@ mod draw_list;
 mod font;
 mod helper;
 mod input;
+mod input_chatlink;
 mod input_color;
 mod input_text;
 mod map_ids;
@@ -20,8 +21,8 @@ mod window;
 
 pub use self::{
     animation::*, bounds::*, button::*, combo::*, component_wise::*, draw_list::*, font::*,
-    helper::*, input::*, input_color::*, input_text::*, map_ids::*, popup::*, slider::*,
-    spinner::*, style::*, text::*, tree::*, window::*,
+    helper::*, input::*, input_chatlink::*, input_color::*, input_text::*, map_ids::*, popup::*,
+    slider::*, spinner::*, style::*, text::*, tree::*, window::*,
 };
 
 pub type Point = [f32; 2];
