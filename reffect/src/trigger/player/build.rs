@@ -4,7 +4,7 @@ use crate::{
     context::{Context, Profession, Specialization, Update},
     render::{enum_combo_bitflags, helper, input_trait_id},
     serde::bitflags,
-    trigger::{TriggerMode, Trigger},
+    trigger::{Trigger, TriggerMode},
 };
 use const_default::ConstDefault;
 use enumflags2::BitFlags;

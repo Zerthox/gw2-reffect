@@ -52,7 +52,7 @@ impl PlayerTrigger {
     }
 
     pub fn update(&mut self, ctx: &Context) {
-        self.gear.update(ctx);
+        self.gear.update(ctx, true);
         self.build.update(ctx);
     }
 

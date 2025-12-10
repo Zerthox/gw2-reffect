@@ -1,5 +1,7 @@
+use strum::AsRefStr;
+
 /// Information about an item.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, AsRefStr)]
 pub enum ItemInfo {
     /// Sigil upgrade.
     Sigil {

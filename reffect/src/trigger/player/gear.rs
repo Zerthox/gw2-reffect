@@ -1,15 +1,14 @@
 use crate::{
     action::Action,
     context::{Context, Update, Weapon},
-    render::{enum_combo_bitflags, helper, input_item_id},
+    internal::{Interface, Internal},
+    render::{Validation, enum_combo_bitflags, helper, input_item_id},
     serde::bitflags,
     trigger::{Trigger, TriggerMode},
 };
 use const_default::ConstDefault;
 use enumflags2::BitFlags;
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
-use reffect_core::Interface;
-use reffect_internal::Internal;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
@@ -17,6 +16,7 @@ use serde::{Deserialize, Serialize};
 pub struct GearTrigger {
     #[serde(with = "bitflags")]
     pub weapons: BitFlags<Weapon>,
+    pub weapon_mode: TriggerMode,
 
     pub sigils: Vec<Item>,
     pub sigil_mode: TriggerMode,
@@ -32,13 +32,19 @@ impl GearTrigger {
         ctx.has_update(Update::Gear)
     }
 
-    pub fn update(&mut self, ctx: &Context) {
+    pub fn update(&mut self, ctx: &Context, full: bool) {
+        if full && ctx.map.is_valid() {
+            for item in self.sigils.iter_mut().chain(&mut self.relics) {
+                item.update();
+            }
+        }
         self.active = self.weapons_active(ctx) && self.sigils_active(ctx) && self.relic_active(ctx);
     }
 
     pub fn weapons_active(&self, ctx: &Context) -> bool {
         let gear = ctx.player.gear.as_ref();
-        TriggerMode::Any.check_flags_optional(self.weapons, gear.map(|gear| gear.weapons).ok())
+        self.weapon_mode
+            .check_flags_optional(self.weapons, gear.map(|gear| gear.weapons).ok())
     }
 
     pub fn sigils_active(&self, ctx: &Context) -> bool {
@@ -62,6 +68,7 @@ impl GearTrigger {
         let _id = ui.push_id("gear");
         let mut changed = false;
 
+        changed |= self.weapon_mode.render_options(ui, "Weapon Mode");
         changed |= enum_combo_bitflags(
             ui,
             "Weapons",
@@ -76,7 +83,7 @@ impl GearTrigger {
 
         if changed {
             // ensure fresh state after changed
-            self.update(ctx);
+            self.update(ctx, false);
         }
 
         changed
@@ -89,18 +96,19 @@ impl GearTrigger {
         let mut action = Action::new();
         for (i, entry) in items.iter_mut().enumerate() {
             let _id = ui.push_id(i as i32);
-            let entry_changed = action.input_with_buttons(ui, i, || {
-                input_item_id(
-                    ui,
-                    format!("##{label}"),
-                    &mut entry.item,
-                    InputTextFlags::empty(),
-                )
+            action.input_with_buttons(ui, i, || {
+                entry.validate().for_item(ui, || {
+                    if input_item_id(
+                        ui,
+                        format!("##{label}"),
+                        &mut entry.item,
+                        InputTextFlags::empty(),
+                    ) {
+                        entry.update();
+                        changed = true;
+                    }
+                })
             });
-            if entry_changed {
-                entry.update();
-                changed = true;
-            }
 
             ui.same_line();
             ui.text(format!("{label} Id {}", i + 1));
@@ -126,7 +134,7 @@ impl GearTrigger {
 impl Trigger for GearTrigger {
     fn is_active(&mut self, ctx: &Context) -> bool {
         if self.needs_update(ctx) {
-            self.update(ctx);
+            self.update(ctx, false);
         }
         self.active
     }
@@ -135,8 +143,9 @@ impl Trigger for GearTrigger {
 impl ConstDefault for GearTrigger {
     const DEFAULT: Self = Self {
         weapons: BitFlags::EMPTY,
+        weapon_mode: TriggerMode::Any,
         sigils: Vec::new(),
-        sigil_mode: TriggerMode::All,
+        sigil_mode: TriggerMode::Any,
         relics: Vec::new(),
         active: true,
     };
@@ -154,6 +163,7 @@ pub struct Item {
     pub item: u32,
 
     /// Hidden buff id.
+    #[serde(skip)]
     pub buff: u32,
 }
 
@@ -167,5 +177,19 @@ impl Item {
             .ok()
             .and_then(|info| info.buff())
             .unwrap_or(0);
+    }
+
+    pub fn validate(&self) -> Validation<String> {
+        let Self { item, .. } = *self;
+        if let Ok(info) = Internal::get_item_info(item)
+            && let Some(buff) = info.buff()
+        {
+            Validation::Confirm(format!(
+                "{} {item} corresponds to hidden effect {buff}",
+                info.as_ref()
+            ))
+        } else {
+            Validation::Error(format!("Item {item} is invalid"))
+        }
     }
 }

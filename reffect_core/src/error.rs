@@ -11,6 +11,9 @@ pub enum Error {
     #[error("Disabled")]
     Disabled,
 
+    #[error("Not initialized")]
+    NotInitialized,
+
     #[error("No handler")]
     Handler,
 

@@ -34,6 +34,11 @@ impl MapInfo {
     }
 
     #[inline]
+    pub fn is_valid(&self) -> bool {
+        self.id != 0
+    }
+
+    #[inline]
     pub fn is_on_map(&self, id: u32) -> bool {
         self.id == id
     }

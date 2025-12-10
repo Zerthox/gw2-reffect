@@ -1,6 +1,6 @@
 pub mod legacy;
 
-use super::{TriggerMode, Trigger};
+use super::{Trigger, TriggerMode};
 use crate::{
     action::Action,
     context::{Context, MapCategory},
