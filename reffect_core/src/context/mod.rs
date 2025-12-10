@@ -145,13 +145,13 @@ impl Context {
         self.edit.is_editing() || self.has_any_update()
     }
 
-    /// Checks whether the given updates have happened.
+    /// Checks whether any of the given updates has happened.
     #[inline]
     pub fn has_update(&self, update: impl Into<BitFlags<Update>>) -> bool {
-        self.updates.contains(update)
+        self.updates.intersects(update)
     }
 
-    /// Checks whether the given updates have happened or edit mode is active.
+    /// Checks whether any of the given updates has happened or edit mode is active.
     #[inline]
     pub fn has_update_or_edit(&self, update: impl Into<BitFlags<Update>>) -> bool {
         self.edit.is_editing() || self.has_update(update)
