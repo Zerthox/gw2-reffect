@@ -23,7 +23,10 @@ impl CombatTrigger {
 
 impl Trigger for CombatTrigger {
     fn is_active(&mut self, ctx: &Context) -> bool {
-        self.0.map(|combat| combat == ctx.ui.combat).unwrap_or(true)
+        match self.0 {
+            Some(combat) => combat == ctx.ui.combat,
+            None => true,
+        }
     }
 }
 

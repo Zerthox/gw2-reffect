@@ -5,7 +5,7 @@ mod traits;
 
 pub use self::{build::*, combat::*, gear::*, traits::*};
 
-use super::{Trigger, check_bitflags_optional};
+use super::{Trigger, TriggerMode};
 use crate::{
     context::{Context, Mount},
     render::enum_combo_bitflags,
@@ -57,7 +57,7 @@ impl PlayerTrigger {
     }
 
     pub fn mounts_active(&self, ctx: &Context) -> bool {
-        check_bitflags_optional(self.mounts, ctx.player.mount.ok())
+        TriggerMode::Any.check_flags_optional(self.mounts, ctx.player.mount.ok())
     }
 }
 

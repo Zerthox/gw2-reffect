@@ -1,6 +1,6 @@
 pub mod legacy;
 
-use super::{Trigger, check_bitflags};
+use super::{TriggerMode, Trigger};
 use crate::{
     action::Action,
     context::{Context, MapCategory},
@@ -59,7 +59,7 @@ impl MapTrigger {
     }
 
     fn resolve_active(&self, ctx: &Context) -> bool {
-        check_bitflags(self.category, ctx.map.category)
+        TriggerMode::Any.check_flags(self.category, ctx.map.category)
             && (self.ids.is_empty() || {
                 let id_match = self.ids.iter().any(|id| ctx.map.is_on_map(*id));
                 if self.whitelist { id_match } else { !id_match }

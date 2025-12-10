@@ -2,7 +2,7 @@ use crate::render::enum_combo;
 use enumflags2::{BitFlag, BitFlags};
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
-use strum::{AsRefStr, EnumIter, VariantArray};
+use strum::{AsRefStr, Display, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 
 #[derive(
     Debug,
@@ -13,13 +13,16 @@ use strum::{AsRefStr, EnumIter, VariantArray};
     PartialOrd,
     Ord,
     Hash,
+    Display,
     AsRefStr,
+    IntoStaticStr,
     EnumIter,
+    EnumCount,
     VariantArray,
     Serialize,
     Deserialize,
 )]
-pub enum Mode {
+pub enum TriggerMode {
     #[strum(serialize = "Any of")]
     Any,
 
@@ -34,8 +37,9 @@ pub enum Mode {
     NotAll,
 }
 
-impl Mode {
-    pub fn check_iter<T>(
+impl TriggerMode {
+    /// Checks the iterator with the given predicate while returning `false` for empty iterators.
+    pub fn check_iter_non_empty<T>(
         &self,
         iter: impl IntoIterator<Item = T>,
         predicate: impl FnMut(T) -> bool,
@@ -43,20 +47,58 @@ impl Mode {
         match self {
             Self::Any => iter.into_iter().any(predicate),
             Self::All => iter.into_iter().all(predicate),
-            Self::NotAny => !Self::Any.check_iter(iter, predicate),
-            Self::NotAll => !Self::All.check_iter(iter, predicate),
+            Self::NotAny => !Self::Any.check_iter_non_empty(iter, predicate),
+            Self::NotAll => !Self::All.check_iter_non_empty(iter, predicate),
         }
     }
 
-    pub fn check_flags<T>(&self, expected: BitFlags<T>, got: BitFlags<T>) -> bool
+    /// Checks the slice with the given predicate while returning `false` for empty slices.
+    pub fn check_slice_non_empty<T>(&self, slice: &[T], predicate: impl FnMut(&T) -> bool) -> bool {
+        self.check_iter_non_empty(slice, predicate)
+    }
+
+    /// Checks the slice with the given predicate while returning `true` for empty slices.
+    pub fn check_slice<T>(&self, slice: &[T], predicate: impl FnMut(&T) -> bool) -> bool {
+        slice.is_empty() || self.check_slice_non_empty(slice, predicate)
+    }
+
+    /// Checks the given flags while returning `false` for empty flags.
+    pub fn check_flags_non_empty<T>(
+        &self,
+        expected: BitFlags<T>,
+        got: impl Into<BitFlags<T>>,
+    ) -> bool
     where
         T: BitFlag,
     {
         match self {
-            Self::Any => got.intersects(expected),
-            Self::All => got.contains(expected),
-            Self::NotAny => !Self::Any.check_flags(expected, got),
-            Self::NotAll => !Self::All.check_flags(expected, got),
+            Self::Any => got.into().intersects(expected),
+            Self::All => got.into().contains(expected),
+            Self::NotAny => !Self::Any.check_flags_non_empty(expected, got),
+            Self::NotAll => !Self::All.check_flags_non_empty(expected, got),
+        }
+    }
+
+    /// Checks the given flags while returning `true` for empty flags.
+    pub fn check_flags<T>(&self, expected: BitFlags<T>, got: impl Into<BitFlags<T>>) -> bool
+    where
+        T: BitFlag,
+    {
+        expected.is_empty() || self.check_flags_non_empty(expected, got)
+    }
+
+    /// Checks the given flags while returning `true` for empty flags.
+    pub fn check_flags_optional<T>(
+        &self,
+        expected: BitFlags<T>,
+        got: Option<impl Into<BitFlags<T>>>,
+    ) -> bool
+    where
+        T: BitFlag,
+    {
+        match got {
+            Some(got) => self.check_flags(expected, got),
+            None => true,
         }
     }
 

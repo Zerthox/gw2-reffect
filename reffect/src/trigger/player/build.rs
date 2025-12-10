@@ -4,7 +4,7 @@ use crate::{
     context::{Context, Profession, Specialization, Update},
     render::{enum_combo_bitflags, helper, input_trait_id},
     serde::bitflags,
-    trigger::{Mode, Trigger, check_bitflags_optional},
+    trigger::{TriggerMode, Trigger},
 };
 use const_default::ConstDefault;
 use enumflags2::BitFlags;
@@ -15,7 +15,7 @@ use serde::{Deserialize, Serialize};
 #[serde(default)]
 pub struct BuildTrigger {
     pub traits: Vec<TraitRequirement>,
-    pub trait_mode: Mode,
+    pub trait_mode: TriggerMode,
 
     #[serde(skip_serializing)]
     #[serde(with = "bitflags")]
@@ -48,13 +48,13 @@ impl BuildTrigger {
     }
 
     fn specs_active(&self, ctx: &Context) -> bool {
-        check_bitflags_optional(self.specs, ctx.player.spec.ok())
+        TriggerMode::Any.check_flags_optional(self.specs, ctx.player.spec.ok())
     }
 
     fn traits_active(&self, ctx: &Context) -> bool {
         if let Ok(build) = ctx.player.build.as_ref() {
             self.trait_mode
-                .check_iter(&self.traits, |req| req.is_met(&build.traits))
+                .check_slice(&self.traits, |req| req.is_met(&build.traits))
         } else {
             true
         }
@@ -126,7 +126,7 @@ impl Trigger for BuildTrigger {
 impl ConstDefault for BuildTrigger {
     const DEFAULT: Self = Self {
         traits: Vec::new(),
-        trait_mode: Mode::All,
+        trait_mode: TriggerMode::All,
         profs: BitFlags::EMPTY,
         specs: BitFlags::EMPTY,
         active: true,

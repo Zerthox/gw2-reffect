@@ -3,7 +3,7 @@ use crate::{
     context::{Context, Update, Weapon},
     render::{enum_combo_bitflags, helper, input_item_id},
     serde::bitflags,
-    trigger::{Mode, Trigger, check_bitflags_optional},
+    trigger::{Trigger, TriggerMode},
 };
 use const_default::ConstDefault;
 use enumflags2::BitFlags;
@@ -19,7 +19,7 @@ pub struct GearTrigger {
     pub weapons: BitFlags<Weapon>,
 
     pub sigils: Vec<Item>,
-    pub sigil_mode: Mode,
+    pub sigil_mode: TriggerMode,
 
     pub relics: Vec<Item>,
 
@@ -38,13 +38,13 @@ impl GearTrigger {
 
     pub fn weapons_active(&self, ctx: &Context) -> bool {
         let gear = ctx.player.gear.as_ref();
-        check_bitflags_optional(self.weapons, gear.map(|gear| gear.weapons).ok())
+        TriggerMode::Any.check_flags_optional(self.weapons, gear.map(|gear| gear.weapons).ok())
     }
 
     pub fn sigils_active(&self, ctx: &Context) -> bool {
         if let Ok(gear) = ctx.player.gear.as_ref() {
             self.sigil_mode
-                .check_iter(&self.sigils, |sigil| gear.sigils.contains(&sigil.buff))
+                .check_slice(&self.sigils, |sigil| gear.sigils.contains(&sigil.buff))
         } else {
             true
         }
@@ -52,7 +52,7 @@ impl GearTrigger {
 
     pub fn relic_active(&self, ctx: &Context) -> bool {
         if let Ok(gear) = ctx.player.gear.as_ref() {
-            self.relics.iter().any(|relic| gear.relic == relic.buff)
+            TriggerMode::Any.check_slice(&self.relics, |relic| gear.relic == relic.buff)
         } else {
             true
         }
@@ -103,7 +103,7 @@ impl GearTrigger {
             }
 
             ui.same_line();
-            ui.text(format!("Item Id {}", i + 1));
+            ui.text(format!("{label} Id {}", i + 1));
 
             if i == 0 {
                 helper(ui, || {
@@ -136,7 +136,7 @@ impl ConstDefault for GearTrigger {
     const DEFAULT: Self = Self {
         weapons: BitFlags::EMPTY,
         sigils: Vec::new(),
-        sigil_mode: Mode::All,
+        sigil_mode: TriggerMode::All,
         relics: Vec::new(),
         active: true,
     };

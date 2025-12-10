@@ -4,7 +4,7 @@ use crate::{
     named::Named,
     render::{enum_combo_bitflags, helper},
     serde::bitflags,
-    trigger::Mode,
+    trigger::TriggerMode,
 };
 use const_default::ConstDefault;
 use enumflags2::{BitFlags, make_bitflags};
@@ -20,7 +20,7 @@ pub struct AbilityStateTrigger {
     pub states: BitFlags<AbilityState>,
 
     #[serde(alias = "condition")]
-    pub mode: Mode,
+    pub mode: TriggerMode,
 }
 
 impl AbilityStateTrigger {
@@ -47,7 +47,7 @@ impl AbilityStateTrigger {
 impl ConstDefault for AbilityStateTrigger {
     const DEFAULT: Self = Self {
         states: make_bitflags!(AbilityState::Pending),
-        mode: Mode::Any,
+        mode: TriggerMode::Any,
     };
 }
 
