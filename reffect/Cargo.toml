@@ -17,10 +17,11 @@ open = "5.1.2"
 partial = { git = "https://github.com/zerthox/partial-rs" }
 reffect_core = { path = "../reffect_core" }
 reffect_internal = { git = "https://github.com/zerthox/gw2-reffect" }
-rfd = { version = "0.15.0", default-features = false }
+rfd = { version = "0.16.0", default-features = false }
 semver = { version = "1.0.17", features = ["serde"] }
 serde = { workspace = true }
 serde_json = { workspace = true }
+serde_path_to_error = "0.1.20"
 serde_with = { workspace = true }
 strum = { workspace = true }
 thiserror = { workspace = true }

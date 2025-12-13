@@ -1,9 +1,10 @@
 use crate::{elements::Pack, util::file_name};
 use serde::{Deserialize, Serialize};
+use serde_path_to_error::{Error, Track};
 use std::{
     borrow::Cow,
     fs::File,
-    io::{BufReader, BufWriter},
+    io::{self, BufReader, BufWriter},
     path::Path,
 };
 use strum::AsRefStr;
@@ -30,13 +31,15 @@ impl<'a> Schema<'a> {
             })
             .ok()?;
         let reader = BufReader::new(file);
-        let schema = serde_json::from_reader::<_, Self>(reader)
+        let schema = Self::deserialize(reader)
             .inspect_err(|err| {
+                let json_err = err.inner();
                 log::warn!(
-                    "Failed to parse pack file \"{}\": {err} (line {}, column {})",
+                    "Failed to parse pack file \"{}\": {err} (at {}, line {}, column {})",
                     file_name(path),
-                    err.line(),
-                    err.column(),
+                    err.path(),
+                    json_err.line(),
+                    json_err.column(),
                 )
             })
             .ok()?;
@@ -47,6 +50,15 @@ impl<'a> Schema<'a> {
             schema.as_ref(),
         );
         Some(schema)
+    }
+
+    fn deserialize(reader: impl io::Read) -> Result<Self, Error<serde_json::Error>> {
+        let mut deserializer = serde_json::Deserializer::from_reader(reader);
+        let schema: Self = serde_path_to_error::deserialize(&mut deserializer)?;
+        deserializer
+            .end()
+            .map_err(|err| Error::new(Track::new().path(), err))?;
+        Ok(schema)
     }
 
     pub fn save_to_file(&self, path: impl AsRef<Path>) -> bool {
