@@ -1,11 +1,10 @@
-use enumflags2::bitflags;
-use serde::{Deserialize, Serialize};
-use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
-
 use crate::{
     colors::{self, Color, Colored},
     named::Named,
 };
+use enumflags2::bitflags;
+use serde::{Deserialize, Serialize};
+use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
 
 #[derive(
     Debug,
@@ -74,10 +73,12 @@ impl TryFrom<u8> for Mount {
 }
 
 impl Named for Mount {
+    #[inline]
     fn name(&self) -> &'static str {
         self.into()
     }
 
+    #[inline]
     fn short_name(&self) -> &'static str {
         match self {
             Self::None => "No",
@@ -96,6 +97,7 @@ impl Named for Mount {
 }
 
 impl Colored for Mount {
+    #[inline]
     fn colored(&self) -> Option<Color> {
         match self {
             Self::None => None,

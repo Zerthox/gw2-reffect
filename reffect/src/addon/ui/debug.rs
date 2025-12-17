@@ -11,7 +11,10 @@ use crate::{
 };
 use nexus::imgui::{StyleColor, TreeNode, TreeNodeFlags, Ui, Window};
 use reffect_core::context::{Build, Gear};
-use std::{cmp::Ordering, fmt};
+use std::{
+    cmp::Ordering,
+    fmt::{self, Write},
+};
 use strum::IntoEnumIterator;
 
 impl Addon {
@@ -69,7 +72,15 @@ impl Addon {
                     ui.unindent();
                 });
                 debug_result_tree(ui, "pltbuild", "Player build", &ctx.player.build, |build| {
-                    let Build { traits } = build;
+                    let Build {
+                        specs,
+                        traits,
+                        selected_skills,
+                        prof_info,
+                    } = build;
+
+                    let [spec1, spec2, spec3] = specs;
+                    ui.text(format!("Specs: {spec1: >2} {spec2: >2} {spec3: >2}"));
 
                     ui.text("Traits:");
                     ui.indent();
@@ -81,6 +92,29 @@ impl Addon {
                         ui.text(format!("{adept: >4} {master: >4} {grandmaster: >4}"));
                     }
                     ui.unindent();
+
+                    ui.text("Selected skills:");
+                    if !selected_skills.is_empty() {
+                        ui.indent();
+                        let mut text = String::new();
+                        for (i, skill) in selected_skills.iter().enumerate() {
+                            if i != 0 && i.is_multiple_of(3) {
+                                text.push('\n');
+                            }
+                            let _ = write!(&mut text, "{skill: >5} ");
+                        }
+                        ui.text(text);
+                        ui.unindent();
+                    }
+
+                    ui.text("Profession info:");
+                    for info in prof_info.iter() {
+                        let _color = info
+                            .colored()
+                            .map(|color| ui.push_style_color(StyleColor::Text, color));
+                        ui.same_line();
+                        ui.text(info.to_string());
+                    }
                 });
                 debug_result_tree(
                     ui,

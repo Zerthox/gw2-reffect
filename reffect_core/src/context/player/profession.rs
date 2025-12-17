@@ -43,6 +43,7 @@ pub enum Profession {
 impl TryFrom<u8> for Profession {
     type Error = u8;
 
+    #[inline]
     fn try_from(value: u8) -> Result<Self, Self::Error> {
         match value {
             1 => Ok(Self::Guardian),
@@ -130,10 +131,12 @@ impl Profession {
 }
 
 impl Named for Profession {
+    #[inline]
     fn name(&self) -> &'static str {
         self.into()
     }
 
+    #[inline]
     fn short_name(&self) -> &'static str {
         match self {
             Self::Guardian => "Gdn",
@@ -150,6 +153,7 @@ impl Named for Profession {
 }
 
 impl Colored for Profession {
+    #[inline]
     fn colored(&self) -> Option<Color> {
         Some(match self {
             Self::Guardian => colors::GUARDIAN,

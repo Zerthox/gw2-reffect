@@ -71,6 +71,9 @@ pub enum Error {
     #[error("Character specialization not found")]
     Specialization,
 
+    #[error("Character build not found")]
+    Build,
+
     #[error("Kennel not found")]
     Kennel,
 
