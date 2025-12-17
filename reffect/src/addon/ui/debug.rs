@@ -113,7 +113,7 @@ impl Addon {
                             .colored()
                             .map(|color| ui.push_style_color(StyleColor::Text, color));
                         ui.same_line();
-                        ui.text(info.to_string());
+                        ui.text(info);
                     }
                 });
                 debug_result_tree(
