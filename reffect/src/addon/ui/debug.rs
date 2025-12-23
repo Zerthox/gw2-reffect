@@ -75,8 +75,8 @@ impl Addon {
                     let Build {
                         specs,
                         traits,
-                        selected_skills,
-                        prof_info,
+                        skill_selections,
+                        prof_selections,
                     } = build;
 
                     let [spec1, spec2, spec3] = specs;
@@ -93,11 +93,11 @@ impl Addon {
                     }
                     ui.unindent();
 
-                    ui.text("Selected skills:");
-                    if !selected_skills.is_empty() {
+                    ui.text("Skill selections:");
+                    if !skill_selections.is_empty() {
                         ui.indent();
                         let mut text = String::new();
-                        for (i, skill) in selected_skills.iter().enumerate() {
+                        for (i, skill) in skill_selections.iter().enumerate() {
                             if i != 0 && i.is_multiple_of(3) {
                                 text.push('\n');
                             }
@@ -107,8 +107,8 @@ impl Addon {
                         ui.unindent();
                     }
 
-                    ui.text("Profession info:");
-                    for info in prof_info.iter() {
+                    ui.text("Profession selections:");
+                    for info in prof_selections.iter() {
                         let _color = info
                             .colored()
                             .map(|color| ui.push_style_color(StyleColor::Text, color));

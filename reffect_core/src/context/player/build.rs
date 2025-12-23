@@ -1,11 +1,10 @@
-use enumflags2::{BitFlags, bitflags};
-use serde::{Deserialize, Serialize};
-use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
-
 use crate::{
     colors::{self, Color, Colored},
     named::Named,
 };
+use enumflags2::{BitFlags, bitflags};
+use serde::{Deserialize, Serialize};
+use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
 
 #[derive(Debug, Clone)]
 pub struct Build {
@@ -16,10 +15,10 @@ pub struct Build {
     pub traits: Traits,
 
     /// Selected skills.
-    pub selected_skills: Vec<u32>,
+    pub skill_selections: Vec<u32>,
 
-    /// Profession-specific info.
-    pub prof_info: BitFlags<ProfInfo>,
+    /// Profession-specific selections.
+    pub prof_selections: BitFlags<ProfSelection>,
 }
 
 impl Build {
@@ -28,8 +27,8 @@ impl Build {
         Self {
             specs: [0; 3],
             traits: [0; 9],
-            selected_skills: Vec::new(),
-            prof_info: BitFlags::EMPTY,
+            skill_selections: Vec::new(),
+            prof_selections: BitFlags::EMPTY,
         }
     }
 }
@@ -57,7 +56,7 @@ pub type Traits = [u32; 9];
 )]
 #[bitflags]
 #[repr(u32)]
-pub enum ProfInfo {
+pub enum ProfSelection {
     #[strum(serialize = "Assassin")]
     LegendAssassin = 1 << 0,
 
@@ -95,14 +94,14 @@ pub enum ProfInfo {
     FamiliarEarth = 1 << 11,
 }
 
-impl Named for ProfInfo {
+impl Named for ProfSelection {
     #[inline]
     fn name(&self) -> &'static str {
         self.into()
     }
 }
 
-impl Colored for ProfInfo {
+impl Colored for ProfSelection {
     #[inline]
     fn colored(&self) -> Option<Color> {
         match self {
