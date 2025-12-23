@@ -31,7 +31,10 @@ A variety of filters are supported:
 - In/out of combat
 - Selected elite specialization
 - Selected traits
+- Selected skills (slot skills, weapon/profession skill replacements)
+- Profession-specific selections (Revenant legends, Evoker familiar)
 - Equipped weapons
+- Equipped sigils & relic
 - Current mount
 - Current map
 
