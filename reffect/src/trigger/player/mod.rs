@@ -10,6 +10,7 @@ use crate::{
     context::{Context, Mount},
     render::enum_combo_bitflags,
     serde::bitflags,
+    trigger::MemoizedTrigger,
 };
 use const_default::ConstDefault;
 use enumflags2::BitFlags;
@@ -52,7 +53,7 @@ impl PlayerTrigger {
     }
 
     pub fn update(&mut self, ctx: &Context) {
-        self.gear.update(ctx, true);
+        self.gear.update_full(ctx);
         self.build.update(ctx);
     }
 

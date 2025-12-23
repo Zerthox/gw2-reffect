@@ -4,7 +4,7 @@ use crate::{
     context::{Context, Profession, Specialization, Update},
     render::{enum_combo_bitflags, helper, input_trait_id},
     serde::bitflags,
-    trigger::{Trigger, TriggerMode},
+    trigger::{MemoizedTrigger, TriggerMode},
 };
 use const_default::ConstDefault;
 use enumflags2::BitFlags;
@@ -37,14 +37,6 @@ impl BuildTrigger {
                 self.specs.insert(prof.specializations());
             }
         }
-    }
-
-    pub fn needs_update(&self, ctx: &Context) -> bool {
-        ctx.has_update(Update::Identity | Update::Traits)
-    }
-
-    pub fn update(&mut self, ctx: &Context) {
-        self.active = self.specs_active(ctx) && self.traits_active(ctx);
     }
 
     fn specs_active(&self, ctx: &Context) -> bool {
@@ -114,12 +106,17 @@ impl BuildTrigger {
     }
 }
 
-impl Trigger for BuildTrigger {
-    fn is_active(&mut self, ctx: &Context) -> bool {
-        if self.needs_update(ctx) {
-            self.update(ctx);
-        }
-        self.active
+impl MemoizedTrigger for BuildTrigger {
+    fn memoized_state(&mut self) -> &mut bool {
+        &mut self.active
+    }
+
+    fn needs_update(&self, ctx: &Context) -> bool {
+        ctx.has_update(Update::Identity | Update::Traits)
+    }
+
+    fn resolve_active(&mut self, ctx: &Context) -> bool {
+        self.specs_active(ctx) && self.traits_active(ctx)
     }
 }
 

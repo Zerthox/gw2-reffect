@@ -1,5 +1,5 @@
 use super::{MapTrigger, PlayerTrigger, Trigger, map::legacy::MapTriggerLegacy};
-use crate::{context::Context, serde::migrate};
+use crate::{context::Context, serde::migrate, trigger::MemoizedTrigger};
 use const_default::ConstDefault;
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};

@@ -1,11 +1,12 @@
 pub mod legacy;
 
-use super::{Trigger, TriggerMode};
+use super::TriggerMode;
 use crate::{
     action::Action,
     context::{Context, MapCategory},
     render::{enum_combo_bitflags, helper, input_u32, item_context_menu, map_select},
     serde::bitflags,
+    trigger::MemoizedTrigger,
 };
 use const_default::ConstDefault;
 use enumflags2::BitFlags;
@@ -53,23 +54,23 @@ impl MapTrigger {
             ..Self::default()
         }
     }
+}
 
-    pub fn update(&mut self, ctx: &Context) {
-        self.active = self.resolve_active(ctx);
+impl MemoizedTrigger for MapTrigger {
+    fn memoized_state(&mut self) -> &mut bool {
+        &mut self.active
     }
 
-    fn resolve_active(&self, ctx: &Context) -> bool {
+    fn needs_update(&self, _ctx: &Context) -> bool {
+        false
+    }
+
+    fn resolve_active(&mut self, ctx: &Context) -> bool {
         TriggerMode::Any.check_flags(self.category, ctx.map.category)
             && (self.ids.is_empty() || {
                 let id_match = self.ids.iter().any(|id| ctx.map.is_on_map(*id));
                 if self.whitelist { id_match } else { !id_match }
             })
-    }
-}
-
-impl Trigger for MapTrigger {
-    fn is_active(&mut self, _ctx: &Context) -> bool {
-        self.active
     }
 }
 
@@ -99,11 +100,11 @@ impl MapTrigger {
                 });
             }
         }
-        if ui.button("Add Map Id") {
+        if ui.button("Add Map") {
             self.ids.push(0);
             changed = true;
         }
-        item_context_menu("addctx", || {
+        item_context_menu("mapaddctx", || {
             if let Some(maps) = map_select(ui) {
                 self.ids.extend(maps.iter().map(|map| map.id));
             }

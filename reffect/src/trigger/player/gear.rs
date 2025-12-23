@@ -4,7 +4,7 @@ use crate::{
     internal::{Interface, Internal},
     render::{Validation, enum_combo_bitflags, helper, input_item_id},
     serde::bitflags,
-    trigger::{Trigger, TriggerMode},
+    trigger::{MemoizedTrigger, TriggerMode},
 };
 use const_default::ConstDefault;
 use enumflags2::BitFlags;
@@ -28,17 +28,13 @@ pub struct GearTrigger {
 }
 
 impl GearTrigger {
-    pub fn needs_update(&self, ctx: &Context) -> bool {
-        ctx.has_update(Update::Gear)
-    }
-
-    pub fn update(&mut self, ctx: &Context, full: bool) {
-        if full && ctx.map.is_valid() {
+    pub fn update_full(&mut self, ctx: &Context) {
+        if ctx.map.is_valid() {
             for item in self.sigils.iter_mut().chain(&mut self.relics) {
                 item.update();
             }
         }
-        self.active = self.weapons_active(ctx) && self.sigils_active(ctx) && self.relic_active(ctx);
+        self.update(ctx);
     }
 
     pub fn weapons_active(&self, ctx: &Context) -> bool {
@@ -83,7 +79,7 @@ impl GearTrigger {
 
         if changed {
             // ensure fresh state after changed
-            self.update(ctx, false);
+            self.update(ctx);
         }
 
         changed
@@ -131,12 +127,17 @@ impl GearTrigger {
     }
 }
 
-impl Trigger for GearTrigger {
-    fn is_active(&mut self, ctx: &Context) -> bool {
-        if self.needs_update(ctx) {
-            self.update(ctx, false);
-        }
-        self.active
+impl MemoizedTrigger for GearTrigger {
+    fn resolve_active(&mut self, ctx: &Context) -> bool {
+        self.weapons_active(ctx) && self.sigils_active(ctx) && self.relic_active(ctx)
+    }
+
+    fn memoized_state(&mut self) -> &mut bool {
+        &mut self.active
+    }
+
+    fn needs_update(&self, ctx: &Context) -> bool {
+        ctx.has_update(Update::Gear)
     }
 }
 
