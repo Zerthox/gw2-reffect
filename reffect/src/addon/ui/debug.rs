@@ -50,7 +50,7 @@ impl Addon {
                 ui.text(format!("Map id: {}", ctx.map.id));
                 ui.text(format!("Map category: {}", ctx.map.category));
 
-                debug_result_tree(ui, "plgearp", "Player gear", &ctx.player.gear, |gear| {
+                debug_result_tree(ui, "plgear", "Player gear", &ctx.player.gear, |gear| {
                     let Gear {
                         weapons,
                         sigils,
@@ -71,7 +71,7 @@ impl Addon {
                     }
                     ui.unindent();
                 });
-                debug_result_tree(ui, "pltbuild", "Player build", &ctx.player.build, |build| {
+                debug_result_tree(ui, "plbuild", "Player build", &ctx.player.build, |build| {
                     let Build {
                         specs,
                         traits,
@@ -108,13 +108,16 @@ impl Addon {
                     }
 
                     ui.text("Profession selections:");
+                    ui.indent();
                     for info in prof_selections.iter() {
                         let _color = info
                             .colored()
                             .map(|color| ui.push_style_color(StyleColor::Text, color));
-                        ui.same_line();
                         ui.text(info);
+                        ui.same_line();
                     }
+                    ui.new_line();
+                    ui.unindent();
                 });
                 debug_result_tree(
                     ui,
