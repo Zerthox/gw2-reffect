@@ -6,7 +6,7 @@ mod elements;
 mod render;
 mod schema;
 mod settings;
-mod texture_manager;
+mod texture;
 mod tree;
 mod trigger;
 

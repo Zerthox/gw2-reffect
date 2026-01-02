@@ -4,7 +4,7 @@ use crate::{
     elements::Pack,
     internal::{Interface, Internal},
     settings::AddonSettings,
-    texture_manager::TextureManager,
+    texture::TextureManager,
     tree::FilterUpdater,
     util::file_name,
 };

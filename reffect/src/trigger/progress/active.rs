@@ -1,11 +1,10 @@
 use super::ProgressValue;
 use crate::{
-    context::{Ability, AbilityState, Buff, Resource, SkillId},
+    context::{Ability, AbilityState, Buff, Resource, ResourceType, SkillId},
     fmt::{Time, Unit},
     settings::FormatSettings,
 };
 use enumflags2::BitFlags;
-use reffect_core::context::ResourceType;
 
 #[derive(Debug, Clone)]
 pub enum ProgressActive {

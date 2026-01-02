@@ -28,6 +28,10 @@ impl<T> Worker<T> {
             .map(|handle| Self { name, handle })
     }
 
+    pub fn handle(&self) -> &JoinHandle<T> {
+        &self.handle
+    }
+
     pub fn wait(self) -> Option<T> {
         self.handle
             .join()

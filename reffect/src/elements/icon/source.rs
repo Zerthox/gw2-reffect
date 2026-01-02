@@ -1,23 +1,17 @@
 use crate::{
     action::DynAction,
     addon::Addon,
-    context::SkillId,
     elements::RenderCtx,
     enums::check_variant_array,
-    internal::{Interface, Internal},
     lockbox::Lockbox,
     render::{Validation, enum_combo, input_text_simple_menu, item_context_menu},
-    texture_manager::TextureManager,
 };
 use const_default::ConstDefault;
-use nexus::imgui::{ComboBoxFlags, MenuItem, TextureId, Ui};
+use nexus::imgui::{ComboBoxFlags, MenuItem, Ui};
 use rfd::FileDialog;
 use serde::{Deserialize, Serialize};
 use std::{path::PathBuf, thread};
 use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
-use windows::core::Interface as _;
-
-// TODO: id gen for loaded icons? handle duplicates on load?
 
 #[derive(
     Debug,
@@ -33,9 +27,9 @@ use windows::core::Interface as _;
     Deserialize,
 )]
 pub enum IconSource {
-    Unknown,
-
     Empty,
+
+    Unknown,
 
     #[serde(alias = "Dynamic")]
     Automatic,
@@ -68,56 +62,12 @@ impl VariantArray for IconSource {
 const _: () = check_variant_array::<IconSource>();
 
 impl IconSource {
-    pub const UNKNOWN_ID: &'static str = "REFFECT_ICON_UNKNOWN";
-
-    pub fn needs_load(&self) -> bool {
-        !matches!(self, Self::Unknown | Self::Empty)
-    }
-
     pub fn is_empty(&self) -> bool {
         matches!(self, Self::Empty)
     }
 
-    pub fn load(&self) {
-        TextureManager::add_source(self)
-    }
-
-    pub fn get_texture(&self, skill: SkillId) -> Option<TextureId> {
-        match self {
-            Self::Empty => None,
-            Self::Automatic => match skill {
-                SkillId::Unknown => TextureManager::get_texture(&IconSource::Unknown),
-                SkillId::WeaponSwap | SkillId::PetSwap => TextureManager::get_weapon_swap(),
-                SkillId::BundleDrop => TextureManager::get_bundle_drop(),
-                SkillId::Id(id) => match Internal::get_skill_icon(id) {
-                    Some(tex) => Some(tex.as_raw().into()),
-                    None => TextureManager::get_texture(&IconSource::Unknown),
-                },
-            },
-            _ => TextureManager::get_texture(self),
-        }
-    }
-
-    pub fn generate_id(&self) -> String {
-        match self {
-            Self::Unknown => Self::UNKNOWN_ID.into(),
-            Self::Empty | Self::Automatic => String::new(),
-            Self::File(path) => format!("REFFECT_ICON_FILE_\"{}\"", path.display()),
-            Self::Url(url) => format!("REFFECT_ICON_URL_\"{url}\""),
-        }
-    }
-
-    pub fn pretty_print(&self) -> String {
-        match self {
-            Self::Unknown => "unknown".into(),
-            Self::Empty => "empty".into(),
-            Self::Automatic => "automatic".into(),
-            Self::File(path) => format!("file \"{}\"", path.display()),
-            Self::Url(url) => format!("url \"{url}\""),
-        }
-    }
-
-    pub fn render_select(&mut self, ui: &Ui, ctx: &RenderCtx) -> DynAction<Self> {
+    pub fn render_select(&mut self, ui: &Ui, ctx: &RenderCtx) -> IconSelectResult {
+        let mut reload = false;
         let mut action = DynAction::empty();
 
         let validation = match self {
@@ -180,7 +130,7 @@ impl IconSource {
 
                 if let Some(file) = FILE.try_take(id) {
                     *path = file;
-                    self.load();
+                    reload = true;
                 }
             }
             Self::Url(url) => {
@@ -192,11 +142,17 @@ impl IconSource {
 
                 ui.same_line();
                 if ui.button("Load") {
-                    self.load();
+                    reload = true;
                 }
             }
         }
 
-        action
+        IconSelectResult { reload, action }
     }
+}
+
+#[derive(Debug)]
+pub struct IconSelectResult {
+    pub reload: bool,
+    pub action: DynAction<IconSource>,
 }

@@ -1,8 +1,9 @@
 mod element;
+mod load;
 mod props;
 mod source;
 
-pub use self::{element::*, props::*, source::*};
+pub use self::{element::*, load::*, props::*, source::*};
 
 use super::{Common, Props, RenderCtx};
 use crate::{
@@ -22,7 +23,7 @@ use serde::{Deserialize, Serialize};
 #[serde(default)]
 pub struct Icon {
     #[serde(rename = "icon")]
-    pub source: IconSource,
+    pub texture: LoadedIcon,
 
     #[serde(flatten)]
     pub props: Props<IconProps>, // TODO: move to element/list icon to allow common conditions
@@ -37,7 +38,7 @@ pub struct Icon {
 
 impl Icon {
     pub fn load(&mut self) {
-        self.source.load();
+        self.texture.load();
     }
 
     fn texture_color(&self, ui: &Ui) -> [f32; 4] {
@@ -63,11 +64,12 @@ impl Icon {
         if let Some(active) = active {
             let [width, height] = size;
             let small_size = width.min(height);
-            let texture = self.source.get_texture(if ctx.settings.use_game_icons {
+            let skill_id = if ctx.settings.use_game_icons {
                 active.skill()
             } else {
                 SkillId::Unknown
-            });
+            };
+            let texture = self.texture.get_texture(skill_id);
 
             let (start, end) = Self::bounds(size);
             let start = ctx.pos().add(start);
@@ -86,7 +88,7 @@ impl Icon {
                     .uv_max(uv_max)
                     .col(color)
                     .build();
-            } else if !self.source.is_empty() {
+            } else if !self.texture.source.is_empty() {
                 draw_spinner_bg(
                     ui,
                     ctx.pos(),
@@ -175,8 +177,8 @@ impl Icon {
     pub fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) -> DynAction<Self> {
         let mut action = DynAction::<Self>::empty();
 
-        let source_action = self.source.render_select(ui, ctx);
-        action.or(source_action.map(|icon: &mut Self| &mut icon.source));
+        let source_action = self.texture.render_select(ui, ctx);
+        action.or(source_action.map(|icon: &mut Self| &mut icon.texture.source));
 
         ui.spacing();
 
@@ -208,7 +210,8 @@ impl Icon {
     pub fn render_debug(&mut self, ui: &Ui, _ctx: &RenderCtx) {
         const SIZE: [f32; 2] = [64.0, 64.0];
 
-        let texture = self.source.get_texture(SkillId::Unknown);
+        let texture = self.texture.get_texture(SkillId::Unknown);
+        debug_optional(ui, "Texture key", self.texture.key);
         debug_optional(
             ui,
             "Texture",
@@ -230,7 +233,7 @@ impl Icon {
 
 impl ConstDefault for Icon {
     const DEFAULT: Self = Self {
-        source: IconSource::Unknown,
+        texture: LoadedIcon::DEFAULT,
         props: Props::DEFAULT,
         duration_bar: false,
         duration_text: false,

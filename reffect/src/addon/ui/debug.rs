@@ -3,14 +3,13 @@ use crate::{
     clipboard::Clipboard,
     colors::{self, Colored},
     context::{
-        AbilityState, BuffMap, CombatantResources, Context, Defiance, PlayerResources, SkillInfo,
-        Skillbar, Slot,
+        AbilityState, BuffMap, Build, CombatantResources, Context, Defiance, Gear, PlayerResources,
+        SkillInfo, Skillbar, Slot,
     },
     error::Error,
     internal::{Interface, Internal},
 };
 use nexus::imgui::{StyleColor, TreeNode, TreeNodeFlags, Ui, Window};
-use reffect_core::context::{Build, Gear};
 use std::{
     cmp::Ordering,
     fmt::{self, Write},
