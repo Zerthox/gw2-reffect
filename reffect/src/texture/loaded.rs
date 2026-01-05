@@ -1,18 +1,20 @@
 use crate::texture::{TextureKey, TextureManager, TextureSource};
 use const_default::ConstDefault;
-use serde::{Deserialize, Serialize, Serializer};
+use serde::{Deserialize, Serialize};
 
 pub trait AsTextureSource {
     fn as_texture_source(&self) -> Option<TextureSource>;
 }
 
-#[derive(Debug, Clone, Deserialize)]
-#[serde(from = "T")]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(transparent)]
 pub struct LoadedTexture<T>
 where
     T: AsTextureSource,
 {
     pub source: T,
+
+    #[serde(skip)]
     pub key: Option<TextureKey>,
 }
 
@@ -54,18 +56,5 @@ where
 {
     fn from(source: T) -> Self {
         Self::unloaded(source)
-    }
-}
-
-impl<T> Serialize for LoadedTexture<T>
-where
-    T: AsTextureSource + Serialize,
-{
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        let Self { source, key: _ } = self;
-        source.serialize(serializer)
     }
 }
