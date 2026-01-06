@@ -20,18 +20,24 @@ use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct Icon {
+    /// Icon texture.
     #[serde(rename = "icon")]
     pub texture: LoadedIcon,
 
     #[serde(flatten)]
     pub props: Props<IconProps>, // TODO: move to element/list icon to allow common conditions
 
+    /// Enable duration bar.
     #[serde(alias = "duration")]
     pub duration_bar: bool,
+
+    /// Enable duration text.
     pub duration_text: bool,
 
+    /// Enable stacks text.
     #[serde(alias = "stacks")]
     pub stacks_text: bool,
 }
@@ -88,7 +94,7 @@ impl Icon {
                     .uv_max(uv_max)
                     .col(color)
                     .build();
-            } else if !self.texture.source.is_empty() {
+            } else if !self.texture.source().is_empty() {
                 draw_spinner_bg(
                     ui,
                     ctx.pos(),
@@ -177,8 +183,11 @@ impl Icon {
     pub fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) -> DynAction<Self> {
         let mut action = DynAction::<Self>::empty();
 
-        let source_action = self.texture.render_select(ui, ctx);
-        action.or(source_action.map(|icon: &mut Self| &mut icon.texture.source));
+        if let Some(mut action_fn) = self.texture.render_select(ui, ctx).take() {
+            action.set(move |icon: &mut Self| {
+                icon.texture.load_source(|source| action_fn(source));
+            });
+        }
 
         ui.spacing();
 
@@ -211,7 +220,7 @@ impl Icon {
         const SIZE: [f32; 2] = [64.0, 64.0];
 
         let texture = self.texture.get_texture(SkillId::Unknown);
-        debug_optional(ui, "Texture key", self.texture.key);
+        debug_optional(ui, "Texture key", self.texture.key());
         debug_optional(
             ui,
             "Texture",

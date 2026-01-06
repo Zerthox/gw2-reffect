@@ -5,10 +5,13 @@ use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, ConstDefault, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct FilterTrigger {
+    /// Player configuration.
     pub player: PlayerTrigger,
 
+    /// Map configuration.
     #[serde(deserialize_with = "migrate::<_, _, MapTriggerLegacy>")]
     pub map: MapTrigger,
 }

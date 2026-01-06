@@ -23,6 +23,7 @@ use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
     Serialize,
     Deserialize,
 )]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[bitflags]
 #[repr(u32)]
 pub enum Mount {

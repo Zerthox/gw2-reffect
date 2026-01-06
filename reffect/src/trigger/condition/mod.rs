@@ -10,6 +10,11 @@ use serde::{Deserialize, Serialize};
 
 // TODO: add common props: pos, opacity, animation
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(
+    feature = "schema",
+    derive(schemars::JsonSchema),
+    schemars(bound = "T::Partial: schemars::JsonSchema")
+)]
 #[serde(default)]
 pub struct Condition<T>
 where

@@ -15,12 +15,16 @@ use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct Pack {
     #[serde(flatten)]
     pub common: Common,
 
+    /// Pack layer.
     pub layer: i32,
+
+    /// Pack elements.
     pub elements: Vec<Element>,
 
     #[serde(skip)]

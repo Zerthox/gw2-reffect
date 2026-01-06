@@ -23,10 +23,13 @@ use strum::{AsRefStr, EnumCount, EnumIter, IntoEnumIterator, VariantArray};
     Serialize,
     Deserialize,
 )]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub enum ElementAnchor {
+    /// Anchor to parent.
     #[default]
     Parent,
 
+    /// Anchor to screen point.
     Screen(Anchor),
 }
 
@@ -86,6 +89,7 @@ impl ElementAnchor {
     Serialize,
     Deserialize,
 )]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub enum Anchor {
     #[strum(serialize = "Top Left")]
     TopLeft,

@@ -27,6 +27,7 @@ use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
     Serialize,
     Deserialize,
 )]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub enum Combatant {
     /// Player controlled character.
     Player,

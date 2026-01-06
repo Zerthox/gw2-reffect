@@ -10,10 +10,13 @@ use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct IconElement {
     #[serde(flatten)]
     pub icon: Icon,
+
+    /// Icon size.
     pub size: [f32; 2],
 }
 

@@ -1,6 +1,6 @@
 use crate::{
     action::DynAction,
-    colors,
+    colors::{self, Color},
     elements::PartialProps,
     render::{
         helper, input_color_alpha, input_optional, input_percent_inverse,
@@ -15,15 +15,28 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Partial, Serialize, Deserialize)]
 #[partial(derive(Debug, Clone, Serialize, Deserialize))]
+#[cfg_attr(
+    feature = "schema",
+    derive(schemars::JsonSchema),
+    partial(derive(schemars::JsonSchema))
+)]
 #[serde(default)]
 pub struct IconProps {
+    /// Icon tint.
     #[serde(alias = "color")]
-    pub tint: [f32; 4],
+    pub tint: Color,
+
+    /// Icon zoom.
     pub zoom: f32, // kept as factor to avoid divisions
+
+    /// Icon rounding.
     pub round: f32,
 
+    /// Border size.
     pub border_size: f32,
-    pub border_color: [f32; 4],
+
+    /// Border color.
+    pub border_color: Color,
 }
 
 impl ConstDefault for IconProps {

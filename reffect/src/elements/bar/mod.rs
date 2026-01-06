@@ -24,20 +24,32 @@ use serde::{Deserialize, Serialize};
 // TODO: rounding
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct Bar {
+    /// Progress used by bar.
     #[serde(alias = "progress")]
     pub progress_kind: Progress,
+
+    /// Maximum progress.
     pub max: f32,
 
     #[serde(flatten)]
     pub props: Props<BarProps>,
 
+    /// Bar size.
     pub size: [f32; 2],
+
+    /// Bar alignment.
     pub align: Align,
+
+    /// Fill direction.
     pub direction: Direction,
 
+    /// Unit for ticks.
     pub tick_unit: Unit,
+
+    /// Tick placements.
     pub ticks: Vec<f32>,
 }
 

@@ -63,6 +63,7 @@ impl MapInfo {
     Serialize,
     Deserialize,
 )]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[repr(u8)]
 #[bitflags]
 pub enum MapCategory {

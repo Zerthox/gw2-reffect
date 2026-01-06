@@ -18,17 +18,23 @@ use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct PlayerTrigger {
+    /// Combat configuration.
     pub combat: CombatTrigger,
 
+    /// Gear configuration.
     #[serde(flatten)]
     pub gear: GearTrigger,
 
+    /// Build configuration.
     #[serde(flatten)]
     pub build: BuildTrigger,
 
+    /// Current mount.
     #[serde(with = "bitflags")]
+    #[cfg_attr(feature = "schema", schemars(with = "bitflags::Schema<Mount>"))]
     pub mounts: BitFlags<Mount>,
 }
 

@@ -23,7 +23,7 @@ impl AsTextureSource for IconSource {
 
 impl LoadedIcon {
     pub fn get_texture(&self, skill: SkillId) -> Option<imgui::TextureId> {
-        match &self.source {
+        match self.source() {
             IconSource::Empty => None,
             IconSource::Unknown => TextureManager::get_unknown(),
             IconSource::Automatic => match skill {
@@ -36,15 +36,18 @@ impl LoadedIcon {
                 },
             },
             IconSource::File(_) | IconSource::Url(_) => {
-                self.key.and_then(TextureManager::get_texture)
+                self.key().and_then(TextureManager::get_texture)
             }
         }
     }
 
     pub fn render_select(&mut self, ui: &Ui, ctx: &RenderCtx) -> DynAction<IconSource> {
-        let IconSelectResult { reload, action } = self.source.render_select(ui, ctx);
+        let mut source = self.source_mut();
+        let IconSelectResult { reload, action } = source.render_select(ui, ctx);
         if reload {
-            self.load();
+            source.reload();
+        } else {
+            source.unchanged();
         }
         action
     }

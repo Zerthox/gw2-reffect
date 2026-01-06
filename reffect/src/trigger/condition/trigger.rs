@@ -18,6 +18,7 @@ use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 #[derive(
     Debug, Clone, PartialEq, AsRefStr, IntoStaticStr, EnumIter, EnumCount, Serialize, Deserialize,
 )]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub enum ConditionTrigger {
     #[strum(serialize = "Trigger Threshold")]
     ProgressThreshold(ProgressThreshold),

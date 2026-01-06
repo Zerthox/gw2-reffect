@@ -14,6 +14,7 @@ use std::num::NonZero;
 use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct Animation {
     /// Kind of animation.
@@ -59,6 +60,7 @@ impl Animation {
 
 // TODO: tint animation changing color via state?
 #[derive(Debug, Clone, AsRefStr, IntoStaticStr, EnumIter, EnumCount, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub enum AnimationKind {
     Pulse,
     Shake { intensity: f32 },

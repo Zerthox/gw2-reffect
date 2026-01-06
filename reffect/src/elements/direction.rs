@@ -18,6 +18,7 @@ use strum::{AsRefStr, EnumIter, VariantArray};
     Serialize,
     Deserialize,
 )]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub enum Direction {
     Right,
     Left,

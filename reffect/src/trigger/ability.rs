@@ -14,11 +14,15 @@ use serde::{Deserialize, Serialize};
 use std::fmt;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct AbilityStateTrigger {
+    /// Ability states.
     #[serde(with = "bitflags")]
+    #[cfg_attr(feature = "schema", schemars(with = "bitflags::Schema<AbilityState>"))]
     pub states: BitFlags<AbilityState>,
 
+    /// Trigger logic mode.
     #[serde(alias = "condition")]
     pub mode: TriggerMode,
 }

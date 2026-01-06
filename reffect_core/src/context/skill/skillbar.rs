@@ -51,6 +51,7 @@ impl Skillbar {
     Serialize,
     Deserialize,
 )]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub enum Slot {
     #[strum(serialize = "Weapon Swap")]
     WeaponSwap,

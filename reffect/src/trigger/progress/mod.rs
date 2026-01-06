@@ -14,6 +14,7 @@ use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct ProgressTrigger {
     /// Progress source.

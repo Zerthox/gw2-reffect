@@ -27,12 +27,22 @@ use serde::{Deserialize, Serialize};
 // TODO: wrapping, sorting options
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct IconList {
+    /// List layout.
     pub layout: Layout,
+
+    /// List direction.
     pub direction: Direction,
+
+    /// Icon size.
     pub size: [f32; 2],
+
+    /// Padding between icons.
     pub pad: f32,
+
+    /// Icons.
     pub icons: Vec<ListIcon>,
 }
 

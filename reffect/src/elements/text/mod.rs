@@ -21,12 +21,16 @@ use std::{iter::Peekable, str::Chars};
 pub use self::{decoration::*, props::*};
 
 #[derive(Debug, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct Text {
+    /// Text contents.
     pub text: String,
 
+    /// Text font.
     pub font: LoadedFont,
 
+    /// Text alignment.
     pub align: AlignHorizontal,
 
     #[serde(flatten)]

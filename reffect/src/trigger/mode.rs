@@ -22,6 +22,7 @@ use strum::{AsRefStr, Display, EnumCount, EnumIter, IntoStaticStr, VariantArray}
     Serialize,
     Deserialize,
 )]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub enum TriggerMode {
     #[strum(serialize = "Any of")]
     Any,

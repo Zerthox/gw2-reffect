@@ -12,22 +12,38 @@ use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct BuildTrigger {
+    /// Build traits.
     pub traits: Vec<TraitRequirement>,
+
+    /// Trigger logic mode for traits.
     pub trait_mode: TriggerMode,
 
+    /// Build profession.
     #[serde(skip_serializing)]
     #[serde(with = "bitflags")]
+    #[cfg_attr(feature = "schema", schemars(with = "bitflags::Schema<Profession>"))]
     profs: BitFlags<Profession>, // TODO: remove after grace period
 
+    /// Build specialization.
     #[serde(with = "bitflags")]
+    #[cfg_attr(
+        feature = "schema",
+        schemars(with = "bitflags::Schema<Specialization>")
+    )]
     pub specs: BitFlags<Specialization>,
 
+    /// Selected skills.
     pub skill_selections: Vec<u32>,
+
+    /// Trigger logic mode for selected skills.
     pub skill_selections_mode: TriggerMode,
 
+    /// Profession-specific selections.
     #[serde(with = "bitflags")]
+    #[cfg_attr(feature = "schema", schemars(with = "bitflags::Schema<ProfSelection>"))]
     pub prof_selections: BitFlags<ProfSelection>,
 
     #[serde(skip)]

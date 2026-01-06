@@ -3,9 +3,13 @@ use const_default::ConstDefault;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct TraitRequirement {
+    /// Trait id.
     pub id: u32,
+
+    /// Whether to check for present or missing.
     pub present: bool,
 }
 

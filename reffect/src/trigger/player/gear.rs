@@ -12,15 +12,24 @@ use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct GearTrigger {
+    /// Equipped weapons.
     #[serde(with = "bitflags")]
+    #[cfg_attr(feature = "schema", schemars(with = "bitflags::Schema<Weapon>"))]
     pub weapons: BitFlags<Weapon>,
+
+    /// Trigger logic mode for weapons.
     pub weapon_mode: TriggerMode,
 
+    /// Equipped sigils.
     pub sigils: Vec<Item>,
+
+    /// Trigger logic mode for sigils.
     pub sigil_mode: TriggerMode,
 
+    /// Equipped relic.
     pub relics: Vec<Item>,
 
     #[serde(skip)]
@@ -159,6 +168,8 @@ impl Default for GearTrigger {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(transparent)]
 pub struct Item {
     /// Item id.
     pub item: u32,

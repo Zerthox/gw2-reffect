@@ -15,6 +15,7 @@ use std::fmt;
 
 // TODO: create a more straightforward threshold?
 #[derive(Debug, Default, ConstDefault, PartialEq, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct ProgressThreshold {
     /// Threshold type.
     pub threshold_type: ThresholdType,

@@ -25,6 +25,7 @@ use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
     Deserialize,
     VariantArray,
 )]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub enum AmountType {
     /// Intensity.
     Intensity,

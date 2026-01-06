@@ -1,5 +1,6 @@
 use crate::{
     colors,
+    colors::Color,
     elements::PartialProps,
     render::{input_color_alpha, input_optional, input_percent, input_positive_with_format},
 };
@@ -10,19 +11,36 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Partial, Serialize, Deserialize)]
 #[partial(derive(Debug, Clone, Serialize, Deserialize))]
+#[cfg_attr(
+    feature = "schema",
+    derive(schemars::JsonSchema),
+    partial(derive(schemars::JsonSchema))
+)]
 #[serde(default)]
 pub struct BarProps {
+    /// Lower progress bound.
     pub lower_bound: f32,
+
+    /// Upper progress bound.
     pub upper_bound: f32,
 
-    pub fill: [f32; 4],
-    pub background: [f32; 4],
+    /// Fill color.
+    pub fill: Color,
 
+    /// Background color.
+    pub background: Color,
+
+    /// Border size.
     pub border_size: f32,
-    pub border_color: [f32; 4],
 
+    /// Border color.
+    pub border_color: Color,
+
+    /// Tick thickness.
     pub tick_size: f32,
-    pub tick_color: [f32; 4],
+
+    /// Tick color.
+    pub tick_color: Color,
 }
 
 impl ConstDefault for BarProps {

@@ -125,10 +125,12 @@ pub fn font_select_with_preview(
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(from = "Option<String>")]
-#[serde(into = "Option<String>")]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[serde(transparent)]
 pub struct LoadedFont {
     name: Option<String>,
+
+    #[serde(skip)]
     loaded: Option<Font>,
 }
 

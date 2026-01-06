@@ -14,13 +14,18 @@ use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct MapTrigger {
+    /// Map category.
     #[serde(with = "bitflags")]
+    #[cfg_attr(feature = "schema", schemars(with = "bitflags::Schema<MapCategory>"))]
     pub category: BitFlags<MapCategory>,
 
+    /// Whether to use as whitelist or blacklist.
     #[serde(default = "default_true")]
     pub whitelist: bool,
 
+    /// Map ids.
     #[serde(default)] // TODO: move up after migration end
     pub ids: Vec<u32>,
 

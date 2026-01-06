@@ -1,6 +1,6 @@
 use super::TextDecoration;
 use crate::{
-    colors,
+    colors::{self, Color},
     elements::{PartialProps, RenderCtx},
     render::{input_color_alpha, input_optional, input_percent},
 };
@@ -11,11 +11,21 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Partial, Serialize, Deserialize)]
 #[partial(derive(Debug, Clone, Serialize, Deserialize))]
+#[cfg_attr(
+    feature = "schema",
+    derive(schemars::JsonSchema),
+    partial(derive(schemars::JsonSchema))
+)]
 #[serde(default)]
 pub struct TextProps {
+    /// Text scale.
     #[serde(alias = "size")]
     pub scale: f32,
-    pub color: [f32; 4],
+
+    /// Text scale.
+    pub color: Color,
+
+    /// Text decoration.
     pub decoration: TextDecoration,
 }
 

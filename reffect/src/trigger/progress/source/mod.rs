@@ -31,6 +31,7 @@ use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
     Serialize,
     Deserialize,
 )]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(tag = "type")]
 pub enum ProgressSource {
     /// Inherit from above.

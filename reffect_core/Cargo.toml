@@ -17,6 +17,7 @@ nexus = { git = "https://github.com/zerthox/nexus-rs", features = [
 num_enum = "0.7.1"
 microseh = { workspace = true }
 partial = { git = "https://github.com/zerthox/partial-rs" }
+schemars = { workspace = true, optional = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 serde_with = { workspace = true }
@@ -29,3 +30,4 @@ windows = { workspace = true, features = [
 
 [features]
 profile = []
+schema = ["dep:schemars"]

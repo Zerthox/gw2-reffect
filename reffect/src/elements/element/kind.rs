@@ -12,6 +12,7 @@ use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 
 #[derive(Debug, Clone, EnumIter, EnumCount, AsRefStr, IntoStaticStr, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(tag = "type")]
 pub enum ElementType {
     Group(Group),

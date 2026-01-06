@@ -22,28 +22,38 @@ use std::mem;
 
 /// Common behavior between elements and packs.
 #[derive(Debug, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct Common {
+    /// Whether the element is enabled.
     pub enabled: bool,
 
     #[serde(skip)]
     pub id: Id,
 
+    /// Custom name for editor.
     pub name: String,
 
+    /// Anchor.
     #[serde(deserialize_with = "migrate::<_, _, Anchor>")]
     pub anchor: ElementAnchor,
+
+    /// Relative position offset.
     pub pos: [f32; 2],
 
+    /// Opacity.
     pub opacity: f32,
 
+    /// Trigger configuration.
     #[serde(alias = "buff")]
     #[serde(alias = "progress")]
     #[serde(alias = "progress_trigger")]
     pub trigger: ProgressTrigger,
 
+    /// Filter configuration.
     pub filter: FilterTrigger,
 
+    /// Animation.
     pub animation: Option<Animation>,
 
     #[serde(skip)]

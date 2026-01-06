@@ -4,11 +4,12 @@ mod assets;
 mod clipboard;
 mod elements;
 mod render;
-mod schema;
 mod settings;
 mod texture;
 mod tree;
 mod trigger;
+
+pub mod schema;
 
 pub use reffect_core::*;
 pub use reffect_internal as internal;

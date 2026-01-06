@@ -4,9 +4,7 @@ use crate::render::item_context_menu;
 use nexus::imgui::{MenuItem, Ui};
 use std::fmt;
 
-pub type DynActionFn<T> = Box<dyn FnMut(&mut T)>;
-
-pub struct DynAction<T>(Option<DynActionFn<T>>);
+pub struct DynAction<T>(Option<Box<dyn FnMut(&mut T)>>);
 
 impl<T> DynAction<T> {
     pub const fn empty() -> Self {
@@ -22,6 +20,10 @@ impl<T> DynAction<T> {
             Some(action) => Self::new(action),
             None => Self::empty(),
         }
+    }
+
+    pub fn take(self) -> Option<impl FnMut(&mut T)> {
+        self.0
     }
 
     pub fn is_none(&self) -> bool {

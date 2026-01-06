@@ -18,3 +18,6 @@ where
     let flags = Vec::<T>::deserialize(deserializer)?;
     Ok(BitFlags::from_iter(flags))
 }
+
+#[cfg(feature = "schema")]
+pub type Schema<T> = Vec<T>;

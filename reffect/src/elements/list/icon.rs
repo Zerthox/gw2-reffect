@@ -9,16 +9,22 @@ use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct ListIcon {
+    /// Whether the list icon is enabled.
     pub enabled: bool,
+
+    /// Custom name for editor.
     pub name: String,
 
+    /// Trigger configuration.
     #[serde(alias = "buff")]
     #[serde(alias = "progress")]
     #[serde(alias = "progress_active")]
     pub trigger: ProgressTrigger,
 
+    /// Filter configuration.
     pub filter: FilterTrigger,
 
     #[serde(flatten)]

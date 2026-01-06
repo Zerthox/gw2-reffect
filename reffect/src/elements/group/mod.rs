@@ -10,8 +10,10 @@ use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, ConstDefault, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct Group {
+    /// Group member elements.
     pub members: Vec<Element>,
 }
 

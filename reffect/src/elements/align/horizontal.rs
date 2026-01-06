@@ -17,6 +17,7 @@ use strum::{AsRefStr, EnumIter, IntoEnumIterator};
     Serialize,
     Deserialize,
 )]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub enum AlignHorizontal {
     Left,
     Center,

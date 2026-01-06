@@ -24,6 +24,7 @@ use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
     Serialize,
     Deserialize,
 )]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[bitflags]
 #[repr(u64)]
 pub enum Specialization {

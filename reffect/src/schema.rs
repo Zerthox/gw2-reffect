@@ -10,6 +10,7 @@ use std::{
 use strum::AsRefStr;
 
 #[derive(Debug, Clone, AsRefStr, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(tag = "schema")]
 #[serde(rename_all = "lowercase")]
 #[strum(serialize_all = "lowercase")]

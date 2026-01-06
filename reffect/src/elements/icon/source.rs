@@ -26,6 +26,7 @@ use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
     Serialize,
     Deserialize,
 )]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub enum IconSource {
     Empty,
 
@@ -76,7 +77,9 @@ impl IconSource {
             }
             _ => Validation::Ok,
         };
-        validation.for_item(ui, || enum_combo(ui, "Icon", self, ComboBoxFlags::empty()));
+        validation.for_item(ui, || {
+            reload |= enum_combo(ui, "Icon", self, ComboBoxFlags::empty()).is_some()
+        });
         item_context_menu("iconsrc", || {
             if MenuItem::new("Copy to all siblings").build(ui) {
                 let source = self.clone();

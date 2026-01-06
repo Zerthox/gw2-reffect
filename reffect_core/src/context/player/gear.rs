@@ -50,6 +50,7 @@ impl Gear {
     Serialize,
     Deserialize,
 )]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[bitflags]
 #[repr(u32)]
 pub enum Weapon {

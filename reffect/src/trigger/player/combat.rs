@@ -5,6 +5,7 @@ use nexus::imgui::{Selectable, Ui};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, ConstDefault, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 #[repr(transparent)]
 pub struct CombatTrigger(Option<bool>);

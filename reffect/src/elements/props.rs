@@ -12,11 +12,16 @@ use serde::{Deserialize, Serialize};
 use std::{fmt, ops};
 
 #[derive(Debug, Default, ConstDefault, Clone, Serialize, Deserialize)]
+#[cfg_attr(
+    feature = "schema",
+    derive(schemars::JsonSchema),
+    schemars(bound = "T: Default + schemars::JsonSchema, T::Partial: schemars::JsonSchema")
+)]
 #[serde(default)]
 pub struct Props<T>
 where
     T: Clone + IntoPartial,
-    T::Partial: Clone + fmt::Debug + Serialize + for<'d> Deserialize<'d>,
+    T::Partial: PartialProps<T>,
 {
     #[serde(flatten)]
     pub base: T,
@@ -30,7 +35,7 @@ where
 impl<T> Props<T>
 where
     T: Clone + IntoPartial,
-    T::Partial: Clone + fmt::Debug + Serialize + for<'d> Deserialize<'d>,
+    T::Partial: PartialProps<T>,
 {
     pub fn update(&mut self, ctx: &Context, active: Option<&ProgressActive>) {
         if ctx.has_any_update_or_edit() {
@@ -47,7 +52,7 @@ where
 impl<T> ops::Deref for Props<T>
 where
     T: Clone + IntoPartial,
-    T::Partial: Clone + fmt::Debug + Serialize + for<'d> Deserialize<'d>,
+    T::Partial: PartialProps<T>,
 {
     type Target = T;
 
@@ -59,7 +64,7 @@ where
 impl<T> Props<T>
 where
     T: Clone + IntoPartial + 'static,
-    T::Partial: fmt::Debug + Clone + Serialize + for<'d> Deserialize<'d> + PartialProps<T>,
+    T::Partial: PartialProps<T>,
 {
     pub fn render_condition_options(
         &mut self,
@@ -143,6 +148,7 @@ where
 pub trait PartialProps<T>
 where
     T: IntoPartial<Partial = Self>,
+    Self: Clone + fmt::Debug + Serialize + for<'de> Deserialize<'de>,
 {
     fn render_options(&mut self, ui: &Ui, base: &T);
 }
