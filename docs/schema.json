@@ -1,0 +1,2058 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Schema",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "type": "string",
+          "const": "v1"
+        }
+      },
+      "$ref": "#/$defs/Pack",
+      "required": [
+        "schema"
+      ]
+    }
+  ],
+  "$defs": {
+    "AbilityState": {
+      "oneOf": [
+        {
+          "description": "Ability is auto-attack.",
+          "type": "string",
+          "const": "AutoAttack"
+        },
+        {
+          "description": "Ability is queued or casting.",
+          "type": "string",
+          "const": "Pending"
+        },
+        {
+          "description": "Ability is pressed.",
+          "type": "string",
+          "const": "Pressed"
+        }
+      ]
+    },
+    "AbilityStateTrigger": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "description": "Trigger logic mode.",
+          "$ref": "#/$defs/TriggerMode",
+          "default": "Any"
+        },
+        "states": {
+          "description": "Ability states.",
+          "type": "array",
+          "default": [
+            "Pending"
+          ],
+          "items": {
+            "$ref": "#/$defs/AbilityState"
+          }
+        }
+      }
+    },
+    "Align": {
+      "description": "2 dimensional alignment.",
+      "type": "string",
+      "enum": [
+        "Right",
+        "Left",
+        "Up",
+        "Down",
+        "Center"
+      ]
+    },
+    "AlignHorizontal": {
+      "description": "Horizontal alignment.",
+      "type": "string",
+      "enum": [
+        "Left",
+        "Center",
+        "Right"
+      ]
+    },
+    "AmountType": {
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "SecondaryDuration",
+            "SecondaryPercent"
+          ]
+        },
+        {
+          "description": "Intensity.",
+          "type": "string",
+          "const": "Intensity"
+        },
+        {
+          "description": "Duration.",
+          "type": "string",
+          "const": "Duration"
+        },
+        {
+          "description": "Progress percent.",
+          "type": "string",
+          "const": "Percent"
+        }
+      ]
+    },
+    "Anchor": {
+      "description": "Fixed anchor point.",
+      "type": "string",
+      "enum": [
+        "TopLeft",
+        "TopCenter",
+        "TopRight",
+        "LeftCenter",
+        "Center",
+        "RightCenter",
+        "BottomLeft",
+        "BottomCenter",
+        "BottomRight"
+      ]
+    },
+    "Animation": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "description": "Kind of animation.",
+          "$ref": "#/$defs/AnimationKind",
+          "default": "Pulse"
+        },
+        "period": {
+          "description": "Animation period in milliseconds.",
+          "type": "integer",
+          "format": "uint32",
+          "default": 1000,
+          "minimum": 1
+        }
+      }
+    },
+    "AnimationKind": {
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "Pulse"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Shake": {
+              "type": "object",
+              "properties": {
+                "intensity": {
+                  "type": "number",
+                  "format": "float"
+                }
+              },
+              "required": [
+                "intensity"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Shake"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Bounce": {
+              "type": "object",
+              "properties": {
+                "intensity": {
+                  "type": "number",
+                  "format": "float"
+                }
+              },
+              "required": [
+                "intensity"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Bounce"
+          ]
+        }
+      ]
+    },
+    "Bar": {
+      "type": "object",
+      "properties": {
+        "align": {
+          "description": "Bar alignment.",
+          "$ref": "#/$defs/Align",
+          "default": "Center"
+        },
+        "background": {
+          "description": "Background color.",
+          "type": "array",
+          "default": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "items": {
+            "type": "number",
+            "format": "float"
+          },
+          "maxItems": 4,
+          "minItems": 4
+        },
+        "border_color": {
+          "description": "Border color.",
+          "type": "array",
+          "default": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "items": {
+            "type": "number",
+            "format": "float"
+          },
+          "maxItems": 4,
+          "minItems": 4
+        },
+        "border_size": {
+          "description": "Border size.",
+          "type": "number",
+          "format": "float",
+          "default": 1.0
+        },
+        "conditions": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Condition3"
+          }
+        },
+        "direction": {
+          "description": "Fill direction.",
+          "$ref": "#/$defs/Direction",
+          "default": "Right"
+        },
+        "fill": {
+          "description": "Fill color.",
+          "type": "array",
+          "default": [
+            0.0,
+            1.0,
+            0.0,
+            1.0
+          ],
+          "items": {
+            "type": "number",
+            "format": "float"
+          },
+          "maxItems": 4,
+          "minItems": 4
+        },
+        "lower_bound": {
+          "description": "Lower progress bound.",
+          "type": "number",
+          "format": "float",
+          "default": 0.0
+        },
+        "max": {
+          "description": "Maximum progress.",
+          "type": "number",
+          "format": "float",
+          "default": 25.0
+        },
+        "progress_kind": {
+          "description": "Progress used by bar.",
+          "$ref": "#/$defs/Progress",
+          "default": "Duration"
+        },
+        "size": {
+          "description": "Bar size.",
+          "type": "array",
+          "default": [
+            128.0,
+            12.0
+          ],
+          "items": {
+            "type": "number",
+            "format": "float"
+          },
+          "maxItems": 2,
+          "minItems": 2
+        },
+        "tick_color": {
+          "description": "Tick color.",
+          "type": "array",
+          "default": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "items": {
+            "type": "number",
+            "format": "float"
+          },
+          "maxItems": 4,
+          "minItems": 4
+        },
+        "tick_size": {
+          "description": "Tick thickness.",
+          "type": "number",
+          "format": "float",
+          "default": 1.0
+        },
+        "tick_unit": {
+          "description": "Unit for ticks.",
+          "$ref": "#/$defs/Unit",
+          "default": "Percent"
+        },
+        "ticks": {
+          "description": "Tick placements.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "upper_bound": {
+          "description": "Upper progress bound.",
+          "type": "number",
+          "format": "float",
+          "default": 1.0
+        }
+      }
+    },
+    "CombatTrigger": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "Combatant": {
+      "oneOf": [
+        {
+          "description": "Player controlled character.",
+          "type": "string",
+          "const": "Player"
+        },
+        {
+          "description": "Pet of player controlled character.",
+          "type": "string",
+          "const": "Pet"
+        },
+        {
+          "description": "Current target.",
+          "type": "string",
+          "const": "Target"
+        },
+        {
+          "description": "Group member.",
+          "type": "string",
+          "const": "GroupMember1"
+        },
+        {
+          "description": "Group member.",
+          "type": "string",
+          "const": "GroupMember2"
+        },
+        {
+          "description": "Group member.",
+          "type": "string",
+          "const": "GroupMember3"
+        },
+        {
+          "description": "Group member.",
+          "type": "string",
+          "const": "GroupMember4"
+        }
+      ]
+    },
+    "Condition": {
+      "type": "object",
+      "properties": {
+        "properties": {
+          "$ref": "#/$defs/PartialIconProps"
+        },
+        "trigger": {
+          "$ref": "#/$defs/ConditionTrigger",
+          "default": {
+            "ProgressThreshold": {
+              "amount_type": "Intensity",
+              "threshold_type": "Always"
+            }
+          }
+        }
+      }
+    },
+    "Condition2": {
+      "type": "object",
+      "properties": {
+        "properties": {
+          "$ref": "#/$defs/PartialTextProps"
+        },
+        "trigger": {
+          "$ref": "#/$defs/ConditionTrigger",
+          "default": {
+            "ProgressThreshold": {
+              "amount_type": "Intensity",
+              "threshold_type": "Always"
+            }
+          }
+        }
+      }
+    },
+    "Condition3": {
+      "type": "object",
+      "properties": {
+        "properties": {
+          "$ref": "#/$defs/PartialBarProps"
+        },
+        "trigger": {
+          "$ref": "#/$defs/ConditionTrigger",
+          "default": {
+            "ProgressThreshold": {
+              "amount_type": "Intensity",
+              "threshold_type": "Always"
+            }
+          }
+        }
+      }
+    },
+    "ConditionTrigger": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "ProgressThreshold": {
+              "$ref": "#/$defs/ProgressThreshold"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "ProgressThreshold"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "AbilityState": {
+              "$ref": "#/$defs/AbilityStateTrigger"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "AbilityState"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Player": {
+              "$ref": "#/$defs/PlayerTrigger"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Player"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Map": {
+              "$ref": "#/$defs/MapTrigger"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Map"
+          ]
+        }
+      ]
+    },
+    "Direction": {
+      "type": "string",
+      "enum": [
+        "Right",
+        "Left",
+        "Up",
+        "Down",
+        "Horizontal",
+        "Vertical"
+      ]
+    },
+    "Element": {
+      "description": "Common behavior between elements and packs.",
+      "type": "object",
+      "properties": {
+        "anchor": {
+          "description": "Anchor.",
+          "$ref": "#/$defs/ElementAnchor",
+          "default": "Parent"
+        },
+        "animation": {
+          "description": "Animation.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Animation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "enabled": {
+          "description": "Whether the element is enabled.",
+          "type": "boolean",
+          "default": true
+        },
+        "filter": {
+          "description": "Filter configuration.",
+          "$ref": "#/$defs/FilterTrigger",
+          "default": {
+            "map": {
+              "category": [],
+              "ids": [],
+              "whitelist": true
+            },
+            "player": {
+              "combat": null,
+              "mounts": [],
+              "prof_selections": [],
+              "relics": [],
+              "sigil_mode": "Any",
+              "sigils": [],
+              "skill_selections": [],
+              "skill_selections_mode": "All",
+              "specs": [],
+              "trait_mode": "All",
+              "traits": [],
+              "weapon_mode": "Any",
+              "weapons": []
+            }
+          }
+        },
+        "name": {
+          "description": "Custom name for editor.",
+          "type": "string",
+          "default": "Unnamed"
+        },
+        "opacity": {
+          "description": "Opacity.",
+          "type": "number",
+          "format": "float",
+          "default": 1.0
+        },
+        "pos": {
+          "description": "Relative position offset.",
+          "type": "array",
+          "default": [
+            0.0,
+            0.0
+          ],
+          "items": {
+            "type": "number",
+            "format": "float"
+          },
+          "maxItems": 2,
+          "minItems": 2
+        },
+        "trigger": {
+          "description": "Trigger configuration.",
+          "$ref": "#/$defs/ProgressTrigger",
+          "default": {
+            "source": {
+              "type": "Inherit"
+            },
+            "threshold": {
+              "amount_type": "Intensity",
+              "threshold_type": "Always"
+            }
+          }
+        }
+      },
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "Group"
+            }
+          },
+          "$ref": "#/$defs/Group",
+          "required": [
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "Icon"
+            }
+          },
+          "$ref": "#/$defs/IconElement",
+          "required": [
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "IconList"
+            }
+          },
+          "$ref": "#/$defs/IconList",
+          "required": [
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "Text"
+            }
+          },
+          "$ref": "#/$defs/Text",
+          "required": [
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "Bar"
+            }
+          },
+          "$ref": "#/$defs/Bar",
+          "required": [
+            "type"
+          ]
+        }
+      ]
+    },
+    "ElementAnchor": {
+      "description": "Element anchor point.",
+      "oneOf": [
+        {
+          "description": "Anchor to parent.",
+          "type": "string",
+          "const": "Parent"
+        },
+        {
+          "description": "Anchor to screen point.",
+          "type": "object",
+          "properties": {
+            "Screen": {
+              "$ref": "#/$defs/Anchor"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Screen"
+          ]
+        }
+      ]
+    },
+    "FilterTrigger": {
+      "type": "object",
+      "properties": {
+        "map": {
+          "description": "Map configuration.",
+          "$ref": "#/$defs/MapTrigger",
+          "default": {
+            "category": [],
+            "ids": [],
+            "whitelist": true
+          }
+        },
+        "player": {
+          "description": "Player configuration.",
+          "$ref": "#/$defs/PlayerTrigger",
+          "default": {
+            "combat": null,
+            "mounts": [],
+            "prof_selections": [],
+            "relics": [],
+            "sigil_mode": "Any",
+            "sigils": [],
+            "skill_selections": [],
+            "skill_selections_mode": "All",
+            "specs": [],
+            "trait_mode": "All",
+            "traits": [],
+            "weapon_mode": "Any",
+            "weapons": []
+          }
+        }
+      }
+    },
+    "Group": {
+      "type": "object",
+      "properties": {
+        "members": {
+          "description": "Group member elements.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Element"
+          }
+        }
+      }
+    },
+    "IconElement": {
+      "type": "object",
+      "properties": {
+        "border_color": {
+          "description": "Border color.",
+          "type": "array",
+          "default": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "items": {
+            "type": "number",
+            "format": "float"
+          },
+          "maxItems": 4,
+          "minItems": 4
+        },
+        "border_size": {
+          "description": "Border size.",
+          "type": "number",
+          "format": "float",
+          "default": 0.0
+        },
+        "conditions": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Condition"
+          }
+        },
+        "duration_bar": {
+          "description": "Enable duration bar.",
+          "type": "boolean",
+          "default": false
+        },
+        "duration_text": {
+          "description": "Enable duration text.",
+          "type": "boolean",
+          "default": false
+        },
+        "icon": {
+          "description": "Icon texture.",
+          "$ref": "#/$defs/IconSource",
+          "default": "Unknown"
+        },
+        "round": {
+          "description": "Icon rounding.",
+          "type": "number",
+          "format": "float",
+          "default": 0.0
+        },
+        "size": {
+          "description": "Icon size.",
+          "type": "array",
+          "default": [
+            32.0,
+            32.0
+          ],
+          "items": {
+            "type": "number",
+            "format": "float"
+          },
+          "maxItems": 2,
+          "minItems": 2
+        },
+        "stacks_text": {
+          "description": "Enable stacks text.",
+          "type": "boolean",
+          "default": false
+        },
+        "tint": {
+          "description": "Icon tint.",
+          "type": "array",
+          "default": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "items": {
+            "type": "number",
+            "format": "float"
+          },
+          "maxItems": 4,
+          "minItems": 4
+        },
+        "zoom": {
+          "description": "Icon zoom.",
+          "type": "number",
+          "format": "float",
+          "default": 1.0
+        }
+      }
+    },
+    "IconList": {
+      "type": "object",
+      "properties": {
+        "direction": {
+          "description": "List direction.",
+          "$ref": "#/$defs/Direction",
+          "default": "Right"
+        },
+        "icons": {
+          "description": "Icons.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ListIcon"
+          }
+        },
+        "layout": {
+          "description": "List layout.",
+          "$ref": "#/$defs/Layout",
+          "default": "Dynamic"
+        },
+        "pad": {
+          "description": "Padding between icons.",
+          "type": "number",
+          "format": "float",
+          "default": 2.0
+        },
+        "size": {
+          "description": "Icon size.",
+          "type": "array",
+          "default": [
+            32.0,
+            32.0
+          ],
+          "items": {
+            "type": "number",
+            "format": "float"
+          },
+          "maxItems": 2,
+          "minItems": 2
+        }
+      }
+    },
+    "IconSource": {
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "Empty",
+            "Unknown",
+            "Automatic"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Url": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Url"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "File": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "File"
+          ]
+        }
+      ]
+    },
+    "Item": {
+      "description": "Item id.",
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0
+    },
+    "Layout": {
+      "type": "string",
+      "enum": [
+        "Dynamic",
+        "Static"
+      ]
+    },
+    "ListIcon": {
+      "type": "object",
+      "properties": {
+        "border_color": {
+          "description": "Border color.",
+          "type": "array",
+          "default": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "items": {
+            "type": "number",
+            "format": "float"
+          },
+          "maxItems": 4,
+          "minItems": 4
+        },
+        "border_size": {
+          "description": "Border size.",
+          "type": "number",
+          "format": "float",
+          "default": 0.0
+        },
+        "conditions": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Condition"
+          }
+        },
+        "duration_bar": {
+          "description": "Enable duration bar.",
+          "type": "boolean",
+          "default": false
+        },
+        "duration_text": {
+          "description": "Enable duration text.",
+          "type": "boolean",
+          "default": false
+        },
+        "enabled": {
+          "description": "Whether the list icon is enabled.",
+          "type": "boolean",
+          "default": true
+        },
+        "filter": {
+          "description": "Filter configuration.",
+          "$ref": "#/$defs/FilterTrigger",
+          "default": {
+            "map": {
+              "category": [],
+              "ids": [],
+              "whitelist": true
+            },
+            "player": {
+              "combat": null,
+              "mounts": [],
+              "prof_selections": [],
+              "relics": [],
+              "sigil_mode": "Any",
+              "sigils": [],
+              "skill_selections": [],
+              "skill_selections_mode": "All",
+              "specs": [],
+              "trait_mode": "All",
+              "traits": [],
+              "weapon_mode": "Any",
+              "weapons": []
+            }
+          }
+        },
+        "icon": {
+          "description": "Icon texture.",
+          "$ref": "#/$defs/IconSource",
+          "default": "Unknown"
+        },
+        "name": {
+          "description": "Custom name for editor.",
+          "type": "string",
+          "default": "Unnamed"
+        },
+        "round": {
+          "description": "Icon rounding.",
+          "type": "number",
+          "format": "float",
+          "default": 0.0
+        },
+        "stacks_text": {
+          "description": "Enable stacks text.",
+          "type": "boolean",
+          "default": false
+        },
+        "tint": {
+          "description": "Icon tint.",
+          "type": "array",
+          "default": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "items": {
+            "type": "number",
+            "format": "float"
+          },
+          "maxItems": 4,
+          "minItems": 4
+        },
+        "trigger": {
+          "description": "Trigger configuration.",
+          "$ref": "#/$defs/ProgressTrigger",
+          "default": {
+            "source": {
+              "combatant": "Player",
+              "ids": [
+                0
+              ],
+              "type": "Buff"
+            },
+            "threshold": {
+              "amount_type": "Intensity",
+              "threshold_type": "Present"
+            }
+          }
+        },
+        "zoom": {
+          "description": "Icon zoom.",
+          "type": "number",
+          "format": "float",
+          "default": 1.0
+        }
+      }
+    },
+    "MapCategory": {
+      "type": "string",
+      "enum": [
+        "PvE",
+        "PvP",
+        "WvW",
+        "Instance",
+        "Other"
+      ]
+    },
+    "MapTrigger": {
+      "type": "object",
+      "properties": {
+        "category": {
+          "description": "Map category.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/MapCategory"
+          }
+        },
+        "ids": {
+          "description": "Map ids.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          }
+        },
+        "whitelist": {
+          "description": "Whether to use as whitelist or blacklist.",
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "required": [
+        "category"
+      ]
+    },
+    "Mount": {
+      "type": "string",
+      "enum": [
+        "None",
+        "Raptor",
+        "Springer",
+        "Skimmer",
+        "Jackal",
+        "Griffon",
+        "RollerBeetle",
+        "Warclaw",
+        "Skyscale",
+        "SiegeTurtle",
+        "Skiff"
+      ]
+    },
+    "Pack": {
+      "description": "Common behavior between elements and packs.",
+      "type": "object",
+      "properties": {
+        "anchor": {
+          "description": "Anchor.",
+          "$ref": "#/$defs/ElementAnchor",
+          "default": "Parent"
+        },
+        "animation": {
+          "description": "Animation.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Animation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "elements": {
+          "description": "Pack elements.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Element"
+          }
+        },
+        "enabled": {
+          "description": "Whether the element is enabled.",
+          "type": "boolean",
+          "default": true
+        },
+        "filter": {
+          "description": "Filter configuration.",
+          "$ref": "#/$defs/FilterTrigger",
+          "default": {
+            "map": {
+              "category": [],
+              "ids": [],
+              "whitelist": true
+            },
+            "player": {
+              "combat": null,
+              "mounts": [],
+              "prof_selections": [],
+              "relics": [],
+              "sigil_mode": "Any",
+              "sigils": [],
+              "skill_selections": [],
+              "skill_selections_mode": "All",
+              "specs": [],
+              "trait_mode": "All",
+              "traits": [],
+              "weapon_mode": "Any",
+              "weapons": []
+            }
+          }
+        },
+        "layer": {
+          "description": "Pack layer.",
+          "type": "integer",
+          "format": "int32",
+          "default": 0
+        },
+        "name": {
+          "description": "Custom name for editor.",
+          "type": "string",
+          "default": "Unnamed"
+        },
+        "opacity": {
+          "description": "Opacity.",
+          "type": "number",
+          "format": "float",
+          "default": 1.0
+        },
+        "pos": {
+          "description": "Relative position offset.",
+          "type": "array",
+          "default": [
+            0.0,
+            0.0
+          ],
+          "items": {
+            "type": "number",
+            "format": "float"
+          },
+          "maxItems": 2,
+          "minItems": 2
+        },
+        "trigger": {
+          "description": "Trigger configuration.",
+          "$ref": "#/$defs/ProgressTrigger",
+          "default": {
+            "source": {
+              "type": "Inherit"
+            },
+            "threshold": {
+              "amount_type": "Intensity",
+              "threshold_type": "Always"
+            }
+          }
+        }
+      }
+    },
+    "PartialBarProps": {
+      "description": "Partial of [`BarProps`].",
+      "type": "object",
+      "properties": {
+        "background": {
+          "description": "Background color.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "number",
+            "format": "float"
+          },
+          "maxItems": 4,
+          "minItems": 4
+        },
+        "border_color": {
+          "description": "Border color.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "number",
+            "format": "float"
+          },
+          "maxItems": 4,
+          "minItems": 4
+        },
+        "border_size": {
+          "description": "Border size.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "float"
+        },
+        "fill": {
+          "description": "Fill color.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "number",
+            "format": "float"
+          },
+          "maxItems": 4,
+          "minItems": 4
+        },
+        "lower_bound": {
+          "description": "Lower progress bound.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "float"
+        },
+        "tick_color": {
+          "description": "Tick color.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "number",
+            "format": "float"
+          },
+          "maxItems": 4,
+          "minItems": 4
+        },
+        "tick_size": {
+          "description": "Tick thickness.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "float"
+        },
+        "upper_bound": {
+          "description": "Upper progress bound.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "float"
+        }
+      }
+    },
+    "PartialIconProps": {
+      "description": "Partial of [`IconProps`].",
+      "type": "object",
+      "properties": {
+        "border_color": {
+          "description": "Border color.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "number",
+            "format": "float"
+          },
+          "maxItems": 4,
+          "minItems": 4
+        },
+        "border_size": {
+          "description": "Border size.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "float"
+        },
+        "round": {
+          "description": "Icon rounding.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "float"
+        },
+        "tint": {
+          "description": "Icon tint.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "number",
+            "format": "float"
+          },
+          "maxItems": 4,
+          "minItems": 4
+        },
+        "zoom": {
+          "description": "Icon zoom.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "float"
+        }
+      }
+    },
+    "PartialTextProps": {
+      "description": "Partial of [`TextProps`].",
+      "type": "object",
+      "properties": {
+        "color": {
+          "description": "Text scale.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "number",
+            "format": "float"
+          },
+          "maxItems": 4,
+          "minItems": 4
+        },
+        "decoration": {
+          "description": "Text decoration.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TextDecoration"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "scale": {
+          "description": "Text scale.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "float"
+        }
+      }
+    },
+    "PlayerTrigger": {
+      "type": "object",
+      "properties": {
+        "combat": {
+          "description": "Combat configuration.",
+          "$ref": "#/$defs/CombatTrigger",
+          "default": null
+        },
+        "mounts": {
+          "description": "Current mount.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Mount"
+          }
+        },
+        "prof_selections": {
+          "description": "Profession-specific selections.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ProfSelection"
+          }
+        },
+        "profs": {
+          "description": "Build profession.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Profession"
+          },
+          "writeOnly": true
+        },
+        "relics": {
+          "description": "Equipped relic.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Item"
+          }
+        },
+        "sigil_mode": {
+          "description": "Trigger logic mode for sigils.",
+          "$ref": "#/$defs/TriggerMode",
+          "default": "Any"
+        },
+        "sigils": {
+          "description": "Equipped sigils.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Item"
+          }
+        },
+        "skill_selections": {
+          "description": "Selected skills.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          }
+        },
+        "skill_selections_mode": {
+          "description": "Trigger logic mode for selected skills.",
+          "$ref": "#/$defs/TriggerMode",
+          "default": "All"
+        },
+        "specs": {
+          "description": "Build specialization.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Specialization"
+          }
+        },
+        "trait_mode": {
+          "description": "Trigger logic mode for traits.",
+          "$ref": "#/$defs/TriggerMode",
+          "default": "All"
+        },
+        "traits": {
+          "description": "Build traits.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/TraitRequirement"
+          }
+        },
+        "weapon_mode": {
+          "description": "Trigger logic mode for weapons.",
+          "$ref": "#/$defs/TriggerMode",
+          "default": "Any"
+        },
+        "weapons": {
+          "description": "Equipped weapons.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Weapon"
+          }
+        }
+      }
+    },
+    "ProfSelection": {
+      "type": "string",
+      "enum": [
+        "LegendAssassin",
+        "LegendCentaur",
+        "LegendDemon",
+        "LegendDwarf",
+        "LegendDragon",
+        "LegendRenegade",
+        "LegendAlliance",
+        "LegendEntity",
+        "FamiliarFire",
+        "FamiliarWater",
+        "FamiliarAir",
+        "FamiliarEarth"
+      ]
+    },
+    "Profession": {
+      "type": "string",
+      "enum": [
+        "Guardian",
+        "Warrior",
+        "Engineer",
+        "Ranger",
+        "Thief",
+        "Elementalist",
+        "Mesmer",
+        "Necromancer",
+        "Revenant"
+      ]
+    },
+    "Progress": {
+      "type": "string",
+      "enum": [
+        "Intensity",
+        "Duration",
+        "SecondaryDuration"
+      ]
+    },
+    "ProgressSource": {
+      "oneOf": [
+        {
+          "description": "Inherit from above.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "Inherit"
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        {
+          "description": "Always active, no associated progress.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "Always"
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        {
+          "description": "Buff ids, multiple matches are merged.",
+          "type": "object",
+          "properties": {
+            "combatant": {
+              "$ref": "#/$defs/Combatant",
+              "default": "Player"
+            },
+            "ids": {
+              "type": "array",
+              "default": [],
+              "items": {
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0
+              }
+            },
+            "type": {
+              "type": "string",
+              "const": "Buff"
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        {
+          "description": "Ability ids, first match is used.",
+          "type": "object",
+          "properties": {
+            "ids": {
+              "type": "array",
+              "default": [],
+              "items": {
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0
+              }
+            },
+            "type": {
+              "type": "string",
+              "const": "Ability"
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        {
+          "description": "Skillbar slot.",
+          "type": "object",
+          "properties": {
+            "slot": {
+              "$ref": "#/$defs/Slot",
+              "default": "WeaponSwap"
+            },
+            "type": {
+              "type": "string",
+              "const": "SkillbarSlot"
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        {
+          "description": "Health.",
+          "type": "object",
+          "properties": {
+            "combatant": {
+              "$ref": "#/$defs/Combatant",
+              "default": "Player"
+            },
+            "type": {
+              "type": "string",
+              "const": "Health"
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "HealthReduction"
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        {
+          "description": "Barrier.",
+          "type": "object",
+          "properties": {
+            "combatant": {
+              "$ref": "#/$defs/Combatant",
+              "default": "Player"
+            },
+            "type": {
+              "type": "string",
+              "const": "Barrier"
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "combatant": {
+              "$ref": "#/$defs/Combatant",
+              "default": "Player"
+            },
+            "type": {
+              "type": "string",
+              "const": "Defiance"
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        {
+          "description": "Endurance.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "Endurance"
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        {
+          "description": "Primary profession resource.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "PrimaryResource"
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        {
+          "description": "Secondary profession resource.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "SecondaryResource"
+            }
+          },
+          "required": [
+            "type"
+          ]
+        }
+      ]
+    },
+    "ProgressThreshold": {
+      "type": "object",
+      "properties": {
+        "amount_type": {
+          "description": "Amount type.",
+          "$ref": "#/$defs/AmountType",
+          "default": "Intensity"
+        },
+        "threshold_type": {
+          "description": "Threshold type.",
+          "$ref": "#/$defs/ThresholdType"
+        }
+      },
+      "required": [
+        "threshold_type"
+      ]
+    },
+    "ProgressTrigger": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "description": "Progress source.",
+          "$ref": "#/$defs/ProgressSource",
+          "default": {
+            "type": "Inherit"
+          }
+        },
+        "threshold": {
+          "description": "Threshold requirement.",
+          "$ref": "#/$defs/ProgressThreshold",
+          "default": {
+            "amount_type": "Intensity",
+            "threshold_type": "Always"
+          }
+        }
+      }
+    },
+    "Slot": {
+      "description": "Skillbar slot.",
+      "type": "string",
+      "enum": [
+        "WeaponSwap",
+        "Weapon1",
+        "Weapon2",
+        "Weapon3",
+        "Weapon4",
+        "Weapon5",
+        "Heal",
+        "Utility1",
+        "Utility2",
+        "Utility3",
+        "Elite",
+        "Profession1",
+        "Profession2",
+        "Profession3",
+        "Profession4",
+        "Profession5",
+        "SpecialAction",
+        "Mount"
+      ]
+    },
+    "Specialization": {
+      "type": "string",
+      "enum": [
+        "Guardian",
+        "Dragonhunter",
+        "Firebrand",
+        "Willbender",
+        "Luminary",
+        "Warrior",
+        "Berserker",
+        "Spellbreaker",
+        "Bladesworn",
+        "Paragon",
+        "Revenant",
+        "Herald",
+        "Renegade",
+        "Vindicator",
+        "Conduit",
+        "Engineer",
+        "Scrapper",
+        "Holosmith",
+        "Mechanist",
+        "Amalgam",
+        "Ranger",
+        "Druid",
+        "Soulbeast",
+        "Untamed",
+        "Galeshot",
+        "Thief",
+        "Daredevil",
+        "Deadeye",
+        "Specter",
+        "Antiquary",
+        "Elementalist",
+        "Tempest",
+        "Weaver",
+        "Catalyst",
+        "Evoker",
+        "Mesmer",
+        "Chronomancer",
+        "Mirage",
+        "Virtuoso",
+        "Troubadour",
+        "Necromancer",
+        "Reaper",
+        "Scourge",
+        "Harbinger",
+        "Ritualist"
+      ]
+    },
+    "Text": {
+      "type": "object",
+      "properties": {
+        "align": {
+          "description": "Text alignment.",
+          "$ref": "#/$defs/AlignHorizontal",
+          "default": "Center"
+        },
+        "color": {
+          "description": "Text scale.",
+          "type": "array",
+          "default": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "items": {
+            "type": "number",
+            "format": "float"
+          },
+          "maxItems": 4,
+          "minItems": 4
+        },
+        "conditions": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Condition2"
+          }
+        },
+        "decoration": {
+          "description": "Text decoration.",
+          "$ref": "#/$defs/TextDecoration",
+          "default": "None"
+        },
+        "font": {
+          "description": "Text font.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null
+        },
+        "scale": {
+          "description": "Text scale.",
+          "type": "number",
+          "format": "float",
+          "default": 1.0
+        },
+        "text": {
+          "description": "Text contents.",
+          "type": "string",
+          "default": ""
+        }
+      }
+    },
+    "TextDecoration": {
+      "type": "string",
+      "enum": [
+        "None",
+        "Shadow",
+        "ShadowDouble",
+        "Outline",
+        "OutlineDouble"
+      ]
+    },
+    "ThresholdType": {
+      "oneOf": [
+        {
+          "description": "Always met.",
+          "type": "string",
+          "const": "Always"
+        },
+        {
+          "description": "Must be present.",
+          "type": "string",
+          "const": "Present"
+        },
+        {
+          "description": "Must be missing.",
+          "type": "string",
+          "const": "Missing"
+        },
+        {
+          "description": "Amount below.",
+          "type": "object",
+          "properties": {
+            "Below": {
+              "type": "number",
+              "format": "float"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Below"
+          ]
+        },
+        {
+          "description": "Amount above.",
+          "type": "object",
+          "properties": {
+            "Above": {
+              "type": "number",
+              "format": "float"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Above"
+          ]
+        },
+        {
+          "description": "Exact amount.",
+          "type": "object",
+          "properties": {
+            "Exact": {
+              "type": "number",
+              "format": "float"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Exact"
+          ]
+        },
+        {
+          "description": "Amount in range.",
+          "type": "object",
+          "properties": {
+            "Between": {
+              "type": "array",
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number",
+                  "format": "float"
+                },
+                {
+                  "type": "number",
+                  "format": "float"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Between"
+          ]
+        }
+      ]
+    },
+    "TraitRequirement": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Trait id.",
+          "type": "integer",
+          "format": "uint32",
+          "default": 0,
+          "minimum": 0
+        },
+        "present": {
+          "description": "Whether to check for present or missing.",
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "TriggerMode": {
+      "type": "string",
+      "enum": [
+        "Any",
+        "All",
+        "NotAny",
+        "NotAll"
+      ]
+    },
+    "Unit": {
+      "type": "string",
+      "enum": [
+        "Percent",
+        "Absolute"
+      ]
+    },
+    "Weapon": {
+      "type": "string",
+      "enum": [
+        "AxeMain",
+        "AxeOff",
+        "DaggerMain",
+        "DaggerOff",
+        "MaceMain",
+        "MaceOff",
+        "PistolMain",
+        "PistolOff",
+        "SwordMain",
+        "SwordOff",
+        "Scepter",
+        "Focus",
+        "Shield",
+        "Torch",
+        "Warhorn",
+        "Greatsword",
+        "Hammer",
+        "Longbow",
+        "Rifle",
+        "Shortbow",
+        "Staff",
+        "Spear"
+      ]
+    }
+  }
+}
