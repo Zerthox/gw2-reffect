@@ -67,7 +67,7 @@ impl IconSource {
         matches!(self, Self::Empty)
     }
 
-    pub fn render_select(&mut self, ui: &Ui, ctx: &RenderCtx) -> IconSelectResult {
+    pub fn render_select(&mut self, ui: &Ui, ctx: &RenderCtx) -> IconEditResult {
         let mut reload = false;
         let mut action = DynAction::empty();
 
@@ -150,12 +150,12 @@ impl IconSource {
             }
         }
 
-        IconSelectResult { reload, action }
+        IconEditResult { reload, action }
     }
 }
 
 #[derive(Debug)]
-pub struct IconSelectResult {
+pub struct IconEditResult {
     pub reload: bool,
     pub action: DynAction<IconSource>,
 }

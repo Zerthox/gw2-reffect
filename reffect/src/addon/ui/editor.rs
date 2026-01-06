@@ -88,9 +88,9 @@ impl Addon {
                     let ctx = RenderCtx::create(ui, ctx, &self.settings);
                     let mut reorder = false;
                     for pack in &mut self.packs {
-                        let (rendered, changed) = pack.try_render_options(ui, &ctx);
-                        reorder |= changed;
-                        if rendered {
+                        let result = pack.try_render_options(ui, &ctx);
+                        reorder |= result.reorder;
+                        if result.rendered {
                             // end after we find the element that has to render
                             break;
                         }

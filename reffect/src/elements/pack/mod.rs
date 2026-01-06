@@ -140,19 +140,25 @@ impl Pack {
     ///
     /// First value indicates if the pack or a child rendered.
     /// Second value indicates if the pack layer changed.
-    pub fn try_render_options(&mut self, ui: &Ui, ctx: &RenderCtx) -> (bool, bool) {
+    pub fn try_render_options(&mut self, ui: &Ui, ctx: &RenderCtx) -> PackEditResult {
         let id = self.common.id;
         if ctx.edit.is_selected(id) {
             let reorder = self.render_options(ui, ctx);
-            return (true, reorder);
+            return PackEditResult {
+                rendered: true,
+                reorder,
+            };
         } else if ctx.edit.is_selected_parent(id) {
             for child in &mut self.elements {
                 if child.try_render_options(ui, ctx) {
-                    return (true, false);
+                    return PackEditResult {
+                        rendered: true,
+                        ..Default::default()
+                    };
                 }
             }
         }
-        (false, false)
+        PackEditResult::default()
     }
 
     /// Renders the pack options.
@@ -222,4 +228,10 @@ impl Default for Pack {
             file: PathBuf::new(),
         }
     }
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct PackEditResult {
+    pub rendered: bool,
+    pub reorder: bool,
 }

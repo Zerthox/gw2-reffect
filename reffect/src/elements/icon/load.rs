@@ -2,7 +2,7 @@ use super::IconSource;
 use crate::{
     action::DynAction,
     context::SkillId,
-    elements::{RenderCtx, icon::IconSelectResult},
+    elements::{RenderCtx, icon::IconEditResult},
     internal::{Interface, Internal},
     texture::{AsTextureSource, LoadedTexture, TextureManager, TextureSource},
 };
@@ -43,7 +43,7 @@ impl LoadedIcon {
 
     pub fn render_select(&mut self, ui: &Ui, ctx: &RenderCtx) -> DynAction<IconSource> {
         let mut source = self.source_mut();
-        let IconSelectResult { reload, action } = source.render_select(ui, ctx);
+        let IconEditResult { reload, action } = source.render_select(ui, ctx);
         if reload {
             source.reload();
         } else {
