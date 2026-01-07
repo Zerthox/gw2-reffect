@@ -43,6 +43,8 @@ The information is retrieved with the following policy in mind:
 - No combining logic for combat information outside of grouping stacks of multiple effects into a single UI element.
 - No information about profession resources when hidden from the player.
 - No information about ability cooldowns when hidden from the player.
+- No accurate health information for target & group members.
+- No generic effects for group members. *Ingame these are only displayable in Party UI and not Squad UI.*
 
 ## Building from source
 Reffect is *partially* open source: while a major part of the addon is open source, there is a closed source portion which is responsible for memory reading information from the game.
