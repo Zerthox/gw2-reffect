@@ -1,9 +1,9 @@
-use super::TextureSource;
-use crate::{texture::TextureManager, worker::Worker};
+use super::{TextureManager, TextureSource};
+use crate::worker::Worker;
 use std::sync::mpsc;
 
 #[derive(Debug)]
-pub struct TextureLoader {
+pub(super) struct TextureLoader {
     worker: Worker,
     sender: mpsc::Sender<TextureSource>,
 }

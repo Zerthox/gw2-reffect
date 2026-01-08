@@ -1,4 +1,4 @@
-use crate::texture::TextureSource;
+use super::TextureSource;
 use nexus::imgui;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -6,7 +6,7 @@ use nexus::imgui;
 pub struct TextureKey(pub(super) usize);
 
 #[derive(Debug, Clone)]
-pub enum TextureEntry {
+pub(super) enum TextureEntry {
     Pending { source: TextureSource },
     Resolved { texture: imgui::TextureId },
 }

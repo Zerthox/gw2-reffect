@@ -4,4 +4,4 @@ mod loader;
 mod manager;
 mod source;
 
-pub use self::{entry::*, loaded::*, loader::*, manager::*, source::*};
+pub use self::{entry::*, loaded::*, manager::*, source::*};

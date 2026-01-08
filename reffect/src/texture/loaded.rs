@@ -1,12 +1,7 @@
-use std::{mem, ops};
-
-use crate::texture::{TextureKey, TextureManager, TextureSource};
+use super::{AsTextureSource, TextureKey, TextureManager};
 use const_default::ConstDefault;
 use serde::{Deserialize, Serialize};
-
-pub trait AsTextureSource {
-    fn as_texture_source(&self) -> Option<TextureSource>;
-}
+use std::{mem, ops};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]

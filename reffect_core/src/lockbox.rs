@@ -29,11 +29,11 @@ where
 
     /// Attempts to retrieve the value, returning [`None`] if the key did not match.
     pub fn try_take(&self, key: K) -> Option<V> {
-        let mut guard = self.data.lock().unwrap();
-        matches!(&*guard, Some((cur, _)) if cur == &key).then(|| {
-            let (_, data) = unsafe { guard.take().unwrap_unchecked() };
-            data
-        })
+        self.data
+            .lock()
+            .unwrap()
+            .take_if(|(expected, _)| expected == &key)
+            .map(|(_, value)| value)
     }
 }
 

@@ -1,8 +1,5 @@
-use crate::{
-    addon::Addon,
-    assets,
-    texture::{TextureEntry, TextureKey, TextureLoader, TextureSource},
-};
+use super::{TextureEntry, TextureKey, TextureSource, loader::TextureLoader};
+use crate::{addon::Addon, assets};
 use nexus::{
     imgui,
     texture::{
