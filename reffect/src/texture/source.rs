@@ -122,8 +122,7 @@ impl TextureSource {
         input_text_simple_menu(ui, "##urlctx", url);
 
         ui.same_line();
-        let reload = ui.button("Load");
-        reload
+        ui.button("Load")
     }
 }
 
