@@ -174,7 +174,7 @@ impl LoadedFont {
             match self.loaded {
                 Some(font) if !font.is_valid() => Validation::Error("Font invalidated"),
                 Some(_) => Validation::Ok,
-                None => Validation::Error("Failed to find fond"),
+                None => Validation::Error("Failed to find font"),
             }
         } else {
             Validation::Ok

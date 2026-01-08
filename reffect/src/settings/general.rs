@@ -29,6 +29,10 @@ impl GeneralSettings {
         }
     }
 
+    pub fn load(&mut self) {
+        self.font.reload();
+    }
+
     pub fn migrate(&mut self, version: &Version) -> bool {
         const ICON_TEXT_ANCHORS: Version = Version::new(0, 6, 2);
 
