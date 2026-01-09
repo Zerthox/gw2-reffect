@@ -11,7 +11,10 @@ pub struct ContextSettings {
 
     pub edit: EditSettings,
 
+    #[serde(skip_serializing)]
     edit_during_combat: Option<bool>,
+
+    #[serde(skip_serializing)]
     edit_show_all: Option<bool>,
 }
 
