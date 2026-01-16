@@ -27,6 +27,7 @@ impl<T> StoppableWorker<T> {
 }
 
 #[derive(Debug, Clone)]
+#[repr(transparent)]
 pub struct Token {
     stop: Arc<AtomicBool>,
 }

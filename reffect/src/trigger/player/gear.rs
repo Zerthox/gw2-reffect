@@ -80,11 +80,14 @@ impl GearTrigger {
             &mut self.weapons,
             ComboBoxFlags::HEIGHT_LARGEST,
         );
+        helper(ui, || ui.text("Equipped weapons (active or inactive)"));
 
         changed |= self.sigil_mode.render_options(ui, "Sigil Mode");
         changed |= Self::render_item_inputs(ui, "Sigil", &mut self.sigils);
+        helper(ui, || ui.text("Equipped sigils (active or inactive"));
 
         changed |= Self::render_item_inputs(ui, "Relic", &mut self.relics);
+        helper(ui, || ui.text("Equipped relic"));
 
         if changed {
             // ensure fresh state after changed

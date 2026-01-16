@@ -74,7 +74,7 @@ impl BuildTrigger {
         }
     }
 
-    fn skill_choices_active(&self, ctx: &Context) -> bool {
+    fn skill_selections_active(&self, ctx: &Context) -> bool {
         if let Ok(build) = ctx.player.build.as_ref() {
             self.skill_selections_mode
                 .check_slice(&self.skill_selections, |id| {
@@ -85,7 +85,7 @@ impl BuildTrigger {
         }
     }
 
-    fn prof_chocies_active(&self, ctx: &Context) -> bool {
+    fn prof_selections_active(&self, ctx: &Context) -> bool {
         let build = ctx.player.build.as_ref();
         TriggerMode::Any.check_flags_optional(
             self.prof_selections,
@@ -151,6 +151,7 @@ impl BuildTrigger {
 
             if i == 0 {
                 helper(ui, || {
+                    ui.text("Skill selections in build (slot skills, skill overrides)");
                     ui.text("Can be found on the wiki, same as in GW2 API");
                     ui.text("Supports pasting chat links");
                 });
@@ -209,8 +210,8 @@ impl MemoizedTrigger for BuildTrigger {
     fn resolve_active(&mut self, ctx: &Context) -> bool {
         self.specs_active(ctx)
             && self.traits_active(ctx)
-            && self.skill_choices_active(ctx)
-            && self.prof_chocies_active(ctx)
+            && self.skill_selections_active(ctx)
+            && self.prof_selections_active(ctx)
     }
 }
 

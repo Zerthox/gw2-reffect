@@ -81,9 +81,14 @@ impl Trigger for PlayerTrigger {
 impl PlayerTrigger {
     pub fn render_options(&mut self, ui: &Ui, ctx: &Context) {
         self.combat.render_options(ui);
+
+        ui.spacing();
         self.gear.render_options(ui, ctx);
+
+        ui.spacing();
         self.build.render_options(ui, ctx);
 
+        ui.spacing();
         enum_combo_bitflags(ui, "Mount", &mut self.mounts, ComboBoxFlags::HEIGHT_LARGE);
     }
 }
