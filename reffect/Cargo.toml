@@ -11,7 +11,7 @@ rust-version = "1.91"
 const-default = { version = "1.0.0", features = ["std", "derive"] }
 enumflags2 = { workspace = true }
 itertools = "0.14.0"
-log = { workspace = true, features = ["release_max_level_debug"] }
+log = { workspace = true }
 nexus = { git = "https://github.com/zerthox/nexus-rs", features = ["log"] }
 open = "5.1.2"
 partial = { git = "https://github.com/zerthox/partial-rs" }

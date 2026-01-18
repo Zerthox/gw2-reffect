@@ -9,7 +9,7 @@ rust-version = "1.91"
 [dependencies]
 base64 = "0.22.1"
 enumflags2 = { workspace = true }
-log = { workspace = true, features = ["release_max_level_debug"] }
+log = { workspace = true }
 nexus = { git = "https://github.com/zerthox/nexus-rs", features = [
     "log",
     "mumble_json",
