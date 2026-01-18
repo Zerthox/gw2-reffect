@@ -96,7 +96,7 @@ impl ListIcon {
     pub fn render_debug(&mut self, ui: &Ui, ctx: &RenderCtx) {
         self.trigger.render_debug(ui);
         self.filter.render_debug(ui, ctx);
-        self.icon.render_debug(ui, ctx)
+        self.icon.render_debug(ui, ctx, &self.trigger)
     }
 }
 

@@ -5,7 +5,7 @@ mod source;
 
 pub use self::{element::*, load::*, props::*, source::*};
 
-use super::{Common, Props, RenderCtx};
+use super::{Props, RenderCtx};
 use crate::{
     action::DynAction,
     colors::{self, with_alpha, with_alpha_factor},
@@ -13,7 +13,7 @@ use crate::{
     render::{ComponentWise, Rect, debug_optional, draw_spinner_bg},
     render_copy_field,
     settings::icon::DurationBarSettings,
-    trigger::{ProgressActive, ProgressValue},
+    trigger::{ProgressActive, ProgressTrigger, ProgressValue},
 };
 use const_default::ConstDefault;
 use nexus::imgui::Ui;
@@ -206,20 +206,32 @@ impl Icon {
         action
     }
 
-    pub fn render_tabs(&mut self, ui: &Ui, ctx: &Context, common: &Common) -> DynAction<Self> {
+    pub fn render_tabs(
+        &mut self,
+        ui: &Ui,
+        ctx: &Context,
+        trigger: &ProgressTrigger,
+    ) -> DynAction<Self> {
         if let Some(_token) = ui.tab_item("Condition") {
             self.props
-                .render_condition_options(ui, ctx, &common.trigger.source)
+                .render_condition_options(ui, ctx, &trigger.source)
                 .map(|icon: &mut Self| &mut icon.props)
         } else {
             DynAction::empty()
         }
     }
 
-    pub fn render_debug(&mut self, ui: &Ui, _ctx: &RenderCtx) {
+    pub fn render_debug(&mut self, ui: &Ui, ctx: &RenderCtx, trigger: &ProgressTrigger) {
         const SIZE: [f32; 2] = [64.0, 64.0];
 
-        let texture = self.texture.get_texture(SkillId::Unknown);
+        let skill = if ctx.settings.use_game_icons
+            && let Some(active) = trigger.active()
+        {
+            active.skill()
+        } else {
+            SkillId::Unknown
+        };
+        let texture = self.texture.get_texture(ui, skill);
         debug_optional(ui, "Texture key", self.texture.key());
         debug_optional(
             ui,

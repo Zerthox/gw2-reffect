@@ -167,7 +167,7 @@ impl Element {
 
             if let Some(_token) = ui.tab_item("?") {
                 self.common.render_debug(ui, ctx);
-                self.kind.render_debug(ui, ctx);
+                self.kind.render_debug(ui, ctx, &self.common);
             }
         }
     }
