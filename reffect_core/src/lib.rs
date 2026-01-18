@@ -20,16 +20,19 @@ use crate::{
     context::{ItemInfo, SkillInfo},
     error::Result,
 };
+use nexus::imgui;
 use windows::Win32::Graphics::Direct3D11::ID3D11ShaderResourceView;
 
 pub type Texture = ID3D11ShaderResourceView;
 
-/// Interface for API.
+pub type Ui<'ui> = imgui::Ui<'ui>;
+
+/// Interface for internal API.
 pub trait Interface {
-    /// Initializes the API.
+    /// Initializes the internal API.
     fn init();
 
-    /// Deinitializes the API.
+    /// Deinitializes the internal API.
     fn deinit();
 
     /// Retrieves item information.
@@ -42,5 +45,5 @@ pub trait Interface {
     fn get_skill_info(id: u32) -> Result<SkillInfo>;
 
     /// Retrieves skill icon.
-    fn get_skill_icon(id: u32) -> Option<Texture>;
+    fn get_skill_icon(ui: &Ui, id: u32) -> Option<Texture>;
 }

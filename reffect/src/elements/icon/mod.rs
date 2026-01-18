@@ -75,7 +75,7 @@ impl Icon {
             } else {
                 SkillId::Unknown
             };
-            let texture = self.texture.get_texture(skill_id);
+            let texture = self.texture.get_texture(ui, skill_id);
 
             let (start, end) = Self::bounds(size);
             let start = ctx.pos().add(start);

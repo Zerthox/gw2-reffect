@@ -1,5 +1,5 @@
 use reffect_core::{
-    Texture,
+    Texture, Ui,
     context::{ItemInfo, SkillInfo},
     error::{Error, Result},
 };
@@ -36,7 +36,7 @@ impl Interface for Dummy {
     }
 
     #[inline]
-    fn get_skill_icon(_id: u32) -> Option<Texture> {
+    fn get_skill_icon(_ui: &Ui, _id: u32) -> Option<Texture> {
         None
     }
 }

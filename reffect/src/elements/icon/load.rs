@@ -22,7 +22,7 @@ impl AsTextureSource for IconSource {
 }
 
 impl LoadedIcon {
-    pub fn get_texture(&self, skill: SkillId) -> Option<imgui::TextureId> {
+    pub fn get_texture(&self, ui: &Ui, skill: SkillId) -> Option<imgui::TextureId> {
         match self.source() {
             IconSource::Empty => None,
             IconSource::Unknown => TextureManager::get_unknown(),
@@ -30,7 +30,7 @@ impl LoadedIcon {
                 SkillId::Unknown => TextureManager::get_unknown(),
                 SkillId::WeaponSwap | SkillId::PetSwap => TextureManager::get_weapon_swap(),
                 SkillId::BundleDrop => TextureManager::get_bundle_drop(),
-                SkillId::Id(id) => match Internal::get_skill_icon(id) {
+                SkillId::Id(id) => match Internal::get_skill_icon(ui, id) {
                     Some(tex) => Some(tex.as_raw().into()),
                     None => TextureManager::get_unknown(),
                 },

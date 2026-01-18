@@ -21,6 +21,7 @@ pub struct Buff {
 }
 
 impl Buff {
+    /// Creates an empty buff.
     #[inline]
     pub const fn empty() -> Self {
         Self {
@@ -28,6 +29,23 @@ impl Buff {
             apply_time: 0,
             runout_time: 0,
         }
+    }
+
+    /// Creates a buff with hidden durations.
+    #[inline]
+    pub const fn hidden_duration() -> Self {
+        Self {
+            stacks: 1,
+            apply_time: 0,
+            runout_time: u32::MAX,
+        }
+    }
+
+    /// Makes the buff duration hidden.
+    #[inline]
+    pub const fn hide_duration(&mut self) {
+        self.apply_time = 0;
+        self.runout_time = u32::MAX;
     }
 
     /// Checks whether the buff is infinite duration.

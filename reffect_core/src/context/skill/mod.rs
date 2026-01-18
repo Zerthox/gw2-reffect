@@ -95,3 +95,14 @@ pub enum Visibility {
     /// Visible for group member.
     Group = 1 << 3,
 }
+
+impl Visibility {
+    /// Whether the visibility allows full durations for boons & conditions.
+    #[inline]
+    pub const fn allow_full_durations(&self) -> bool {
+        matches!(
+            self,
+            Self::Player | Self::TargetHostile | Self::TargetNonHostile,
+        )
+    }
+}
