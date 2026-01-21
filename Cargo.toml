@@ -20,5 +20,6 @@ reffect_internal = { path = "reffect_internal" }
 
 [profile.release]
 lto = true
+codegen-units = 1
 debug = "full"
 split-debuginfo = "packed"
