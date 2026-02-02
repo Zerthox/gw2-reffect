@@ -30,8 +30,8 @@ impl ProgressThreshold {
         let amount = self.amount_type.amount(active, ctx);
         match self.threshold_type {
             ThresholdType::Always => true,
-            ThresholdType::Present => active.intensity() > 0, // we use intensity for present checks
-            ThresholdType::Missing => active.intensity() == 0,
+            ThresholdType::Present => active.is_present(),
+            ThresholdType::Missing => !active.is_present(),
             ThresholdType::Below(required) => amount <= required,
             ThresholdType::Above(required) => amount >= required,
             ThresholdType::Exact(required) => amount == required,

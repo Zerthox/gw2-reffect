@@ -176,6 +176,15 @@ impl ProgressActive {
         matches!(self, Self::Ability { .. })
     }
 
+    /// Whether the progress is present.
+    pub const fn is_present(&self) -> bool {
+        match *self {
+            Self::Resource { current, .. } => current > 0.0,
+            Self::Buff { stacks, .. } => stacks > 0,
+            Self::Ability { recharge, .. } => recharge == 0,
+        }
+    }
+
     /// Returns the intensity (stacks/ammo).
     pub const fn intensity(&self) -> u32 {
         match *self {
