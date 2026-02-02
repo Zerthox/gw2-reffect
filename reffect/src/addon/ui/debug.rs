@@ -3,8 +3,8 @@ use crate::{
     clipboard::Clipboard,
     colors::{self, Colored},
     context::{
-        AbilityState, BuffMap, Build, CombatantResources, Context, Defiance, Gear, PlayerResources,
-        SkillInfo, Skillbar, Slot,
+        Ability, AbilityState, BuffMap, Build, CombatantResources, Context, Defiance, Gear,
+        PlayerResources, SkillId, SkillInfo, Skillbar, Slot,
     },
     error::Error,
     internal::{Interface, Internal},
@@ -285,7 +285,10 @@ fn debug_buffs(ui: &Ui, ctx: &Context, buffs: &BuffMap) {
                 ..
             }) = Internal::get_skill_info(id)
         {
-            ui.tooltip_text(format!("Stacking {stacking}\nVisible for {visibility}"));
+            ui.tooltip(|| {
+                ui.text(format!("Stacking {stacking}"));
+                ui.text(format!("Visible for {visibility}"));
+            });
         }
     }
 }
@@ -297,40 +300,71 @@ fn debug_skillbar(ui: &Ui, ctx: &Context, skillbar: &Skillbar) {
             let color = if ability.state.contains(AbilityState::Pressed) {
                 Some(ui.push_style_color(StyleColor::Text, colors::BLUE))
             } else if ability.state.contains(AbilityState::Pending) {
+                Some(ui.push_style_color(StyleColor::Text, colors::GREEN))
+            } else if ability.state.contains(AbilityState::NoResources) {
+                Some(ui.push_style_color(StyleColor::Text, colors::RED))
+            } else if ability.state.contains(AbilityState::NoRange) {
                 Some(ui.push_style_color(StyleColor::Text, colors::YELLOW))
             } else {
                 None
             };
 
             ui.same_line();
-            ui.text(format!("{}x {}", ability.ammo, ability.id));
-            drop(color);
+            ui.group(|| {
+                ui.text(format!("{}x {}", ability.ammo, ability.id));
+                drop(color);
 
-            let _color = match ability.recharge_rate.total_cmp(&1.0) {
-                Ordering::Less => Some(ui.push_style_color(StyleColor::Text, colors::BLUE)),
-                Ordering::Equal => None,
-                Ordering::Greater => Some(ui.push_style_color(StyleColor::Text, colors::GREEN)),
-            };
-            let recharge = ability.recharge_remaining(ctx.now);
-            if recharge > 0 {
-                ui.same_line();
-                ui.text(format!(
-                    "{:.1}/{:.1}s {:.1}%",
-                    to_secs(recharge),
-                    to_secs(ability.recharge),
-                    100.0 * ability.recharge_progress(ctx.now)
-                ));
-            }
+                let _color = match ability.recharge_rate.total_cmp(&1.0) {
+                    Ordering::Less => Some(ui.push_style_color(StyleColor::Text, colors::BLUE)),
+                    Ordering::Equal => None,
+                    Ordering::Greater => Some(ui.push_style_color(StyleColor::Text, colors::GREEN)),
+                };
+                let recharge = ability.recharge_remaining(ctx.now);
+                if recharge > 0 {
+                    ui.same_line();
+                    ui.text(format!(
+                        "{:.1}/{:.1}s {:.1}%",
+                        to_secs(recharge),
+                        to_secs(ability.recharge),
+                        100.0 * ability.recharge_progress(ctx.now)
+                    ));
+                }
 
-            let ammo_recharge = ability.ammo_recharge_remaining(ctx.now);
-            if ammo_recharge > 0 {
-                ui.same_line();
-                ui.text(format!(
-                    "Ammo {:.1}/{:.1}s {:.1}%",
-                    to_secs(ammo_recharge),
-                    to_secs(ability.ammo_recharge),
-                    100.0 * ability.ammo_recharge_progress(ctx.now)
-                ));
+                let ammo_recharge = ability.ammo_recharge_remaining(ctx.now);
+                if ammo_recharge > 0 {
+                    ui.same_line();
+                    ui.text(format!(
+                        "Ammo {:.1}/{:.1}s {:.1}%",
+                        to_secs(ammo_recharge),
+                        to_secs(ability.ammo_recharge),
+                        100.0 * ability.ammo_recharge_progress(ctx.now)
+                    ));
+                }
+            });
+            if ui.is_item_hovered() {
+                ui.tooltip(|| {
+                    let Ability {
+                        recharge_rate,
+                        state,
+                        ..
+                    } = ability;
+                    ui.text(format!("Rate {recharge_rate}"));
+                    ui.text(format!("State {state}"));
+
+                    if let SkillId::Id(id) = ability.id
+                        && let Ok(SkillInfo::Ability {
+                            is_instant,
+                            is_ammo,
+                            is_ground_targeted,
+                            is_stunbreak,
+                        }) = Internal::get_skill_info(id)
+                    {
+                        ui.text(format!("Instant {is_instant}"));
+                        ui.text(format!("Ammo {is_ammo}"));
+                        ui.text(format!("Ground Targeted {is_ground_targeted}"));
+                        ui.text(format!("Stunbreak {is_stunbreak}"));
+                    }
+                });
             }
         }
     }

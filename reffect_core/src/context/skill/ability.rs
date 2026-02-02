@@ -140,6 +140,22 @@ pub enum AbilityState {
 
     /// Ability is pressed.
     Pressed = 1 << 2,
+
+    /// Ability is active primary.
+    #[strum(serialize = "Active Primary")]
+    ActivePrimary = 1 << 3,
+
+    /// Ability is active secondary.
+    #[strum(serialize = "Active Secondary")]
+    ActiveSecondary = 1 << 4,
+
+    // Missing resource for ability.
+    #[strum(serialize = "No Resources")]
+    NoResources = 1 << 5,
+
+    // Not in range for ability.
+    #[strum(serialize = "No Range")]
+    NoRange = 1 << 6,
 }
 
 impl Named for AbilityState {
@@ -152,6 +168,10 @@ impl Named for AbilityState {
             Self::AutoAttack => "Auto",
             Self::Pressed => "Press",
             Self::Pending => "Pend",
+            Self::ActivePrimary => "Act1",
+            Self::ActiveSecondary => "Act2",
+            Self::NoResources => "Res",
+            Self::NoRange => "Range",
         }
     }
 }

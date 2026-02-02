@@ -1,4 +1,5 @@
-use super::{Ability, SkillId};
+use super::{Ability, AbilityState, SkillId};
+use enumflags2::BitFlags;
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, Display, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 
@@ -18,6 +19,12 @@ impl Skillbar {
         self.skills[slot as usize].as_ref()
     }
 
+    /// Returns the ability in the given slot.
+    #[inline]
+    pub fn slot_mut(&mut self, slot: Slot) -> Option<&mut Ability> {
+        self.skills[slot as usize].as_mut()
+    }
+
     /// Returns the ability with the given identifier.
     #[inline]
     pub fn ability(&self, id: impl Into<SkillId>) -> Option<&Ability> {
@@ -29,6 +36,14 @@ impl Skillbar {
     #[inline]
     pub fn set_slot(&mut self, slot: Slot, ability: Option<Ability>) {
         self.skills[slot as usize] = ability;
+    }
+
+    /// Sets the state for the ability in the given slot.
+    #[inline]
+    pub fn set_slot_state(&mut self, slot: Slot, state: impl Into<BitFlags<AbilityState>>) {
+        if let Some(ability) = self.slot_mut(slot) {
+            ability.state.insert(state);
+        }
     }
 }
 
