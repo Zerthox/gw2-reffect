@@ -1,4 +1,4 @@
-use crate::{elements::Pack, util::file_name};
+use crate::elements::Pack;
 use serde::{Deserialize, Serialize};
 use serde_path_to_error::{Error, Track};
 use std::{
@@ -28,7 +28,7 @@ impl<'a> Schema<'a> {
         let path = path.as_ref();
         let file = File::open(path)
             .inspect_err(|err| {
-                log::error!("Failed to open pack file \"{}\": {err}", file_name(path))
+                log::error!("Failed to open pack file \"{}\": {err}", path.display())
             })
             .ok()?;
         let reader = BufReader::new(file);
@@ -37,7 +37,7 @@ impl<'a> Schema<'a> {
                 let json_err = err.inner();
                 log::warn!(
                     "Failed to parse pack file \"{}\": {err} (at {}, line {}, column {})",
-                    file_name(path),
+                    path.display(),
                     err.path(),
                     json_err.line(),
                     json_err.column(),
@@ -47,7 +47,7 @@ impl<'a> Schema<'a> {
         log::info!(
             "Added pack \"{}\" from \"{}\" (schema {})",
             schema.name(),
-            file_name(path),
+            path.display(),
             schema.as_ref(),
         );
         Some(schema)
@@ -62,28 +62,13 @@ impl<'a> Schema<'a> {
         Ok(schema)
     }
 
-    pub fn save_to_file(&self, path: impl AsRef<Path>) -> bool {
-        let path = path.as_ref();
-        match File::create(path) {
-            Ok(file) => {
-                let writer = BufWriter::new(file);
-                if let Err(err) = serde_json::to_writer_pretty(writer, self) {
-                    log::error!(
-                        "Failed to serialize pack \"{}\" to \"{}\": {err}",
-                        self.name(),
-                        file_name(path)
-                    );
-                }
-                true
-            }
-            Err(err) => {
-                log::error!(
-                    "Failed to save pack \"{}\" to \"{}\": {err}",
-                    self.name(),
-                    file_name(path)
-                );
-                false
-            }
+    pub fn save_to_file(&self, file: &File) -> bool {
+        let writer = BufWriter::new(file);
+        if let Err(err) = serde_json::to_writer_pretty(writer, self) {
+            log::error!("Failed to serialize pack \"{}\": {err}", self.name());
+            false
+        } else {
+            true
         }
     }
 

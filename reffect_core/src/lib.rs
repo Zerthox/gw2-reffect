@@ -5,6 +5,7 @@ pub mod colors;
 pub mod context;
 pub mod enums;
 pub mod error;
+pub mod file;
 pub mod fmt;
 pub mod id;
 pub mod interval;

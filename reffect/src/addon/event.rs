@@ -2,11 +2,11 @@ use super::Addon;
 use crate::{
     context::Context,
     elements::Pack,
+    file::TempFile,
     internal::{Interface, Internal},
     settings::AddonSettings,
     texture::TextureManager,
     tree::FilterUpdater,
-    util::file_name,
 };
 use nexus::{
     font::{font_receive, get_font},
@@ -57,9 +57,7 @@ impl Addon {
 
         let mut addon = Self::lock();
         AddonSettings::new(&addon.settings, &Context::lock()).save();
-        if addon.settings.save_on_unload {
-            addon.save_packs();
-        }
+        let pack_worker = addon.settings.save_on_unload.then(|| addon.save_packs());
 
         Internal::deinit();
 
@@ -67,6 +65,9 @@ impl Addon {
 
         if let Some(worker) = addon.worker.take() {
             worker.exit_and_wait();
+        }
+        if let Some(thread) = pack_worker {
+            let _ = thread.join();
         }
 
         addon.release();
@@ -85,20 +86,19 @@ impl Addon {
         Self::create_dirs();
         match fs::read_dir(&dir) {
             Ok(iter) => {
-                let files = iter.filter_map(|entry| entry.ok()).filter(|entry| {
-                    matches!(
-                        entry.path().extension().and_then(|ext| ext.to_str()),
-                        Some("json" | "yml" | "yaml")
-                    )
-                });
-
-                for file in files {
-                    if let Some(pack) = Pack::load_from_file(file.path()) {
-                        self.add_pack(pack);
+                for entry in iter.filter_map(|entry| entry.ok()) {
+                    let path = entry.path();
+                    let ext = path.extension().and_then(|ext| ext.to_str());
+                    if let Some("json" | "yml" | "yaml") = ext {
+                        if let Some(pack) = Pack::load_from_file(path) {
+                            self.add_pack(pack);
+                        }
+                    } else if TempFile::is_temp(&path) {
+                        log::warn!("Leftover temp pack file \"{}\"", path.display());
                     }
                 }
-                log::info!("Loaded {} packs", self.packs.len());
 
+                log::info!("Loaded {} packs", self.packs.len());
                 FilterUpdater::update(ctx, &mut self.packs);
             }
             Err(err) => log::error!("Failed to read pack directory: {err}"),
@@ -119,24 +119,39 @@ impl Addon {
                 let pack = self.packs.remove(index);
                 log::info!(
                     "Deleted pack \"{}\" file \"{}\"",
-                    pack.common.name,
-                    file_name(&pack.file)
+                    pack.name(),
+                    pack.file.display()
                 );
             }
             Err(err) => log::error!(
                 "Failed to delete pack \"{}\" file \"{}\": {err}",
-                pack.common.name,
-                file_name(&pack.file)
+                pack.name(),
+                pack.file.display()
             ),
         }
     }
 
-    pub fn save_packs(&self) {
+    pub fn save_packs(&self) -> thread::JoinHandle<()> {
         log::info!("Saving packs");
         Self::create_dirs();
-        for pack in &self.packs {
-            pack.save_to_file();
-        }
+        let files = self
+            .packs
+            .iter()
+            .filter_map(|pack| pack.save_temp())
+            .collect::<Vec<_>>();
+        thread::spawn(move || {
+            for file in files {
+                let target = file.target_path();
+                if let Err(err) = file.persist() {
+                    log::warn!(
+                        "Failed to persist temp pack file \"{}\": {err}",
+                        target.display()
+                    );
+                }
+            }
+
+            log::debug!("Persisted temp pack files");
+        })
     }
 
     pub fn open_create_dialog(&self) {

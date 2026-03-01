@@ -5,7 +5,7 @@ pub mod icon;
 
 pub use self::{context::*, general::*};
 
-use crate::{addon::Addon, context::Context};
+use crate::{addon::Addon, context::Context, file::TempFile};
 use semver::Version;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -71,11 +71,17 @@ impl AddonSettings {
 
     pub fn save(self) {
         let path = Self::file();
-        match File::create(&path) {
-            Ok(file) => {
-                let writer = BufWriter::new(file);
-                serde_json::to_writer_pretty(writer, &self).expect("failed to serialize settings");
-                log::info!("Saved settings to \"{}\"", path.display())
+        match TempFile::create(&path) {
+            Ok(temp) => {
+                let path = path.display();
+                let writer = BufWriter::new(temp.file());
+                if let Err(err) = serde_json::to_writer_pretty(writer, &self) {
+                    log::error!("Failed to serialize settings: {err}");
+                } else if let Err(err) = temp.persist() {
+                    log::error!("Failed to persist settings file \"{path}\": {err}");
+                } else {
+                    log::info!("Saved settings to \"{path}\"");
+                }
             }
             Err(err) => log::error!("Failed to save settings: {err}"),
         }

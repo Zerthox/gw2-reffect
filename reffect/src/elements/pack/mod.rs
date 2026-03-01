@@ -3,6 +3,7 @@ use crate::{
     colors,
     context::EditState,
     elements::RenderCtx,
+    file::TempFile,
     render::{
         Bounds, delete_confirm_modal, item_context_menu, style_disabled_if, tree_select_empty,
     },
@@ -12,7 +13,7 @@ use crate::{
 };
 use nexus::imgui::{MenuItem, StyleColor, Ui};
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+use std::{fs::File, path::PathBuf};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
@@ -32,14 +33,18 @@ pub struct Pack {
 }
 
 impl Pack {
+    pub fn name(&self) -> &str {
+        &self.common.name
+    }
+
     pub fn create(file: PathBuf) -> Option<Self> {
         let mut pack = Self::default();
         if let Some(name) = file.file_stem() {
-            pack.common.name = name.to_string_lossy().into_owned();
+            pack.common.name = name.display().to_string();
         }
         pack.file = file;
         pack.load();
-        pack.save_to_file().then_some(pack)
+        pack.create_file().then_some(pack)
     }
 
     pub fn load(&mut self) {
@@ -60,8 +65,26 @@ impl Pack {
         })
     }
 
-    pub fn save_to_file(&self) -> bool {
-        Schema::latest(self).save_to_file(&self.file)
+    fn create_file(&self) -> bool {
+        match File::create(&self.file) {
+            Ok(file) => Schema::latest(self).save_to_file(&file),
+            Err(err) => {
+                log::warn!(
+                    "Failed to create pack file \"{}\": {err}",
+                    self.file.display()
+                );
+                false
+            }
+        }
+    }
+
+    pub fn save_temp(&self) -> Option<TempFile> {
+        let temp = TempFile::create(&self.file)
+            .map_err(|err| log::warn!("Failed to create temp pack file: {err}"))
+            .ok()?;
+        Schema::latest(self)
+            .save_to_file(temp.file())
+            .then_some(temp)
     }
 
     /// Renders the pack.

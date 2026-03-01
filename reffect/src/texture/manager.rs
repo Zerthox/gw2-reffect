@@ -177,7 +177,9 @@ impl TextureManager {
         Some(())
     }
 
-    fn release_texture(_nexus_id: impl AsRef<str>) {}
+    fn release_texture(_nexus_id: impl AsRef<str>) {
+        // TODO: implement when nexus api supports releasing textures
+    }
 
     fn receive_texture(nexus_id: &str, texture: Option<&Texture>) {
         Self::lock().add_loaded(nexus_id, texture.map(|texture| texture.id()));
