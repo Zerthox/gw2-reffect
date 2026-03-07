@@ -60,10 +60,7 @@ impl Element {
         let kind = (&self.kind).into(); // borrow here to keep ownership
         let id = self.common.id_string();
         let children = self.kind.children();
-        let leaf = children
-            .as_ref()
-            .map(|children| children.is_empty())
-            .unwrap_or(true);
+        let leaf = children.as_ref().is_none_or(|children| children.is_empty());
         let (token, clicked) = {
             let _style = style_disabled_if(ui, !self.common.enabled);
             tree_select_empty(ui, &id, state.is_selected(self.common.id), leaf)

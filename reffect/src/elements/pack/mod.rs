@@ -69,7 +69,7 @@ impl Pack {
         match File::create(&self.file) {
             Ok(file) => Schema::latest(self).save_to_file(&file),
             Err(err) => {
-                log::warn!(
+                log::error!(
                     "Failed to create pack file \"{}\": {err}",
                     self.file.display()
                 );
@@ -80,7 +80,7 @@ impl Pack {
 
     pub fn save_temp(&self) -> Option<TempFile> {
         let temp = TempFile::create(&self.file)
-            .map_err(|err| log::warn!("Failed to create temp pack file: {err}"))
+            .map_err(|err| log::error!("Failed to create temp pack file: {err}"))
             .ok()?;
         Schema::latest(self)
             .save_to_file(temp.file())

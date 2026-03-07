@@ -39,11 +39,11 @@ impl AddonSettings {
         let path = Self::file();
         log::info!("Loading settings from \"{}\"", path.display());
         let file = File::open(&path)
-            .inspect_err(|err| log::warn!("Failed to read settings file: {err}"))
+            .inspect_err(|err| log::error!("Failed to read settings file: {err}"))
             .ok()?;
         let reader = BufReader::new(file);
         serde_json::from_reader(reader)
-            .inspect_err(|err| log::warn!("Failed to parse settings file: {err}"))
+            .inspect_err(|err| log::error!("Failed to parse settings file: {err}"))
             .ok()
     }
 
@@ -62,7 +62,7 @@ impl AddonSettings {
                 }
             }
             Some(Err(err)) => log::warn!("Invalid settings version: {err}"),
-            None => log::warn!("Settings are missing version"),
+            None => log::warn!("Settings file missing version"),
         }
 
         context.apply(settings, ctx);

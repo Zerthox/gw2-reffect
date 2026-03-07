@@ -143,7 +143,7 @@ impl Addon {
             for file in files {
                 let target = file.target_path();
                 if let Err(err) = file.persist() {
-                    log::warn!(
+                    log::error!(
                         "Failed to persist temp pack file \"{}\": {err}",
                         target.display()
                     );

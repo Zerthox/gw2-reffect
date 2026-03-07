@@ -41,7 +41,7 @@ pub enum Error {
     #[error("Item not found")]
     Item,
 
-    #[error("Failed to get user")]
+    #[error("User not found")]
     User,
 
     #[error("Character not found")]
@@ -91,9 +91,6 @@ pub enum Error {
 
     #[error("Group not found")]
     Group,
-
-    #[error("Windows error: {0}")]
-    Windows(windows::core::Error),
 
     #[error("Exception at {address:?}: {code}")]
     Exception {

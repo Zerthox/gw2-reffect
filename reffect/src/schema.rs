@@ -34,13 +34,11 @@ impl<'a> Schema<'a> {
         let reader = BufReader::new(file);
         let schema = Self::deserialize(reader)
             .inspect_err(|err| {
-                let json_err = err.inner();
+                let err_path = err.path();
+                let err = err.inner();
                 log::warn!(
-                    "Failed to parse pack file \"{}\": {err} (at {}, line {}, column {})",
+                    "Failed to parse pack file \"{}\": {err} (key {err_path})",
                     path.display(),
-                    err.path(),
-                    json_err.line(),
-                    json_err.column(),
                 )
             })
             .ok()?;
