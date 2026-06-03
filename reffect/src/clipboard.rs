@@ -28,13 +28,14 @@ impl Clipboard {
     }
 
     pub fn has_some() -> bool {
-        Self::get().with(|clipboard| unsafe { &*clipboard.element.as_ptr() }.is_some())
+        Self::get()
+            .with(|clipboard| unsafe { clipboard.element.as_ptr().as_ref_unchecked() }.is_some())
     }
 
     pub fn has_icon() -> bool {
         Self::get().with(|clipboard| {
             matches!(
-                unsafe { &*clipboard.element.as_ptr() },
+                unsafe { clipboard.element.as_ptr().as_ref_unchecked() },
                 Some(Element {
                     kind: ElementType::Icon(_),
                     ..
@@ -47,7 +48,7 @@ impl Clipboard {
         Self::get().with(|clipboard| {
             ui.text("Clipboard:");
             ui.same_line();
-            match unsafe { &*clipboard.element.as_ptr() } {
+            match unsafe { clipboard.element.as_ptr().as_ref_unchecked() } {
                 Some(element) => ui.text(&element.kind),
                 None => ui.text_disabled("empty"),
             }
