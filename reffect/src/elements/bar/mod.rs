@@ -144,15 +144,26 @@ impl Bar {
                         .map(|value| self.process_value(value))
                         .filter(|value| *value > 0.0 && *value < 1.0)
                     {
-                        // TODO: multiple ticks for horizontal/vertical?
                         let offset = self.direction.progress_value_offset(self.size, progress);
-                        let start = start.add(offset);
-                        let end = start.add(offset_2d);
                         let color = with_alpha_factor(self.props.tick_color, alpha);
+                        let size = self.props.tick_size;
+
+                        let tick_pos = start.add(offset);
                         draw_list
-                            .add_line(start, end, color)
-                            .thickness(self.props.tick_size)
+                            .add_line(tick_pos, tick_pos.add(offset_2d), color)
+                            .thickness(size)
                             .build();
+
+                        if let Some(offset) = self
+                            .direction
+                            .progress_value_offset_alt(self.size, progress)
+                        {
+                            let tick_pos = start.add(offset);
+                            draw_list
+                                .add_line(tick_pos, tick_pos.add(offset_2d), color)
+                                .thickness(size)
+                                .build();
+                        }
                     }
                 }
             }

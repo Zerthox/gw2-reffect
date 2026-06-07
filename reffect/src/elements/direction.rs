@@ -29,7 +29,13 @@ pub enum Direction {
 }
 
 impl Direction {
-    pub fn align(&self) -> Align {
+    /// Whether the direction is bi-directional.
+    pub const fn is_bidirectional(&self) -> bool {
+        matches!(self, Self::Horizontal | Self::Vertical)
+    }
+
+    /// Convert the direction to the corresponding alignment.
+    pub const fn align(&self) -> Align {
         match self {
             Self::Right => Align::Right,
             Self::Left => Align::Left,
@@ -39,7 +45,8 @@ impl Direction {
         }
     }
 
-    pub fn offset_2d(&self, size: [f32; 2]) -> [f32; 2] {
+    /// Returns the offset in the orthogonal 2-dimensional direction.
+    pub const fn offset_2d(&self, size: [f32; 2]) -> [f32; 2] {
         let [width, height] = size;
         match self {
             Self::Right | Self::Left | Self::Horizontal => [0.0, height],
@@ -47,7 +54,7 @@ impl Direction {
         }
     }
 
-    pub fn progress_value_offset(&self, size: [f32; 2], progress: f32) -> [f32; 2] {
+    pub const fn progress_value_offset(&self, size: [f32; 2], progress: f32) -> [f32; 2] {
         let [width, height] = size;
         match self {
             Self::Right => [progress * width, 0.0],
@@ -59,7 +66,20 @@ impl Direction {
         }
     }
 
-    pub fn progress_rect_offset(&self, size: [f32; 2], progress: f32) -> Rect {
+    pub const fn progress_value_offset_alt(
+        &self,
+        size: [f32; 2],
+        progress: f32,
+    ) -> Option<[f32; 2]> {
+        let [width, height] = size;
+        match self {
+            Self::Right | Self::Left | Self::Up | Self::Down => None,
+            Self::Horizontal => Some([(0.5 - 0.5 * progress) * width, 0.0]),
+            Self::Vertical => Some([0.0, (0.5 - 0.5 * progress) * height]),
+        }
+    }
+
+    pub const fn progress_rect_offset(&self, size: [f32; 2], progress: f32) -> Rect {
         let [width, height] = size;
         match self {
             Self::Right => ([0.0, 0.0], [progress * width, 0.0]),
@@ -77,7 +97,7 @@ impl Direction {
         }
     }
 
-    pub fn list_start_offset(&self, size: [f32; 2], pad: f32, total: usize) -> [f32; 2] {
+    pub const fn list_start_offset(&self, size: [f32; 2], pad: f32, total: usize) -> [f32; 2] {
         let [width, height] = size;
         let last = total.saturating_sub(1) as f32;
         match self {
@@ -87,7 +107,7 @@ impl Direction {
         }
     }
 
-    pub fn list_item_offset(
+    pub const fn list_item_offset(
         &self,
         size: [f32; 2],
         pad: f32,
