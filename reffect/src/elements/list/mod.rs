@@ -50,6 +50,12 @@ pub struct IconList {
 impl TreeNode for IconList {}
 
 impl IconList {
+    pub fn load(&mut self) {
+        for list_icon in &mut self.icons {
+            list_icon.icon.load();
+        }
+    }
+
     pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, common: &Common) {
         let render_icon = |icon: &mut ListIcon, i, len| {
             let offset = self.direction.list_item_offset(self.size, self.pad, i, len);

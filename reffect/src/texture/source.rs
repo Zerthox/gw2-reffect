@@ -23,6 +23,7 @@ use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
     Serialize,
     Deserialize,
 )]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub enum TextureSource {
     File(PathBuf),
     Url(String),
@@ -130,10 +131,25 @@ pub trait AsTextureSource {
     fn as_texture_source(&self) -> Option<TextureSource>;
 }
 
+impl AsTextureSource for TextureSource {
+    #[inline]
+    fn as_texture_source(&self) -> Option<TextureSource> {
+        Some(self.clone())
+    }
+}
+
+impl AsTextureSource for Option<TextureSource> {
+    #[inline]
+    fn as_texture_source(&self) -> Option<TextureSource> {
+        self.clone()
+    }
+}
+
 impl<T> AsTextureSource for T
 where
     T: AsRef<TextureSource>,
 {
+    #[inline]
     fn as_texture_source(&self) -> Option<TextureSource> {
         Some(self.as_ref().clone())
     }

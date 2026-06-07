@@ -1,7 +1,8 @@
 mod progress;
 mod props;
+mod texture;
 
-pub use self::{progress::*, props::*};
+pub use self::{progress::*, props::*, texture::*};
 
 use super::{Direction, Props, RenderCtx, Unit, align::Align};
 use crate::{
@@ -18,7 +19,8 @@ use crate::{
     trigger::ProgressActive,
 };
 use const_default::ConstDefault;
-use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
+use nexus::imgui::{self, ComboBoxFlags, DrawListMut, InputTextFlags, Ui};
+use reffect_core::colors::Color;
 use serde::{Deserialize, Serialize};
 
 // TODO: rounding
@@ -37,6 +39,12 @@ pub struct Bar {
     #[serde(flatten)]
     pub props: Props<BarProps>,
 
+    /// Bar fill texture.
+    pub fill_texture: LoadedBarTexture,
+
+    /// Bar background texture.
+    pub background_texture: LoadedBarTexture,
+
     /// Bar size.
     pub size: [f32; 2],
 
@@ -54,6 +62,11 @@ pub struct Bar {
 }
 
 impl Bar {
+    pub fn load(&mut self) {
+        self.fill_texture.load();
+        self.background_texture.load();
+    }
+
     fn calc_progress(&self, ctx: &Context, active: &ProgressActive) -> f32 {
         let progress = self.progress_kind.calc_progress(ctx, active, self.max);
         self.process_value(progress).clamp(0.0, 1.0)
@@ -72,7 +85,7 @@ impl Bar {
             let progress = self.calc_progress(ctx, active);
 
             let alpha = ui.clone_style().alpha;
-            let (start, end) = self.bounds_with_offset(ui, ctx, ctx.pos());
+            let bounds @ (start, end) = self.bounds_with_offset(ui, ctx, ctx.pos());
             let offset_2d = self.direction.offset_2d(self.size);
 
             let (offset_start, offset_end) =
@@ -81,26 +94,38 @@ impl Bar {
             let fill_end = start.add(offset_end);
 
             let bg_color = with_alpha_factor(self.props.background, alpha);
+            let bg_texture = self.background_texture.get_texture(ui);
             let fill_color = with_alpha_factor(self.props.fill, alpha);
+            let fill_texture = self.fill_texture.get_texture(ui);
 
             let draw_list = ui.get_background_draw_list();
+
+            // background
             if start != fill_start {
-                draw_list
-                    .add_rect(start, fill_start.add(offset_2d), bg_color)
-                    .filled(true)
-                    .build();
+                self.render_bar_contents(
+                    &draw_list,
+                    bounds,
+                    start,
+                    fill_start.add(offset_2d),
+                    bg_color,
+                    bg_texture,
+                );
             }
             if end != fill_end.add(offset_2d) {
-                draw_list
-                    .add_rect(fill_end, end, bg_color)
-                    .filled(true)
-                    .build();
+                self.render_bar_contents(&draw_list, bounds, fill_end, end, bg_color, bg_texture);
             }
-            draw_list
-                .add_rect(fill_start, fill_end.add(offset_2d), fill_color)
-                .filled(true)
-                .build();
 
+            // fill
+            self.render_bar_contents(
+                &draw_list,
+                bounds,
+                fill_start,
+                fill_end.add(offset_2d),
+                fill_color,
+                fill_texture,
+            );
+
+            // border
             if self.props.border_size > 0.0 {
                 let border_color = with_alpha_factor(self.props.border_color, alpha);
                 draw_list
@@ -109,6 +134,7 @@ impl Bar {
                     .build();
             }
 
+            // ticks
             if self.props.tick_size > 0.0 {
                 let max = self.progress_kind.progress_max(active, self.max);
                 for tick in &self.ticks {
@@ -130,6 +156,25 @@ impl Bar {
                     }
                 }
             }
+        }
+    }
+
+    fn render_bar_contents(
+        &self,
+        draw_list: &DrawListMut,
+        bounds: Rect,
+        start: [f32; 2],
+        end: [f32; 2],
+        color: Color,
+        texture: Option<imgui::TextureId>,
+    ) {
+        if let Some(texture) = texture {
+            let (min, max) = bounds;
+            draw_list.with_clip_rect(start, end, || {
+                draw_list.add_image(texture, min, max).col(color).build();
+            });
+        } else {
+            draw_list.add_rect(start, end, color).filled(true).build();
         }
     }
 
@@ -168,9 +213,19 @@ impl Bar {
 
         input_size(&mut self.size);
 
-        input_color_alpha(ui, "Fill", &mut self.props.base.fill);
+        ui.spacing();
 
-        input_color_alpha(ui, "Background", &mut self.props.base.background);
+        input_color_alpha(ui, "Fill", &mut self.props.base.fill);
+        helper(ui, || ui.text("Color/tint for foreground progress"));
+        self.fill_texture.render_select(ui, "Fill texture");
+        helper(ui, || ui.text("Optional texture for foreground progress"));
+
+        input_color_alpha(ui, "Back color", &mut self.props.base.background);
+        helper(ui, || ui.text("Color/tint for background"));
+        self.background_texture.render_select(ui, "Back texture");
+        helper(ui, || ui.text("Optional texture for background"));
+
+        ui.spacing();
 
         input_positive_with_format(
             "Border size",
@@ -266,6 +321,8 @@ impl ConstDefault for Bar {
         progress_kind: Progress::DEFAULT,
         max: 25.0,
         props: Props::DEFAULT,
+        fill_texture: LoadedBarTexture::DEFAULT,
+        background_texture: LoadedBarTexture::DEFAULT,
         align: Align::Center,
         size: [128.0, 12.0],
         direction: Direction::Right,

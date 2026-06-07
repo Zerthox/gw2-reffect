@@ -44,11 +44,7 @@ impl LoadedIcon {
     pub fn render_select(&mut self, ui: &Ui, ctx: &RenderCtx) -> DynAction<IconSource> {
         let mut source = self.source_mut();
         let IconEditResult { reload, action } = source.render_select(ui, ctx);
-        if reload {
-            source.reload();
-        } else {
-            source.unchanged();
-        }
+        source.reload_if(reload);
         action
     }
 }

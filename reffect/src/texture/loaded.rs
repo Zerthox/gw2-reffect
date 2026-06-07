@@ -94,6 +94,15 @@ where
     /// Same as dropping.
     pub fn reload(self) {}
 
+    /// Reloads the texture if the condition is met.
+    pub fn reload_if(self, reload: bool) {
+        if reload {
+            self.reload();
+        } else {
+            self.unchanged();
+        }
+    }
+
     /// Resets the texture to unloaded state.
     pub const fn reset(self) {
         self.0.key = None;
