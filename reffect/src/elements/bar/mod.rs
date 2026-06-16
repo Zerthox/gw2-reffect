@@ -39,12 +39,6 @@ pub struct Bar {
     #[serde(flatten)]
     pub props: Props<BarProps>,
 
-    /// Bar fill texture.
-    pub fill_texture: LoadedBarTexture,
-
-    /// Bar background texture.
-    pub background_texture: LoadedBarTexture,
-
     /// Bar size.
     pub size: [f32; 2],
 
@@ -63,8 +57,11 @@ pub struct Bar {
 
 impl Bar {
     pub fn load(&mut self) {
-        self.fill_texture.load();
-        self.background_texture.load();
+        self.props.base.load();
+        self.props.current.load();
+        for condition in &mut self.props.conditions {
+            BarProps::load_partial(&mut condition.properties);
+        }
     }
 
     fn calc_progress(&self, ctx: &Context, active: &ProgressActive) -> f32 {
@@ -94,9 +91,9 @@ impl Bar {
             let fill_end = start.add(offset_end);
 
             let bg_color = with_alpha_factor(self.props.background, alpha);
-            let bg_texture = self.background_texture.get_texture(ui);
+            let bg_texture = self.props.background_texture.get_texture(ui);
             let fill_color = with_alpha_factor(self.props.fill, alpha);
-            let fill_texture = self.fill_texture.get_texture(ui);
+            let fill_texture = self.props.fill_texture.get_texture(ui);
 
             let draw_list = ui.get_background_draw_list();
 
@@ -228,12 +225,18 @@ impl Bar {
 
         input_color_alpha(ui, "Fill", &mut self.props.base.fill);
         helper(ui, || ui.text("Color/tint for foreground progress"));
-        self.fill_texture.render_select(ui, "Fill texture");
+        self.props
+            .base
+            .fill_texture
+            .render_select(ui, "Fill texture");
         helper(ui, || ui.text("Optional texture for foreground progress"));
 
         input_color_alpha(ui, "Back color", &mut self.props.base.background);
         helper(ui, || ui.text("Color/tint for background"));
-        self.background_texture.render_select(ui, "Back texture");
+        self.props
+            .base
+            .background_texture
+            .render_select(ui, "Back texture");
         helper(ui, || ui.text("Optional texture for background"));
 
         ui.spacing();
@@ -332,8 +335,7 @@ impl ConstDefault for Bar {
         progress_kind: Progress::DEFAULT,
         max: 25.0,
         props: Props::DEFAULT,
-        fill_texture: LoadedBarTexture::DEFAULT,
-        background_texture: LoadedBarTexture::DEFAULT,
+
         align: Align::Center,
         size: [128.0, 12.0],
         direction: Direction::Right,

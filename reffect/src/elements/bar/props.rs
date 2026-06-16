@@ -1,3 +1,4 @@
+use super::LoadedBarTexture;
 use crate::{
     colors,
     colors::Color,
@@ -27,8 +28,14 @@ pub struct BarProps {
     /// Fill color.
     pub fill: Color,
 
+    /// Bar fill texture.
+    pub fill_texture: LoadedBarTexture,
+
     /// Background color.
     pub background: Color,
+
+    /// Bar background texture.
+    pub background_texture: LoadedBarTexture,
 
     /// Border size.
     pub border_size: f32,
@@ -48,7 +55,9 @@ impl ConstDefault for BarProps {
         lower_bound: 0.0,
         upper_bound: 1.0,
         fill: colors::GREEN,
+        fill_texture: LoadedBarTexture::DEFAULT,
         background: colors::TRANSPARENT,
+        background_texture: LoadedBarTexture::DEFAULT,
         border_size: 1.0,
         border_color: colors::BLACK,
         tick_size: 1.0,
@@ -62,13 +71,31 @@ impl Default for BarProps {
     }
 }
 
+impl BarProps {
+    pub fn load(&mut self) {
+        self.fill_texture.load();
+        self.background_texture.load();
+    }
+
+    pub fn load_partial(partial: &mut Partial<BarProps>) {
+        if let Some(texture) = &mut partial.fill_texture {
+            texture.load();
+        }
+        if let Some(texture) = &mut partial.background_texture {
+            texture.load();
+        }
+    }
+}
+
 impl PartialProps<BarProps> for Partial<BarProps> {
     fn render_options(&mut self, ui: &Ui, base: &BarProps) {
         let Self {
             lower_bound,
             upper_bound,
             fill,
+            fill_texture,
             background,
+            background_texture,
             border_size,
             border_color,
             tick_size,
@@ -99,10 +126,25 @@ impl PartialProps<BarProps> for Partial<BarProps> {
         );
         input_optional(
             ui,
+            "Fill texture",
+            fill_texture,
+            || base.fill_texture.clone(),
+            |texture| texture.render_select(ui, "Fill texture"),
+        );
+
+        input_optional(
+            ui,
             "Background",
             background,
             || base.background,
             |color| input_color_alpha(ui, "Background", color),
+        );
+        input_optional(
+            ui,
+            "Back texture",
+            background_texture,
+            || base.background_texture.clone(),
+            |texture| texture.render_select(ui, "Back texture"),
         );
 
         input_optional(
