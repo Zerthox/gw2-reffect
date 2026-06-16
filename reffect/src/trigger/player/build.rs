@@ -46,6 +46,12 @@ pub struct BuildTrigger {
     #[cfg_attr(feature = "schema", schemars(with = "bitflags::Schema<ProfSelection>"))]
     pub prof_selections: BitFlags<ProfSelection>,
 
+    /// Selected pets.
+    pub pets: Vec<u32>,
+
+    /// Trigger logic mode for selected pets.
+    pub pet_mode: TriggerMode,
+
     #[serde(skip)]
     active: bool,
 }
@@ -91,6 +97,17 @@ impl BuildTrigger {
             self.prof_selections,
             build.map(|build| build.prof_selections).ok(),
         )
+    }
+
+    fn pet_selections_active(&self, ctx: &Context) -> bool {
+        if ctx.player.has_pets()
+            && let Ok(build) = ctx.player.build.as_ref()
+        {
+            self.pet_mode
+                .check_slice(&self.pets, |id| build.pets.contains(id))
+        } else {
+            true
+        }
     }
 
     fn render_trait_options(&mut self, ui: &Ui) -> bool {
@@ -167,6 +184,38 @@ impl BuildTrigger {
         changed
     }
 
+    fn render_pet_options(&mut self, ui: &Ui) -> bool {
+        let _id = ui.push_id("pet");
+        let mut changed = false;
+
+        changed |= self.skill_selections_mode.render_options(ui, "Pet Mode");
+
+        let mut action = Action::new();
+        for (i, id) in self.pets.iter_mut().enumerate() {
+            let _id = ui.push_id(i as i32);
+            changed |= action.input_with_buttons(ui, i, || {
+                input_skill_id(ui, "##id", id, InputTextFlags::empty())
+            });
+            ui.same_line();
+            ui.text(format!("Pet Id {}", i + 1));
+
+            if i == 0 {
+                helper(ui, || {
+                    ui.text("Pet selections in the build (ranger only)");
+                    ui.text("Can be found on the wiki, same as in GW2 API");
+                });
+            }
+        }
+        changed |= action.perform(&mut self.pets);
+
+        if ui.button("Add Pet") {
+            self.pets.push(0);
+            changed = true;
+        }
+
+        changed
+    }
+
     pub fn render_options(&mut self, ui: &Ui, ctx: &Context) -> bool {
         let _id = ui.push_id("build");
         let mut changed = false;
@@ -188,6 +237,8 @@ impl BuildTrigger {
             &mut self.prof_selections,
             ComboBoxFlags::HEIGHT_LARGE,
         );
+
+        changed |= self.render_pet_options(ui);
 
         if changed {
             // ensure fresh state after changed
@@ -212,6 +263,7 @@ impl MemoizedTrigger for BuildTrigger {
             && self.traits_active(ctx)
             && self.skill_selections_active(ctx)
             && self.prof_selections_active(ctx)
+            && self.pet_selections_active(ctx)
     }
 }
 
@@ -224,6 +276,8 @@ impl ConstDefault for BuildTrigger {
         skill_selections: Vec::new(),
         skill_selections_mode: TriggerMode::All,
         prof_selections: BitFlags::EMPTY,
+        pets: Vec::new(),
+        pet_mode: TriggerMode::All,
         active: true,
     };
 }

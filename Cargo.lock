@@ -973,7 +973,7 @@ dependencies = [
 
 [[package]]
 name = "reffect"
-version = "0.10.3"
+version = "0.11.0"
 dependencies = [
  "const-default",
  "enumflags2",

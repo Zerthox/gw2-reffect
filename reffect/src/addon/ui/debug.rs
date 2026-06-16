@@ -76,6 +76,7 @@ impl Addon {
                         traits,
                         skill_selections,
                         prof_selections,
+                        pets,
                     } = build;
 
                     let [spec1, spec2, spec3] = specs;
@@ -117,6 +118,9 @@ impl Addon {
                     }
                     ui.new_line();
                     ui.unindent();
+
+                    let [pet1, pet2] = pets;
+                    ui.text(format!("Pets: {pet1} {pet2}"));
                 });
                 debug_result_tree(
                     ui,

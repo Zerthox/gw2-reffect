@@ -19,6 +19,9 @@ pub struct Build {
 
     /// Profession-specific selections.
     pub prof_selections: BitFlags<ProfSelection>,
+
+    /// Current selected pets.
+    pub pets: Pets,
 }
 
 impl Build {
@@ -29,6 +32,7 @@ impl Build {
             traits: [0; 9],
             skill_selections: Vec::new(),
             prof_selections: BitFlags::EMPTY,
+            pets: [0; 2],
         }
     }
 }
@@ -36,6 +40,8 @@ impl Build {
 pub type Specializations = [u32; 3];
 
 pub type Traits = [u32; 9];
+
+pub type Pets = [u32; 2];
 
 #[derive(
     Debug,

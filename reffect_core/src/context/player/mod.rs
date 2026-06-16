@@ -82,6 +82,11 @@ impl PlayerInfo {
         self.buff_info = Err(error.clone());
         self.skillbar = Err(error);
     }
+
+    #[inline]
+    pub const fn has_pets(&self) -> bool {
+        matches!(self.prof, Ok(Profession::Ranger))
+    }
 }
 
 #[derive(Debug, Clone, Default)]
