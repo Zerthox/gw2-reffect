@@ -23,6 +23,8 @@ use strum::{AsRefStr, EnumIter, VariantArray};
 )]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub enum Progress {
+    Fixed,
+
     Intensity,
 
     Duration,
@@ -42,8 +44,13 @@ impl Default for Progress {
 }
 
 impl Progress {
+    pub const fn use_max(&self) -> bool {
+        matches!(self, Self::Intensity)
+    }
+
     pub fn calc_progress(&self, ctx: &Context, active: &ProgressActive, max: f32) -> f32 {
         match self {
+            Self::Fixed => 1.0,
             Self::Intensity => {
                 if max > 0.0 {
                     active.intensity() as f32 / max
@@ -60,6 +67,7 @@ impl Progress {
 
     pub fn progress_max(&self, active: &ProgressActive, max: f32) -> f32 {
         match self {
+            Self::Fixed => 1.0,
             Self::Intensity => max,
             Self::Duration => active.max(ProgressValue::Primary),
             Self::SecondaryDuration => active.max(ProgressValue::Secondary),

@@ -194,7 +194,7 @@ impl Bar {
             ComboBoxFlags::empty(),
         );
 
-        if let Progress::Intensity = self.progress_kind {
+        if self.progress_kind.use_max() {
             input_positive_with_format(
                 "Max",
                 &mut self.max,
