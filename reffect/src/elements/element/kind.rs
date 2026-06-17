@@ -14,6 +14,7 @@ use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 #[derive(Debug, Clone, EnumIter, EnumCount, AsRefStr, IntoStaticStr, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(tag = "type")]
+#[allow(clippy::large_enum_variant)]
 pub enum ElementType {
     Group(Group),
 
@@ -25,7 +26,7 @@ pub enum ElementType {
 
     Text(Text),
 
-    Bar(Bar),
+    Bar(Bar), // TODO: box for reduced size?
 }
 
 impl VariantArray for ElementType {
