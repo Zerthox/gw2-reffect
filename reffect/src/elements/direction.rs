@@ -1,4 +1,4 @@
-use super::{Icon, align::Align};
+use super::list::ListIcon;
 use crate::render::{ComponentWise, Rect};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, VariantArray};
@@ -32,17 +32,6 @@ impl Direction {
     /// Whether the direction is bi-directional.
     pub const fn is_bidirectional(&self) -> bool {
         matches!(self, Self::Horizontal | Self::Vertical)
-    }
-
-    /// Convert the direction to the corresponding alignment.
-    pub const fn align(&self) -> Align {
-        match self {
-            Self::Right => Align::Right,
-            Self::Left => Align::Left,
-            Self::Up => Align::Up,
-            Self::Down => Align::Down,
-            Self::Horizontal | Self::Vertical => Align::Center,
-        }
     }
 
     /// Returns the offset in the orthogonal 2-dimensional direction.
@@ -148,7 +137,7 @@ impl Direction {
                 ([0.0, start], [0.0, start + offset_y])
             }
         };
-        let (bounds_min, bounds_max) = Icon::bounds(size);
+        let (bounds_min, bounds_max) = ListIcon::ALIGN.bounds(size);
         (first.add(bounds_min), last.add(bounds_max))
     }
 }

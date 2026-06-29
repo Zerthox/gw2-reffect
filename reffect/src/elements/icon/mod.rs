@@ -10,7 +10,8 @@ use crate::{
     action::DynAction,
     colors::{self, with_alpha, with_alpha_factor},
     context::{Context, SkillId},
-    render::{ComponentWise, Rect, debug_optional, draw_spinner_bg},
+    elements::align::Align,
+    render::{ComponentWise, debug_optional, draw_spinner_bg},
     render_copy_field,
     settings::icon::DurationBarSettings,
     trigger::{ProgressActive, ProgressTrigger, ProgressValue},
@@ -52,18 +53,13 @@ impl Icon {
         [r, g, b, a * ui.clone_style().alpha]
     }
 
-    pub fn bounds(size: [f32; 2]) -> Rect {
-        let start = size.mul_scalar(-0.5);
-        let end = size.mul_scalar(0.5);
-        (start, end)
-    }
-
     pub fn render(
         &mut self,
         ui: &Ui,
         ctx: &RenderCtx,
         active: Option<&ProgressActive>,
         size: [f32; 2],
+        align: Align,
     ) {
         self.props.update(ctx, active);
 
@@ -77,7 +73,7 @@ impl Icon {
             };
             let texture = self.texture.get_texture(ui, skill_id);
 
-            let (start, end) = Self::bounds(size);
+            let (start, end) = align.bounds(size);
             let start = ctx.pos().add(start);
             let end = ctx.pos().add(end);
             let round = self.props.round * small_size;

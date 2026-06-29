@@ -1,8 +1,7 @@
 use crate::{
     action::DynAction,
     context::Context,
-    elements::{Common, Element, ElementType, Icon, IconElement, RenderCtx},
-    render::Rect,
+    elements::{Common, Element, ElementType, Icon, IconElement, RenderCtx, align::Align},
     trigger::{FilterTrigger, ProgressActive, ProgressTrigger, Trigger},
 };
 use nexus::imgui::Ui;
@@ -32,6 +31,8 @@ pub struct ListIcon {
 }
 
 impl ListIcon {
+    pub const ALIGN: Align = Align::Center;
+
     pub fn is_visible(&mut self, ctx: &RenderCtx) -> bool {
         self.enabled
             && if ctx.edit.is_editing() {
@@ -46,11 +47,8 @@ impl ListIcon {
     }
 
     pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, size: [f32; 2]) {
-        self.icon.render(ui, ctx, self.trigger.active(), size)
-    }
-
-    pub fn bounds(&self, size: [f32; 2]) -> Rect {
-        Icon::bounds(size)
+        self.icon
+            .render(ui, ctx, self.trigger.active(), size, Self::ALIGN)
     }
 
     pub fn into_element(self, size: [f32; 2]) -> Element {
@@ -65,6 +63,7 @@ impl ListIcon {
             kind: ElementType::Icon(IconElement {
                 icon: self.icon,
                 size,
+                ..IconElement::default()
             }),
         }
     }

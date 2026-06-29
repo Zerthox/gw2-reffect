@@ -1,12 +1,12 @@
-use super::{Icon, RenderCtx};
+use super::Icon;
 use crate::{
     context::Context,
-    elements::Common,
-    render::{Bounds, Rect, input_size},
+    elements::{Common, RenderCtx, align::Align},
+    render::{Bounds, Rect, enum_combo, input_size},
     tree::TreeNode,
 };
 use const_default::ConstDefault;
-use nexus::imgui::Ui;
+use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -18,6 +18,9 @@ pub struct IconElement {
 
     /// Icon size.
     pub size: [f32; 2],
+
+    /// Icon alignment.
+    pub align: Align,
 }
 
 impl TreeNode for IconElement {}
@@ -25,11 +28,13 @@ impl TreeNode for IconElement {}
 impl IconElement {
     pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, common: &Common) {
         self.icon
-            .render(ui, ctx, common.trigger.active(), self.size)
+            .render(ui, ctx, common.trigger.active(), self.size, self.align)
     }
 
     pub fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) {
         input_size(&mut self.size);
+
+        enum_combo(ui, "Align", &mut self.align, ComboBoxFlags::empty());
 
         self.icon.render_options(ui, ctx);
     }
@@ -45,7 +50,7 @@ impl IconElement {
 
 impl Bounds for IconElement {
     fn bounds(&self, _ui: &Ui, _ctx: &Context) -> Rect {
-        Icon::bounds(self.size)
+        self.align.bounds(self.size)
     }
 }
 
@@ -53,6 +58,7 @@ impl ConstDefault for IconElement {
     const DEFAULT: Self = Self {
         icon: Icon::DEFAULT,
         size: [32.0, 32.0],
+        align: Align::Center,
     };
 }
 

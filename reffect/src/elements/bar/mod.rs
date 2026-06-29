@@ -325,8 +325,7 @@ impl TreeNode for Bar {}
 
 impl Bounds for Bar {
     fn bounds(&self, _ui: &Ui, _ctx: &Context) -> Rect {
-        let start = self.align.offset(self.size);
-        (start, start.add(self.size))
+        self.align.bounds(self.size)
     }
 }
 

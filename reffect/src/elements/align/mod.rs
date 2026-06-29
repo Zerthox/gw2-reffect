@@ -2,10 +2,9 @@ mod horizontal;
 
 pub use self::horizontal::*;
 
+use crate::render::{ComponentWise, Rect};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, VariantArray};
-
-// TODO: add to element or common?
 
 /// 2 dimensional alignment.
 #[derive(
@@ -33,7 +32,8 @@ pub enum Align {
 }
 
 impl Align {
-    pub fn offset(&self, size: [f32; 2]) -> [f32; 2] {
+    #[inline]
+    pub const fn offset(&self, size: [f32; 2]) -> [f32; 2] {
         let [width, height] = size;
         match self {
             Self::Right => [0.0, -0.5 * height],
@@ -42,5 +42,11 @@ impl Align {
             Self::Down => [-0.5 * width, 0.0],
             Self::Center => [-0.5 * width, -0.5 * height],
         }
+    }
+
+    #[inline]
+    pub fn bounds(&self, size: [f32; 2]) -> Rect {
+        let start = self.offset(size);
+        (start, start.add(size))
     }
 }
