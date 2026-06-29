@@ -1,5 +1,5 @@
 use nexus::{
-    data_link::mumble::map_id::{fractal, hub, raid, strike},
+    data_link::mumble::map_id::{fractal, hub, raid},
     imgui::{MenuItem, Ui},
 };
 use std::slice;
@@ -30,7 +30,7 @@ impl MapGroup {
 
 pub fn map_select(ui: &Ui) -> Option<&'static [Map]> {
     let mut selected = None;
-    for group in [GENERAL, FRACTALS, RAIDS, STRIKES] {
+    for group in [GENERAL, FRACTALS, RAID_WINGS, RAID_ENCOUNTERS] {
         ui.menu(group.name, || {
             if MenuItem::new("All").build(ui) {
                 selected = Some(group.maps);
@@ -95,8 +95,8 @@ pub const FRACTALS: MapGroup = MapGroup::new(
     ],
 );
 
-pub const RAIDS: MapGroup = MapGroup::new(
-    "Raids",
+pub const RAID_WINGS: MapGroup = MapGroup::new(
+    "Raid Wings",
     &[
         Map::new("Spirit Vale", raid::SPIRIT_VALE),
         Map::new("Salvation Pass", raid::SALVATION_PASS),
@@ -112,26 +112,27 @@ pub const RAIDS: MapGroup = MapGroup::new(
     ],
 );
 
-pub const STRIKES: MapGroup = MapGroup::new(
-    "Strikes",
+pub const RAID_ENCOUNTERS: MapGroup = MapGroup::new(
+    "Raid Encounters",
     &[
         Map::new(
             "Secret Lair of the Snowmen",
-            strike::SECRET_LAIR_OF_THE_SNOWMEN,
+            raid::SECRET_LAIR_OF_THE_SNOWMEN,
         ),
-        Map::new("Shiverpeaks Pass", strike::SHIVERPEAKS_PASS),
-        Map::new("Boneskinner", strike::BONESKINNER),
-        Map::new("Fraenir of Jormag", strike::FRAENIR_OF_JORMAG),
-        Map::new("Voice and Claw", strike::VOICE_AND_CLAW),
-        Map::new("Whisper of Jormag", strike::WHISPER_OF_JORMAG),
-        Map::new("Forging Steel", strike::FORGING_STEEL),
-        Map::new("Cold War", strike::COLD_WAR),
-        Map::new("Aetherblade Hideout", strike::AETHERBLADE_HIDEOUT),
-        Map::new("Xunlai Jade Junkyard", strike::XUNLAI_JADE_JUNKYARD),
-        Map::new("Kaineng Overlook", strike::KAINENG_OVERLOOK),
-        Map::new("Harvest Temple", strike::HARVEST_TEMPLE),
-        Map::new("Old Lion's Court", strike::OLD_LIONS_COURT),
-        Map::new("Cosmic Observatory", strike::COSMIC_OBSERVATORY),
-        Map::new("Temple of Febe", strike::TEMPLE_OF_FEBE),
+        Map::new("Shiverpeaks Pass", raid::SHIVERPEAKS_PASS),
+        Map::new("Boneskinner", raid::BONESKINNER),
+        Map::new("Fraenir of Jormag", raid::FRAENIR_OF_JORMAG),
+        Map::new("Voice and Claw", raid::VOICE_AND_CLAW),
+        Map::new("Whisper of Jormag", raid::WHISPER_OF_JORMAG),
+        Map::new("Forging Steel", raid::FORGING_STEEL),
+        Map::new("Cold War", raid::COLD_WAR),
+        Map::new("Aetherblade Hideout", raid::AETHERBLADE_HIDEOUT),
+        Map::new("Xunlai Jade Junkyard", raid::XUNLAI_JADE_JUNKYARD),
+        Map::new("Kaineng Overlook", raid::KAINENG_OVERLOOK),
+        Map::new("Harvest Temple", raid::HARVEST_TEMPLE),
+        Map::new("Old Lion's Court", raid::OLD_LIONS_COURT),
+        Map::new("Cosmic Observatory", raid::COSMIC_OBSERVATORY),
+        Map::new("Temple of Febe", raid::TEMPLE_OF_FEBE),
+        Map::new("Guardian's Glade", raid::GUARDIANS_GLADE),
     ],
 );
