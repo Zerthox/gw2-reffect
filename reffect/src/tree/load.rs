@@ -1,6 +1,6 @@
 use super::VisitMut;
 use crate::{
-    elements::{Bar, IconElement, IconList, Text},
+    elements::{Bar, Icon, Text},
     trigger::FilterTrigger,
 };
 
@@ -8,12 +8,8 @@ use crate::{
 pub struct Loader;
 
 impl VisitMut for Loader {
-    fn visit_icon_list(&mut self, list: &mut IconList) {
-        list.load();
-    }
-
-    fn visit_icon(&mut self, icon: &mut IconElement) {
-        icon.icon.load()
+    fn visit_icon(&mut self, icon: &mut Icon) {
+        icon.load()
     }
 
     fn visit_text(&mut self, text: &mut Text) {

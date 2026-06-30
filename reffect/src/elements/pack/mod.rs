@@ -89,14 +89,13 @@ impl Pack {
 
     /// Renders the pack.
     pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx) {
-        if self.common.is_visible(ctx) {
-            self.common.update(ctx, None);
+        if self.common.is_visible_or_edit(ctx) {
             {
                 let _token = ctx.push_child(ui, &self.common);
                 let _style = self.common.push_style(ui, ctx);
 
                 for element in &mut self.elements {
-                    element.render(ui, ctx, &self.common);
+                    element.render(ui, ctx);
                 }
             }
 

@@ -61,8 +61,6 @@ impl Icon {
         size: [f32; 2],
         align: Align,
     ) {
-        self.props.update(ctx, active);
-
         if let Some(active) = active {
             let [width, height] = size;
             let small_size = width.min(height);

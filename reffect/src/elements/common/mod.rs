@@ -3,7 +3,7 @@ use crate::{
     action::ChildElementAction,
     clipboard::Clipboard,
     colors,
-    context::{Context, EditState},
+    context::EditState,
     elements::{Animation, RenderCtx},
     enums::EnumStaticVariants,
     id::Id,
@@ -12,7 +12,7 @@ use crate::{
         push_alpha_change, push_window_clip_rect_fullscreen, slider_percent,
     },
     serde::migrate,
-    trigger::{FilterTrigger, ProgressActive, ProgressTrigger, Trigger},
+    trigger::{FilterTrigger, ProgressTrigger},
 };
 use nexus::imgui::{Condition, MenuItem, MouseButton, StyleVar, Ui, Window};
 use serde::{Deserialize, Serialize};
@@ -68,7 +68,7 @@ impl Common {
         self.id.to_string()
     }
 
-    pub fn is_visible(&mut self, ctx: &RenderCtx) -> bool {
+    pub fn is_visible_or_edit(&mut self, ctx: &RenderCtx) -> bool {
         if ctx.edit.is_editing() {
             (self.enabled && ctx.is_edited()) || ctx.edit.is_selected_or_parent(self.id)
         } else {
@@ -82,10 +82,6 @@ impl Common {
 
     pub fn pos_root(&self, ui: &Ui) -> [f32; 2] {
         self.pos(ui, ElementAnchor::root(ui))
-    }
-
-    pub fn update(&mut self, ctx: &Context, parent_active: Option<&ProgressActive>) -> bool {
-        self.trigger.update(ctx, parent_active)
     }
 
     pub fn push_style<'ui>(&mut self, ui: &'ui Ui, ctx: &RenderCtx) -> impl Drop + 'ui {

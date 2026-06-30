@@ -1,11 +1,9 @@
 use super::ProgressActive;
 use crate::{
-    context::Context,
+    context::{Context, Updateable},
     enums::check_variant_array,
     render::{Validation, enum_combo},
-    trigger::{
-        AbilityStateTrigger, MapTrigger, PlayerTrigger, ProgressSource, ProgressThreshold, Trigger,
-    },
+    trigger::{AbilityStateTrigger, MapTrigger, PlayerTrigger, ProgressSource, ProgressThreshold},
 };
 use const_default::ConstDefault;
 use nexus::imgui::{ComboBoxFlags, Ui};
@@ -54,12 +52,18 @@ impl Default for ConditionTrigger {
 }
 
 impl ConditionTrigger {
-    pub fn is_active(&mut self, ctx: &Context, active: &ProgressActive) -> bool {
+    pub fn is_active_or_update(&mut self, ctx: &Context, active: &ProgressActive) -> bool {
         match self {
             Self::ProgressThreshold(threshold) => threshold.is_met(active, ctx),
-            Self::AbilityState(ability_state) => ability_state.is_active(active),
-            Self::Player(player) => player.is_active(ctx),
-            Self::Map(map) => map.is_active(ctx),
+            Self::AbilityState(ability_state) => ability_state.is_present(active),
+            Self::Player(player) => {
+                player.update_if_need(ctx);
+                player.is_active(ctx)
+            }
+            Self::Map(map) => {
+                map.update_if_need(ctx);
+                map.is_active()
+            }
         }
     }
 

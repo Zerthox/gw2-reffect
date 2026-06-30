@@ -32,7 +32,7 @@ where
     where
         T::Partial: Clone,
     {
-        if self.trigger.is_active(ctx, active) {
+        if self.trigger.is_active_or_update(ctx, active) {
             value.set(self.properties.clone());
         }
     }

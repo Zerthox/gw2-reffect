@@ -3,11 +3,7 @@ mod editor;
 mod options;
 
 use super::Addon;
-use crate::{
-    context::{Context, Update},
-    elements::RenderCtx,
-    tree::FilterUpdater,
-};
+use crate::{context::Context, elements::RenderCtx, tree::Updater};
 use nexus::imgui::Ui;
 
 impl Addon {
@@ -15,8 +11,8 @@ impl Addon {
         let mut ctx = Context::lock();
 
         ctx.prepare_render(&self.links);
-        if ctx.has_update(Update::Map) {
-            FilterUpdater::update(&ctx, &mut self.packs);
+        if ctx.has_any_update_or_edit() {
+            Updater::update(&ctx, &mut self.packs);
         }
 
         self.render_displays(ui, &ctx);
@@ -26,7 +22,7 @@ impl Addon {
         }
 
         self.render_popups(ui);
-        ctx.reset();
+        ctx.reset_after_render();
     }
 
     pub fn render_displays(&mut self, ui: &Ui, ctx: &Context) {

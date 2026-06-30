@@ -56,14 +56,12 @@ impl IconList {
         }
     }
 
-    pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, common: &Common) {
+    pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, _common: &Common) {
         let render_icon = |icon: &mut ListIcon, i, len| {
             let offset = self.direction.list_item_offset(self.size, self.pad, i, len);
             let _token = ctx.push_offset(offset);
             icon.render(ui, ctx, self.size);
         };
-
-        let parent_active = common.trigger.active();
 
         match self.layout {
             Layout::Dynamic => {
@@ -71,7 +69,7 @@ impl IconList {
                     .icons
                     .iter_mut()
                     .filter_map(|icon| {
-                        let visible = icon.is_visible(ctx) && icon.update(ctx, parent_active);
+                        let visible = icon.is_visible(ctx);
                         visible.then_some(icon)
                     })
                     .collect::<Vec<_>>();
@@ -84,7 +82,7 @@ impl IconList {
             Layout::Static => {
                 let len = self.icons.len();
                 for (i, icon) in self.icons.iter_mut().enumerate() {
-                    if icon.is_visible(ctx) && icon.update(ctx, parent_active) {
+                    if icon.is_visible(ctx) {
                         render_icon(icon, i, len);
                     }
                 }

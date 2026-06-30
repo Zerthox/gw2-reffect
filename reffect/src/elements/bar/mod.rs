@@ -7,7 +7,7 @@ pub use self::{progress::*, props::*, texture::*};
 use super::{Direction, Props, RenderCtx, Unit, align::Align};
 use crate::{
     action::Action,
-    colors::with_alpha_factor,
+    colors::{Color, with_alpha_factor},
     context::Context,
     elements::Common,
     render::{
@@ -20,7 +20,6 @@ use crate::{
 };
 use const_default::ConstDefault;
 use nexus::imgui::{self, ComboBoxFlags, DrawListMut, InputTextFlags, Ui};
-use reffect_core::colors::Color;
 use serde::{Deserialize, Serialize};
 
 // TODO: rounding
@@ -75,10 +74,7 @@ impl Bar {
     }
 
     pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, common: &Common) {
-        let active = common.trigger.active();
-        self.props.update(ctx, active);
-
-        if let Some(active) = active {
+        if let Some(active) = common.trigger.active() {
             let progress = self.calc_progress(ctx, active);
 
             let alpha = ui.clone_style().alpha;

@@ -10,7 +10,7 @@ use crate::{
     render::{
         Bounds, Rect, delete_confirm_modal, item_context_menu, style_disabled_if, tree_select_empty,
     },
-    tree::{Loader, Resizer, TreeNode, VisitMut},
+    tree::{TreeNode, Loader, Resizer, VisitMut},
 };
 use nexus::imgui::{MenuItem, StyleColor, Ui};
 use serde::{Deserialize, Serialize};
@@ -37,9 +37,9 @@ impl Element {
     }
 
     /// Renders the element.
-    pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, parent: &Common) {
-        if self.common.is_visible(ctx) {
-            if self.common.update(ctx, parent.trigger.active()) || self.kind.is_passthrough() {
+    pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx) {
+        if self.common.is_visible_or_edit(ctx) {
+            if self.common.trigger.is_visible() || self.kind.is_passthrough() {
                 let _token = ctx.push_child(ui, &self.common);
                 let _style = self.common.push_style(ui, ctx);
                 self.kind.render(ui, ctx, &self.common);

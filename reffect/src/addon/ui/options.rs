@@ -5,7 +5,7 @@ use nexus::imgui::{TreeNodeFlags, Ui};
 impl Addon {
     pub fn render_options(&mut self, ui: &Ui) {
         let ctx = &mut *Context::lock();
-        ctx.edit.update_allowed(&ctx.ui);
+        ctx.update_edit_mode();
 
         if let Some(_token) = ui.tab_bar("options") {
             if let Some(_token) = ui.tab_item("Editor") {

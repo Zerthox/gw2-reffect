@@ -5,11 +5,7 @@ mod value;
 
 pub use self::{active::*, source::*, threshold::*, value::*};
 
-use crate::{
-    context::{Context, Update},
-    render::debug_optional,
-    serde::migrate,
-};
+use crate::{context::Context, render::debug_optional, serde::migrate};
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
@@ -29,7 +25,7 @@ pub struct ProgressTrigger {
 
     /// Memoized active progress.
     #[serde(skip)]
-    active_memo: Option<ProgressActive>,
+    active: Option<ProgressActive>,
 }
 
 impl ProgressTrigger {
@@ -43,19 +39,34 @@ impl ProgressTrigger {
                 threshold_type: ThresholdType::Present,
                 amount_type: AmountType::default(),
             },
-            active_memo: None,
+            active: None,
         }
     }
 
-    pub fn update(&mut self, ctx: &Context, parent: Option<&ProgressActive>) -> bool {
-        if ctx.has_update_or_edit(Update::Game) {
-            // TODO: end of edit causes memo to "flash", maybe flag to end edit mode?
-            self.active_memo = self.active_updated(ctx, parent);
-        }
-        self.active_memo.is_some()
+    pub fn active(&self) -> Option<&ProgressActive> {
+        self.active.as_ref()
     }
 
-    fn active_updated(
+    pub fn is_visible(&self) -> bool {
+        self.active.is_some()
+    }
+
+    pub fn needs_update(&self, ctx: &Context) -> bool {
+        ctx.has_update_or_edit(self.source.update_on())
+    }
+
+    pub fn update_if_need(&mut self, ctx: &Context, parent: Option<&ProgressActive>) {
+        if self.needs_update(ctx) {
+            self.force_update(ctx, parent);
+        }
+    }
+
+    pub fn force_update(&mut self, ctx: &Context, parent: Option<&ProgressActive>) {
+        // TODO: end of edit causes memo to "flash", maybe flag to end edit mode?
+        self.active = self.resolve_active(ctx, parent);
+    }
+
+    fn resolve_active(
         &mut self,
         ctx: &Context,
         parent: Option<&ProgressActive>,
@@ -69,10 +80,6 @@ impl ProgressTrigger {
         }
     }
 
-    pub fn active(&self) -> Option<&ProgressActive> {
-        self.active_memo.as_ref()
-    }
-
     pub fn render_options(&mut self, ui: &Ui, ctx: &Context) {
         let mut changed = false;
         let _id = ui.push_id("trigger");
@@ -84,7 +91,7 @@ impl ProgressTrigger {
         }
 
         if changed {
-            self.update(ctx, None);
+            self.force_update(ctx, None);
         }
     }
 
@@ -98,7 +105,7 @@ impl Clone for ProgressTrigger {
         Self {
             source: self.source.clone(),
             threshold: self.threshold.clone(),
-            active_memo: None, // dont clone the memo
+            active: None, // dont clone the memo
         }
     }
 }

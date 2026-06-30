@@ -6,7 +6,7 @@ use crate::{
     internal::{Interface, Internal},
     settings::AddonSettings,
     texture::TextureManager,
-    tree::FilterUpdater,
+    tree::Updater,
 };
 use nexus::{
     font::{font_receive, get_font},
@@ -49,7 +49,7 @@ impl Addon {
             settings.apply(&mut addon.settings, &mut ctx);
         }
         addon.worker = Context::create_worker(addon.links.clone());
-        addon.load_packs(&ctx);
+        addon.load_packs(&mut ctx);
     }
 
     pub fn unload() {
@@ -79,7 +79,7 @@ impl Addon {
         let _ = fs::create_dir(Self::icons_dir());
     }
 
-    pub fn load_packs(&mut self, ctx: &Context) {
+    pub fn load_packs(&mut self, ctx: &mut Context) {
         let dir = Self::packs_dir();
         log::info!("Loading packs from \"{}\"", dir.display());
 
@@ -97,9 +97,10 @@ impl Addon {
                         log::warn!("Leftover temp pack file \"{}\"", path.display());
                     }
                 }
-
                 log::info!("Loaded {} packs", self.packs.len());
-                FilterUpdater::update(ctx, &mut self.packs);
+
+                ctx.force_update();
+                Updater::update(ctx, &mut self.packs);
             }
             Err(err) => log::error!("Failed to read pack directory: {err}"),
         }

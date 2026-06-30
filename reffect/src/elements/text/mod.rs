@@ -3,7 +3,7 @@ mod props;
 
 use super::{Props, RenderCtx, align::AlignHorizontal};
 use crate::{
-    context::{Context, Update},
+    context::Context,
     elements::Common,
     fmt::Unit,
     render::{
@@ -44,17 +44,16 @@ pub struct Text {
 }
 
 impl Text {
-    pub fn update(&mut self, ctx: &RenderCtx, common: &Common) {
-        let active = common.trigger.active();
-        self.props.update(ctx, active);
-        if self.frequent || ctx.has_update_or_edit(Update::Game) {
+    pub fn load(&mut self) {
+        self.font.reload();
+    }
+
+    pub fn reprocess(&mut self, ctx: &RenderCtx, common: &Common) {
+        if self.frequent || ctx.edit.is_editing() || common.trigger.needs_update(ctx) {
+            let active = common.trigger.active();
             self.frequent = false; // reset frequent, only enable while active
             self.text_memo = active.map(|active| self.process_text(active, ctx, common));
         }
-    }
-
-    pub fn load(&mut self) {
-        self.font.reload();
     }
 
     fn process_text(
@@ -169,7 +168,7 @@ impl TreeNode for Text {}
 
 impl Text {
     pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, common: &Common) {
-        self.update(ctx, common);
+        self.reprocess(ctx, common);
 
         if let Some(text) = &self.text_memo {
             let _font = self.font.push();

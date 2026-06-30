@@ -8,7 +8,7 @@ use self::transfer::Transfer;
 use super::ProgressActive;
 use crate::{
     action::Action,
-    context::{Buff, Context, ResourceType, SkillInfo, Slot},
+    context::{Buff, Context, ResourceType, SkillInfo, Slot, Update, Updates},
     enums::check_variant_array,
     error::Error,
     internal::{Interface, Internal},
@@ -137,6 +137,35 @@ const _: () = check_variant_array::<ProgressSource>();
 impl ProgressSource {
     pub fn no_threshold(&self) -> bool {
         matches!(self, Self::Always)
+    }
+
+    pub fn update_on(&self) -> Updates {
+        match self {
+            Self::Inherit | Self::Always => Updates::empty(),
+            Self::Buff { combatant, .. } => match combatant {
+                Combatant::Player | Combatant::Pet => Update::PlayerBuffs.into(),
+                Combatant::Target => Update::TargetBuffs.into(),
+                Combatant::GroupMember1
+                | Combatant::GroupMember2
+                | Combatant::GroupMember3
+                | Combatant::GroupMember4 => Update::GroupBuffs.into(),
+            },
+            Self::Ability { .. } | Self::SkillbarSlot { .. } => Update::PlayerSkillbar.into(),
+            Self::Health { combatant }
+            | Self::Barrier { combatant }
+            | Self::Defiance { combatant } => match combatant {
+                Combatant::Player | Combatant::Pet => Update::PlayerResources.into(),
+                Combatant::Target => Update::TargetResources.into(),
+                Combatant::GroupMember1
+                | Combatant::GroupMember2
+                | Combatant::GroupMember3
+                | Combatant::GroupMember4 => Update::GroupResources.into(),
+            },
+            Self::HealthReduction
+            | Self::Endurance
+            | Self::PrimaryResource
+            | Self::SecondaryResource => Update::PlayerResources.into(),
+        }
     }
 
     pub fn progress(

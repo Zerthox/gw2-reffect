@@ -5,6 +5,8 @@ use nexus::imgui::Ui;
 
 pub use self::settings::*;
 
+// TODO: force updates when exiting edit mode
+
 #[derive(Debug)]
 pub struct EditState {
     /// Edit settings.

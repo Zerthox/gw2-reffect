@@ -8,14 +8,14 @@ mod resource;
 mod skill;
 mod target;
 mod ui;
+mod updates;
 
 pub use self::{
     combatant::*, edit::*, group::*, item::*, map::*, player::*, resource::*, skill::*, target::*,
-    ui::*,
+    ui::*, updates::*,
 };
 
 use crate::{error::Error, links::Links, profiling::measure, worker::StoppableWorker};
-use enumflags2::{BitFlags, bitflags};
 use std::{
     sync::{Mutex, MutexGuard},
     thread,
@@ -28,8 +28,8 @@ pub struct Context {
     /// Current system time.
     pub now: u32,
 
-    /// Flags for pending updates.
-    pub updates: BitFlags<Update>,
+    /// Pending updates.
+    pub updates: Updates,
 
     /// Edit state.
     pub edit: EditState,
@@ -55,7 +55,7 @@ impl Context {
     pub const fn new() -> Self {
         Self {
             now: 0,
-            updates: BitFlags::EMPTY,
+            updates: Updates::EMPTY,
             edit: EditState::new(),
             ui: UiInfo::empty(),
             map: MapInfo::empty(),
@@ -90,16 +90,6 @@ impl Context {
         })
     }
 
-    /// Performs a quick update before rendering.
-    #[inline]
-    pub fn prepare_render(&mut self, links: &Links) {
-        self.now = unsafe { timeGetTime() };
-        self.ui.update(links);
-        if let Some(mumble) = links.mumble() {
-            self.player.update_fast(mumble);
-        }
-    }
-
     /// Performs a slow update.
     pub fn update_slow(&mut self, links: &Links) {
         measure(
@@ -110,7 +100,7 @@ impl Context {
                 {
                     match mumble.parse_identity() {
                         Ok(identity) => {
-                            self.updates.insert(Update::Identity);
+                            self.updates.insert(Update::PlayerIdentity);
                             self.player.update_identity(identity);
                         }
                         Err(err) => log::error!("Failed to parse mumble identity: {err}"),
@@ -122,15 +112,31 @@ impl Context {
                     }
                 }
             },
-            |elapsed| log::debug!("Slow context update took {elapsed:?}"),
+            |elapsed| log::trace!("Slow context update took {elapsed:?}"),
         )
     }
 
-    /// Resets the context.
+    /// Prepares updates before rendering elements.
     #[inline]
-    pub fn reset(&mut self) {
-        self.updates = BitFlags::empty();
+    pub fn prepare_render(&mut self, links: &Links) {
+        self.now = unsafe { timeGetTime() };
+        self.ui.update(links);
+        if let Some(mumble) = links.mumble() {
+            self.player.update_fast(mumble);
+        }
+    }
+
+    /// Resets after rendering.
+    #[inline]
+    pub fn reset_after_render(&mut self) {
+        self.reset_updates();
         self.edit.reset_allowed();
+    }
+
+    /// Updates edit mode.
+    #[inline]
+    pub fn update_edit_mode(&mut self) {
+        self.edit.update_allowed(&self.ui);
     }
 
     /// Checks whether any updates have happened.
@@ -142,19 +148,32 @@ impl Context {
     /// Checks whether any updates have happened or edit mode is active.
     #[inline]
     pub fn has_any_update_or_edit(&self) -> bool {
-        self.edit.is_editing() || self.has_any_update()
+        self.has_any_update() || self.edit.is_editing()
     }
 
     /// Checks whether any of the given updates has happened.
     #[inline]
-    pub fn has_update(&self, update: impl Into<BitFlags<Update>>) -> bool {
+    pub fn has_update(&self, update: impl Into<Updates>) -> bool {
         self.updates.intersects(update)
     }
 
     /// Checks whether any of the given updates has happened or edit mode is active.
     #[inline]
-    pub fn has_update_or_edit(&self, update: impl Into<BitFlags<Update>>) -> bool {
-        self.edit.is_editing() || self.has_update(update)
+    pub fn has_update_or_edit(&self, update: impl Into<Updates>) -> bool {
+        self.has_update(update) || self.edit.is_editing()
+    }
+
+    /// Resets updates.
+    #[inline]
+    pub fn reset_updates(&mut self) {
+        self.updates = Updates::empty();
+    }
+
+    /// Forces all updates.
+    #[inline]
+    pub fn force_update(&mut self) {
+        self.updates = Updates::all();
+        log::trace!("Forcing pack updates");
     }
 
     #[inline]
@@ -170,24 +189,4 @@ impl Default for Context {
     fn default() -> Self {
         Self::new()
     }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[bitflags]
-#[repr(u8)]
-pub enum Update {
-    /// Game update.
-    Game = 1 << 0,
-
-    /// Player identity update.
-    Identity = 1 << 1,
-
-    /// Map update.
-    Map = 1 << 2,
-
-    /// Traits update.
-    Traits = 1 << 3,
-
-    /// Gear update.
-    Gear = 1 << 4,
 }

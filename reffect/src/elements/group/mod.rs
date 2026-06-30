@@ -24,9 +24,9 @@ impl TreeNode for Group {
 }
 
 impl Group {
-    pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, common: &Common) {
+    pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, _common: &Common) {
         for member in &mut self.members {
-            member.render(ui, ctx, common);
+            member.render(ui, ctx);
         }
     }
 

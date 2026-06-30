@@ -1,10 +1,10 @@
 use crate::{
     action::Action,
-    context::{Context, Update, Weapon},
+    context::{Context, Update, Updateable, Weapon},
     internal::{Interface, Internal},
     render::{Validation, enum_combo_bitflags, helper, input_item_id},
     serde::bitflags,
-    trigger::{MemoizedTrigger, TriggerMode},
+    trigger::TriggerMode,
 };
 use const_default::ConstDefault;
 use enumflags2::BitFlags;
@@ -37,22 +37,27 @@ pub struct GearTrigger {
 }
 
 impl GearTrigger {
-    pub fn update_full(&mut self, ctx: &Context) {
-        if ctx.map.is_valid() {
-            for item in self.sigils.iter_mut().chain(&mut self.relics) {
-                item.update();
-            }
-        }
-        self.update(ctx);
+    pub fn is_active(&self) -> bool {
+        self.active
     }
 
-    pub fn weapons_active(&self, ctx: &Context) -> bool {
+    pub fn needs_item_update(&self, ctx: &Context) -> bool {
+        ctx.has_update(Update::Map) && ctx.map.is_valid()
+    }
+
+    fn update_items(&mut self) {
+        for item in self.sigils.iter_mut().chain(&mut self.relics) {
+            item.update();
+        }
+    }
+
+    fn weapons_active(&self, ctx: &Context) -> bool {
         let gear = ctx.player.gear.as_ref();
         self.weapon_mode
             .check_flags_optional(self.weapons, gear.map(|gear| gear.weapons).ok())
     }
 
-    pub fn sigils_active(&self, ctx: &Context) -> bool {
+    fn sigils_active(&self, ctx: &Context) -> bool {
         if let Ok(gear) = ctx.player.gear.as_ref() {
             self.sigil_mode
                 .check_slice(&self.sigils, |sigil| gear.sigils.contains(&sigil.buff))
@@ -61,7 +66,7 @@ impl GearTrigger {
         }
     }
 
-    pub fn relic_active(&self, ctx: &Context) -> bool {
+    fn relic_active(&self, ctx: &Context) -> bool {
         if let Ok(gear) = ctx.player.gear.as_ref() {
             TriggerMode::Any.check_slice(&self.relics, |relic| gear.relic == relic.buff)
         } else {
@@ -91,7 +96,7 @@ impl GearTrigger {
 
         if changed {
             // ensure fresh state after changed
-            self.update(ctx);
+            self.force_update(ctx);
         }
 
         changed
@@ -139,17 +144,22 @@ impl GearTrigger {
     }
 }
 
-impl MemoizedTrigger for GearTrigger {
-    fn resolve_active(&mut self, ctx: &Context) -> bool {
-        self.weapons_active(ctx) && self.sigils_active(ctx) && self.relic_active(ctx)
-    }
-
-    fn memoized_state(&mut self) -> &mut bool {
-        &mut self.active
-    }
-
+impl Updateable for GearTrigger {
     fn needs_update(&self, ctx: &Context) -> bool {
-        ctx.has_update(Update::Gear)
+        ctx.has_update(Update::PlayerGear) || self.needs_item_update(ctx)
+    }
+
+    fn force_update(&mut self, ctx: &Context) {
+        self.active = self.weapons_active(ctx) && self.sigils_active(ctx) && self.relic_active(ctx);
+    }
+
+    fn update_if_need(&mut self, ctx: &Context) {
+        if self.needs_item_update(ctx) {
+            self.update_items();
+        }
+        if self.needs_update(ctx) {
+            self.force_update(ctx);
+        }
     }
 }
 

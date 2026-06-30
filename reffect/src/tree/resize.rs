@@ -38,7 +38,7 @@ impl VisitMut for Resizer {
         list.pad *= self.factor;
     }
 
-    fn visit_icon(&mut self, icon: &mut IconElement) {
+    fn visit_icon_element(&mut self, icon: &mut IconElement) {
         icon.size = icon.size.mul_scalar(self.factor);
     }
 

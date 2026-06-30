@@ -1,10 +1,10 @@
 use super::TraitRequirement;
 use crate::{
     action::Action,
-    context::{Context, ProfSelection, Profession, Specialization, Update},
+    context::{Context, ProfSelection, Profession, Specialization, Update, Updateable},
     render::{enum_combo_bitflags, helper, input_skill_id, input_trait_id},
     serde::bitflags,
-    trigger::{MemoizedTrigger, TriggerMode},
+    trigger::TriggerMode,
 };
 use const_default::ConstDefault;
 use enumflags2::BitFlags;
@@ -65,6 +65,10 @@ impl BuildTrigger {
                 self.specs.insert(prof.specializations());
             }
         }
+    }
+
+    pub fn is_active(&self) -> bool {
+        self.active
     }
 
     fn specs_active(&self, ctx: &Context) -> bool {
@@ -242,28 +246,24 @@ impl BuildTrigger {
 
         if changed {
             // ensure fresh state after changed
-            self.update(ctx);
+            self.force_update(ctx);
         }
 
         changed
     }
 }
 
-impl MemoizedTrigger for BuildTrigger {
-    fn memoized_state(&mut self) -> &mut bool {
-        &mut self.active
-    }
-
+impl Updateable for BuildTrigger {
     fn needs_update(&self, ctx: &Context) -> bool {
-        ctx.has_update(Update::Identity | Update::Traits)
+        ctx.has_update(Update::PlayerIdentity | Update::PlayerBuild)
     }
 
-    fn resolve_active(&mut self, ctx: &Context) -> bool {
-        self.specs_active(ctx)
+    fn force_update(&mut self, ctx: &Context) {
+        self.active = self.specs_active(ctx)
             && self.traits_active(ctx)
             && self.skill_selections_active(ctx)
             && self.prof_selections_active(ctx)
-            && self.pet_selections_active(ctx)
+            && self.pet_selections_active(ctx);
     }
 }
 

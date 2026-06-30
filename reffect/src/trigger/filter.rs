@@ -1,5 +1,8 @@
-use super::{MapTrigger, PlayerTrigger, Trigger, map::legacy::MapTriggerLegacy};
-use crate::{context::Context, serde::migrate, trigger::MemoizedTrigger};
+use super::{MapTrigger, PlayerTrigger, map::legacy::MapTriggerLegacy};
+use crate::{
+    context::{Context, Updateable},
+    serde::migrate,
+};
 use const_default::ConstDefault;
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
@@ -21,9 +24,12 @@ impl FilterTrigger {
         self.player.load();
     }
 
-    pub fn update(&mut self, ctx: &Context) {
-        self.player.update(ctx);
-        self.map.update(ctx);
+    pub fn is_active(&mut self, ctx: &Context) -> bool {
+        self.player.is_active(ctx) && self.map.is_active()
+    }
+
+    pub fn can_update_progress(&self) -> bool {
+        self.player.can_update_progress() && self.map.is_active()
     }
 
     pub fn render_options(&mut self, ui: &Ui, ctx: &Context) {
@@ -33,18 +39,25 @@ impl FilterTrigger {
         self.map.render_options(ui, ctx);
     }
 
-    pub fn render_debug(&mut self, ui: &Ui, ctx: &Context) {
-        ui.text(format!("Gear filter: {}", self.player.gear.is_active(ctx)));
-        ui.text(format!(
-            "Build filter: {}",
-            self.player.build.is_active(ctx)
-        ));
-        ui.text(format!("Map filter: {}", self.map.is_active(ctx)));
+    pub fn render_debug(&mut self, ui: &Ui, _ctx: &Context) {
+        ui.text(format!("Gear filter: {}", self.player.gear.is_active()));
+        ui.text(format!("Build filter: {}", self.player.build.is_active()));
+        ui.text(format!("Map filter: {}", self.map.is_active()));
     }
 }
 
-impl Trigger for FilterTrigger {
-    fn is_active(&mut self, ctx: &Context) -> bool {
-        self.player.is_active(ctx) && self.map.is_active(ctx)
+impl Updateable for FilterTrigger {
+    fn needs_update(&self, ctx: &Context) -> bool {
+        self.map.needs_update(ctx) || self.player.needs_update(ctx)
+    }
+
+    fn force_update(&mut self, ctx: &Context) {
+        self.player.force_update(ctx);
+        self.map.force_update(ctx);
+    }
+
+    fn update_if_need(&mut self, ctx: &Context) {
+        self.player.update_if_need(ctx);
+        self.map.update_if_need(ctx);
     }
 }

@@ -5,12 +5,11 @@ mod traits;
 
 pub use self::{build::*, combat::*, gear::*, traits::*};
 
-use super::{Trigger, TriggerMode};
+use super::TriggerMode;
 use crate::{
-    context::{Context, Mount},
+    context::{Context, Mount, Updateable},
     render::enum_combo_bitflags,
     serde::bitflags,
-    trigger::MemoizedTrigger,
 };
 use const_default::ConstDefault;
 use enumflags2::BitFlags;
@@ -58,9 +57,15 @@ impl PlayerTrigger {
         self.build.load();
     }
 
-    pub fn update(&mut self, ctx: &Context) {
-        self.gear.update_full(ctx);
-        self.build.update(ctx);
+    pub fn is_active(&self, ctx: &Context) -> bool {
+        self.build.is_active()
+            && self.gear.is_active()
+            && self.combat.is_active(ctx)
+            && self.mounts_active(ctx)
+    }
+
+    pub fn can_update_progress(&self) -> bool {
+        self.build.is_active() && self.gear.is_active()
     }
 
     pub fn mounts_active(&self, ctx: &Context) -> bool {
@@ -68,13 +73,19 @@ impl PlayerTrigger {
     }
 }
 
-impl Trigger for PlayerTrigger {
-    fn is_active(&mut self, ctx: &Context) -> bool {
-        self.build.is_active(ctx)
-            && self.combat.is_active(ctx)
-            && self.gear.is_active(ctx)
-            && self.build.is_active(ctx)
-            && self.mounts_active(ctx)
+impl Updateable for PlayerTrigger {
+    fn needs_update(&self, ctx: &Context) -> bool {
+        self.gear.needs_update(ctx) || self.build.needs_update(ctx)
+    }
+
+    fn force_update(&mut self, ctx: &Context) {
+        self.build.force_update(ctx);
+        self.gear.force_update(ctx);
+    }
+
+    fn update_if_need(&mut self, ctx: &Context) {
+        self.build.update_if_need(ctx);
+        self.gear.update_if_need(ctx);
     }
 }
 

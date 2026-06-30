@@ -3,10 +3,9 @@ pub mod legacy;
 use super::TriggerMode;
 use crate::{
     action::Action,
-    context::{Context, MapCategory},
+    context::{Context, MapCategory, Update, Updateable},
     render::{enum_combo_bitflags, helper, input_u32, item_context_menu, map_select},
     serde::bitflags,
-    trigger::MemoizedTrigger,
 };
 use const_default::ConstDefault;
 use enumflags2::BitFlags;
@@ -59,23 +58,23 @@ impl MapTrigger {
             ..Self::default()
         }
     }
+
+    pub fn is_active(&self) -> bool {
+        self.active
+    }
 }
 
-impl MemoizedTrigger for MapTrigger {
-    fn memoized_state(&mut self) -> &mut bool {
-        &mut self.active
+impl Updateable for MapTrigger {
+    fn needs_update(&self, ctx: &Context) -> bool {
+        ctx.has_update(Update::Map)
     }
 
-    fn needs_update(&self, _ctx: &Context) -> bool {
-        false
-    }
-
-    fn resolve_active(&mut self, ctx: &Context) -> bool {
-        TriggerMode::Any.check_flags(self.category, ctx.map.category)
+    fn force_update(&mut self, ctx: &Context) {
+        self.active = TriggerMode::Any.check_flags(self.category, ctx.map.category)
             && (self.ids.is_empty() || {
                 let id_match = self.ids.iter().any(|id| ctx.map.is_on_map(*id));
                 if self.whitelist { id_match } else { !id_match }
-            })
+            });
     }
 }
 
@@ -125,7 +124,7 @@ impl MapTrigger {
 
         if changed {
             // ensure fresh state after changed
-            self.update(ctx);
+            self.force_update(ctx);
         }
 
         changed

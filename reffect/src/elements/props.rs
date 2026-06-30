@@ -38,12 +38,10 @@ where
     T::Partial: PartialProps<T>,
 {
     pub fn update(&mut self, ctx: &Context, active: Option<&ProgressActive>) {
-        if ctx.has_any_update_or_edit() {
-            self.current = self.base.clone();
-            if let Some(active) = active {
-                for condition in &mut self.conditions {
-                    condition.process(&mut self.current, ctx, active);
-                }
+        self.current = self.base.clone();
+        if let Some(active) = active {
+            for condition in &mut self.conditions {
+                condition.process(&mut self.current, ctx, active);
             }
         }
     }

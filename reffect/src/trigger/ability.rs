@@ -28,7 +28,7 @@ pub struct AbilityStateTrigger {
 }
 
 impl AbilityStateTrigger {
-    pub fn is_active(&self, active: &ProgressActive) -> bool {
+    pub fn is_present(&self, active: &ProgressActive) -> bool {
         self.mode.check_flags(self.states, active.ability_state())
     }
 

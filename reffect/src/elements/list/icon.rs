@@ -1,8 +1,7 @@
 use crate::{
     action::DynAction,
-    context::Context,
     elements::{Common, Element, ElementType, Icon, IconElement, RenderCtx, align::Align},
-    trigger::{FilterTrigger, ProgressActive, ProgressTrigger, Trigger},
+    trigger::{FilterTrigger, ProgressTrigger},
 };
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
@@ -38,12 +37,8 @@ impl ListIcon {
             && if ctx.edit.is_editing() {
                 ctx.is_edited()
             } else {
-                self.filter.is_active(ctx)
+                self.filter.is_active(ctx) && self.trigger.is_visible()
             }
-    }
-
-    pub fn update(&mut self, ctx: &Context, parent_active: Option<&ProgressActive>) -> bool {
-        self.trigger.update(ctx, parent_active)
     }
 
     pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, size: [f32; 2]) {
