@@ -10,7 +10,7 @@ use crate::{
     render::{
         Bounds, Rect, delete_confirm_modal, item_context_menu, style_disabled_if, tree_select_empty,
     },
-    tree::{TreeNode, Loader, Resizer, VisitMut},
+    tree::{Loader, Resizer, TreeNode, VisitMut},
 };
 use nexus::imgui::{MenuItem, StyleColor, Ui};
 use serde::{Deserialize, Serialize};
