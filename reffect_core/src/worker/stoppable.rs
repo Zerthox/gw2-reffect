@@ -1,7 +1,10 @@
 use super::Worker;
-use std::sync::{
-    Arc,
-    atomic::{AtomicBool, Ordering},
+use std::{
+    sync::{
+        Arc,
+        atomic::{AtomicBool, Ordering},
+    },
+    thread::{JoinHandle, Thread},
 };
 
 #[derive(Debug)]
@@ -20,6 +23,17 @@ impl<T> StoppableWorker<T> {
         Worker::spawn(name, move || work(worker_token)).map(|worker| Self { worker, token })
     }
 
+    #[inline]
+    pub fn handle(&self) -> &JoinHandle<T> {
+        self.worker.handle()
+    }
+
+    #[inline]
+    pub fn thread(&self) -> &Thread {
+        self.handle().thread()
+    }
+
+    #[inline]
     pub fn exit_and_wait(self) -> Option<T> {
         self.token.request_stop();
         self.worker.wait()

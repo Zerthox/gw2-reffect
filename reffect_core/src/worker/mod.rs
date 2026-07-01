@@ -1,6 +1,6 @@
 mod stoppable;
 
-use std::thread::{self, JoinHandle};
+use std::thread::{self, JoinHandle, Thread};
 
 pub use self::stoppable::*;
 
@@ -28,10 +28,17 @@ impl<T> Worker<T> {
             .map(|handle| Self { name, handle })
     }
 
+    #[inline]
     pub fn handle(&self) -> &JoinHandle<T> {
         &self.handle
     }
 
+    #[inline]
+    pub fn thread(&self) -> &Thread {
+        self.handle.thread()
+    }
+
+    #[inline]
     pub fn wait(self) -> Option<T> {
         self.handle
             .join()
