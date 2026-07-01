@@ -7,16 +7,20 @@ use crate::{
 };
 
 pub trait VisitMut: Sized {
+    fn visit_children_of(&mut self, node: &mut impl Walk) {
+        node.walk_mut(self);
+    }
+
     fn visit_pack(&mut self, pack: &mut Pack) {
-        pack.walk_mut(self);
+        self.visit_children_of(pack);
     }
 
     fn visit_element(&mut self, element: &mut Element) {
-        element.walk_mut(self);
+        self.visit_children_of(element);
     }
 
     fn visit_common(&mut self, common: &mut Common) {
-        common.walk_mut(self);
+        self.visit_children_of(common);
     }
 
     fn visit_progress_trigger(&mut self, _trigger: &mut ProgressTrigger) {}
@@ -24,23 +28,23 @@ pub trait VisitMut: Sized {
     fn visit_filter_trigger(&mut self, _trigger: &mut FilterTrigger) {}
 
     fn visit_element_type(&mut self, element: &mut ElementType) {
-        element.walk_mut(self);
+        self.visit_children_of(element);
     }
 
     fn visit_group(&mut self, group: &mut Group) {
-        group.walk_mut(self);
+        self.visit_children_of(group);
     }
 
     fn visit_icon_list(&mut self, list: &mut IconList) {
-        list.walk_mut(self);
+        self.visit_children_of(list);
     }
 
     fn visit_list_icon(&mut self, list_icon: &mut ListIcon) {
-        list_icon.walk_mut(self);
+        self.visit_children_of(list_icon);
     }
 
     fn visit_icon_element(&mut self, icon_element: &mut IconElement) {
-        icon_element.walk_mut(self);
+        self.visit_children_of(icon_element);
     }
 
     fn visit_icon(&mut self, _icon: &mut Icon) {}

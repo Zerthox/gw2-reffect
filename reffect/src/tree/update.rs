@@ -1,16 +1,18 @@
 use super::VisitMut;
 use crate::{
     context::{Context, Update, Updateable},
-    elements::{Bar, Common, Element, Icon, Pack, Text, list::ListIcon},
+    elements::{Bar, Element, Icon, Pack, Text, list::ListIcon},
     profiling::measure,
     trigger::{FilterTrigger, ProgressActive, ProgressTrigger},
 };
 
 #[derive(Debug, Clone)]
 pub struct Updater<'ctx, 'p> {
+    /// Current context.
     ctx: &'ctx Context,
-    current: Option<&'p ProgressActive>,
-    parent: Option<&'p ProgressActive>,
+
+    /// Relevant progress, parent or own.
+    active: Option<&'p ProgressActive>,
 }
 
 impl<'ctx, 'p> Updater<'ctx, 'p> {
@@ -29,27 +31,19 @@ impl<'ctx, 'p> Updater<'ctx, 'p> {
     }
 
     fn root(ctx: &'ctx Context) -> Self {
-        Self {
-            ctx,
-            current: None,
-            parent: None,
-        }
+        Self { ctx, active: None }
     }
 
-    fn next(&self, current: &'p ProgressTrigger) -> Self {
-        Self {
-            ctx: self.ctx,
-            parent: self.current,
-            current: current.active(),
-        }
-    }
-
-    fn visit_filter_and_progress(
+    #[must_use]
+    fn update_and_push(
         &self,
         filter: &mut FilterTrigger,
-        progress: &mut ProgressTrigger,
-    ) {
-        let Self { ctx, parent, .. } = *self;
+        progress: &'p mut ProgressTrigger,
+    ) -> Self {
+        let Self {
+            ctx,
+            active: parent,
+        } = *self;
 
         let force = filter.needs_update(ctx);
         filter.update_if_need(ctx);
@@ -59,40 +53,43 @@ impl<'ctx, 'p> Updater<'ctx, 'p> {
         } else if filter.can_update_progress() {
             progress.update_if_need(ctx, parent);
         }
+
+        Self {
+            ctx: self.ctx,
+            active: progress.active(),
+        }
     }
 }
 
 impl VisitMut for Updater<'_, '_> {
     fn visit_pack(&mut self, pack: &mut Pack) {
-        self.visit_common(&mut pack.common);
-        self.next(&pack.common.trigger)
-            .visit_elements(&mut pack.elements);
+        let Pack {
+            common, elements, ..
+        } = pack;
+        self.update_and_push(&mut common.filter, &mut common.trigger)
+            .visit_elements(elements);
     }
 
     fn visit_element(&mut self, element: &mut Element) {
-        self.visit_common(&mut element.common);
-        self.next(&element.common.trigger)
-            .visit_element_type(&mut element.kind);
-    }
-
-    fn visit_common(&mut self, common: &mut Common) {
-        self.visit_filter_and_progress(&mut common.filter, &mut common.trigger);
+        let Element { common, kind } = element;
+        self.update_and_push(&mut common.filter, &mut common.trigger)
+            .visit_element_type(kind);
     }
 
     fn visit_list_icon(&mut self, list_icon: &mut ListIcon) {
-        self.visit_icon(&mut list_icon.icon);
-        self.visit_filter_and_progress(&mut list_icon.filter, &mut list_icon.trigger);
+        self.update_and_push(&mut list_icon.filter, &mut list_icon.trigger)
+            .visit_icon(&mut list_icon.icon);
     }
 
     fn visit_icon(&mut self, icon: &mut Icon) {
-        icon.props.update(self.ctx, self.current);
+        icon.props.update(self.ctx, self.active);
     }
 
     fn visit_text(&mut self, text: &mut Text) {
-        text.props.update(self.ctx, self.current);
+        text.props.update(self.ctx, self.active);
     }
 
     fn visit_bar(&mut self, bar: &mut Bar) {
-        bar.props.update(self.ctx, self.current);
+        bar.props.update(self.ctx, self.active);
     }
 }
