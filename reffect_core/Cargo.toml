@@ -8,6 +8,7 @@ rust-version = "1.95"
 
 [dependencies]
 base64 = "0.22.1"
+chrono = "0.4.45"
 enumflags2 = { workspace = true }
 log = { workspace = true }
 nexus = { git = "https://github.com/zerthox/nexus-rs", features = [
@@ -21,12 +22,16 @@ schemars = { workspace = true, optional = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 serde_with = { workspace = true }
+shadow-rs = { version = "2.0.0", features = ["metadata"] }
 strum = { workspace = true }
 thiserror = { workspace = true }
 windows = { workspace = true, features = [
     "Win32_Media",
     "Win32_Graphics_Direct3D11",
 ] }
+
+[build-dependencies]
+shadow-rs = "2.0.0"
 
 [features]
 profile = []

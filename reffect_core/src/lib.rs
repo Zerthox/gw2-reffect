@@ -11,6 +11,7 @@ pub mod id;
 pub mod interval;
 pub mod links;
 pub mod lockbox;
+pub mod metadata;
 pub mod named;
 pub mod profiling;
 pub mod serde;

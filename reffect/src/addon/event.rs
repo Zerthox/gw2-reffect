@@ -15,13 +15,11 @@ use nexus::{
 use rfd::FileDialog;
 use std::{fs, thread};
 
-const VERSION: &str = env!("CARGO_PKG_VERSION");
-
 const REPOSITORY: &str = env!("CARGO_PKG_REPOSITORY");
 
 impl Addon {
     pub fn load() {
-        log::info!("Reffect v{VERSION} load");
+        log::info!("Reffect v{} load", Self::VERSION);
         TextureManager::load();
 
         register_render(
@@ -53,7 +51,7 @@ impl Addon {
     }
 
     pub fn unload() {
-        log::info!("Reffect v{VERSION} unload");
+        log::info!("Reffect v{} unload", Self::VERSION);
 
         let mut addon = Self::lock();
         AddonSettings::new(&addon.settings, &Context::lock()).save();

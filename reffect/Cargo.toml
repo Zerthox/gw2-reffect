@@ -5,12 +5,13 @@ authors = ["Zerthox"]
 edition = "2024"
 description = "Customizable effect, resource & ability displays"
 repository = "https://github.com/zerthox/gw2-reffect"
+license = "GPL-3.0-or-later"
 rust-version = "1.95"
 
 [dependencies]
 const-default = { version = "1.0.0", features = ["std", "derive"] }
 enumflags2 = { workspace = true }
-itertools = "0.14.0"
+itertools = "0.15.0"
 log = { workspace = true }
 nexus = { git = "https://github.com/zerthox/nexus-rs", features = ["log"] }
 open = "5.1.2"

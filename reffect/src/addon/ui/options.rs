@@ -1,5 +1,8 @@
 use super::Addon;
-use crate::context::Context;
+use crate::{
+    context::Context,
+    metadata::{BUILD_TIME, COMMIT, RUSTC},
+};
 use nexus::imgui::{TreeNodeFlags, Ui};
 
 impl Addon {
@@ -63,6 +66,38 @@ impl Addon {
                     }
                 }
             }
+
+            if let Some(_token) = ui.tab_item("?") {
+                ui.text("Reffect");
+                ui.same_line();
+                copyable_text(
+                    ui,
+                    format!(
+                        "{} ({COMMIT} {})",
+                        Self::VERSION,
+                        BUILD_TIME.format("%Y-%m-%d %H:%M UTC")
+                    ),
+                );
+
+                ui.text("Built with");
+                ui.same_line();
+                copyable_text(ui, RUSTC);
+
+                ui.text("Disclosed source licensed under GNU General Public License v3");
+
+                ui.spacing();
+            }
         }
+    }
+}
+
+fn copyable_text(ui: &Ui, text: impl AsRef<str>) {
+    let text = text.as_ref();
+    ui.text(text);
+    if ui.is_item_hovered() {
+        ui.tooltip_text("Click to copy");
+    }
+    if ui.is_item_clicked() {
+        ui.set_clipboard_text(text);
     }
 }

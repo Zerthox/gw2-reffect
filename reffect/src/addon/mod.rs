@@ -21,6 +21,8 @@ pub struct Addon {
 }
 
 impl Addon {
+    pub const VERSION: &str = env!("CARGO_PKG_VERSION");
+
     pub fn new() -> Self {
         Self {
             debug: false,
