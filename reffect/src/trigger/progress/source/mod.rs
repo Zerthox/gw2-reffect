@@ -143,7 +143,8 @@ impl ProgressSource {
         match self {
             Self::Inherit | Self::Always => Updates::empty(),
             Self::Buff { combatant, .. } => match combatant {
-                Combatant::Player | Combatant::Pet => Update::PlayerBuffs.into(),
+                Combatant::Player => Update::PlayerBuffs.into(),
+                Combatant::Pet => Updates::empty(),
                 Combatant::Target => Update::TargetBuffs.into(),
                 Combatant::GroupMember1
                 | Combatant::GroupMember2
@@ -154,7 +155,8 @@ impl ProgressSource {
             Self::Health { combatant }
             | Self::Barrier { combatant }
             | Self::Defiance { combatant } => match combatant {
-                Combatant::Player | Combatant::Pet => Update::PlayerResources.into(),
+                Combatant::Player => Update::PlayerResources.into(),
+                Combatant::Pet => Update::PetResources.into(),
                 Combatant::Target => Update::TargetResources.into(),
                 Combatant::GroupMember1
                 | Combatant::GroupMember2
