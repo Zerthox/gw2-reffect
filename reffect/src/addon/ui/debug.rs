@@ -246,10 +246,11 @@ fn debug_player_resources(ui: &Ui, resources: &PlayerResources) {
     let PlayerResources {
         combatant,
         health_reduction,
+        pet: _,
         endurance,
         primary,
         secondary,
-        pet: _,
+        rate,
     } = resources;
 
     debug_combatant_resources(ui, combatant, false);
@@ -258,6 +259,7 @@ fn debug_player_resources(ui: &Ui, resources: &PlayerResources) {
     ui.text(format!("Endurance: {endurance}",));
     ui.text(format!("Primary: {primary}"));
     ui.text(format!("Secondary: {secondary}"));
+    ui.text(format!("Rate: {rate}"));
 }
 
 fn debug_buffs(ui: &Ui, ctx: &Context, buffs: &BuffMap) {

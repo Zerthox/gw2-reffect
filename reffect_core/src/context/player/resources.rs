@@ -21,6 +21,9 @@ pub struct PlayerResources {
 
     /// Secondary profession resource.
     pub secondary: Resource,
+
+    /// Profession resource rate.
+    pub rate: Resource,
 }
 
 impl PlayerResources {
@@ -34,6 +37,7 @@ impl PlayerResources {
             endurance: Resource::empty(),
             primary: Resource::empty(),
             secondary: Resource::empty(),
+            rate: Resource::empty(),
         }
     }
 }

@@ -102,6 +102,10 @@ pub enum ProgressSource {
     /// Secondary profession resource.
     #[strum(serialize = "Secondary Resource")]
     SecondaryResource,
+
+    /// Profession resource rate.
+    #[strum(serialize = "Resource Rate")]
+    ResourceRate,
 }
 
 impl VariantArray for ProgressSource {
@@ -129,6 +133,7 @@ impl VariantArray for ProgressSource {
         Self::Endurance,
         Self::PrimaryResource,
         Self::SecondaryResource,
+        Self::ResourceRate,
     ];
 }
 
@@ -166,7 +171,8 @@ impl ProgressSource {
             Self::HealthReduction
             | Self::Endurance
             | Self::PrimaryResource
-            | Self::SecondaryResource => Update::PlayerResources.into(),
+            | Self::SecondaryResource
+            | Self::ResourceRate => Update::PlayerResources.into(),
         }
     }
 
@@ -234,6 +240,10 @@ impl ProgressSource {
                 let resources = ctx.player.resources.as_ref().ok()?;
                 ProgressActive::from_resource(&resources.secondary, ResourceType::Profession)
             }
+            Self::ResourceRate => {
+                let resources = ctx.player.resources.as_ref().ok()?;
+                ProgressActive::from_resource(&resources.rate, ResourceType::Profession)
+            }
         }
     }
 
@@ -276,7 +286,7 @@ impl ProgressSource {
             Self::Defiance { .. } => {
                 ProgressActive::edit_resource(progress, 100.0, ResourceType::DefianceActive)
             }
-            Self::PrimaryResource | Self::SecondaryResource => {
+            Self::PrimaryResource | Self::SecondaryResource | Self::ResourceRate => {
                 ProgressActive::edit_resource(progress, 30.0, ResourceType::Profession)
             }
         }

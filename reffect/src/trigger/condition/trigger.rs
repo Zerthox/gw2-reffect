@@ -88,7 +88,8 @@ impl ConditionTrigger {
                 | ProgressSource::Defiance { .. }
                 | ProgressSource::Endurance
                 | ProgressSource::PrimaryResource
-                | ProgressSource::SecondaryResource => {
+                | ProgressSource::SecondaryResource
+                | ProgressSource::ResourceRate => {
                     Validation::Error("Condition requires an ability-like trigger source")
                 }
             },

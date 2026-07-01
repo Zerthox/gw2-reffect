@@ -36,7 +36,8 @@ impl From<ProgressSource> for Transfer {
             | ProgressSource::HealthReduction
             | ProgressSource::Endurance
             | ProgressSource::PrimaryResource
-            | ProgressSource::SecondaryResource => Self::default(),
+            | ProgressSource::SecondaryResource
+            | ProgressSource::ResourceRate => Self::default(),
         }
     }
 }
@@ -62,7 +63,8 @@ impl Transfer {
             | ProgressSource::HealthReduction
             | ProgressSource::Endurance
             | ProgressSource::PrimaryResource
-            | ProgressSource::SecondaryResource => {}
+            | ProgressSource::SecondaryResource
+            | ProgressSource::ResourceRate => {}
         }
     }
 }
