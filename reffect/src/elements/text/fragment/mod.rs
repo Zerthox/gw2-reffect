@@ -36,7 +36,7 @@ impl<'s> TextFragment<'s> {
         name: &str,
     ) -> impl fmt::Display {
         fmt::from_fn(|formatter| match *self {
-            Self::Literal(ref text) => formatter.write_str(text),
+            Self::Literal(text) => formatter.write_str(text),
             Self::Name => formatter.write_str(name),
             Self::Intensity { pretty } => {
                 if pretty {
