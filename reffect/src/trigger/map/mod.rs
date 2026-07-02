@@ -66,7 +66,7 @@ impl MapTrigger {
 
 impl Updateable for MapTrigger {
     fn needs_update(&self, ctx: &Context) -> bool {
-        ctx.has_update(Update::Map)
+        ctx.has_update_or_edit(Update::Map)
     }
 
     fn force_update(&mut self, ctx: &Context) {

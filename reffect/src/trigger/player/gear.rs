@@ -146,7 +146,7 @@ impl GearTrigger {
 
 impl Updateable for GearTrigger {
     fn needs_update(&self, ctx: &Context) -> bool {
-        ctx.has_update(Update::PlayerGear) || self.needs_item_update(ctx)
+        ctx.has_update_or_edit(Update::PlayerGear) || self.needs_item_update(ctx)
     }
 
     fn force_update(&mut self, ctx: &Context) {

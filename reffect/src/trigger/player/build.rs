@@ -255,7 +255,7 @@ impl BuildTrigger {
 
 impl Updateable for BuildTrigger {
     fn needs_update(&self, ctx: &Context) -> bool {
-        ctx.has_update(Update::PlayerIdentity | Update::PlayerBuild)
+        ctx.has_update_or_edit(Update::PlayerIdentity | Update::PlayerBuild)
     }
 
     fn force_update(&mut self, ctx: &Context) {
