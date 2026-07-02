@@ -64,7 +64,7 @@ impl PlayerTrigger {
             && self.mounts_active(ctx)
     }
 
-    pub fn can_update_progress(&self) -> bool {
+    pub fn allow_child_update(&self) -> bool {
         self.build.is_active() && self.gear.is_active()
     }
 

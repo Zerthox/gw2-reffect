@@ -52,18 +52,12 @@ impl Default for ConditionTrigger {
 }
 
 impl ConditionTrigger {
-    pub fn is_active_or_update(&mut self, ctx: &Context, active: &ProgressActive) -> bool {
+    pub fn is_active(&mut self, ctx: &Context, active: &ProgressActive) -> bool {
         match self {
             Self::ProgressThreshold(threshold) => threshold.is_met(active, ctx),
             Self::AbilityState(ability_state) => ability_state.is_present(active),
-            Self::Player(player) => {
-                player.update_if_need(ctx);
-                player.is_active(ctx)
-            }
-            Self::Map(map) => {
-                map.update_if_need(ctx);
-                map.is_active()
-            }
+            Self::Player(player) => player.is_active(ctx),
+            Self::Map(map) => map.is_active(),
         }
     }
 
@@ -116,6 +110,32 @@ impl ConditionTrigger {
             Self::Map(map) => {
                 map.render_options(ui, ctx);
             }
+        }
+    }
+}
+
+impl Updateable for ConditionTrigger {
+    fn needs_update(&self, ctx: &Context) -> bool {
+        match self {
+            Self::ProgressThreshold(_) | Self::AbilityState(_) => false,
+            Self::Player(player) => player.needs_update(ctx),
+            Self::Map(map) => map.needs_update(ctx),
+        }
+    }
+
+    fn force_update(&mut self, ctx: &Context) {
+        match self {
+            Self::ProgressThreshold(_) | Self::AbilityState(_) => {}
+            Self::Player(player) => player.force_update(ctx),
+            Self::Map(map) => map.force_update(ctx),
+        }
+    }
+
+    fn update_if_need(&mut self, ctx: &Context) {
+        match self {
+            Self::ProgressThreshold(_) | Self::AbilityState(_) => {}
+            Self::Player(player) => player.update_if_need(ctx),
+            Self::Map(map) => map.update_if_need(ctx),
         }
     }
 }

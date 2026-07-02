@@ -1,7 +1,7 @@
 use crate::{
     action::{Action, DynAction},
     colors,
-    context::Context,
+    context::{Context, Updateable},
     render::{collapsing_header_same_line_end, delete_confirm_modal, item_context_menu},
     trigger::{Condition, ProgressActive, ProgressSource},
 };
@@ -37,10 +37,11 @@ where
     T: Clone + IntoPartial,
     T::Partial: PartialProps<T>,
 {
-    pub fn update(&mut self, ctx: &Context, active: Option<&ProgressActive>) {
+    pub fn update(&mut self, ctx: &Context, active: Option<&ProgressActive>, force: bool) {
         self.current = self.base.clone();
         if let Some(active) = active {
             for condition in &mut self.conditions {
+                condition.trigger.update_if_forced_or_needed(ctx, force);
                 condition.process(&mut self.current, ctx, active);
             }
         }

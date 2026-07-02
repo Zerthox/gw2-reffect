@@ -11,8 +11,11 @@ pub struct Updater<'ctx, 'p> {
     /// Current context.
     ctx: &'ctx Context,
 
-    /// Relevant progress, parent or own.
-    active: Option<&'p ProgressActive>,
+    /// Relevant trigger, parent or own.
+    trigger: Option<&'p ProgressTrigger>,
+
+    /// Whether to force update children.
+    force: bool,
 }
 
 impl<'ctx, 'p> Updater<'ctx, 'p> {
@@ -31,33 +34,46 @@ impl<'ctx, 'p> Updater<'ctx, 'p> {
     }
 
     fn root(ctx: &'ctx Context) -> Self {
-        Self { ctx, active: None }
+        Self {
+            ctx,
+            trigger: None,
+            force: false,
+        }
     }
 
     #[must_use]
     fn update_and_push(
         &self,
         filter: &mut FilterTrigger,
-        progress: &'p mut ProgressTrigger,
-    ) -> Self {
+        trigger: &'p mut ProgressTrigger,
+    ) -> Option<Self> {
         let Self {
             ctx,
-            active: parent,
+            trigger: parent,
+            force,
         } = *self;
 
-        let force = filter.needs_update(ctx);
+        let force = force || filter.needs_update(ctx);
         filter.update_if_need(ctx);
 
-        if force {
-            progress.force_update(ctx, parent);
-        } else if filter.can_update_progress() {
-            progress.update_if_need(ctx, parent);
+        if !ctx.edit.is_editing() && !filter.allow_child_update() {
+            return None;
         }
 
-        Self {
-            ctx: self.ctx,
-            active: progress.active(),
+        if force {
+            trigger.force_update(ctx, parent);
+        } else {
+            trigger.update_if_need(ctx, parent);
         }
+        Some(Self {
+            ctx: self.ctx,
+            trigger: Some(trigger),
+            force,
+        })
+    }
+
+    fn active(&self) -> Option<&'p ProgressActive> {
+        self.trigger?.active()
     }
 }
 
@@ -66,30 +82,37 @@ impl VisitMut for Updater<'_, '_> {
         let Pack {
             common, elements, ..
         } = pack;
-        self.update_and_push(&mut common.filter, &mut common.trigger)
-            .visit_elements(elements);
+        if let Some(mut child) = self.update_and_push(&mut common.filter, &mut common.trigger) {
+            child.visit_elements(elements);
+        }
     }
 
     fn visit_element(&mut self, element: &mut Element) {
         let Element { common, kind } = element;
-        self.update_and_push(&mut common.filter, &mut common.trigger)
-            .visit_element_type(kind);
+        if let Some(mut child) = self.update_and_push(&mut common.filter, &mut common.trigger) {
+            child.visit_element_type(kind);
+        }
     }
 
     fn visit_list_icon(&mut self, list_icon: &mut ListIcon) {
-        self.update_and_push(&mut list_icon.filter, &mut list_icon.trigger)
-            .visit_icon(&mut list_icon.icon);
+        if let Some(mut child) = self.update_and_push(&mut list_icon.filter, &mut list_icon.trigger)
+        {
+            child.visit_icon(&mut list_icon.icon);
+        }
     }
 
     fn visit_icon(&mut self, icon: &mut Icon) {
-        icon.props.update(self.ctx, self.active);
+        icon.props.update(self.ctx, self.active(), self.force);
     }
 
     fn visit_text(&mut self, text: &mut Text) {
-        text.props.update(self.ctx, self.active);
+        if self.force {
+            text.reprocess_next_frame();
+        }
+        text.props.update(self.ctx, self.active(), self.force);
     }
 
     fn visit_bar(&mut self, bar: &mut Bar) {
-        bar.props.update(self.ctx, self.active);
+        bar.props.update(self.ctx, self.active(), self.force);
     }
 }

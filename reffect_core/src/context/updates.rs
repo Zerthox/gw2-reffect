@@ -64,4 +64,14 @@ pub trait Updateable {
             self.force_update(ctx);
         }
     }
+
+    /// Updates the state if forced or needed.
+    #[inline]
+    fn update_if_forced_or_needed(&mut self, ctx: &Context, force: bool) {
+        if force {
+            self.force_update(ctx);
+        } else {
+            self.update_if_need(ctx);
+        }
+    }
 }

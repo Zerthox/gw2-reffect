@@ -28,8 +28,8 @@ impl FilterTrigger {
         self.player.is_active(ctx) && self.map.is_active()
     }
 
-    pub fn can_update_progress(&self) -> bool {
-        self.player.can_update_progress() && self.map.is_active()
+    pub fn allow_child_update(&self) -> bool {
+        self.player.allow_child_update() && self.map.is_active()
     }
 
     pub fn render_options(&mut self, ui: &Ui, ctx: &Context) {

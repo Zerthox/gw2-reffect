@@ -51,19 +51,26 @@ impl ProgressTrigger {
         self.active.is_some()
     }
 
-    pub fn needs_update(&self, ctx: &Context) -> bool {
-        ctx.has_update_or_edit(self.source.update_on())
+    pub fn needs_update(&self, ctx: &Context, parent: Option<&Self>) -> bool {
+        let updates = if self.source.inherits()
+            && let Some(parent) = parent
+        {
+            parent.source.update_on()
+        } else {
+            self.source.update_on()
+        };
+        ctx.has_update_or_edit(updates)
     }
 
-    pub fn update_if_need(&mut self, ctx: &Context, parent: Option<&ProgressActive>) {
-        if self.needs_update(ctx) {
+    pub fn update_if_need(&mut self, ctx: &Context, parent: Option<&Self>) {
+        if self.needs_update(ctx, parent) {
             self.force_update(ctx, parent);
         }
     }
 
-    pub fn force_update(&mut self, ctx: &Context, parent: Option<&ProgressActive>) {
+    pub fn force_update(&mut self, ctx: &Context, parent: Option<&Self>) {
         // TODO: end of edit causes memo to "flash", maybe flag to end edit mode?
-        self.active = self.resolve_active(ctx, parent);
+        self.active = self.resolve_active(ctx, parent.and_then(|trigger| trigger.active()));
     }
 
     fn resolve_active(

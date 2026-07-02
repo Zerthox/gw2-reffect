@@ -140,13 +140,25 @@ impl VariantArray for ProgressSource {
 const _: () = check_variant_array::<ProgressSource>();
 
 impl ProgressSource {
+    pub fn inherits(&self) -> bool {
+        matches!(self, Self::Inherit)
+    }
+
     pub fn no_threshold(&self) -> bool {
         matches!(self, Self::Always)
     }
 
+    pub fn is_timed(&self) -> bool {
+        matches!(
+            self,
+            Self::Inherit | Self::Buff { .. } | Self::Ability { .. } | Self::SkillbarSlot { .. }
+        )
+    }
+
     pub fn update_on(&self) -> Updates {
         match self {
-            Self::Inherit | Self::Always => Updates::empty(),
+            Self::Inherit => Updates::all(), // dont know when parent updates
+            Self::Always => Updates::empty(),
             Self::Buff { combatant, .. } => match combatant {
                 Combatant::Player => Update::PlayerBuffs.into(),
                 Combatant::Pet => Updates::empty(),
