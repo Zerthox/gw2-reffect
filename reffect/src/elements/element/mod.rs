@@ -144,28 +144,24 @@ impl Element {
 
     /// Renders the element options.
     pub fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) {
-        if let Some(_token) = ui.tab_bar(self.common.id_string()) {
-            if let Some(_token) = ui.tab_item(&self.kind) {
-                self.common.render_options(ui, ctx);
-                ui.spacing();
-                self.kind.render_options(ui, ctx);
-            }
+        if let Some(_token) = ui.tab_item(format!("{}###type", self.kind.as_ref())) {
+            self.common.render_options(ui, ctx);
+            ui.spacing();
+            self.kind.render_options(ui, ctx);
+        }
 
-            self.kind.render_tabs(ui, ctx, &self.common);
+        self.kind.render_tabs(ui, ctx, &self.common);
 
-            if let Some(_token) = ui.tab_item("Filter") {
-                self.common.render_filters(ui, ctx);
-                self.kind.render_filters(ui, ctx);
-            }
-
-            if let Some(_token) = ui.tab_item("Animation") {
-                self.common.render_animation(ui);
-            }
-
-            if let Some(_token) = ui.tab_item("?") {
-                self.common.render_debug(ui, ctx);
-                self.kind.render_debug(ui, ctx, &self.common);
-            }
+        if let Some(_token) = ui.tab_item("Filter") {
+            self.common.render_filters(ui, ctx);
+            self.kind.render_filters(ui, ctx);
+        }
+        if let Some(_token) = ui.tab_item("Animation") {
+            self.common.render_animation(ui);
+        }
+        if let Some(_token) = ui.tab_item("?") {
+            self.common.render_debug(ui, ctx);
+            self.kind.render_debug(ui, ctx, &self.common);
         }
     }
 }

@@ -45,6 +45,12 @@ impl EditState {
         self.allowed
     }
 
+    /// Whether an element is selected.
+    #[inline]
+    pub fn has_selected(&self) -> bool {
+        self.selected != Id::default()
+    }
+
     /// Whether the id is selected.
     #[inline]
     pub fn is_selected(&self, id: Id) -> bool {
@@ -84,7 +90,7 @@ impl EditState {
     /// Whether any element is edited.
     #[inline]
     pub fn is_editing(&self) -> bool {
-        self.is_allowed() && self.selected != Id::default()
+        self.is_allowed() && self.has_selected()
     }
 
     pub fn select(&mut self, id: Id) -> bool {

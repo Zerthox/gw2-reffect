@@ -85,18 +85,20 @@ impl Addon {
                 ui.same_line();
                 ChildWindow::new("element-options").build(ui, || {
                     let _style = small_padding(ui);
-                    let ctx = RenderCtx::create(ui, ctx, &self.settings);
-                    let mut reorder = false;
-                    for pack in &mut self.packs {
-                        let result = pack.try_render_options(ui, &ctx);
-                        reorder |= result.reorder;
-                        if result.rendered {
-                            // end after we find the element that has to render
-                            break;
+                    if let Some(_token) = ui.tab_bar("tabs") {
+                        let ctx = RenderCtx::create(ui, ctx, &self.settings);
+                        let mut reorder = false;
+                        for pack in &mut self.packs {
+                            let result = pack.try_render_options(ui, &ctx);
+                            reorder |= result.reorder;
+                            if result.rendered {
+                                // end after we find the element that has to render
+                                break;
+                            }
                         }
-                    }
-                    if reorder {
-                        self.packs.sort_by_key(|pack| pack.layer);
+                        if reorder {
+                            self.packs.sort_by_key(|pack| pack.layer);
+                        }
                     }
                 });
             });

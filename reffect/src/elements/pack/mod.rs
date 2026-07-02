@@ -186,30 +186,25 @@ impl Pack {
     /// Renders the pack options.
     fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) -> bool {
         let mut changed = false;
-        if let Some(_token) = ui.tab_bar(self.common.id_string()) {
-            if let Some(_token) = ui.tab_item("Pack") {
-                self.common.render_options(ui, ctx);
+        if let Some(_token) = ui.tab_item("Pack###type") {
+            self.common.render_options(ui, ctx);
 
-                ui.spacing();
+            ui.spacing();
 
-                changed |= ui
-                    .input_int("Layer", &mut self.layer)
-                    .step(1)
-                    .step_fast(10)
-                    .build();
-            }
-
-            if let Some(_token) = ui.tab_item("Filter") {
-                self.common.render_filters(ui, ctx);
-            }
-
-            if let Some(_token) = ui.tab_item("Animation") {
-                self.common.render_animation(ui);
-            }
-
-            if let Some(_token) = ui.tab_item("?") {
-                self.render_debug(ui, ctx);
-            }
+            changed |= ui
+                .input_int("Layer", &mut self.layer)
+                .step(1)
+                .step_fast(10)
+                .build();
+        }
+        if let Some(_token) = ui.tab_item("Filter") {
+            self.common.render_filters(ui, ctx);
+        }
+        if let Some(_token) = ui.tab_item("Animation") {
+            self.common.render_animation(ui);
+        }
+        if let Some(_token) = ui.tab_item("?") {
+            self.render_debug(ui, ctx);
         }
 
         changed
