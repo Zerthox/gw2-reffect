@@ -31,15 +31,18 @@ impl VisitMut for Resizer {
         if common.anchor == ElementAnchor::Parent {
             common.pos = common.pos.mul_scalar(self.factor);
         }
+        self.visit_children_of(common);
     }
 
     fn visit_icon_list(&mut self, list: &mut IconList) {
         list.size = list.size.mul_scalar(self.factor);
         list.pad *= self.factor;
+        self.visit_children_of(list);
     }
 
     fn visit_icon_element(&mut self, icon: &mut IconElement) {
         icon.size = icon.size.mul_scalar(self.factor);
+        self.visit_children_of(icon);
     }
 
     fn visit_text(&mut self, text: &mut Text) {
