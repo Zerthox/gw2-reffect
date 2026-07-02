@@ -1,9 +1,15 @@
+use const_default::ConstDefault;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum ProgressValue {
     Primary,
     Secondary,
     PreferPrimary,
     PreferSecondary,
+}
+
+impl ConstDefault for ProgressValue {
+    const DEFAULT: Self = Self::Primary;
 }
 
 impl ProgressValue {

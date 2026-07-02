@@ -236,6 +236,7 @@ impl Common {
         ui.checkbox("Enabled", &mut self.enabled);
 
         ui.input_text("Name", &mut self.name).build();
+        // TODO: update child text when changed
 
         self.anchor.render_select(ui);
         input_pos(&mut self.pos);

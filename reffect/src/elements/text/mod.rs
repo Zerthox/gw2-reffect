@@ -1,22 +1,23 @@
 mod decoration;
+mod fragment;
+mod process;
 mod props;
 
+use self::process::Processing;
 use super::{Props, RenderCtx, align::AlignHorizontal};
 use crate::{
     context::Context,
-    elements::Common,
-    fmt::Unit,
+    elements::{Common, text::fragment::TextFragment},
     render::{
         Bounds, ComponentWise, LoadedFont, Rect, debug_optional, draw_text_bg, helper,
         input_text_multi_with_menu,
     },
     tree::TreeNode,
-    trigger::{ProgressActive, ProgressValue},
 };
 use const_default::ConstDefault;
 use nexus::imgui::{InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
-use std::{iter::Peekable, str::Chars};
+use std::fmt::Write;
 
 pub use self::{decoration::*, props::*};
 
@@ -37,140 +38,45 @@ pub struct Text {
     pub props: Props<TextProps>,
 
     #[serde(skip)]
-    frequent: bool,
+    processing: Processing,
 
     #[serde(skip)]
-    text_memo: Option<String>,
+    processed_text: Option<String>,
 }
 
 impl Text {
     pub fn load(&mut self) {
         self.font.reload();
+        self.reprocess_next_frame();
+    }
+
+    pub fn reprocess_next_frame(&mut self) {
+        self.processing = Processing::Frame;
+    }
+
+    pub fn reprocess_if_need(&mut self, ctx: &RenderCtx, common: &Common) {
+        if self.processing.needs_reprocess(ctx, &common.trigger) {
+            self.reprocess(ctx, common);
+        }
     }
 
     pub fn reprocess(&mut self, ctx: &RenderCtx, common: &Common) {
-        if self.frequent || ctx.edit.is_editing() || common.trigger.needs_update(ctx) {
-            let active = common.trigger.active();
-            self.frequent = false; // reset frequent, only enable while active
-            self.text_memo = active.map(|active| self.process_text(active, ctx, common));
-        }
-    }
-
-    fn process_text(
-        &mut self,
-        active: &ProgressActive,
-        ctx: &RenderCtx,
-        common: &Common,
-    ) -> String {
-        const PREFIX: char = '%';
-
-        let mut result = String::with_capacity(self.text.len()); // always same or larger size
-
-        let is_timed = active.is_timed();
-        let mut iter = self.text.chars().peekable();
-        while let Some(el) = iter.next() {
-            if el == PREFIX {
-                if let Some(next) = iter.peek().copied() {
-                    match next {
-                        'n' => {
-                            iter.next();
-                            result.push_str(&common.name);
-                        }
-                        'i' | 's' => {
-                            // backwards compat for %s stacks
-                            iter.next();
-                            result.push_str(&active.intensity().to_string());
-                        }
-                        'I' => {
-                            iter.next();
-                            result.push_str(&Unit::format(active.intensity()));
-                        }
-                        'c' | 'r' | 'C' => {
-                            // backwards compat for %r remaining
-                            iter.next();
-                            let value = Self::parse_value(&mut iter);
-                            let pretty = next.is_ascii_uppercase();
-                            result.push_str(&active.current_text(
-                                value,
-                                ctx.now,
-                                pretty,
-                                &ctx.settings.format,
-                            ));
-                            self.frequent = is_timed;
-                        }
-                        'f' | 'F' => {
-                            iter.next();
-                            let value = Self::parse_value(&mut iter);
-                            let pretty = next.is_ascii_uppercase();
-                            result.push_str(&active.max_text(value, pretty, &ctx.settings.format));
-                        }
-                        'p' | 'P' => {
-                            iter.next();
-                            let value = Self::parse_value(&mut iter);
-                            let pretty = next.is_ascii_uppercase();
-                            let progress = 100.0 * active.progress_or_default(value, ctx.now);
-                            let precision = if pretty { 1 } else { 0 };
-                            result.push_str(&format!("{progress:.precision$}"));
-                            self.frequent = is_timed;
-                        }
-                        PREFIX => {
-                            iter.next();
-                            result.push(PREFIX);
-                        }
-                        _ => {
-                            result.push(PREFIX);
-                        }
-                    }
-                } else {
-                    result.push(el);
-                }
-            } else {
-                result.push(el);
+        self.processing = Processing::MIN;
+        self.processed_text = common.trigger.active().map(|active| {
+            let mut text = String::with_capacity(self.text.len()); // expecting same size or larger
+            for fragment in TextFragment::parse(&self.text) {
+                self.processing
+                    .or(Processing::resolve(&fragment, &common.trigger.source));
+                let _ = write!(&mut text, "{}", fragment.display(active, ctx, &common.name));
             }
-        }
-
-        result
-    }
-
-    fn parse_value(iter: &mut Peekable<Chars>) -> ProgressValue {
-        match iter.peek() {
-            Some('1') => {
-                iter.next();
-                ProgressValue::Primary
-            }
-            Some('2') => {
-                iter.next();
-                ProgressValue::Secondary
-            }
-            _ => ProgressValue::Primary,
-        }
-    }
-
-    fn helper(ui: &Ui) {
-        helper(ui, || {
-            ui.text("Uppercase for pretty format");
-            ui.text("Suffix 1 or 2 for primary/secondary");
-            ui.text("%n for name");
-            ui.text("%i for intensity");
-            ui.text("%c for current amount");
-            ui.text("%f for full/max amount");
-            ui.text("%p for progress percent");
-            ui.text("%% for % sign");
+            text
         });
     }
 
-    fn calc_offset(&self, ui: &Ui, text: &str) -> [f32; 2] {
-        self.align.text_offset(ui, text, self.props.scale)
-    }
-}
-
-impl TreeNode for Text {}
-
-impl Text {
     pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, common: &Common) {
-        self.reprocess(ctx, common);
+        self.reprocess_if_need(ctx, common);
 
-        if let Some(text) = &self.text_memo {
+        if let Some(text) = &self.processed_text {
             let _font = self.font.push();
             let font_scale = self.props.scale;
             let offset = self.calc_offset(ui, text);
@@ -185,35 +91,35 @@ impl Text {
             draw_text_bg(ui, text, pos, font_scale, color);
         }
     }
-}
 
-impl Bounds for Text {
-    fn bounds(&self, ui: &Ui, _ctx: &Context) -> Rect {
-        self.text_memo
-            .as_ref()
-            .map(|text| {
-                let _font = self.font.push();
-                let offset = self.calc_offset(ui, text);
-                let size = ui.calc_text_size(text).mul_scalar(self.props.scale);
-                (offset, offset.add(size))
-            })
-            .unwrap_or_default()
+    fn calc_offset(&self, ui: &Ui, text: &str) -> [f32; 2] {
+        self.align.text_offset(ui, text, self.props.scale)
     }
-}
 
-impl Text {
     pub fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) {
-        input_text_multi_with_menu(
+        let changed = input_text_multi_with_menu(
             ui,
             "##text",
             &mut self.text,
             [0.0, 3.0 * ui.text_line_height()],
             InputTextFlags::ALLOW_TAB_INPUT,
         );
+        if changed {
+            self.reprocess_next_frame();
+        }
 
         ui.same_line();
         ui.text("Text"); // own label to fix helper position
-        Self::helper(ui);
+        helper(ui, || {
+            ui.text("Uppercase for pretty format");
+            ui.text("Suffix 1 or 2 for primary/secondary");
+            ui.text("%n for name");
+            ui.text("%i for intensity");
+            ui.text("%c for current amount");
+            ui.text("%f for full/max amount");
+            ui.text("%p for progress percent");
+            ui.text("%% for % sign");
+        });
 
         self.align.render_combo(ui);
 
@@ -228,12 +134,24 @@ impl Text {
                 .render_condition_options(ui, ctx, &common.trigger.source);
         }
     }
-}
 
-impl Text {
     pub fn render_debug(&mut self, ui: &Ui, _ctx: &RenderCtx) {
         debug_optional(ui, "Font", self.font.as_font());
-        ui.text(format!("Frequent: {}", self.frequent));
+        ui.text(format!("Processing: {}", self.processing));
+    }
+}
+
+impl Bounds for Text {
+    fn bounds(&self, ui: &Ui, _ctx: &Context) -> Rect {
+        self.processed_text
+            .as_ref()
+            .map(|text| {
+                let _font = self.font.push();
+                let offset = self.calc_offset(ui, text);
+                let size = ui.calc_text_size(text).mul_scalar(self.props.scale);
+                (offset, offset.add(size))
+            })
+            .unwrap_or_default()
     }
 }
 
@@ -243,8 +161,8 @@ impl ConstDefault for Text {
         align: AlignHorizontal::Center,
         props: Props::DEFAULT,
         font: LoadedFont::empty(),
-        frequent: false,
-        text_memo: None,
+        processing: Processing::MIN,
+        processed_text: None,
     };
 }
 
@@ -261,8 +179,9 @@ impl Clone for Text {
             align: self.align,
             props: self.props.clone(),
             font: self.font.clone(),
-            frequent: self.frequent,
-            text_memo: None, // dont clone the memo
+            ..Self::DEFAULT // dont clone internal state
         }
     }
 }
+
+impl TreeNode for Text {}
