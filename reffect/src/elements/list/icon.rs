@@ -35,7 +35,7 @@ impl ListIcon {
     pub fn is_visible(&mut self, ctx: &RenderCtx) -> bool {
         self.enabled
             && if ctx.edit.is_editing() {
-                ctx.is_edited()
+                ctx.is_edit_visible()
             } else {
                 self.filter.is_active(ctx) && self.trigger.is_visible()
             }

@@ -53,13 +53,12 @@ impl<'ctx, 'p> Updater<'ctx, 'p> {
             force,
         } = *self;
 
-        let force = force || filter.needs_update(ctx);
         filter.update_if_need(ctx);
-
-        if !ctx.edit.is_editing() && !filter.allow_child_update() {
+        if !ctx.edit.is_editing() && !filter.allow_child_updates() {
             return None;
         }
 
+        let force = force || filter.force_child_updates(ctx);
         if force {
             trigger.force_update(ctx, parent);
         } else {

@@ -20,7 +20,7 @@ use serde::{Deserialize, Serialize};
 #[serde(default)]
 pub struct Element {
     #[serde(flatten)]
-    pub common: Common,
+    pub common: Common, // TODO: move to element types
 
     #[serde(flatten)]
     pub kind: ElementType,

@@ -19,6 +19,9 @@ use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 
+// TODO: active weapon
+// TODO: active pet
+
 #[derive(
     Debug,
     Default,

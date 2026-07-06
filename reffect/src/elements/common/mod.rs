@@ -70,7 +70,7 @@ impl Common {
 
     pub fn is_visible_or_edit(&mut self, ctx: &RenderCtx) -> bool {
         if ctx.edit.is_editing() {
-            (self.enabled && ctx.is_edited()) || ctx.edit.is_selected_or_parent(self.id)
+            (self.enabled && ctx.is_edit_visible()) || ctx.edit.is_selected_or_parent(self.id)
         } else {
             self.enabled && self.filter.is_active(ctx)
         }
@@ -236,7 +236,6 @@ impl Common {
         ui.checkbox("Enabled", &mut self.enabled);
 
         ui.input_text("Name", &mut self.name).build();
-        // TODO: update child text when changed
 
         self.anchor.render_select(ui);
         input_pos(&mut self.pos);

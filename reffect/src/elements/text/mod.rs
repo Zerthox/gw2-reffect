@@ -55,7 +55,7 @@ impl Text {
     }
 
     pub fn reprocess_if_need(&mut self, ctx: &RenderCtx, common: &Common) {
-        if self.processing.needs_reprocess(ctx, &common.trigger) {
+        if ctx.edit.is_edited(common.id) && self.processing.needs_reprocess(ctx, &common.trigger) {
             self.reprocess(ctx, common);
         }
     }

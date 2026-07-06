@@ -19,7 +19,7 @@ pub struct RenderCtx<'a> {
     /// Settings.
     pub settings: &'a GeneralSettings,
 
-    /// Whether the current element is edited.
+    /// Whether the current element is visible in edit mode.
     edit: Cell<bool>,
 
     /// Current screen cursor position.
@@ -54,7 +54,7 @@ impl<'a> RenderCtx<'a> {
         } else {
             self.context.edit.is_edited(common.id)
         };
-        self.edit.set(self.is_edited() || edited);
+        self.edit.set(self.edit.get() || edited);
         self.pos.set(common.pos(ui, self.pos()));
         token
     }
@@ -74,7 +74,7 @@ impl<'a> RenderCtx<'a> {
     }
 
     /// Checks whether the current element is visible in edit mode.
-    pub fn is_edited(&self) -> bool {
+    pub fn is_edit_visible(&self) -> bool {
         self.edit.get()
     }
 
@@ -103,7 +103,7 @@ impl<'a, 'b> Token<'a, 'b> {
     fn capture(ctx: &'a RenderCtx<'b>) -> Self {
         Self {
             ctx,
-            edited: ctx.is_edited(),
+            edited: ctx.is_edit_visible(),
             pos: ctx.pos(),
         }
     }

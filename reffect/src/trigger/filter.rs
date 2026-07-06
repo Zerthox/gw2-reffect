@@ -28,8 +28,13 @@ impl FilterTrigger {
         self.player.is_active(ctx) && self.map.is_active()
     }
 
-    pub fn allow_child_update(&self) -> bool {
+    pub fn allow_child_updates(&self) -> bool {
         self.player.allow_child_update() && self.map.is_active()
+    }
+
+    pub fn force_child_updates(&self, ctx: &Context) -> bool {
+        // TODO: combat as well?
+        self.needs_update(ctx)
     }
 
     pub fn render_options(&mut self, ui: &Ui, ctx: &Context) {
