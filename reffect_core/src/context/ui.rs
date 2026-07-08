@@ -9,7 +9,7 @@ pub struct UiInfo {
 }
 
 impl UiInfo {
-    pub const fn empty() -> Self {
+    pub const fn new() -> Self {
         Self {
             gameplay: false,
             map_open: false,
@@ -30,5 +30,11 @@ impl UiInfo {
 
     pub fn should_show(&self) -> bool {
         self.gameplay && !self.map_open
+    }
+}
+
+impl Default for UiInfo {
+    fn default() -> Self {
+        Self::new()
     }
 }

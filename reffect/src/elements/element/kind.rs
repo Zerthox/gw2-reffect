@@ -92,6 +92,41 @@ impl ElementType {
             Self::Bar(bar) => bar.render_debug(ui, ctx),
         }
     }
+
+    pub fn as_group(&self) -> Option<&Group> {
+        match self {
+            Self::Group(group) => Some(group),
+            _ => None,
+        }
+    }
+
+    pub fn as_icon(&self) -> Option<&IconElement> {
+        match self {
+            Self::Icon(icon) => Some(icon),
+            _ => None,
+        }
+    }
+
+    pub fn as_icon_list(&self) -> Option<&IconList> {
+        match self {
+            Self::IconList(list) => Some(list),
+            _ => None,
+        }
+    }
+
+    pub fn as_text(&self) -> Option<&Text> {
+        match self {
+            Self::Text(text) => Some(text),
+            _ => None,
+        }
+    }
+
+    pub fn as_bar(&self) -> Option<&Bar> {
+        match self {
+            Self::Bar(bar) => Some(bar),
+            _ => None,
+        }
+    }
 }
 
 impl TreeNode for ElementType {

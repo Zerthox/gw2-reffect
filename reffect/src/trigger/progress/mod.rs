@@ -6,10 +6,11 @@ mod value;
 pub use self::{active::*, source::*, threshold::*, value::*};
 
 use crate::{context::Context, render::debug_optional, serde::migrate};
+use const_default::ConstDefault;
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default, Serialize, Deserialize)]
+#[derive(Debug, Default, ConstDefault, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct ProgressTrigger {
@@ -29,6 +30,14 @@ pub struct ProgressTrigger {
 }
 
 impl ProgressTrigger {
+    pub const fn with(source: ProgressSource) -> Self {
+        Self {
+            source,
+            threshold: ProgressThreshold::DEFAULT,
+            active: None,
+        }
+    }
+
     pub fn buff() -> Self {
         Self {
             source: ProgressSource::Buff {

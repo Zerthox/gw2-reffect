@@ -23,22 +23,12 @@ use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 // TODO: active pet
 
 #[derive(
-    Debug,
-    Default,
-    Clone,
-    PartialEq,
-    AsRefStr,
-    IntoStaticStr,
-    EnumIter,
-    EnumCount,
-    Serialize,
-    Deserialize,
+    Debug, Clone, PartialEq, AsRefStr, IntoStaticStr, EnumIter, EnumCount, Serialize, Deserialize,
 )]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(tag = "type")]
 pub enum ProgressSource {
     /// Inherit from above.
-    #[default]
     Inherit,
 
     /// Always active, no associated progress.
@@ -109,6 +99,16 @@ pub enum ProgressSource {
     /// Profession resource rate.
     #[strum(serialize = "Resource Rate")]
     ResourceRate,
+}
+
+impl ConstDefault for ProgressSource {
+    const DEFAULT: Self = Self::Inherit;
+}
+
+impl Default for ProgressSource {
+    fn default() -> Self {
+        Self::DEFAULT
+    }
 }
 
 impl VariantArray for ProgressSource {

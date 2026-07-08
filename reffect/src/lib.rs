@@ -2,14 +2,14 @@ mod action;
 mod addon;
 mod assets;
 mod clipboard;
-mod elements;
 mod render;
-mod settings;
 mod texture;
-mod tree;
-mod trigger;
 
+pub mod elements;
 pub mod schema;
+pub mod settings;
+pub mod tree;
+pub mod trigger;
 
 pub use reffect_core::*;
 pub use reffect_internal as internal;

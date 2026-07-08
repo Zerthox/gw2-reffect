@@ -3,15 +3,15 @@ mod fragment;
 mod process;
 mod props;
 
-use self::process::Processing;
 use super::{Props, RenderCtx, align::AlignHorizontal};
 use crate::{
     context::Context,
-    elements::{Common, text::fragment::TextFragment},
+    elements::Common,
     render::{
         Bounds, ComponentWise, LoadedFont, Rect, debug_optional, draw_text_bg, helper,
         input_text_multi_with_menu,
     },
+    settings::FormatSettings,
     tree::TreeNode,
 };
 use const_default::ConstDefault;
@@ -19,7 +19,7 @@ use nexus::imgui::{InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
 use std::fmt::Write;
 
-pub use self::{decoration::*, props::*};
+pub use self::{decoration::*, fragment::*, process::*, props::*};
 
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
@@ -54,26 +54,38 @@ impl Text {
         self.processing = Processing::Frame;
     }
 
-    pub fn reprocess_if_need(&mut self, ctx: &RenderCtx, common: &Common) {
-        if ctx.edit.is_edited(common.id) && self.processing.needs_reprocess(ctx, &common.trigger) {
-            self.reprocess(ctx, common);
+    pub fn needs_reprocess(&mut self, ctx: &Context, common: &Common) -> bool {
+        ctx.edit.is_edited(common.id) || self.processing.needs_reprocess(ctx, &common.trigger)
+    }
+
+    pub fn reprocess_if_need(&mut self, ctx: &Context, settings: &FormatSettings, common: &Common) {
+        if self.needs_reprocess(ctx, common) {
+            self.reprocess(ctx, settings, common);
         }
     }
 
-    pub fn reprocess(&mut self, ctx: &RenderCtx, common: &Common) {
+    pub fn reprocess(&mut self, ctx: &Context, settings: &FormatSettings, common: &Common) {
         self.processing = Processing::MIN;
         self.processed_text = common.trigger.active().map(|active| {
             let mut text = String::with_capacity(self.text.len()); // expecting same size or larger
             for fragment in TextFragment::parse(&self.text) {
                 self.processing.or(Processing::resolve(&fragment, active));
-                let _ = write!(&mut text, "{}", fragment.display(active, ctx, &common.name));
+                let _ = write!(
+                    &mut text,
+                    "{}",
+                    fragment.display(active, ctx, settings, &common.name)
+                );
             }
             text
         });
     }
 
+    pub fn processed_text(&self) -> Option<&str> {
+        self.processed_text.as_deref()
+    }
+
     pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, common: &Common) {
-        self.reprocess_if_need(ctx, common);
+        self.reprocess_if_need(ctx, &ctx.settings.format, common);
 
         if let Some(text) = &self.processed_text {
             let _font = self.font.push();
@@ -160,7 +172,7 @@ impl ConstDefault for Text {
         align: AlignHorizontal::Center,
         props: Props::DEFAULT,
         font: LoadedFont::empty(),
-        processing: Processing::MIN,
+        processing: Processing::Frame,
         processed_text: None,
     };
 }

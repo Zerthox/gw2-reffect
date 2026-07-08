@@ -117,3 +117,91 @@ impl VisitMut for Updater<'_, '_> {
         bar.props.update(self.ctx, self.active(), self.force);
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{
+        context::{Gear, PlayerInfo, Weapon},
+        trigger::{ChildUpdates, ProgressSource, ProgressTrigger},
+    };
+
+    fn create_ctx() -> Context {
+        let mut ctx = Context::disabled();
+        ctx.player = PlayerInfo::empty();
+        ctx
+    }
+
+    fn create_filter() -> FilterTrigger {
+        let mut filter = FilterTrigger::default();
+        filter.player.gear.weapons = Weapon::AxeMain.into();
+        filter
+    }
+
+    #[test]
+    fn filter_update() {
+        let mut ctx = create_ctx();
+        let mut filter = create_filter();
+
+        ctx.force_update();
+        let child_updates = filter.update(&ctx, false);
+        assert_eq!(
+            child_updates,
+            ChildUpdates {
+                allow: false,
+                force: false
+            }
+        );
+        assert_eq!(filter.is_active(&ctx), false);
+
+        ctx.player.gear = Ok(Gear {
+            weapons: Weapon::AxeMain | Weapon::AxeOff,
+            ..Gear::empty()
+        });
+        ctx.updates = Update::PlayerGear.into();
+
+        let child_updates = filter.update(&ctx, false);
+        assert_eq!(
+            child_updates,
+            ChildUpdates {
+                allow: true,
+                force: true
+            }
+        );
+        assert_eq!(filter.is_active(&ctx), true);
+    }
+
+    #[test]
+    fn push() {
+        let mut ctx = create_ctx();
+        ctx.player.gear = Ok(Gear {
+            weapons: Weapon::AxeMain | Weapon::AxeOff,
+            ..Gear::empty()
+        });
+
+        let mut filter = create_filter();
+
+        let mut trigger = ProgressTrigger::with(ProgressSource::PrimaryResource);
+        let trigger_ptr = &raw const trigger;
+
+        ctx.force_update();
+        let parent = Updater::root(&ctx)
+            .update_and_push(&mut filter, &mut trigger)
+            .expect("no parent visit");
+
+        let active_trigger = parent.trigger.expect("no trigger");
+        assert_eq!(&raw const *active_trigger, trigger_ptr);
+        assert_eq!(parent.force, true);
+
+        let mut trigger = ProgressTrigger::with(ProgressSource::Inherit);
+        let trigger_ptr = &raw const trigger;
+
+        let child = parent
+            .update_and_push(&mut FilterTrigger::default(), &mut trigger)
+            .expect("no child visit");
+
+        let active_trigger = child.trigger.expect("no trigger");
+        assert_eq!(&raw const *active_trigger, trigger_ptr);
+        assert_eq!(child.force, true);
+    }
+}

@@ -52,30 +52,44 @@ pub struct Context {
 
 impl Context {
     #[inline]
-    pub const fn new() -> Self {
+    pub const fn disabled() -> Self {
         Self {
             now: 0,
             updates: Updates::EMPTY,
             edit: EditState::new(),
-            ui: UiInfo::empty(),
+            ui: UiInfo::new(),
+            map: MapInfo::empty(),
+            player: PlayerInfo::disabled(),
+            target: TargetInfo::disabled(),
+            group: Err(Error::Disabled),
+        }
+    }
+
+    #[inline]
+    pub const fn empty() -> Self {
+        Self {
+            now: 0,
+            updates: Updates::EMPTY,
+            edit: EditState::new(),
+            ui: UiInfo::new(),
             map: MapInfo::empty(),
             player: PlayerInfo::empty(),
             target: TargetInfo::empty(),
-            group: Err(Error::Disabled),
+            group: Ok(GroupInfo::empty()),
         }
     }
 
     /// Returns the context.
     #[inline]
     pub fn lock() -> MutexGuard<'static, Self> {
-        static CTX: Mutex<Context> = Mutex::new(Context::new());
+        static CTX: Mutex<Context> = Mutex::new(Context::disabled());
 
         CTX.lock().unwrap()
     }
 
     #[inline]
     pub fn unload() {
-        *Self::lock() = Self::new();
+        *Self::lock() = Self::disabled();
     }
 
     /// Creates the context worker.
@@ -173,7 +187,7 @@ impl Context {
     #[inline]
     pub fn force_update(&mut self) {
         self.updates = Updates::all();
-        log::trace!("Forcing pack updates");
+        log::trace!("Forcing all updates");
     }
 
     #[inline]
@@ -181,12 +195,5 @@ impl Context {
         self.player.set_error(error.clone());
         self.target.set_error(error.clone());
         self.group = Err(error);
-    }
-}
-
-impl Default for Context {
-    #[inline]
-    fn default() -> Self {
-        Self::new()
     }
 }

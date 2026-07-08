@@ -15,10 +15,18 @@ pub struct TargetInfo {
 
 impl TargetInfo {
     #[inline]
-    pub const fn empty() -> Self {
+    pub const fn disabled() -> Self {
         Self {
             resources: Err(Error::Disabled),
             buffs: Err(Error::Disabled),
+        }
+    }
+
+    #[inline]
+    pub const fn empty() -> Self {
+        Self {
+            resources: Ok(CombatantResources::empty()),
+            buffs: Ok(BuffMap::new()),
         }
     }
 

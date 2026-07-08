@@ -51,7 +51,7 @@ impl<'a> Schema<'a> {
         Some(schema)
     }
 
-    fn deserialize(reader: impl io::Read) -> Result<Self, Error<serde_json::Error>> {
+    pub fn deserialize(reader: impl io::Read) -> Result<Self, Error<serde_json::Error>> {
         let mut deserializer = serde_json::Deserializer::from_reader(reader);
         let schema: Self = serde_path_to_error::deserialize(&mut deserializer)?;
         deserializer

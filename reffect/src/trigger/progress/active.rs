@@ -6,7 +6,7 @@ use crate::{
 };
 use enumflags2::BitFlags;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum ProgressActive {
     Resource {
         current: f32,
@@ -32,6 +32,15 @@ pub enum ProgressActive {
 }
 
 impl ProgressActive {
+    /// Creates a dummy empty active progress.
+    pub const fn empty() -> Self {
+        Self::Resource {
+            current: 0.0,
+            max: 0.0,
+            resource: ResourceType::DEFAULT,
+        }
+    }
+
     /// Creates a dummy active progress for always trigger.
     pub const fn always() -> Self {
         Self::Resource {

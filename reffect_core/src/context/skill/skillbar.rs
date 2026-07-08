@@ -13,6 +13,14 @@ pub struct Skillbar {
 }
 
 impl Skillbar {
+    /// Creates an empty skillbar.
+    #[inline]
+    pub const fn empty() -> Self {
+        Self {
+            skills: [const { None }; Slot::COUNT],
+        }
+    }
+
     /// Returns the ability in the given slot.
     #[inline]
     pub fn slot(&self, slot: Slot) -> Option<&Ability> {

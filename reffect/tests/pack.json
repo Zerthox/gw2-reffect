@@ -1,0 +1,195 @@
+{
+    "schema": "v1",
+    "enabled": true,
+    "name": "Test Pack",
+    "anchor": { "Screen": "Center" },
+    "pos": [0.0, 0.0],
+    "opacity": 1.0,
+    "trigger": {
+        "source": {
+            "type": "Buff",
+            "combatant": "Player",
+            "ids": [740]
+        },
+        "threshold": {
+            "threshold_type": "Always",
+            "amount_type": "Intensity"
+        }
+    },
+    "filter": {
+        "player": {
+            "combat": null,
+            "weapons": [],
+            "weapon_mode": "Any",
+            "sigils": [],
+            "sigil_mode": "All",
+            "relics": [],
+            "traits": [],
+            "trait_mode": "All",
+            "specs": [],
+            "skill_selections": [],
+            "skill_selections_mode": "All",
+            "prof_selections": [],
+            "pets": [],
+            "pet_mode": "All",
+            "mounts": []
+        },
+        "map": {
+            "category": ["PvE", "Instance"],
+            "whitelist": true,
+            "ids": []
+        }
+    },
+    "animation": null,
+    "layer": 0,
+    "elements": [
+        {
+            "enabled": true,
+            "name": "Test Group",
+            "anchor": "Parent",
+            "pos": [0.0, 0.0],
+            "opacity": 1.0,
+            "trigger": {
+                "source": "Inherit",
+                "threshold": {
+                    "threshold_type": "Always",
+                    "amount_type": "Intensity"
+                }
+            },
+            "filter": {
+                "player": {
+                    "combat": null,
+                    "weapons": [],
+                    "weapon_mode": "Any",
+                    "sigils": [],
+                    "sigil_mode": "All",
+                    "relics": [],
+                    "traits": [],
+                    "trait_mode": "All",
+                    "specs": [],
+                    "skill_selections": [],
+                    "skill_selections_mode": "All",
+                    "prof_selections": [],
+                    "pets": [],
+                    "pet_mode": "All",
+                    "mounts": []
+                },
+                "map": {
+                    "category": [],
+                    "whitelist": true,
+                    "ids": []
+                }
+            },
+            "animation": null,
+            "type": "Group",
+            "members": [
+                {
+                    "enabled": true,
+                    "name": "Test Text",
+                    "anchor": "Parent",
+                    "pos": [0.0, 0.0],
+                    "opacity": 1.0,
+                    "trigger": {
+                        "source": "Inherit",
+                        "threshold": {
+                            "threshold_type": "Always",
+                            "amount_type": "Intensity"
+                        }
+                    },
+                    "filter": {
+                        "player": {
+                            "combat": null,
+                            "weapons": [],
+                            "weapon_mode": "Any",
+                            "sigils": [],
+                            "sigil_mode": "All",
+                            "relics": [],
+                            "traits": [],
+                            "trait_mode": "All",
+                            "specs": [],
+                            "skill_selections": [],
+                            "skill_selections_mode": "All",
+                            "prof_selections": [],
+                            "pets": [],
+                            "pet_mode": "All",
+                            "mounts": []
+                        },
+                        "map": {
+                            "category": [],
+                            "whitelist": true,
+                            "ids": []
+                        }
+                    },
+                    "animation": null,
+                    "type": "Text",
+                    "text": "%ix %n %c/%f %p%%",
+                    "font": null,
+                    "align": "Center",
+                    "scale": 0.8,
+                    "color": [1.0, 1.0, 1.0, 1.0],
+                    "decoration": "Shadow",
+                    "conditions": [
+                        {
+                            "trigger": {
+                                "ProgressThreshold": {
+                                    "threshold_type": "Present",
+                                    "amount_type": "Intensity"
+                                }
+                            },
+                            "properties": {
+                                "scale": 1.0,
+                                "color": null,
+                                "decoration": null
+                            }
+                        },
+                        {
+                            "trigger": {
+                                "ProgressThreshold": {
+                                    "threshold_type": {
+                                        "Between": [1.0, 9.0]
+                                    },
+                                    "amount_type": "Intensity"
+                                }
+                            },
+                            "properties": {
+                                "scale": null,
+                                "color": [1.0, 0.0, 0.0, 1.0],
+                                "decoration": null
+                            }
+                        },
+                        {
+                            "trigger": {
+                                "ProgressThreshold": {
+                                    "threshold_type": {
+                                        "Between": [10.0, 19.0]
+                                    },
+                                    "amount_type": "Intensity"
+                                }
+                            },
+                            "properties": {
+                                "scale": null,
+                                "color": [1.0, 1.0, 0.0, 1.0],
+                                "decoration": null
+                            }
+                        },
+                        {
+                            "trigger": {
+                                "ProgressThreshold": {
+                                    "threshold_type": {
+                                        "Above": 25.0
+                                    },
+                                    "amount_type": "Intensity"
+                                }
+                            },
+                            "properties": {
+                                "scale": null,
+                                "color": [0.0, 1.0, 0.0, 1.0],
+                                "decoration": null
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

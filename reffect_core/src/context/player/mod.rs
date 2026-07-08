@@ -48,7 +48,7 @@ pub struct PlayerInfo {
 
 impl PlayerInfo {
     #[inline]
-    pub const fn empty() -> Self {
+    pub const fn disabled() -> Self {
         Self {
             prof: Err(0),
             spec: Err(0),
@@ -59,6 +59,21 @@ impl PlayerInfo {
             resources: Err(Error::Disabled),
             buff_info: Err(Error::Disabled),
             skillbar: Err(Error::Disabled),
+        }
+    }
+
+    #[inline]
+    pub const fn empty() -> Self {
+        Self {
+            prof: Err(0),
+            spec: Err(0),
+            race: Err(0),
+            mount: Err(0),
+            gear: Ok(Gear::empty()),
+            build: Ok(Build::empty()),
+            resources: Ok(PlayerResources::empty()),
+            buff_info: Ok(PlayerBuffInfo::empty()),
+            skillbar: Ok(Skillbar::empty()),
         }
     }
 
@@ -99,4 +114,15 @@ pub struct PlayerBuffInfo {
 
     /// Last applied squad highlight.
     pub last_squad_highlight: u32,
+}
+
+impl PlayerBuffInfo {
+    #[inline]
+    pub const fn empty() -> Self {
+        Self {
+            buffs: BuffMap::new(),
+            last_screen_border: 0,
+            last_squad_highlight: 0,
+        }
+    }
 }
