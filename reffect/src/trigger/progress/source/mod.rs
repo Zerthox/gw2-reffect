@@ -143,51 +143,44 @@ impl VariantArray for ProgressSource {
 const _: () = check_variant_array::<ProgressSource>();
 
 impl ProgressSource {
-    pub fn inherits(&self) -> bool {
+    pub const fn inherits(&self) -> bool {
         matches!(self, Self::Inherit)
     }
 
-    pub fn no_threshold(&self) -> bool {
+    pub const fn no_threshold(&self) -> bool {
         matches!(self, Self::Always)
     }
 
-    pub fn is_timed(&self) -> bool {
-        matches!(
-            self,
-            Self::Inherit | Self::Buff { .. } | Self::Ability { .. } | Self::SkillbarSlot { .. }
-        )
-    }
-
-    pub fn update_on(&self) -> Updates {
+    pub const fn update_on(&self) -> Updates {
         match self {
-            Self::Inherit => Updates::all(), // dont know when parent updates
-            Self::Always => Updates::empty(),
+            Self::Inherit => Updates::ALL, // dont know when parent updates
+            Self::Always => Updates::EMPTY,
             Self::Buff { combatant, .. } => match combatant {
-                Combatant::Player => Update::PlayerBuffs.into(),
-                Combatant::Pet => Updates::empty(),
-                Combatant::Target => Update::TargetBuffs.into(),
+                Combatant::Player => Update::PlayerBuffs.flags(),
+                Combatant::Pet => Updates::EMPTY,
+                Combatant::Target => Update::TargetBuffs.flags(),
                 Combatant::GroupMember1
                 | Combatant::GroupMember2
                 | Combatant::GroupMember3
-                | Combatant::GroupMember4 => Update::GroupBuffs.into(),
+                | Combatant::GroupMember4 => Update::GroupBuffs.flags(),
             },
-            Self::Ability { .. } | Self::SkillbarSlot { .. } => Update::PlayerSkillbar.into(),
+            Self::Ability { .. } | Self::SkillbarSlot { .. } => Update::PlayerSkillbar.flags(),
             Self::Health { combatant }
             | Self::Barrier { combatant }
             | Self::Defiance { combatant } => match combatant {
-                Combatant::Player => Update::PlayerResources.into(),
-                Combatant::Pet => Update::PetResources.into(),
-                Combatant::Target => Update::TargetResources.into(),
+                Combatant::Player => Update::PlayerResources.flags(),
+                Combatant::Pet => Update::PetResources.flags(),
+                Combatant::Target => Update::TargetResources.flags(),
                 Combatant::GroupMember1
                 | Combatant::GroupMember2
                 | Combatant::GroupMember3
-                | Combatant::GroupMember4 => Update::GroupResources.into(),
+                | Combatant::GroupMember4 => Update::GroupResources.flags(),
             },
             Self::HealthReduction
             | Self::Endurance
             | Self::PrimaryResource
             | Self::SecondaryResource
-            | Self::ResourceRate => Update::PlayerResources.into(),
+            | Self::ResourceRate => Update::PlayerResources.flags(),
         }
     }
 

@@ -28,13 +28,19 @@ impl FilterTrigger {
         self.player.is_active(ctx) && self.map.is_active()
     }
 
-    pub fn allow_child_updates(&self) -> bool {
-        self.player.allow_child_update() && self.map.is_active()
+    /// Updates the filter if needed and returns update information.
+    pub fn update(&mut self, ctx: &Context) -> ChildUpdates {
+        let before = self.allow_child_updates();
+        self.update_if_need(ctx);
+        let after = self.allow_child_updates();
+        ChildUpdates {
+            allow: after,
+            force: after != before,
+        }
     }
 
-    pub fn force_child_updates(&self, ctx: &Context) -> bool {
-        // TODO: combat as well?
-        self.needs_update(ctx)
+    pub fn allow_child_updates(&self) -> bool {
+        self.player.build.is_active() && self.player.gear.is_active() && self.map.is_active()
     }
 
     pub fn render_options(&mut self, ui: &Ui, ctx: &Context) {
@@ -65,4 +71,10 @@ impl Updateable for FilterTrigger {
         self.player.update_if_need(ctx);
         self.map.update_if_need(ctx);
     }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct ChildUpdates {
+    pub allow: bool,
+    pub force: bool,
 }

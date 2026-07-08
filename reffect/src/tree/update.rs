@@ -1,6 +1,6 @@
 use super::VisitMut;
 use crate::{
-    context::{Context, Update, Updateable},
+    context::{Context, Update},
     elements::{Bar, Element, Icon, Pack, Text, list::ListIcon},
     profiling::measure,
     trigger::{FilterTrigger, ProgressActive, ProgressTrigger},
@@ -53,22 +53,19 @@ impl<'ctx, 'p> Updater<'ctx, 'p> {
             force,
         } = *self;
 
-        filter.update_if_need(ctx);
-        if !ctx.edit.is_editing() && !filter.allow_child_updates() {
-            return None;
-        }
+        let child_updates = filter.update(ctx);
+        if child_updates.allow || ctx.edit.is_editing() {
+            let force = force || child_updates.force;
+            trigger.update(ctx, parent, force);
 
-        let force = force || filter.force_child_updates(ctx);
-        if force {
-            trigger.force_update(ctx, parent);
+            Some(Self {
+                ctx: self.ctx,
+                trigger: Some(trigger),
+                force,
+            })
         } else {
-            trigger.update_if_need(ctx, parent);
+            None
         }
-        Some(Self {
-            ctx: self.ctx,
-            trigger: Some(trigger),
-            force,
-        })
     }
 
     fn active(&self) -> Option<&'p ProgressActive> {

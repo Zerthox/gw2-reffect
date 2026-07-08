@@ -62,8 +62,8 @@ impl ProgressTrigger {
         ctx.has_update_or_edit(updates)
     }
 
-    pub fn update_if_need(&mut self, ctx: &Context, parent: Option<&Self>) {
-        if self.needs_update(ctx, parent) {
+    pub fn update(&mut self, ctx: &Context, parent: Option<&Self>, force: bool) {
+        if force || self.needs_update(ctx, parent) {
             self.force_update(ctx, parent);
         }
     }

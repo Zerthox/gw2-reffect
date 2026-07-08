@@ -64,10 +64,6 @@ impl PlayerTrigger {
             && self.mounts_active(ctx)
     }
 
-    pub fn allow_child_update(&self) -> bool {
-        self.build.is_active() && self.gear.is_active()
-    }
-
     pub fn mounts_active(&self, ctx: &Context) -> bool {
         TriggerMode::Any.check_flags_optional(self.mounts, ctx.player.mount.ok())
     }

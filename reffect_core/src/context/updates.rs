@@ -1,11 +1,13 @@
 use crate::context::Context;
 use enumflags2::{BitFlags, bitflags};
 
+/// Update flags.
 pub type Updates = BitFlags<Update>;
 
+/// An update type.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[bitflags]
-#[repr(u32)]
+#[repr(u16)]
 pub enum Update {
     /// Player identity update.
     PlayerIdentity = 1 << 0,
@@ -40,16 +42,25 @@ pub enum Update {
     /// Group member identity update.
     GroupIdentity = 1 << 10,
 
-    /// Group resources update.
+    /// Group member resources update.
     GroupResources = 1 << 11,
 
-    /// Group buffs update.
+    /// Group member buffs update.
     GroupBuffs = 1 << 12,
 
     /// Map update.
     Map = 1 << 13,
 }
 
+impl Update {
+    /// Convert the update into update flags.
+    #[inline]
+    pub const fn flags(self) -> Updates {
+        unsafe { Updates::from_bits_unchecked_c(self as u16, Updates::CONST_TOKEN) }
+    }
+}
+
+/// Updateable type.
 pub trait Updateable {
     /// Checks whether updates are needed.
     fn needs_update(&self, ctx: &Context) -> bool;
@@ -67,7 +78,7 @@ pub trait Updateable {
 
     /// Updates the state if forced or needed.
     #[inline]
-    fn update_if_forced_or_needed(&mut self, ctx: &Context, force: bool) {
+    fn update_if_force_or_need(&mut self, ctx: &Context, force: bool) {
         if force {
             self.force_update(ctx);
         } else {

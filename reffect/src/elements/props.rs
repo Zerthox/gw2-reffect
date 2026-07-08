@@ -41,7 +41,7 @@ where
         self.current = self.base.clone();
         if let Some(active) = active {
             for condition in &mut self.conditions {
-                condition.trigger.update_if_forced_or_needed(ctx, force);
+                condition.trigger.update_if_force_or_need(ctx, force);
                 condition.process(&mut self.current, ctx, active);
             }
         }
