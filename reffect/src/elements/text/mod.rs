@@ -65,8 +65,7 @@ impl Text {
         self.processed_text = common.trigger.active().map(|active| {
             let mut text = String::with_capacity(self.text.len()); // expecting same size or larger
             for fragment in TextFragment::parse(&self.text) {
-                self.processing
-                    .or(Processing::resolve(&fragment, &common.trigger.source));
+                self.processing.or(Processing::resolve(&fragment, active));
                 let _ = write!(&mut text, "{}", fragment.display(active, ctx, &common.name));
             }
             text

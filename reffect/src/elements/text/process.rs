@@ -1,7 +1,7 @@
 use crate::{
     context::Context,
     elements::text::fragment::TextFragment,
-    trigger::{ProgressSource, ProgressTrigger},
+    trigger::{ProgressActive, ProgressTrigger},
 };
 use strum::{AsRefStr, Display};
 
@@ -24,14 +24,14 @@ impl Processing {
         *self = (*self).max(other);
     }
 
-    pub fn resolve(fragment: &TextFragment<'_>, source: &ProgressSource) -> Self {
+    pub fn resolve(fragment: &TextFragment, active: &ProgressActive) -> Self {
         match fragment {
             TextFragment::Literal(_) | TextFragment::Name => Self::Static,
             TextFragment::Intensity { .. } => Self::Trigger,
             TextFragment::Current { .. }
             | TextFragment::Full { .. }
             | TextFragment::Percent { .. } => {
-                if source.is_timed() {
+                if active.is_timed() {
                     Self::Frame
                 } else {
                     Self::Trigger
