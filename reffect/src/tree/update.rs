@@ -19,6 +19,11 @@ pub struct Updater<'ctx, 'p> {
 }
 
 impl<'ctx, 'p> Updater<'ctx, 'p> {
+    pub fn load(ctx: &'ctx mut Context, packs: &mut [Pack]) {
+        ctx.force_update();
+        Self::update(ctx, packs);
+    }
+
     pub fn update(ctx: &'ctx Context, packs: &mut [Pack]) {
         if ctx.has_update(Update::Map) {
             log::debug!("Map changed to {}", ctx.map.id);
@@ -53,7 +58,7 @@ impl<'ctx, 'p> Updater<'ctx, 'p> {
             force,
         } = *self;
 
-        let child_updates = filter.update(ctx);
+        let child_updates = filter.update(ctx, force);
         if child_updates.allow || ctx.edit.is_editing() {
             let force = force || child_updates.force;
             trigger.update(ctx, parent, force);

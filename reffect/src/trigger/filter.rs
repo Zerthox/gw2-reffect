@@ -24,14 +24,14 @@ impl FilterTrigger {
         self.player.load();
     }
 
-    pub fn is_active(&mut self, ctx: &Context) -> bool {
+    pub fn is_active(&self, ctx: &Context) -> bool {
         self.player.is_active(ctx) && self.map.is_active()
     }
 
     /// Updates the filter if needed and returns update information.
-    pub fn update(&mut self, ctx: &Context) -> ChildUpdates {
+    pub fn update(&mut self, ctx: &Context, force: bool) -> ChildUpdates {
         let before = self.allow_child_updates();
-        self.update_if_need(ctx);
+        self.update_if_force_or_need(ctx, force);
         let after = self.allow_child_updates();
         ChildUpdates {
             allow: after,
@@ -73,7 +73,7 @@ impl Updateable for FilterTrigger {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ChildUpdates {
     pub allow: bool,
     pub force: bool,

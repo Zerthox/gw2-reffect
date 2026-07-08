@@ -278,7 +278,7 @@ impl ConstDefault for BuildTrigger {
         prof_selections: BitFlags::EMPTY,
         pets: Vec::new(),
         pet_mode: TriggerMode::All,
-        active: true,
+        active: false,
     };
 }
 

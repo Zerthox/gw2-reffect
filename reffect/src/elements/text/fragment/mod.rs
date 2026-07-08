@@ -1,8 +1,9 @@
 mod parse;
 
 use crate::{
-    elements::RenderCtx,
+    context::Context,
     fmt::Unit,
+    settings::FormatSettings,
     trigger::{ProgressActive, ProgressValue},
 };
 use std::fmt::{self, Display};
@@ -32,7 +33,8 @@ impl<'s> TextFragment<'s> {
     pub fn display(
         &self,
         active: &ProgressActive,
-        ctx: &RenderCtx,
+        ctx: &Context,
+        settings: &FormatSettings,
         name: &str,
     ) -> impl fmt::Display {
         fmt::from_fn(|formatter| match *self {
@@ -46,11 +48,9 @@ impl<'s> TextFragment<'s> {
                 }
             }
             Self::Current { pretty, value } => active
-                .current_text(value, ctx.now, pretty, &ctx.settings.format)
+                .current_text(value, ctx.now, pretty, settings)
                 .fmt(formatter),
-            Self::Full { pretty, value } => active
-                .max_text(value, pretty, &ctx.settings.format)
-                .fmt(formatter),
+            Self::Full { pretty, value } => active.max_text(value, pretty, settings).fmt(formatter),
             Self::Percent { pretty, value } => {
                 let progress = 100.0 * active.progress_or_default(value, ctx.now);
                 let precision = if pretty { 1 } else { 0 };

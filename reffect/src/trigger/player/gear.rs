@@ -170,7 +170,7 @@ impl ConstDefault for GearTrigger {
         sigils: Vec::new(),
         sigil_mode: TriggerMode::Any,
         relics: Vec::new(),
-        active: true,
+        active: false,
     };
 }
 

@@ -52,7 +52,7 @@ impl Default for ConditionTrigger {
 }
 
 impl ConditionTrigger {
-    pub fn is_active(&mut self, ctx: &Context, active: &ProgressActive) -> bool {
+    pub fn is_active(&self, ctx: &Context, active: &ProgressActive) -> bool {
         match self {
             Self::ProgressThreshold(threshold) => threshold.is_met(active, ctx),
             Self::AbilityState(ability_state) => ability_state.is_present(active),

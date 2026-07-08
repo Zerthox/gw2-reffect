@@ -41,7 +41,7 @@ impl ConstDefault for MapTrigger {
         category: BitFlags::EMPTY,
         whitelist: true,
         ids: Vec::new(),
-        active: true,
+        active: false,
     };
 }
 
