@@ -7,6 +7,12 @@ use crate::{context::Context, elements::RenderCtx, tree::Updater};
 use nexus::imgui::Ui;
 
 impl Addon {
+    pub fn prerender_load(ui: &Ui) {
+        log::debug!("Prerender load");
+
+        Self::lock().load_fonts(ui.into());
+    }
+
     pub fn render(&mut self, ui: &Ui) {
         let mut ctx = Context::lock();
 
@@ -27,7 +33,7 @@ impl Addon {
 
     pub fn render_displays(&mut self, ui: &Ui, ctx: &Context) {
         if ctx.ui.should_show() || ctx.edit.is_editing() {
-            let _font = self.settings.font.push();
+            let _font = self.settings.font.push(ui);
             let ctx = RenderCtx::create(ui, ctx, &self.settings);
             for pack in &mut self.packs {
                 pack.render(ui, &ctx);

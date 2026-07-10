@@ -1,12 +1,10 @@
+mod dir;
 mod event;
+mod font;
 mod ui;
 
 use crate::{elements::Pack, links::Links, settings::GeneralSettings, worker::StoppableWorker};
-use nexus::paths::get_addon_dir;
-use std::{
-    path::PathBuf,
-    sync::{Mutex, MutexGuard, OnceLock},
-};
+use std::sync::{Mutex, MutexGuard, OnceLock};
 
 static ADDON: OnceLock<Mutex<Addon>> = OnceLock::new();
 
@@ -43,17 +41,5 @@ impl Addon {
 
     pub fn release(&mut self) {
         *self = Self::new();
-    }
-
-    pub fn addon_dir() -> PathBuf {
-        get_addon_dir("reffect").expect("invalid addon directory")
-    }
-
-    pub fn packs_dir() -> PathBuf {
-        Self::addon_dir().join("packs")
-    }
-
-    pub fn icons_dir() -> PathBuf {
-        Self::addon_dir().join("icons")
     }
 }

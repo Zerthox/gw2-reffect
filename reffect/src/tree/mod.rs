@@ -1,10 +1,10 @@
-mod font_reload;
+mod font_load;
 mod load;
 mod resize;
 mod update;
 mod visit;
 
-pub use self::{font_reload::*, load::*, resize::*, update::*, visit::*};
+pub use self::{font_load::*, load::*, resize::*, update::*, visit::*};
 
 use crate::elements::Element;
 

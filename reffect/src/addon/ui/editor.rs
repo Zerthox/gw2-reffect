@@ -15,6 +15,7 @@ impl Addon {
             ELEMENT_ID.reset();
             ctx.edit.reset();
             self.load_packs(ctx);
+            self.load_fonts(ui.into());
         }
         if ui.is_item_hovered() {
             ui.tooltip_text("Reloads from pack files on disk");
@@ -58,7 +59,7 @@ impl Addon {
                             ui.text("No packs loaded");
                             ui.text("Do you want to...");
                             if ui.button("Read the docs") {
-                                self.open_doc("getting-started");
+                                self.open_docs("getting-started");
                             }
                             if ui.button("Install existing") {
                                 self.open_packs_folder()

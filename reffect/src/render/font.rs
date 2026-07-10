@@ -2,40 +2,73 @@ use super::Validation;
 use nexus::imgui::{ComboBoxFlags, Selectable, SelectableFlags, Ui, sys};
 use serde::{Deserialize, Serialize};
 use std::{
-    borrow::Cow,
     ffi::{CStr, CString},
     ptr::NonNull,
     slice,
 };
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(transparent)]
-pub struct Font(pub NonNull<sys::ImFont>);
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Io(pub NonNull<sys::ImGuiIO>);
 
-impl Font {
-    pub unsafe fn get_all() -> impl Iterator<Item = Self> {
+impl Io {
+    /// Forcefully gain access to the IO context.
+    pub unsafe fn force() -> Self {
+        Self(unsafe { NonNull::new_unchecked(sys::igGetIO()) })
+    }
+
+    /// Get access to the IO context via a frame's [`Ui`].
+    pub fn get(_ui: &Ui) -> Self {
+        unsafe { Self::force() }
+    }
+
+    /// Return a reference to the underlying [`sys::ImGuiIO`] struct.
+    pub unsafe fn as_ref<'a>(&self) -> &'a sys::ImGuiIO {
+        unsafe { self.0.as_ref() }
+    }
+
+    /// Returns the fonts.
+    pub unsafe fn fonts<'a>(&self) -> impl Iterator<Item = Font> + 'a {
         unsafe {
-            let io = sys::igGetIO();
-            let atlas = (*io).Fonts;
+            let io = self.as_ref();
+            let atlas = io.Fonts;
             let data = (*atlas).Fonts.Data;
             let len = (*atlas).Fonts.Size;
 
             slice::from_raw_parts(data, len as usize)
                 .iter()
                 .copied()
-                .filter_map(NonNull::new)
-                .map(Self)
+                .filter_map(Font::from_ptr)
         }
     }
 
-    pub fn try_from_name(name: impl AsRef<str>) -> Option<Self> {
-        let name = CString::new(name.as_ref()).ok()?;
-        unsafe { Self::get_all() }.find(|font| unsafe { font.name_raw() } == name.as_c_str())
+    pub fn default_font(&self) -> Option<Font> {
+        Font::from_ptr(unsafe { self.as_ref().FontDefault })
+    }
+}
+
+impl From<&Ui<'_>> for Io {
+    fn from(ui: &Ui) -> Self {
+        Self::get(ui)
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(transparent)]
+pub struct Font(NonNull<sys::ImFont>);
+
+impl Font {
+    pub fn from_ptr(ptr: *mut sys::ImFont) -> Option<Self> {
+        NonNull::new(ptr).map(Self)
     }
 
-    pub fn from_name_or_warn(name: impl AsRef<str>) -> Option<Self> {
+    pub fn try_from_name(io: Io, name: impl AsRef<str>) -> Option<Self> {
+        let name = CString::new(name.as_ref()).ok()?;
+        unsafe { io.fonts() }.find(|font| unsafe { font.name_raw() } == name.as_c_str())
+    }
+
+    pub fn from_name_or_warn(io: Io, name: impl AsRef<str>) -> Option<Self> {
         let name = name.as_ref();
-        let result = Self::try_from_name(name);
+        let result = Self::try_from_name(io, name);
         if result.is_none() {
             log::warn!("Failed to find font \"{name}\"");
         }
@@ -46,13 +79,20 @@ impl Font {
         self.0.as_ptr()
     }
 
-    #[allow(unused)]
+    pub unsafe fn as_ref<'a>(&self) -> &'a sys::ImFont {
+        unsafe { self.0.as_ref() }
+    }
+
+    pub fn size(&self) -> f32 {
+        unsafe { self.as_ref() }.FontSize
+    }
+
     pub fn is_loaded(&self) -> bool {
         unsafe { sys::ImFont_IsLoaded(self.as_ptr()) }
     }
 
-    pub fn is_valid(&self) -> bool {
-        unsafe { Self::get_all() }.any(|font| font == *self)
+    pub fn is_valid(&self, io: Io) -> bool {
+        unsafe { io.fonts() }.any(|font| font == *self)
     }
 
     pub unsafe fn name_raw<'a>(&self) -> &'a CStr {
@@ -63,8 +103,9 @@ impl Font {
         unsafe { self.name_raw() }.to_string_lossy().into_owned()
     }
 
-    pub fn push(&self) -> Option<FontToken> {
-        self.is_valid().then(|| {
+    pub fn push(&self, ui: &Ui) -> Option<FontToken> {
+        // TODO: skip validation?
+        self.is_valid(ui.into()).then(|| {
             unsafe { sys::igPushFont(self.as_ptr()) };
             FontToken
         })
@@ -81,14 +122,6 @@ impl Drop for FontToken {
     }
 }
 
-#[allow(unused)]
-pub fn font_select(ui: &Ui, label: impl AsRef<str>, current: &mut Option<Font>) -> bool {
-    let preview = current
-        .map(|current| unsafe { current.name_raw() }.to_string_lossy())
-        .unwrap_or(Cow::Borrowed("Inherit"));
-    font_select_with_preview(ui, label, preview, current)
-}
-
 pub fn font_select_with_preview(
     ui: &Ui,
     label: impl AsRef<str>,
@@ -102,8 +135,8 @@ pub fn font_select_with_preview(
             changed = true;
         }
 
-        for font in unsafe { Font::get_all() } {
-            let _font = font.push();
+        for font in unsafe { Io::get(ui).fonts() } {
+            let _font = font.push(ui);
             let is_selected = Some(font) == *current;
             if unsafe {
                 sys::igSelectable_Bool(
@@ -142,27 +175,26 @@ impl LoadedFont {
         }
     }
 
-    pub fn loaded(name: Option<String>) -> Self {
-        let mut font = Self::empty();
-        font.load(name);
-        font
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            name: Some(name.into()),
+            loaded: None,
+        }
     }
 
-    pub fn name(&self) -> &Option<String> {
-        &self.name
+    pub fn name(&self) -> Option<&str> {
+        self.name.as_deref()
     }
 
-    pub fn load(&mut self, name: Option<String>) {
-        self.name = name;
-        self.reload();
+    pub fn load(&mut self, io: Io) {
+        self.loaded = self
+            .name
+            .as_ref()
+            .and_then(|name| Font::from_name_or_warn(io, name));
     }
 
-    pub fn reload(&mut self) {
-        self.loaded = self.name.as_ref().and_then(Font::from_name_or_warn);
-    }
-
-    pub fn push(&self) -> Option<FontToken> {
-        self.loaded?.push()
+    pub fn push(&self, ui: &Ui) -> Option<FontToken> {
+        self.loaded?.push(ui)
     }
 
     pub fn as_font(&self) -> Option<Font> {
@@ -172,7 +204,7 @@ impl LoadedFont {
     pub fn render_select(&mut self, ui: &Ui, label: impl AsRef<str>) -> bool {
         let validation = if self.name.is_some() {
             match self.loaded {
-                Some(font) if !font.is_valid() => Validation::Error("Font invalidated"),
+                Some(font) if !font.is_valid(ui.into()) => Validation::Error("Font invalidated"),
                 Some(_) => Validation::Ok,
                 None => Validation::Error("Failed to find font"),
             }
@@ -192,12 +224,6 @@ impl LoadedFont {
                 false
             }
         })
-    }
-}
-
-impl From<Option<String>> for LoadedFont {
-    fn from(name: Option<String>) -> Self {
-        Self::loaded(name)
     }
 }
 

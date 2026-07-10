@@ -46,7 +46,6 @@ pub struct Text {
 
 impl Text {
     pub fn load(&mut self) {
-        self.font.reload();
         self.reprocess_next_frame();
     }
 
@@ -88,7 +87,7 @@ impl Text {
         self.reprocess_if_need(ctx, &ctx.settings.format, common);
 
         if let Some(text) = &self.processed_text {
-            let _font = self.font.push();
+            let _font = self.font.push(ui);
             let font_scale = self.props.scale;
             let offset = self.calc_offset(ui, text);
             let pos = ctx.pos().add(offset);
@@ -157,7 +156,7 @@ impl Bounds for Text {
         self.processed_text
             .as_ref()
             .map(|text| {
-                let _font = self.font.push();
+                let _font = self.font.push(ui);
                 let offset = self.calc_offset(ui, text);
                 let size = ui.calc_text_size(text).mul_scalar(self.props.scale);
                 (offset, offset.add(size))

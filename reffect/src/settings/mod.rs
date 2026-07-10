@@ -66,7 +66,6 @@ impl AddonSettings {
         }
 
         context.apply(settings, ctx);
-        settings.load();
     }
 
     pub fn save(self) {

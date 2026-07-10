@@ -1,20 +1,28 @@
 use nexus::data_link::{NexusLink, get_mumble_link, get_nexus_link, mumble::MumblePtr};
+use std::ptr::NonNull;
 
 #[derive(Debug, Clone)]
 pub struct Links {
     mumble: Option<MumblePtr>,
-    nexus: *const NexusLink,
+    nexus: Option<NonNull<NexusLink>>,
 }
 
 impl Links {
+    pub const fn empty() -> Self {
+        Self {
+            mumble: None,
+            nexus: None,
+        }
+    }
+
     pub fn load() -> Self {
         let mumble = get_mumble_link();
         if mumble.is_none() {
             log::error!("Failed to get Mumble link")
         }
 
-        let nexus = get_nexus_link();
-        if nexus.is_null() {
+        let nexus = NonNull::new(get_nexus_link().cast_mut());
+        if nexus.is_none() {
             log::error!("Failed to get Nexus link")
         }
 
@@ -28,7 +36,7 @@ impl Links {
 
     #[inline]
     pub unsafe fn nexus(&self) -> Option<&NexusLink> {
-        unsafe { self.nexus.as_ref() }
+        self.nexus.map(|ptr| unsafe { ptr.as_ref() })
     }
 }
 

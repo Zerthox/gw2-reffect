@@ -4,13 +4,14 @@ use crate::{
     elements::Pack,
     file::TempFile,
     internal::{Interface, Internal},
+    render::Io,
     settings::AddonSettings,
     texture::TextureManager,
     tree::Updater,
 };
 use nexus::{
     font::{font_receive, get_font},
-    gui::{RenderType, register_render},
+    gui::{RenderType, register_render, render},
 };
 use rfd::FileDialog;
 use std::{fs, thread};
@@ -22,20 +23,24 @@ impl Addon {
         log::info!("Reffect v{} load", Self::VERSION);
         TextureManager::load();
 
-        register_render(
-            RenderType::Render,
-            nexus::gui::render!(|ui| Addon::lock().render(ui)),
-        )
-        .revert_on_unload();
+        register_render(RenderType::Render, render!(|ui| Addon::lock().render(ui)))
+            .revert_on_unload();
 
         register_render(
             RenderType::OptionsRender,
-            nexus::gui::render!(|ui| Addon::lock().render_options(ui)),
+            render!(|ui| Addon::lock().render_options(ui)),
         )
         .revert_on_unload();
 
         // subscribe to default font to get notified when atlas rebuilds
-        get_font("FONT_DEFAULT", font_receive!(|_, _| Addon::reload_fonts())).revert_on_unload();
+        get_font(
+            "FONT_DEFAULT",
+            font_receive!(|_, _| {
+                let io = unsafe { Io::force() }; // called in renderer thread
+                Addon::lock().load_fonts(io)
+            }),
+        )
+        .revert_on_unload();
 
         Internal::init();
 
@@ -72,11 +77,6 @@ impl Addon {
         Context::unload();
     }
 
-    pub fn create_dirs() {
-        let _ = fs::create_dir_all(Self::packs_dir());
-        let _ = fs::create_dir(Self::icons_dir());
-    }
-
     pub fn load_packs(&mut self, ctx: &mut Context) {
         let dir = Self::packs_dir();
         log::info!("Loading packs from \"{}\"", dir.display());
@@ -99,7 +99,7 @@ impl Addon {
 
                 Updater::load(ctx, &mut self.packs);
             }
-            Err(err) => log::error!("Failed to read pack directory: {err}"),
+            Err(err) => log::error!("Failed to read packs directory: {err}"),
         }
     }
 
@@ -153,7 +153,6 @@ impl Addon {
     }
 
     pub fn open_create_dialog(&self) {
-        // just spawn a thread to not have to deal with futures
         thread::spawn(|| {
             Self::create_dirs();
             let packs = Self::packs_dir();
@@ -178,28 +177,7 @@ impl Addon {
         });
     }
 
-    pub fn reload_fonts() {
-        log::debug!("Reloading fonts");
-        let mut addon = Self::lock();
-        addon.settings.font.reload();
-        for pack in &mut addon.packs {
-            pack.reload_fonts();
-        }
-    }
-
-    pub fn open_addon_folder(&self) {
-        if let Err(err) = open::that_detached(Self::addon_dir()) {
-            log::error!("Failed to open addon folder: {err}");
-        }
-    }
-
-    pub fn open_packs_folder(&self) {
-        if let Err(err) = open::that_detached(Self::packs_dir()) {
-            log::error!("Failed to open packs folder: {err}");
-        }
-    }
-
-    pub fn open_doc(&self, file: &'static str) {
+    pub fn open_docs(&self, file: &'static str) {
         let url = format!("{REPOSITORY}/tree/main/docs/{file}.md");
         if let Err(err) = open::that_detached(url) {
             log::error!("Failed to open docs URL: {err}");

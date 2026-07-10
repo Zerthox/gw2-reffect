@@ -4,8 +4,14 @@ use crate::{
     trigger::FilterTrigger,
 };
 
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct Loader;
+
+impl Loader {
+    pub fn new() -> Self {
+        Self
+    }
+}
 
 impl VisitMut for Loader {
     fn visit_icon(&mut self, icon: &mut Icon) {

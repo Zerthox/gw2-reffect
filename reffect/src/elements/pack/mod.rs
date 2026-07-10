@@ -5,10 +5,10 @@ use crate::{
     elements::RenderCtx,
     file::TempFile,
     render::{
-        Bounds, delete_confirm_modal, item_context_menu, style_disabled_if, tree_select_empty,
+        Bounds, Io, delete_confirm_modal, item_context_menu, style_disabled_if, tree_select_empty,
     },
     schema::Schema,
-    tree::{FontReloader, Loader, Resizer, TreeNode, VisitMut},
+    tree::{FontLoader, Loader, Resizer, TreeNode, VisitMut},
     trigger::{FilterTrigger, MapTrigger},
 };
 use nexus::imgui::{MenuItem, StyleColor, Ui};
@@ -51,8 +51,8 @@ impl Pack {
         Loader.visit_pack(self);
     }
 
-    pub fn reload_fonts(&mut self) {
-        FontReloader.visit_pack(self);
+    pub fn load_fonts(&mut self, io: Io) {
+        FontLoader::new(io).visit_pack(self);
     }
 
     pub fn load_from_file(path: impl Into<PathBuf>) -> Option<Self> {
