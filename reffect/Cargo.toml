@@ -1,6 +1,6 @@
 [package]
 name = "reffect"
-version = "0.11.3"
+version = "0.12.0"
 authors = ["Zerthox"]
 edition = "2024"
 description = "Customizable effect, resource & ability displays"

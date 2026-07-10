@@ -15,7 +15,7 @@ impl Addon {
             ELEMENT_ID.reset();
             ctx.edit.reset();
             self.load_packs(ctx);
-            self.load_fonts(ui.into());
+            self.reload_fonts(ui.into());
         }
         if ui.is_item_hovered() {
             ui.tooltip_text("Reloads from pack files on disk");

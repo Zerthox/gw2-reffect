@@ -26,7 +26,7 @@ impl Io {
         unsafe { self.0.as_ref() }
     }
 
-    /// Returns the fonts.
+    /// Returns an iterator over all loaded fonts.
     pub unsafe fn fonts<'a>(&self) -> impl Iterator<Item = Font> + 'a {
         unsafe {
             let io = self.as_ref();
@@ -41,6 +41,7 @@ impl Io {
         }
     }
 
+    /// Retrieves the default fonts.
     pub fn default_font(&self) -> Option<Font> {
         Font::from_ptr(unsafe { self.as_ref().FontDefault })
     }

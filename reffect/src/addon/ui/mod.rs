@@ -4,20 +4,39 @@ mod options;
 
 use super::Addon;
 use crate::{context::Context, elements::RenderCtx, render::Io, tree::Updater};
-use nexus::imgui::Ui;
-use std::thread;
+use nexus::{
+    font::{font_receive, get_font},
+    imgui::Ui,
+};
+use std::{
+    sync::atomic::{AtomicBool, Ordering},
+    thread,
+};
 
 impl Addon {
-    pub fn prerender_load(ui: &Ui) {
-        log::debug!("Prerender load");
+    pub fn render_init(ui: &Ui) {
+        static INIT: AtomicBool = AtomicBool::new(true);
 
-        Self::lock().load_fonts(ui.into());
+        if INIT.load(Ordering::Relaxed) {
+            INIT.store(false, Ordering::Relaxed);
+            log::debug!("Render init");
 
-        let size = Io::get(ui)
-            .default_font()
-            .map(|font| font.size())
-            .unwrap_or(16.0);
-        thread::spawn(move || Self::load_font_files(size));
+            let io = Io::get(ui);
+
+            // subscribe to default font to get notified when atlas rebuilds
+            // this is also called immediately
+            get_font(
+                "FONT_DEFAULT",
+                font_receive!(|_, _| {
+                    let io = unsafe { Io::force() }; // called in renderer thread
+                    Addon::lock().reload_fonts(io)
+                }),
+            )
+            .revert_on_unload();
+
+            let size = io.default_font().map(|font| font.size()).unwrap_or(16.0);
+            thread::spawn(move || Self::load_font_files(size));
+        }
     }
 
     pub fn render(&mut self, ui: &Ui) {
