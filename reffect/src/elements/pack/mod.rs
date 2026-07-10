@@ -48,7 +48,7 @@ impl Pack {
     }
 
     pub fn load(&mut self) {
-        Loader.visit_pack(self);
+        Loader::new().visit_pack(self);
     }
 
     pub fn load_fonts(&mut self, io: Io) {

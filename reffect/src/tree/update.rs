@@ -19,7 +19,7 @@ pub struct Updater<'ctx, 'p> {
 }
 
 impl<'ctx, 'p> Updater<'ctx, 'p> {
-    pub fn load(ctx: &'ctx mut Context, packs: &mut [Pack]) {
+    pub fn force_update(ctx: &'ctx mut Context, packs: &mut [Pack]) {
         ctx.force_update();
         Self::update(ctx, packs);
     }

@@ -3,14 +3,21 @@ mod editor;
 mod options;
 
 use super::Addon;
-use crate::{context::Context, elements::RenderCtx, tree::Updater};
+use crate::{context::Context, elements::RenderCtx, render::Io, tree::Updater};
 use nexus::imgui::Ui;
+use std::thread;
 
 impl Addon {
     pub fn prerender_load(ui: &Ui) {
         log::debug!("Prerender load");
 
         Self::lock().load_fonts(ui.into());
+
+        let size = Io::get(ui)
+            .default_font()
+            .map(|font| font.size())
+            .unwrap_or(16.0);
+        thread::spawn(move || Self::load_font_files(size));
     }
 
     pub fn render(&mut self, ui: &Ui) {

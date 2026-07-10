@@ -16,7 +16,7 @@ fn update() {
         .into_pack()];
     let mut ctx = Context::empty();
 
-    Updater::load(&mut ctx, &mut packs);
+    Updater::force_update(&mut ctx, &mut packs);
     assert_state(
         &mut packs,
         &ctx,

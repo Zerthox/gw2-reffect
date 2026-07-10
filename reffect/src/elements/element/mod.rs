@@ -32,7 +32,7 @@ impl Element {
             kind,
             ..Self::default()
         };
-        Loader.visit_element(&mut element);
+        Loader::new().visit_element(&mut element);
         element
     }
 
