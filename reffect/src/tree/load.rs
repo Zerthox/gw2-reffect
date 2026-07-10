@@ -8,8 +8,14 @@ use crate::{
 pub struct Loader;
 
 impl Loader {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self
+    }
+}
+
+impl Default for Loader {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

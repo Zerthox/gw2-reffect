@@ -14,7 +14,7 @@ impl Addon {
                         Some("ttf" | "otf") => add_font_from_file(
                             path.file_stem()
                                 .and_then(|stem| stem.to_str())
-                                .unwrap_or_else(|| "REFFECT_FONT"),
+                                .unwrap_or("REFFECT_FONT"),
                             &path,
                             size,
                             None,
