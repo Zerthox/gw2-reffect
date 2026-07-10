@@ -1,8 +1,9 @@
 mod ability;
 mod buff;
 mod skillbar;
+mod slot;
 
-pub use self::{ability::*, buff::*, skillbar::*};
+pub use self::{ability::*, buff::*, skillbar::*, slot::*};
 
 use enumflags2::{BitFlags, bitflags};
 use strum::{AsRefStr, Display, IntoStaticStr};

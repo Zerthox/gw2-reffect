@@ -1,7 +1,6 @@
-use super::{Ability, AbilityState, SkillId};
+use super::{Ability, AbilityState, SkillId, Slot};
 use enumflags2::BitFlags;
-use serde::{Deserialize, Serialize};
-use strum::{AsRefStr, Display, EnumCount, EnumIter, IntoStaticStr, VariantArray};
+use strum::EnumCount;
 
 pub type SkillSlots = [Option<Ability>; Slot::COUNT];
 
@@ -23,13 +22,13 @@ impl Skillbar {
 
     /// Returns the ability in the given slot.
     #[inline]
-    pub fn slot(&self, slot: Slot) -> Option<&Ability> {
+    pub const fn slot(&self, slot: Slot) -> Option<&Ability> {
         self.skills[slot as usize].as_ref()
     }
 
     /// Returns the ability in the given slot.
     #[inline]
-    pub fn slot_mut(&mut self, slot: Slot) -> Option<&mut Ability> {
+    pub const fn slot_mut(&mut self, slot: Slot) -> Option<&mut Ability> {
         self.skills[slot as usize].as_mut()
     }
 
@@ -42,7 +41,7 @@ impl Skillbar {
 
     /// Sets the ability in the given slot.
     #[inline]
-    pub fn set_slot(&mut self, slot: Slot, ability: Option<Ability>) {
+    pub const fn set_slot(&mut self, slot: Slot, ability: Option<Ability>) {
         self.skills[slot as usize] = ability;
     }
 
@@ -52,88 +51,5 @@ impl Skillbar {
         if let Some(ability) = self.slot_mut(slot) {
             ability.state.insert(state);
         }
-    }
-}
-
-/// Skillbar slot.
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Hash,
-    Display,
-    AsRefStr,
-    IntoStaticStr,
-    EnumCount,
-    EnumIter,
-    VariantArray,
-    Serialize,
-    Deserialize,
-)]
-#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
-pub enum Slot {
-    #[strum(serialize = "Weapon Swap")]
-    WeaponSwap,
-
-    #[strum(serialize = "Weapon 1")]
-    Weapon1,
-
-    #[strum(serialize = "Weapon 2")]
-    Weapon2,
-
-    #[strum(serialize = "Weapon 3")]
-    Weapon3,
-
-    #[strum(serialize = "Weapon 4")]
-    Weapon4,
-
-    #[strum(serialize = "Weapon 5")]
-    Weapon5,
-
-    Heal,
-
-    #[strum(serialize = "Utility 1")]
-    Utility1,
-
-    #[strum(serialize = "Utility 2")]
-    Utility2,
-
-    #[strum(serialize = "Utility 3")]
-    Utility3,
-
-    Elite,
-
-    #[strum(serialize = "Profession 1")]
-    Profession1,
-
-    #[strum(serialize = "Profession 2")]
-    Profession2,
-
-    #[strum(serialize = "Profession 3")]
-    Profession3,
-
-    #[strum(serialize = "Profession 4")]
-    Profession4,
-
-    #[strum(serialize = "Profession 5")]
-    Profession5,
-
-    #[strum(serialize = "Special Action")]
-    SpecialAction,
-
-    Mount,
-}
-
-impl Slot {
-    pub const DEFAULT: Self = Self::WeaponSwap;
-}
-
-impl Default for Slot {
-    fn default() -> Self {
-        Self::DEFAULT
     }
 }

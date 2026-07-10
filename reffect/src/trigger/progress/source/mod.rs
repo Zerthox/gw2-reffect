@@ -15,7 +15,10 @@ use crate::{
     render::{Validation, enum_combo, helper, input_skill_id},
 };
 use const_default::ConstDefault;
-use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
+use nexus::{
+    gamebind::GameBind,
+    imgui::{ComboBoxFlags, InputTextFlags, Ui},
+};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 
@@ -181,6 +184,14 @@ impl ProgressSource {
             | Self::PrimaryResource
             | Self::SecondaryResource
             | Self::ResourceRate => Update::PlayerResources.flags(),
+        }
+    }
+
+    pub const fn bind(&self) -> Option<GameBind> {
+        // TODO: clickable?
+        match self {
+            Self::SkillbarSlot { slot } => Some(slot.bind()),
+            _ => None,
         }
     }
 
