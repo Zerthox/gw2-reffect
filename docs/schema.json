@@ -20,6 +20,13 @@
     "AbilityState": {
       "oneOf": [
         {
+          "type": "string",
+          "enum": [
+            "NoResources",
+            "NoRange"
+          ]
+        },
+        {
           "description": "Ability is auto-attack.",
           "type": "string",
           "const": "AutoAttack"
@@ -33,6 +40,16 @@
           "description": "Ability is pressed.",
           "type": "string",
           "const": "Pressed"
+        },
+        {
+          "description": "Ability is active primary.",
+          "type": "string",
+          "const": "ActivePrimary"
+        },
+        {
+          "description": "Ability is active secondary.",
+          "type": "string",
+          "const": "ActiveSecondary"
         }
       ]
     },
@@ -210,6 +227,11 @@
           "maxItems": 4,
           "minItems": 4
         },
+        "background_texture": {
+          "description": "Bar background texture.",
+          "$ref": "#/$defs/BarTexture",
+          "default": "None"
+        },
         "border_color": {
           "description": "Border color.",
           "type": "array",
@@ -259,6 +281,11 @@
           },
           "maxItems": 4,
           "minItems": 4
+        },
+        "fill_texture": {
+          "description": "Bar fill texture.",
+          "$ref": "#/$defs/BarTexture",
+          "default": "None"
         },
         "lower_bound": {
           "description": "Lower progress bound.",
@@ -334,6 +361,40 @@
           "default": 1.0
         }
       }
+    },
+    "BarTexture": {
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "None"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Url": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Url"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "File": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "File"
+          ]
+        }
+      ]
     },
     "CombatTrigger": {
       "type": [
@@ -532,6 +593,8 @@
             "player": {
               "combat": null,
               "mounts": [],
+              "pet_mode": "All",
+              "pets": [],
               "prof_selections": [],
               "relics": [],
               "sigil_mode": "Any",
@@ -694,6 +757,8 @@
           "default": {
             "combat": null,
             "mounts": [],
+            "pet_mode": "All",
+            "pets": [],
             "prof_selections": [],
             "relics": [],
             "sigil_mode": "Any",
@@ -725,6 +790,11 @@
     "IconElement": {
       "type": "object",
       "properties": {
+        "align": {
+          "description": "Icon alignment.",
+          "$ref": "#/$defs/Align",
+          "default": "Center"
+        },
         "border_color": {
           "description": "Border color.",
           "type": "array",
@@ -969,6 +1039,8 @@
             "player": {
               "combat": null,
               "mounts": [],
+              "pet_mode": "All",
+              "pets": [],
               "prof_selections": [],
               "relics": [],
               "sigil_mode": "Any",
@@ -1147,6 +1219,8 @@
             "player": {
               "combat": null,
               "mounts": [],
+              "pet_mode": "All",
+              "pets": [],
               "prof_selections": [],
               "relics": [],
               "sigil_mode": "Any",
@@ -1224,6 +1298,17 @@
           "maxItems": 4,
           "minItems": 4
         },
+        "background_texture": {
+          "description": "Bar background texture.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BarTexture"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "border_color": {
           "description": "Border color.",
           "type": [
@@ -1257,6 +1342,17 @@
           },
           "maxItems": 4,
           "minItems": 4
+        },
+        "fill_texture": {
+          "description": "Bar fill texture.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BarTexture"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "lower_bound": {
           "description": "Lower progress bound.",
@@ -1407,6 +1503,21 @@
             "$ref": "#/$defs/Mount"
           }
         },
+        "pet_mode": {
+          "description": "Trigger logic mode for selected pets.",
+          "$ref": "#/$defs/TriggerMode",
+          "default": "All"
+        },
+        "pets": {
+          "description": "Selected pets.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          }
+        },
         "prof_selections": {
           "description": "Profession-specific selections.",
           "type": "array",
@@ -1529,6 +1640,7 @@
     "Progress": {
       "type": "string",
       "enum": [
+        "Fixed",
         "Intensity",
         "Duration",
         "SecondaryDuration"
@@ -1722,6 +1834,19 @@
             "type": {
               "type": "string",
               "const": "SecondaryResource"
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        {
+          "description": "Profession resource rate.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "ResourceRate"
             }
           },
           "required": [
