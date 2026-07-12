@@ -1,9 +1,8 @@
 use crate::{
     colors::{self, with_alpha},
     elements::{Anchor, text::TextDecoration},
-    render::{
-        ComponentWise, draw_text_bg, enum_combo, input_color_alpha, input_percent, input_pos,
-    },
+    math::ComponentWise,
+    render::{draw_text_bg, enum_combo, input_color_alpha, input_percent, input_pos},
 };
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};

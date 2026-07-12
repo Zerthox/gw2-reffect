@@ -1,6 +1,6 @@
 use super::Common;
 use crate::{
-    context::Context, elements::ElementAnchor, render::ComponentWise, settings::GeneralSettings,
+    context::Context, elements::ElementAnchor, math::ComponentWise, settings::GeneralSettings,
 };
 use nexus::imgui::Ui;
 use std::{cell::Cell, ops::Deref};

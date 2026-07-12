@@ -10,8 +10,9 @@ use crate::{
     colors::{Color, with_alpha_factor},
     context::Context,
     elements::Common,
+    math::ComponentWise,
     render::{
-        Bounds, ComponentWise, Rect, enum_combo, helper, helper_slider, input_color_alpha,
+        Bounds, Rect, enum_combo, helper, helper_slider, input_color_alpha,
         input_float_with_format, input_percent, input_positive_with_format, input_size,
         slider_percent,
     },

@@ -7,9 +7,9 @@ use super::{Props, RenderCtx, align::AlignHorizontal};
 use crate::{
     context::Context,
     elements::Common,
+    math::ComponentWise,
     render::{
-        Bounds, ComponentWise, LoadedFont, Rect, debug_optional, draw_text_bg, helper,
-        input_text_multi_with_menu,
+        Bounds, LoadedFont, Rect, debug_optional, draw_text_bg, helper, input_text_multi_with_menu,
     },
     settings::FormatSettings,
     tree::TreeNode,

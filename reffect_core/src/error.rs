@@ -23,8 +23,8 @@ pub enum Error {
     #[error("Unavailable in competitive mode")]
     CompetitiveMode,
 
-    #[error("Main thread not found")]
-    MainThread,
+    #[error("Game thread not found")]
+    GameThread,
 
     #[error("Context not found")]
     Context,

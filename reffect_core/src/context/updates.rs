@@ -56,7 +56,7 @@ impl Update {
     /// Convert the update into update flags.
     #[inline]
     pub const fn flags(self) -> Updates {
-        unsafe { Updates::from_bits_unchecked_c(self as u16, Updates::CONST_TOKEN) }
+        unsafe { Updates::from_bits_unchecked_c(self as _, Updates::CONST_TOKEN) }
     }
 }
 

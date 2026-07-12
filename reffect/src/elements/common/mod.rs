@@ -7,11 +7,13 @@ use crate::{
     elements::{Animation, RenderCtx},
     enums::EnumStaticVariants,
     id::Id,
+    math::ComponentWise,
     render::{
-        ComponentWise, Rect, confirm_modal, helper_slider, input_percent, input_pos,
-        push_alpha_change, push_window_clip_rect_fullscreen, slider_percent,
+        Rect, confirm_modal, helper_slider, input_pos, push_alpha_change,
+        push_window_clip_rect_fullscreen, slider_percent,
     },
     serde::migrate,
+    tree::Resizer,
     trigger::{FilterTrigger, ProgressTrigger},
 };
 use nexus::imgui::{Condition, MenuItem, MouseButton, StyleVar, Ui, Window};
@@ -60,7 +62,7 @@ pub struct Common {
     pub dragging: bool,
 
     #[serde(skip)]
-    pub resize: f32,
+    pub resize: Resizer,
 }
 
 impl Common {
@@ -221,15 +223,13 @@ impl Common {
         }
     }
 
-    pub fn render_resize(&mut self, ui: &Ui, open: bool) -> Option<f32> {
+    pub fn render_resize(&mut self, ui: &Ui, open: bool) -> Option<Resizer> {
         let title = format!("Resize Element##reffect{}", self.id);
         if open {
             ui.open_popup(&title)
         }
-        confirm_modal(ui, &title, || {
-            input_percent("Scale", &mut self.resize);
-        })
-        .then(|| mem::replace(&mut self.resize, 1.0))
+        confirm_modal(ui, &title, || self.resize.render_inputs(ui))
+            .then(|| mem::take(&mut self.resize))
     }
 
     pub fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) {
@@ -288,7 +288,7 @@ impl Default for Common {
             filter: FilterTrigger::default(),
             animation: None,
             dragging: false,
-            resize: 1.0,
+            resize: Resizer::default(),
         }
     }
 }
@@ -306,7 +306,7 @@ impl Clone for Common {
             filter: self.filter.clone(),
             animation: self.animation.clone(),
             dragging: false,
-            resize: 1.0,
+            resize: Resizer::default(),
         }
     }
 }

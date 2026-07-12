@@ -1,7 +1,4 @@
-use crate::{
-    enums::check_variant_array,
-    render::{ComponentWise, enum_combo},
-};
+use crate::{enums::check_variant_array, math::ComponentWise, render::enum_combo};
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 use std::{iter::Copied, slice};

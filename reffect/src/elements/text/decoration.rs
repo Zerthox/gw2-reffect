@@ -1,4 +1,7 @@
-use crate::render::{ComponentWise, draw_text_bg, enum_combo, helper_warn};
+use crate::{
+    math::ComponentWise,
+    render::{draw_text_bg, enum_combo, helper_warn},
+};
 use const_default::ConstDefault;
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};

@@ -63,6 +63,8 @@ pub enum ProgressSource {
     /// Skillbar slot.
     #[strum(serialize = "Slot Recharge")]
     SkillbarSlot {
+        // TODO: restricted to weapon type for weapon slots?
+        // TODO: restricted to pet for profession slots?
         #[serde(default)]
         slot: Slot,
     },

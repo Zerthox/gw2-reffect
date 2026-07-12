@@ -2,6 +2,7 @@ mod action;
 mod addon;
 mod assets;
 mod clipboard;
+mod math;
 mod render;
 mod texture;
 

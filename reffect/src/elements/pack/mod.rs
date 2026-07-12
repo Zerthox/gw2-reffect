@@ -8,7 +8,7 @@ use crate::{
         Bounds, Io, delete_confirm_modal, item_context_menu, style_disabled_if, tree_select_empty,
     },
     schema::Schema,
-    tree::{FontLoader, Loader, Resizer, TreeNode, VisitMut},
+    tree::{FontLoader, Loader, TreeNode, VisitMut},
     trigger::{FilterTrigger, MapTrigger},
 };
 use nexus::imgui::{MenuItem, StyleColor, Ui};
@@ -145,8 +145,8 @@ impl Pack {
             self.common.render_tree_children(ui, state, children);
         }
 
-        if let Some(factor) = self.common.render_resize(ui, open_resize) {
-            Resizer::resize_pack(self, factor);
+        if let Some(resizer) = self.common.render_resize(ui, open_resize) {
+            resizer.resize_pack(self);
         }
 
         let title = format!("Confirm Delete##reffect{id}");

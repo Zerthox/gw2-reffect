@@ -10,7 +10,7 @@ use crate::{
     render::{
         Bounds, Rect, delete_confirm_modal, item_context_menu, style_disabled_if, tree_select_empty,
     },
-    tree::{Loader, Resizer, TreeNode, VisitMut},
+    tree::{Loader, TreeNode, VisitMut},
 };
 use nexus::imgui::{MenuItem, StyleColor, Ui};
 use serde::{Deserialize, Serialize};
@@ -97,8 +97,8 @@ impl Element {
             open_delete = MenuItem::new("Delete").build(ui);
         });
 
-        if let Some(factor) = self.common.render_resize(ui, open_resize) {
-            Resizer::resize_element(self, factor);
+        if let Some(resizer) = self.common.render_resize(ui, open_resize) {
+            resizer.resize_element(self);
         }
 
         let title = format!("Confirm Delete##reffect{id}");

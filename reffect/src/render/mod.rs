@@ -2,7 +2,6 @@ mod animation;
 mod bounds;
 mod button;
 mod combo;
-mod component_wise;
 mod draw_list;
 mod font;
 mod helper;
@@ -20,9 +19,9 @@ mod tree;
 mod window;
 
 pub use self::{
-    animation::*, bounds::*, button::*, combo::*, component_wise::*, draw_list::*, font::*,
-    helper::*, input::*, input_chatlink::*, input_color::*, input_text::*, map_ids::*, popup::*,
-    slider::*, spinner::*, style::*, text::*, tree::*, window::*,
+    animation::*, bounds::*, button::*, combo::*, draw_list::*, font::*, helper::*, input::*,
+    input_chatlink::*, input_color::*, input_text::*, map_ids::*, popup::*, slider::*, spinner::*,
+    style::*, text::*, tree::*, window::*,
 };
 
 pub type Point = [f32; 2];

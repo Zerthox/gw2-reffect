@@ -1,10 +1,10 @@
-#![allow(unused)]
-
+use super::Round;
 use std::{
     borrow::Borrow,
     ops::{Add, Div, Mul, Neg, Sub},
 };
 
+#[allow(dead_code)]
 pub trait ComponentWise<T>: Sized
 where
     T: Copy
@@ -63,6 +63,38 @@ where
     /// Computes component-wise division with a scalar value.
     fn div_scalar(&self, scalar: T) -> Self {
         self.component_wise_map(|el| el / scalar)
+    }
+
+    /// Computes component-wise flooring.
+    fn floor(&self) -> Self
+    where
+        T: Round,
+    {
+        self.component_wise_map(Round::floor)
+    }
+
+    /// Computes component-wise ceiling.
+    fn ceil(&self) -> Self
+    where
+        T: Round,
+    {
+        self.component_wise_map(Round::ceil)
+    }
+
+    /// Computes component-wise rounding.
+    fn round(&self) -> Self
+    where
+        T: Round,
+    {
+        self.component_wise_map(Round::round)
+    }
+
+    /// Computes component-wise rounding.
+    fn round_ties_even(&self) -> Self
+    where
+        T: Round,
+    {
+        self.component_wise_map(Round::round_ties_even)
     }
 }
 

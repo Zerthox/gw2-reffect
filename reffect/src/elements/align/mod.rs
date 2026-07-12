@@ -2,7 +2,7 @@ mod horizontal;
 
 pub use self::horizontal::*;
 
-use crate::render::{ComponentWise, Rect};
+use crate::{math::ComponentWise, render::Rect};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, VariantArray};
 

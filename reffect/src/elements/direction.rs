@@ -1,5 +1,5 @@
 use super::list::ListIcon;
-use crate::render::{ComponentWise, Rect};
+use crate::{math::ComponentWise, render::Rect};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, VariantArray};
 
