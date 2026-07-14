@@ -27,7 +27,7 @@ pub enum ProgressActive {
         end: u32,
         ammo_recharge: u32,
         ammo_end: u32,
-        state: BitFlags<AbilityState>,
+        info: BitFlags<AbilityInfo>,
     },
 }
 
@@ -108,9 +108,9 @@ impl ProgressActive {
             recharge_remaining,
             ammo_recharge,
             ammo_recharge_remaining,
-            state,
-            ..
+            info,
         } = *ability;
+
         Self::Ability {
             id,
             ammo,
@@ -127,7 +127,7 @@ impl ProgressActive {
                 0
             },
             rate: recharge_rate,
-            state,
+            info,
         }
     }
 
@@ -141,7 +141,7 @@ impl ProgressActive {
     }
 
     /// Creates a uff progress for edit mode.
-    pub const fn edit_buff(id: u32, progress: f32, now: u32) -> Self {
+    pub fn edit_buff(id: u32, progress: f32, now: u32) -> Self {
         let decreasing = 1.0 - progress;
         Self::Buff {
             id,
@@ -152,7 +152,7 @@ impl ProgressActive {
     }
 
     /// Creates an ability progress for edit mode.
-    pub const fn edit_ability(id: SkillId, progress: f32, now: u32) -> Self {
+    pub fn edit_ability(id: SkillId, progress: f32, now: u32) -> Self {
         let decreasing = 1.0 - progress;
         Self::Ability {
             id,
@@ -162,7 +162,7 @@ impl ProgressActive {
             rate: 1.0,
             ammo_recharge: 5000,
             ammo_end: now + (5000.0 * decreasing) as u32,
-            state: BitFlags::EMPTY,
+            info: BitFlags::EMPTY,
         }
     }
 
@@ -331,10 +331,10 @@ impl ProgressActive {
         }
     }
 
-    /// Retruns the ability state for the progress.
-    pub const fn ability_state(&self) -> BitFlags<AbilityState> {
+    /// Returns the ability info for the progress.
+    pub const fn ability_info(&self) -> BitFlags<AbilityInfo> {
         match *self {
-            Self::Ability { state, .. } => state,
+            Self::Ability { info, .. } => info,
             _ => BitFlags::EMPTY,
         }
     }

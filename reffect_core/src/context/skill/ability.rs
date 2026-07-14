@@ -34,8 +34,8 @@ pub struct Ability {
     /// Remining ammo recharge in milliseconds.
     pub ammo_recharge_remaining: u32,
 
-    /// Ability state information.
-    pub state: BitFlags<AbilityState>,
+    /// Ability information.
+    pub info: BitFlags<AbilityInfo>,
 }
 
 impl Ability {
@@ -51,7 +51,7 @@ impl Ability {
             recharge_remaining: 0,
             ammo_recharge: 0,
             ammo_recharge_remaining: 0,
-            state: BitFlags::empty(),
+            info: BitFlags::empty(),
         }
     }
 
@@ -67,7 +67,7 @@ impl Ability {
             recharge_remaining: recharge,
             ammo_recharge: 0,
             ammo_recharge_remaining: 0,
-            state: BitFlags::empty(),
+            info: BitFlags::empty(),
         }
     }
 
@@ -110,6 +110,7 @@ impl Ability {
     }
 }
 
+/// Ability information flags.
 #[derive(
     Debug,
     Clone,
@@ -130,7 +131,7 @@ impl Ability {
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[repr(u8)]
 #[bitflags]
-pub enum AbilityState {
+pub enum AbilityInfo {
     /// Ability is auto-attack.
     #[strum(serialize = "Auto Attack")]
     AutoAttack = 1 << 0,
@@ -149,16 +150,20 @@ pub enum AbilityState {
     #[strum(serialize = "Active Secondary")]
     ActiveSecondary = 1 << 4,
 
-    // Missing resource for ability.
+    /// Missing resource for ability.
     #[strum(serialize = "No Resources")]
     NoResources = 1 << 5,
 
-    // Not in range for ability.
+    /// Not in range for ability.
     #[strum(serialize = "No Range")]
     NoRange = 1 << 6,
+
+    /// Ground targeted.
+    #[strum(serialize = "Ground Targeted")]
+    GroundTarget = 1 << 7,
 }
 
-impl Named for AbilityState {
+impl Named for AbilityInfo {
     fn name(&self) -> &'static str {
         self.into()
     }
@@ -172,11 +177,12 @@ impl Named for AbilityState {
             Self::ActiveSecondary => "Act2",
             Self::NoResources => "Res",
             Self::NoRange => "Range",
+            Self::GroundTarget => "Ground",
         }
     }
 }
 
-impl Colored for AbilityState {
+impl Colored for AbilityInfo {
     fn colored(&self) -> Option<Color> {
         None
     }

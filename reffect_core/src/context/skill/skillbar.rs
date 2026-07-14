@@ -1,4 +1,4 @@
-use super::{Ability, AbilityState, SkillId, Slot};
+use super::{Ability, AbilityInfo, SkillId, Slot};
 use enumflags2::BitFlags;
 use strum::EnumCount;
 
@@ -45,11 +45,11 @@ impl Skillbar {
         self.skills[slot as usize] = ability;
     }
 
-    /// Sets the state for the ability in the given slot.
+    /// Sets the ability info for the ability in the given slot.
     #[inline]
-    pub fn set_slot_state(&mut self, slot: Slot, state: impl Into<BitFlags<AbilityState>>) {
+    pub fn set_slot_info(&mut self, slot: Slot, state: impl Into<BitFlags<AbilityInfo>>) {
         if let Some(ability) = self.slot_mut(slot) {
-            ability.state.insert(state);
+            ability.info.insert(state);
         }
     }
 }

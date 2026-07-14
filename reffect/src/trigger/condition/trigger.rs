@@ -3,7 +3,7 @@ use crate::{
     context::{Context, Updateable},
     enums::check_variant_array,
     render::{Validation, enum_combo},
-    trigger::{AbilityStateTrigger, MapTrigger, PlayerTrigger, ProgressSource, ProgressThreshold},
+    trigger::{AbilityInfoTrigger, MapTrigger, PlayerTrigger, ProgressSource, ProgressThreshold},
 };
 use const_default::ConstDefault;
 use nexus::imgui::{ComboBoxFlags, Ui};
@@ -23,7 +23,7 @@ pub enum ConditionTrigger {
 
     #[serde(alias = "AbilityInfo")]
     #[strum(serialize = "Ability State")]
-    AbilityState(AbilityStateTrigger),
+    AbilityState(AbilityInfoTrigger),
 
     Player(PlayerTrigger),
 
@@ -33,7 +33,7 @@ pub enum ConditionTrigger {
 impl VariantArray for ConditionTrigger {
     const VARIANTS: &'static [Self] = &[
         Self::ProgressThreshold(ProgressThreshold::DEFAULT),
-        Self::AbilityState(AbilityStateTrigger::DEFAULT),
+        Self::AbilityState(AbilityInfoTrigger::DEFAULT),
         Self::Player(PlayerTrigger::DEFAULT),
         Self::Map(MapTrigger::DEFAULT),
     ];
