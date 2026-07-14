@@ -18,11 +18,11 @@ use std::fmt;
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct AbilityInfoTrigger {
-    /// Ability states.
+    /// Ability info.
     #[serde(with = "bitflags")]
-    #[cfg_attr(feature = "schema", schemars(with = "bitflags::Schema<AbilityInfo>"))]
     #[serde(alias = "states")]
-    pub info: BitFlags<AbilityInfo>,
+    #[cfg_attr(feature = "schema", schemars(with = "bitflags::Schema<AbilityInfo>"))]
+    pub infos: BitFlags<AbilityInfo>,
 
     /// Trigger logic mode.
     #[serde(alias = "condition")]
@@ -31,13 +31,13 @@ pub struct AbilityInfoTrigger {
 
 impl AbilityInfoTrigger {
     pub fn is_present(&self, active: &ProgressActive) -> bool {
-        self.mode.check_flags(self.info, active.ability_info())
+        self.mode.check_flags(self.infos, active.ability_info())
     }
 
     pub fn render_options(&mut self, ui: &Ui) -> bool {
         let mut changed = false;
 
-        changed |= enum_combo_bitflags(ui, "State", &mut self.info, ComboBoxFlags::empty());
+        changed |= enum_combo_bitflags(ui, "Info", &mut self.infos, ComboBoxFlags::empty());
         helper(ui, || {
             ui.text("Auto Attack: ability is set to auto-attack");
             ui.text("Pressed: ability is pressed");
@@ -52,7 +52,7 @@ impl AbilityInfoTrigger {
 
 impl ConstDefault for AbilityInfoTrigger {
     const DEFAULT: Self = Self {
-        info: make_bitflags!(AbilityInfo::Pending),
+        infos: make_bitflags!(AbilityInfo::Pending),
         mode: TriggerMode::Any,
     };
 }
@@ -65,8 +65,8 @@ impl Default for AbilityInfoTrigger {
 
 impl fmt::Display for AbilityInfoTrigger {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let infos = if !self.info.is_empty() {
-            self.info.iter().map(|info| info.short_name()).join(",")
+        let infos = if !self.infos.is_empty() {
+            self.infos.iter().map(|info| info.short_name()).join(",")
         } else {
             "...".into()
         };
