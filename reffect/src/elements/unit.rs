@@ -2,6 +2,7 @@ use const_default::ConstDefault;
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, VariantArray};
 
+/// A number unit.
 #[derive(
     Debug,
     Clone,
@@ -34,6 +35,7 @@ impl Default for Unit {
 }
 
 impl Unit {
+    /// Calculates the progress in the unit.
     pub fn calc_progress(&self, value: f32, max: f32) -> Option<f32> {
         match self {
             Self::Percent => Some(value),

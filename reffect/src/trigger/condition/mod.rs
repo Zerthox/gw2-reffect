@@ -9,6 +9,8 @@ use partial::{IntoPartial, PartialOps};
 use serde::{Deserialize, Serialize};
 
 // TODO: add common props: pos, opacity, animation
+
+/// A property change condition.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(
     feature = "schema",
@@ -28,6 +30,7 @@ impl<T> Condition<T>
 where
     T: IntoPartial,
 {
+    /// Processes the condition.
     pub fn process(&mut self, value: &mut T, ctx: &Context, active: &ProgressActive)
     where
         T::Partial: Clone,
@@ -37,6 +40,7 @@ where
         }
     }
 
+    /// Renders condition options.
     pub fn render_options(&mut self, ui: &Ui, ctx: &Context, source: &ProgressSource, base: &T)
     where
         T::Partial: PartialProps<T>,

@@ -25,6 +25,7 @@ pub enum AlignHorizontal {
 }
 
 impl AlignHorizontal {
+    /// Calculates the text offset.
     pub fn text_offset(&self, ui: &Ui, text: impl AsRef<str>, font_scale: f32) -> [f32; 2] {
         let [text_x, _] = ui.calc_text_size(text);
         let width = font_scale * text_x;
@@ -34,6 +35,7 @@ impl AlignHorizontal {
         [offset_x, offset_y]
     }
 
+    /// Calculates item offset in x-Direction.
     pub fn item_offset_x(&self, width: f32) -> f32 {
         match self {
             Self::Left => 0.0,
@@ -42,7 +44,8 @@ impl AlignHorizontal {
         }
     }
 
-    pub fn render_combo(&mut self, ui: &Ui) {
+    /// Renders align selection.
+    pub fn render_select(&mut self, ui: &Ui) {
         if let Some(_token) = ui.begin_combo("Align", self.as_ref()) {
             for entry in Self::iter() {
                 let selected = entry == *self;

@@ -1,9 +1,13 @@
 use super::{Combatant, ProgressSource};
 use const_default::ConstDefault;
 
+/// Helper to transfer data between progress sources.
 #[derive(Debug, Clone)]
 pub struct Transfer {
+    /// Selected combatant.
     pub combatant: Combatant,
+
+    /// Selected ids.
     pub ids: Vec<u32>,
 }
 
@@ -43,10 +47,12 @@ impl From<ProgressSource> for Transfer {
 }
 
 impl Transfer {
+    /// Transfers data from one [`ProgressSource`] to another.
     pub fn transfer(from: ProgressSource, to: &mut ProgressSource) {
         Self::from(from).apply(to);
     }
 
+    /// Applies the stores data to a [`ProgressSource`].
     pub fn apply(self, source: &mut ProgressSource) {
         match source {
             ProgressSource::Buff { combatant, ids } => {

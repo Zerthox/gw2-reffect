@@ -2,6 +2,7 @@ use crate::context::Traits;
 use const_default::ConstDefault;
 use serde::{Deserialize, Serialize};
 
+/// A trait requirement.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
@@ -14,6 +15,7 @@ pub struct TraitRequirement {
 }
 
 impl TraitRequirement {
+    /// Checks whether the trait requirement is met.
     pub fn is_met(&self, traits: &Traits) -> bool {
         let contains = traits.contains(&self.id);
         match self.present {

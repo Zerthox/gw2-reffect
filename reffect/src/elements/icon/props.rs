@@ -13,6 +13,7 @@ use nexus::imgui::{InputTextFlags, Ui};
 use partial::Partial;
 use serde::{Deserialize, Serialize};
 
+/// Icon properties.
 #[derive(Debug, Clone, Partial, Serialize, Deserialize)]
 #[partial(derive(Debug, Clone, Serialize, Deserialize))]
 #[cfg_attr(
@@ -56,6 +57,7 @@ impl Default for IconProps {
 }
 
 impl IconProps {
+    /// Renders icon property options.
     pub fn render_options(&mut self, ui: &Ui) -> DynAction<Self> {
         let Self {
             tint,

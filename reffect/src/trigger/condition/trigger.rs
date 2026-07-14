@@ -13,6 +13,8 @@ use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 
 // TODO: add target affinity (target triggers only)
 // TODO: add defiance state (defiance triggers only)
+
+/// Condition trigger.
 #[derive(
     Debug, Clone, PartialEq, AsRefStr, IntoStaticStr, EnumIter, EnumCount, Serialize, Deserialize,
 )]
@@ -52,6 +54,7 @@ impl Default for ConditionTrigger {
 }
 
 impl ConditionTrigger {
+    /// Checks whether the condition is active.
     pub fn is_active(&self, ctx: &Context, active: &ProgressActive) -> bool {
         match self {
             Self::ProgressThreshold(threshold) => threshold.is_met(active, ctx),
@@ -61,10 +64,12 @@ impl ConditionTrigger {
         }
     }
 
+    /// Checks whether the conditions are the same type.
     pub fn is_same_type(&self, other: &Self) -> bool {
         mem::discriminant(self) == mem::discriminant(other)
     }
 
+    /// Validates the source for the condition.
     pub fn validate_source(&self, source: &ProgressSource) -> Validation<&'static str> {
         match self {
             Self::AbilityState(_) => match source {
@@ -91,6 +96,7 @@ impl ConditionTrigger {
         }
     }
 
+    /// Renders condition trigger options.
     pub fn render_options(&mut self, ui: &Ui, ctx: &Context, source: &ProgressSource) {
         let valid = self.validate_source(source);
         valid.for_item(ui, || {

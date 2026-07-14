@@ -21,6 +21,7 @@ use const_default::ConstDefault;
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
+/// Base icon used in icon element & list icon.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
@@ -45,15 +46,18 @@ pub struct Icon {
 }
 
 impl Icon {
+    /// Loads the icon.
     pub fn load(&mut self) {
         self.texture.load();
     }
 
+    /// Calcualtes the texture color.
     fn texture_color(&self, ui: &Ui) -> [f32; 4] {
         let [r, g, b, a] = self.props.tint;
         [r, g, b, a * ui.clone_style().alpha]
     }
 
+    /// Renders the icon.
     pub fn render(
         &mut self,
         ui: &Ui,
@@ -175,6 +179,7 @@ impl Icon {
         }
     }
 
+    /// Renders icon options.
     pub fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) -> DynAction<Self> {
         let mut action = DynAction::<Self>::empty();
 
@@ -201,6 +206,7 @@ impl Icon {
         action
     }
 
+    /// Renders icon tabs.
     pub fn render_tabs(
         &mut self,
         ui: &Ui,
@@ -216,6 +222,7 @@ impl Icon {
         }
     }
 
+    /// Renders icon debug information.
     pub fn render_debug(&mut self, ui: &Ui, ctx: &RenderCtx, trigger: &ProgressTrigger) {
         const SIZE: [f32; 2] = [64.0, 64.0];
 

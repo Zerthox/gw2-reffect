@@ -1,10 +1,18 @@
 use const_default::ConstDefault;
 
+/// A progress value selection.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum ProgressValue {
+    /// Select primary progress.
     Primary,
+
+    /// Select secondary progress.
     Secondary,
+
+    /// Prefer primary but fall back to secondary progress.
     PreferPrimary,
+
+    /// Prefer secondary but fall back to primary progress.
     PreferSecondary,
 }
 

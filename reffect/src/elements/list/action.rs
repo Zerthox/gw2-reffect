@@ -1,11 +1,11 @@
-use const_default::ConstDefault;
-
 use super::ListIcon;
 use crate::{
     clipboard::Clipboard,
     elements::{Element, ElementType},
 };
+use const_default::ConstDefault;
 
+/// Action for a list icon.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[must_use]
 pub enum IconAction {
@@ -19,10 +19,12 @@ pub enum IconAction {
 }
 
 impl IconAction {
+    /// Creates an empty action.
     pub const fn new() -> Self {
         Self::None
     }
 
+    /// Performs the action on the children.
     pub fn perform(self, children: &mut Vec<ListIcon>, size: [f32; 2]) {
         match self {
             Self::None => {}

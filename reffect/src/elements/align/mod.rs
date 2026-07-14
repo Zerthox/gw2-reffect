@@ -32,6 +32,7 @@ pub enum Align {
 }
 
 impl Align {
+    /// Calcualtes the offset.
     #[inline]
     pub const fn offset(&self, size: [f32; 2]) -> [f32; 2] {
         let [width, height] = size;
@@ -44,6 +45,7 @@ impl Align {
         }
     }
 
+    /// Calcualtes the bounds.
     #[inline]
     pub fn bounds(&self, size: [f32; 2]) -> Rect {
         let start = self.offset(size);

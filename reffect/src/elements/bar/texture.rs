@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 
+/// Bar texture source.
 #[derive(
     Debug,
     Clone,
@@ -24,14 +25,18 @@ use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 )]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub enum BarTexture {
+    /// No texture, empty.
     #[serde(alias = "Empty")]
     None,
 
+    /// Texture from URL.
     Url(String),
 
+    /// Texture from local file.
     File(PathBuf),
 }
 
+/// A loded texture with its bar texture source.
 pub type LoadedBarTexture = LoadedTexture<BarTexture>;
 
 impl ConstDefault for BarTexture {
@@ -55,10 +60,12 @@ impl VariantArray for BarTexture {
 const _: () = check_variant_array::<BarTexture>();
 
 impl BarTexture {
+    /// Whether the texture is none.
     pub const fn is_none(&self) -> bool {
         matches!(self, Self::None)
     }
 
+    /// Renders bar texture selection.
     pub fn render_select(&mut self, ui: &Ui, label: impl AsRef<str>) -> bool {
         let mut reload = false;
 
@@ -87,6 +94,7 @@ impl AsTextureSource for BarTexture {
 }
 
 impl LoadedBarTexture {
+    /// Retrieves the texture.
     pub fn get_texture(&self, _ui: &Ui) -> Option<imgui::TextureId> {
         match self.source() {
             BarTexture::None => None,
@@ -96,6 +104,7 @@ impl LoadedBarTexture {
         }
     }
 
+    /// Renders bar texture selection.
     pub fn render_select(&mut self, ui: &Ui, label: impl AsRef<str>) {
         let mut source = self.source_mut();
         let reload = source.render_select(ui, label);

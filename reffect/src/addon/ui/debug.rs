@@ -3,7 +3,7 @@ use crate::{
     clipboard::Clipboard,
     colors::{self, Colored},
     context::{
-        Ability, AbilityState, BuffMap, Build, CombatantResources, Context, Defiance, Gear,
+        Ability, AbilityInfo, BuffMap, Build, CombatantResources, Context, Defiance, Gear,
         PlayerResources, SkillId, SkillInfo, Skillbar, Slot,
     },
     error::Error,
@@ -303,13 +303,13 @@ fn debug_skillbar(ui: &Ui, ctx: &Context, skillbar: &Skillbar) {
     for slot in Slot::iter() {
         ui.text(format!("{slot:<14} ="));
         if let Some(ability) = skillbar.slot(slot) {
-            let color = if ability.state.contains(AbilityState::Pressed) {
+            let color = if ability.info.contains(AbilityInfo::Pressed) {
                 Some(ui.push_style_color(StyleColor::Text, colors::BLUE))
-            } else if ability.state.contains(AbilityState::Pending) {
+            } else if ability.info.contains(AbilityInfo::Pending) {
                 Some(ui.push_style_color(StyleColor::Text, colors::GREEN))
-            } else if ability.state.contains(AbilityState::NoResources) {
+            } else if ability.info.contains(AbilityInfo::NoResources) {
                 Some(ui.push_style_color(StyleColor::Text, colors::RED))
-            } else if ability.state.contains(AbilityState::NoRange) {
+            } else if ability.info.contains(AbilityInfo::NoRange) {
                 Some(ui.push_style_color(StyleColor::Text, colors::YELLOW))
             } else {
                 None
@@ -351,7 +351,7 @@ fn debug_skillbar(ui: &Ui, ctx: &Context, skillbar: &Skillbar) {
                 ui.tooltip(|| {
                     let Ability {
                         recharge_rate,
-                        state,
+                        info: state,
                         ..
                     } = ability;
                     ui.text(format!("Rate {recharge_rate}"));

@@ -66,10 +66,12 @@ pub struct Common {
 }
 
 impl Common {
+    /// Returns the id as string.
     pub fn id_string(&self) -> String {
         self.id.to_string()
     }
 
+    /// Checks whether the element is visible.
     pub fn is_visible_or_edit(&mut self, ctx: &RenderCtx) -> bool {
         if ctx.edit.is_editing() {
             (self.enabled && ctx.is_edit_visible()) || ctx.edit.is_selected_or_parent(self.id)
@@ -78,14 +80,17 @@ impl Common {
         }
     }
 
+    /// Calculates the element position relative to the parent.
     pub fn pos(&self, ui: &Ui, parent_pos: [f32; 2]) -> [f32; 2] {
         self.anchor.pos(ui, parent_pos).add(self.pos)
     }
 
+    /// Calcualtes the element position relative to the root.
     pub fn pos_root(&self, ui: &Ui) -> [f32; 2] {
         self.pos(ui, ElementAnchor::root(ui))
     }
 
+    /// Pushes element styles.
     pub fn push_style<'ui>(&mut self, ui: &'ui Ui, ctx: &RenderCtx) -> impl Drop + 'ui {
         struct Token<T>(T);
 
@@ -169,6 +174,7 @@ impl Common {
             });
     }
 
+    /// Renders the select tree label.
     pub fn render_tree_label(&self, ui: &Ui, kind: &str) {
         ui.same_line();
         ui.text_disabled(kind);
@@ -223,6 +229,7 @@ impl Common {
         }
     }
 
+    /// Renders the resize modal.
     pub fn render_resize(&mut self, ui: &Ui, open: bool) -> Option<Resizer> {
         let title = format!("Resize Element##reffect{}", self.id);
         if open {
@@ -232,6 +239,7 @@ impl Common {
             .then(|| mem::take(&mut self.resize))
     }
 
+    /// Renders common options.
     pub fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) {
         ui.checkbox("Enabled", &mut self.enabled);
 
@@ -248,10 +256,12 @@ impl Common {
         self.trigger.render_options(ui, ctx);
     }
 
+    /// Renders common filters.
     pub fn render_filters(&mut self, ui: &Ui, ctx: &RenderCtx) {
         self.filter.render_options(ui, ctx);
     }
 
+    /// Renders common animation options.
     pub fn render_animation(&mut self, ui: &Ui) {
         if self.animation.is_some() {
             if ui.checkbox("Enabled", &mut true) {
@@ -266,6 +276,7 @@ impl Common {
         }
     }
 
+    /// Renders common debug information.
     pub fn render_debug(&mut self, ui: &Ui, ctx: &RenderCtx) {
         ui.text(format!("Id: {}", self.id));
         ui.text(format!("Pos: {:?}", self.pos_root(ui)));

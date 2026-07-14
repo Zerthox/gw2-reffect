@@ -10,6 +10,7 @@ use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
 
+/// A combatant.
 #[derive(
     Debug,
     Clone,
@@ -66,6 +67,7 @@ impl ConstDefault for Combatant {
 }
 
 impl Combatant {
+    /// Returns the combatant buffs.
     pub fn buffs<'ctx>(&self, ctx: &'ctx Context) -> Option<&'ctx BuffMap> {
         match self {
             Self::Player => Some(&ctx.player.buff_info.as_ref().ok()?.buffs),
@@ -78,6 +80,7 @@ impl Combatant {
         }
     }
 
+    /// Returns the combatant resources.
     pub fn resources<'ctx>(&self, ctx: &'ctx Context) -> Option<&'ctx CombatantResources> {
         match self {
             Self::Player => Some(&ctx.player.resources.as_ref().ok()?.combatant),
@@ -90,6 +93,7 @@ impl Combatant {
         }
     }
 
+    /// Validates whether the combatant supports buffs.
     pub fn validate_buff(&self) -> Validation<impl AsRef<str> + 'static> {
         match self {
             Self::Player | Self::Target => Validation::Ok,
@@ -100,6 +104,7 @@ impl Combatant {
         }
     }
 
+    /// Validates whether the combatant supports the given visibility.
     pub fn supports_visibility(&self, visibility: BitFlags<Visibility>) -> bool {
         match self {
             Self::Player => visibility.intersects(Visibility::Player),
@@ -113,6 +118,7 @@ impl Combatant {
         }
     }
 
+    /// Validates whether the combatant supports the given buff id.
     pub fn validate_buff_id(&self, id: u32) -> Validation<impl AsRef<str> + 'static> {
         match Internal::get_skill_info(id) {
             Ok(SkillInfo::Buff {
@@ -132,6 +138,7 @@ impl Combatant {
         }
     }
 
+    /// Validates whether the combatant supports health & barrier.
     pub fn validate_health_barrier(&self) -> Validation<impl AsRef<str> + 'static> {
         match self {
             Self::Player | Self::Pet => Validation::Ok,
@@ -142,6 +149,7 @@ impl Combatant {
         }
     }
 
+    /// Validates whether the combatant supports defiance.
     pub fn validate_defiance(&self) -> Validation<impl AsRef<str> + 'static> {
         match self {
             Self::Player | Self::Target => Validation::Ok,
@@ -152,6 +160,7 @@ impl Combatant {
         }
     }
 
+    /// Renders combatant selection.
     pub fn render_options(&mut self, ui: &Ui, validation: Validation<impl AsRef<str>>) -> bool {
         let mut changed = false;
 

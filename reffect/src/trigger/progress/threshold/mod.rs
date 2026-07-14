@@ -14,6 +14,8 @@ use serde::{Deserialize, Serialize};
 use std::fmt;
 
 // TODO: create a more straightforward threshold?
+
+/// A progress threshold.
 #[derive(Debug, Default, ConstDefault, PartialEq, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct ProgressThreshold {
@@ -26,6 +28,7 @@ pub struct ProgressThreshold {
 }
 
 impl ProgressThreshold {
+    /// Whether the threshold is met.
     pub fn is_met(&self, active: &ProgressActive, ctx: &Context) -> bool {
         let amount = self.amount_type.amount(active, ctx);
         match self.threshold_type {
@@ -37,6 +40,37 @@ impl ProgressThreshold {
             ThresholdType::Exact(required) => amount == required,
             ThresholdType::Between(min, max) => (min..=max).contains(&amount),
         }
+    }
+
+    /// Renders the threshold options.
+    pub fn render_options(&mut self, ui: &Ui) -> bool {
+        let mut changed = false;
+
+        changed |= enum_combo(
+            ui,
+            "Threshold",
+            &mut self.threshold_type,
+            ComboBoxFlags::empty(),
+        )
+        .is_some();
+        helper(ui, || ui.text("Threshold required to be met"));
+
+        match &mut self.threshold_type {
+            ThresholdType::Always | ThresholdType::Present | ThresholdType::Missing => {}
+            ThresholdType::Above(required)
+            | ThresholdType::Below(required)
+            | ThresholdType::Exact(required) => {
+                changed |= self.amount_type.render_select(ui).is_some();
+                changed |= self.amount_type.render_input(ui, "Amount", required);
+            }
+            ThresholdType::Between(min, max) => {
+                changed |= self.amount_type.render_select(ui).is_some();
+                changed |= self.amount_type.render_input(ui, "Min", min);
+                changed |= self.amount_type.render_input(ui, "Max", max);
+            }
+        }
+
+        changed
     }
 }
 
@@ -56,38 +90,6 @@ impl fmt::Display for ProgressThreshold {
         } else {
             write!(f, "{} {}", self.amount_type, self.threshold_type)
         }
-    }
-}
-
-impl ProgressThreshold {
-    pub fn render_options(&mut self, ui: &Ui) -> bool {
-        let mut changed = false;
-
-        changed |= enum_combo(
-            ui,
-            "Threshold",
-            &mut self.threshold_type,
-            ComboBoxFlags::empty(),
-        )
-        .is_some();
-        helper(ui, || ui.text("Threshold required to be met"));
-
-        match &mut self.threshold_type {
-            ThresholdType::Always | ThresholdType::Present | ThresholdType::Missing => {}
-            ThresholdType::Above(required)
-            | ThresholdType::Below(required)
-            | ThresholdType::Exact(required) => {
-                changed |= self.amount_type.render_options(ui).is_some();
-                changed |= self.amount_type.render_input(ui, "Amount", required);
-            }
-            ThresholdType::Between(min, max) => {
-                changed |= self.amount_type.render_options(ui).is_some();
-                changed |= self.amount_type.render_input(ui, "Min", min);
-                changed |= self.amount_type.render_input(ui, "Max", max);
-            }
-        }
-
-        changed
     }
 }
 

@@ -11,6 +11,7 @@ use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 
+/// Icon source.
 #[derive(
     Debug,
     Clone,
@@ -26,15 +27,20 @@ use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 )]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub enum IconSource {
+    /// Empty icon.
     Empty,
 
+    /// Unknown skill/buff icon.
     Unknown,
 
+    /// Automatically determined icon.
     #[serde(alias = "Dynamic")]
     Automatic,
 
+    /// Icon from URL.
     Url(String),
 
+    /// Icon from local file.
     File(PathBuf),
 }
 
@@ -61,10 +67,12 @@ impl VariantArray for IconSource {
 const _: () = check_variant_array::<IconSource>();
 
 impl IconSource {
-    pub fn is_empty(&self) -> bool {
+    /// Checks whether the icon is empty.
+    pub const fn is_empty(&self) -> bool {
         matches!(self, Self::Empty)
     }
 
+    /// Renders icon source selection.
     pub fn render_select(&mut self, ui: &Ui, ctx: &RenderCtx) -> IconEditResult {
         let mut reload = false;
         let mut action = DynAction::empty();
@@ -95,8 +103,12 @@ impl IconSource {
     }
 }
 
+/// Icon source editing result.
 #[derive(Debug)]
 pub struct IconEditResult {
+    /// Whether the texture needs a reload.
     pub reload: bool,
+
+    /// Action to perform on siblings.
     pub action: DynAction<IconSource>,
 }

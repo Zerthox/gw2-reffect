@@ -11,6 +11,7 @@ use enumflags2::BitFlags;
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
 
+/// Player build trigger.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
@@ -57,6 +58,7 @@ pub struct BuildTrigger {
 }
 
 impl BuildTrigger {
+    /// Loads the build trigger.
     pub fn load(&mut self) {
         // translate old profs to specs if specs empty
         // TODO: remove after grace period
@@ -67,14 +69,17 @@ impl BuildTrigger {
         }
     }
 
+    /// Returns whether the build trigger is active.
     pub fn is_active(&self) -> bool {
         self.active
     }
 
+    /// Resolves whether specializations match.
     fn specs_active(&self, ctx: &Context) -> bool {
         TriggerMode::Any.check_flags_optional(self.specs, ctx.player.spec.ok())
     }
 
+    /// Resolves whether traits match.
     fn traits_active(&self, ctx: &Context) -> bool {
         if let Ok(build) = ctx.player.build.as_ref() {
             self.trait_mode
@@ -84,6 +89,7 @@ impl BuildTrigger {
         }
     }
 
+    /// Resolves whether skill selections match.
     fn skill_selections_active(&self, ctx: &Context) -> bool {
         if let Ok(build) = ctx.player.build.as_ref() {
             self.skill_selections_mode
@@ -95,6 +101,7 @@ impl BuildTrigger {
         }
     }
 
+    /// Resolves whether profession selections match.
     fn prof_selections_active(&self, ctx: &Context) -> bool {
         let build = ctx.player.build.as_ref();
         TriggerMode::Any.check_flags_optional(
@@ -103,6 +110,7 @@ impl BuildTrigger {
         )
     }
 
+    /// Resolves whether pet selections match.
     fn pet_selections_active(&self, ctx: &Context) -> bool {
         if ctx.player.has_pets()
             && let Ok(build) = ctx.player.build.as_ref()
@@ -114,6 +122,7 @@ impl BuildTrigger {
         }
     }
 
+    /// Renders trait options.
     fn render_trait_options(&mut self, ui: &Ui) -> bool {
         let _id = ui.push_id("trait");
         let mut changed = false;
@@ -155,6 +164,7 @@ impl BuildTrigger {
         changed
     }
 
+    /// Renders skill options.
     fn render_skill_options(&mut self, ui: &Ui) -> bool {
         let _id = ui.push_id("skill");
         let mut changed = false;
@@ -188,6 +198,7 @@ impl BuildTrigger {
         changed
     }
 
+    /// Renders pet options.
     fn render_pet_options(&mut self, ui: &Ui) -> bool {
         let _id = ui.push_id("pet");
         let mut changed = false;
@@ -220,6 +231,7 @@ impl BuildTrigger {
         changed
     }
 
+    /// Renders build trigger options.
     pub fn render_options(&mut self, ui: &Ui, ctx: &Context) -> bool {
         let _id = ui.push_id("build");
         let mut changed = false;

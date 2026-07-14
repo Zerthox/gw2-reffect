@@ -25,6 +25,7 @@ use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 // TODO: active weapon
 // TODO: active pet
 
+/// A source of progress.
 #[derive(
     Debug, Clone, PartialEq, AsRefStr, IntoStaticStr, EnumIter, EnumCount, Serialize, Deserialize,
 )]
@@ -148,14 +149,17 @@ impl VariantArray for ProgressSource {
 const _: () = check_variant_array::<ProgressSource>();
 
 impl ProgressSource {
+    /// Whether the source inherit from its parent.
     pub const fn inherits(&self) -> bool {
         matches!(self, Self::Inherit)
     }
 
+    /// Whether the source skips threshold checks.
     pub const fn no_threshold(&self) -> bool {
         matches!(self, Self::Always)
     }
 
+    /// Returns which updates are relevant for the source.
     pub const fn update_on(&self) -> Updates {
         match self {
             Self::Inherit => Updates::ALL, // dont know when parent updates
@@ -189,6 +193,7 @@ impl ProgressSource {
         }
     }
 
+    /// Returns the game bind associated with the source.
     pub const fn bind(&self) -> Option<GameBind> {
         // TODO: clickable?
         match self {
@@ -197,6 +202,7 @@ impl ProgressSource {
         }
     }
 
+    /// Resolves the current [`ProgressActive`].
     pub fn progress(
         &self,
         ctx: &Context,
@@ -268,6 +274,7 @@ impl ProgressSource {
         }
     }
 
+    /// Creates a [`ProgressActive`] for edit mode.
     pub fn progress_edit(&self, ctx: &Context, parent: Option<&ProgressActive>) -> ProgressActive {
         const CYCLE: u32 = 5000;
 
@@ -313,6 +320,7 @@ impl ProgressSource {
         }
     }
 
+    /// Validates the ability id.
     fn ability_validate(id: u32) -> Validation<impl AsRef<str>> {
         match Internal::get_skill_info(id) {
             Ok(SkillInfo::Ability { .. }) => Validation::Confirm(format!("Ability {id} is valid")),
@@ -322,6 +330,7 @@ impl ProgressSource {
         }
     }
 
+    /// Renders an id helper.
     fn id_helper(ui: &Ui) {
         helper(ui, || {
             ui.text("Can be found on the wiki");
@@ -329,6 +338,7 @@ impl ProgressSource {
         });
     }
 
+    /// Renders progress source options.
     pub fn render_options(&mut self, ui: &Ui) -> bool {
         let mut changed = false;
 

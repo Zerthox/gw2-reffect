@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, VariantArray};
 
+/// List layout.
 #[derive(
     Debug,
     Clone,

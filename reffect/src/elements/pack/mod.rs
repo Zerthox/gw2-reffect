@@ -15,10 +15,12 @@ use nexus::imgui::{MenuItem, StyleColor, Ui};
 use serde::{Deserialize, Serialize};
 use std::{fs::File, path::PathBuf};
 
+/// Pack of elements.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct Pack {
+    /// Common.
     #[serde(flatten)]
     pub common: Common,
 
@@ -33,10 +35,12 @@ pub struct Pack {
 }
 
 impl Pack {
+    /// Returns the pack name.
     pub fn name(&self) -> &str {
         &self.common.name
     }
 
+    /// Attempts to create a new pack with the given file path.
     pub fn create(file: PathBuf) -> Option<Self> {
         let mut pack = Self::default();
         if let Some(name) = file.file_stem() {
@@ -47,14 +51,17 @@ impl Pack {
         pack.create_file().then_some(pack)
     }
 
+    /// Loads the pack elements.
     pub fn load(&mut self) {
         Loader::new().visit_pack(self);
     }
 
+    /// Loads or reloads fonts used in the pack.
     pub fn load_fonts(&mut self, io: Io) {
         FontLoader::new(io).visit_pack(self);
     }
 
+    /// Attempts to load a pack from the given file path.
     pub fn load_from_file(path: impl Into<PathBuf>) -> Option<Self> {
         let path = path.into();
         Schema::load_from_file(&path).map(|schema| {
@@ -65,6 +72,7 @@ impl Pack {
         })
     }
 
+    /// Creates a new pack file and saves the pack contents to it.
     fn create_file(&self) -> bool {
         match File::create(&self.file) {
             Ok(file) => Schema::latest(self).save_to_file(&file),
@@ -78,6 +86,7 @@ impl Pack {
         }
     }
 
+    /// Creates a temporary save file for the pack.
     pub fn save_temp(&self) -> Option<TempFile> {
         let temp = TempFile::create(&self.file)
             .map_err(|err| log::error!("Failed to create temp pack file: {err}"))
@@ -159,9 +168,6 @@ impl Pack {
     }
 
     /// Attempts to render options if selected.
-    ///
-    /// First value indicates if the pack or a child rendered.
-    /// Second value indicates if the pack layer changed.
     pub fn try_render_options(&mut self, ui: &Ui, ctx: &RenderCtx) -> PackEditResult {
         let id = self.common.id;
         if ctx.edit.is_selected(id) {
@@ -210,6 +216,7 @@ impl Pack {
         changed
     }
 
+    /// Renders pack debug information.
     fn render_debug(&mut self, ui: &Ui, ctx: &RenderCtx) {
         self.common.render_debug(ui, ctx);
 
@@ -247,8 +254,12 @@ impl Default for Pack {
     }
 }
 
+/// Pack editing result.
 #[derive(Debug, Default, Clone)]
 pub struct PackEditResult {
+    /// Whether the pack of a child element rendered.
     pub rendered: bool,
+
+    /// Whether pack layers need reordering.
     pub reorder: bool,
 }

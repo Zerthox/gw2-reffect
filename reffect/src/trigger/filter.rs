@@ -7,6 +7,7 @@ use const_default::ConstDefault;
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
+/// Visibility filter.
 #[derive(Debug, Default, ConstDefault, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]

@@ -8,6 +8,7 @@ use crate::{
 };
 use std::fmt::{self, Display};
 
+/// Text fragments.
 #[derive(Debug, Clone, PartialEq)]
 pub enum TextFragment<'s> {
     /// Literal text.
@@ -30,6 +31,7 @@ pub enum TextFragment<'s> {
 }
 
 impl<'s> TextFragment<'s> {
+    /// Returns a type that can display the fragment's processed text.
     pub fn display(
         &self,
         active: &ProgressActive,

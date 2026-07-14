@@ -1,11 +1,12 @@
 use super::ProgressValue;
 use crate::{
-    context::{Ability, AbilityState, Buff, Resource, ResourceType, SkillId},
+    context::{Ability, AbilityInfo, Buff, Resource, ResourceType, SkillId},
     fmt::{Time, Unit},
     settings::FormatSettings,
 };
 use enumflags2::BitFlags;
 
+/// Currently active progress data.
 #[derive(Debug, Clone, PartialEq)]
 pub enum ProgressActive {
     Resource {
@@ -339,18 +340,22 @@ impl ProgressActive {
         }
     }
 
+    /// Returns the time between two timestamps.
     fn time_between(start: u32, end: u32) -> u32 {
         end.saturating_sub(start)
     }
 
+    /// Returns the time between two timestamps with a timescale rate.
     fn time_between_scaled(start: u32, end: u32, rate: f32) -> u32 {
         (Self::time_between(start, end) as f32 * rate) as u32
     }
 
+    /// Returns scaled time without the timescale rate.
     fn unscale(time: u32, rate: f32) -> u32 {
         (time as f32 / rate) as u32
     }
 
+    /// Formats duration text.
     fn duration_text(time: u32, settings: &FormatSettings) -> String {
         if time > 0 {
             Time::format(time, settings.minutes_threshold, settings.millis_threshold)

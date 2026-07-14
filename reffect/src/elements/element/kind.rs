@@ -11,21 +11,27 @@ use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 
+/// Element type.
 #[derive(Debug, Clone, EnumIter, EnumCount, AsRefStr, IntoStaticStr, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(tag = "type")]
 #[allow(clippy::large_enum_variant)]
 pub enum ElementType {
+    /// Group element.
     Group(Group),
 
+    /// Icon element.
     Icon(IconElement),
 
+    /// Icon list element.
     #[serde(alias = "List")]
     #[strum(serialize = "List")]
     IconList(IconList),
 
+    /// Text element.
     Text(Text),
 
+    /// Progress bar element.
     Bar(Bar), // TODO: box for reduced size?
 }
 
@@ -42,10 +48,12 @@ impl VariantArray for ElementType {
 const _: () = check_variant_array::<ElementType>();
 
 impl ElementType {
-    pub fn is_passthrough(&self) -> bool {
+    /// Whether the elements is a passthrough ignoring trigger visibility.
+    pub const fn is_passthrough(&self) -> bool {
         matches!(self, Self::Group(_) | Self::IconList(_))
     }
 
+    /// Renders the element.
     pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, common: &Common) {
         match self {
             Self::Group(group) => group.render(ui, ctx, common),
@@ -56,6 +64,7 @@ impl ElementType {
         }
     }
 
+    /// Renders element options.
     pub fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) {
         match self {
             Self::Group(group) => group.render_options(ui, ctx),
@@ -66,6 +75,7 @@ impl ElementType {
         }
     }
 
+    /// Renders element tabs.
     pub fn render_tabs(&mut self, ui: &Ui, ctx: &RenderCtx, common: &Common) {
         match self {
             Self::Group(group) => group.render_tabs(ui, ctx),
@@ -76,6 +86,7 @@ impl ElementType {
         }
     }
 
+    /// Renders element filters.
     pub fn render_filters(&mut self, ui: &Ui, ctx: &Context) {
         match self {
             Self::IconList(list) => list.render_filters(ui, ctx),
@@ -83,6 +94,7 @@ impl ElementType {
         }
     }
 
+    /// Renders element debug information.
     pub fn render_debug(&mut self, ui: &Ui, ctx: &RenderCtx, common: &Common) {
         match self {
             Self::Group(group) => group.render_debug(ui, ctx),
@@ -93,6 +105,7 @@ impl ElementType {
         }
     }
 
+    /// Attempts to retrieve the inner group element.
     pub fn as_group(&self) -> Option<&Group> {
         match self {
             Self::Group(group) => Some(group),
@@ -100,6 +113,7 @@ impl ElementType {
         }
     }
 
+    /// Attempts to retrieve the inner icon element.
     pub fn as_icon(&self) -> Option<&IconElement> {
         match self {
             Self::Icon(icon) => Some(icon),
@@ -107,6 +121,7 @@ impl ElementType {
         }
     }
 
+    /// Attempts to retrieve the inner icon list element.
     pub fn as_icon_list(&self) -> Option<&IconList> {
         match self {
             Self::IconList(list) => Some(list),
@@ -114,6 +129,7 @@ impl ElementType {
         }
     }
 
+    /// Attempts to retrieve the inner text element.
     pub fn as_text(&self) -> Option<&Text> {
         match self {
             Self::Text(text) => Some(text),
@@ -121,6 +137,7 @@ impl ElementType {
         }
     }
 
+    /// Attempts to retrieve the inner progress bar element.
     pub fn as_bar(&self) -> Option<&Bar> {
         match self {
             Self::Bar(bar) => Some(bar),

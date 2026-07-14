@@ -10,6 +10,7 @@ use const_default::ConstDefault;
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
+/// A progress trigger.
 #[derive(Debug, Default, ConstDefault, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
@@ -30,6 +31,7 @@ pub struct ProgressTrigger {
 }
 
 impl ProgressTrigger {
+    /// Creates a new progress trigger with the given source.
     pub const fn with(source: ProgressSource) -> Self {
         Self {
             source,
@@ -38,6 +40,7 @@ impl ProgressTrigger {
         }
     }
 
+    /// Returns the default buff progress trigger.
     pub fn buff() -> Self {
         Self {
             source: ProgressSource::Buff {
@@ -52,14 +55,17 @@ impl ProgressTrigger {
         }
     }
 
+    /// Returns the current [`ProgressActive`] if present.
     pub fn active(&self) -> Option<&ProgressActive> {
         self.active.as_ref()
     }
 
+    /// Checks whether the element is visible (trigger is active).
     pub fn is_visible(&self) -> bool {
         self.active.is_some()
     }
 
+    /// Checks whether the trigger needs an update.
     pub fn needs_update(&self, ctx: &Context, parent: Option<&Self>) -> bool {
         let updates = if self.source.inherits()
             && let Some(parent) = parent
@@ -71,17 +77,20 @@ impl ProgressTrigger {
         ctx.has_update_or_edit(updates)
     }
 
+    /// Updates the trigger if forced or needed.
     pub fn update(&mut self, ctx: &Context, parent: Option<&Self>, force: bool) {
         if force || self.needs_update(ctx, parent) {
             self.force_update(ctx, parent);
         }
     }
 
+    /// Force updates the trigger.
     pub fn force_update(&mut self, ctx: &Context, parent: Option<&Self>) {
         // TODO: end of edit causes memo to "flash", maybe flag to end edit mode?
         self.active = self.resolve_active(ctx, parent.and_then(|trigger| trigger.active()));
     }
 
+    /// Resolves the current [`ProgressActive`].
     fn resolve_active(
         &mut self,
         ctx: &Context,
@@ -96,6 +105,7 @@ impl ProgressTrigger {
         }
     }
 
+    /// Renders the trigger options.
     pub fn render_options(&mut self, ui: &Ui, ctx: &Context) {
         let mut changed = false;
         let _id = ui.push_id("trigger");

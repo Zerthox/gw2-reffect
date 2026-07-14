@@ -1,8 +1,8 @@
+use super::Item;
 use crate::{
     action::Action,
     context::{Context, Update, Updateable, Weapon},
-    internal::{Interface, Internal},
-    render::{Validation, enum_combo_bitflags, helper, input_item_id},
+    render::{enum_combo_bitflags, helper, input_item_id},
     serde::bitflags,
     trigger::TriggerMode,
 };
@@ -11,11 +11,12 @@ use enumflags2::BitFlags;
 use nexus::imgui::{ComboBoxFlags, InputTextFlags, Ui};
 use serde::{Deserialize, Serialize};
 
+/// Player gear trigger.
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct GearTrigger {
-    /// Equipped weapons.
+    /// Equipped weapon types.
     #[serde(with = "bitflags")]
     #[cfg_attr(feature = "schema", schemars(with = "bitflags::Schema<Weapon>"))]
     pub weapons: BitFlags<Weapon>,
@@ -37,6 +38,7 @@ pub struct GearTrigger {
 }
 
 impl GearTrigger {
+    /// Returns whether the gear trigger is active.
     pub fn is_active(&self) -> bool {
         self.active
     }
@@ -51,12 +53,14 @@ impl GearTrigger {
         }
     }
 
+    /// Resolves whether weapon types match.
     fn weapons_active(&self, ctx: &Context) -> bool {
         let gear = ctx.player.gear.as_ref();
         self.weapon_mode
             .check_flags_optional(self.weapons, gear.map(|gear| gear.weapons).ok())
     }
 
+    /// Resolves whether sigils match.
     fn sigils_active(&self, ctx: &Context) -> bool {
         if let Ok(gear) = ctx.player.gear.as_ref() {
             self.sigil_mode
@@ -66,6 +70,7 @@ impl GearTrigger {
         }
     }
 
+    /// Resolves whether the relic matches.
     fn relic_active(&self, ctx: &Context) -> bool {
         if let Ok(gear) = ctx.player.gear.as_ref() {
             TriggerMode::Any.check_slice(&self.relics, |relic| gear.relic == relic.buff)
@@ -74,6 +79,7 @@ impl GearTrigger {
         }
     }
 
+    /// Renders gear trigger options.
     pub fn render_options(&mut self, ui: &Ui, ctx: &Context) -> bool {
         let _id = ui.push_id("gear");
         let mut changed = false;
@@ -102,6 +108,7 @@ impl GearTrigger {
         changed
     }
 
+    /// Renders item inputs.
     fn render_item_inputs(ui: &Ui, label: impl AsRef<str>, items: &mut Vec<Item>) -> bool {
         let label = label.as_ref();
         let mut changed = false;
@@ -177,44 +184,5 @@ impl ConstDefault for GearTrigger {
 impl Default for GearTrigger {
     fn default() -> Self {
         Self::DEFAULT
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
-#[serde(transparent)]
-pub struct Item {
-    /// Item id.
-    pub item: u32,
-
-    /// Hidden buff id.
-    #[serde(skip)]
-    pub buff: u32,
-}
-
-impl Item {
-    pub const fn empty() -> Self {
-        Self { item: 0, buff: 0 }
-    }
-
-    pub fn update(&mut self) {
-        self.buff = Internal::get_item_info(self.item)
-            .ok()
-            .and_then(|info| info.buff())
-            .unwrap_or(0);
-    }
-
-    pub fn validate(&self) -> Validation<String> {
-        let Self { item, .. } = *self;
-        if let Ok(info) = Internal::get_item_info(item)
-            && let Some(buff) = info.buff()
-        {
-            Validation::Confirm(format!(
-                "{} {item} corresponds to hidden effect {buff}",
-                info.as_ref()
-            ))
-        } else {
-            Validation::Error(format!("Item {item} is invalid"))
-        }
     }
 }

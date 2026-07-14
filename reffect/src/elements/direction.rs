@@ -3,6 +3,7 @@ use crate::{math::ComponentWise, render::Rect};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumIter, VariantArray};
 
+/// Direction.
 #[derive(
     Debug,
     Clone,
@@ -43,6 +44,7 @@ impl Direction {
         }
     }
 
+    /// Calculates the offset of the given progress value.
     pub const fn progress_value_offset(&self, size: [f32; 2], progress: f32) -> [f32; 2] {
         let [width, height] = size;
         match self {
@@ -55,6 +57,7 @@ impl Direction {
         }
     }
 
+    /// Calculates the alternative offset of the given progress value.
     pub const fn progress_value_offset_alt(
         &self,
         size: [f32; 2],
@@ -68,6 +71,7 @@ impl Direction {
         }
     }
 
+    /// Calculates the rect dimensions of the given progress.
     pub const fn progress_rect_offset(&self, size: [f32; 2], progress: f32) -> Rect {
         let [width, height] = size;
         match self {
@@ -86,6 +90,7 @@ impl Direction {
         }
     }
 
+    /// Calculates the start offset of a list with the given parameters.
     pub const fn list_start_offset(&self, size: [f32; 2], pad: f32, total: usize) -> [f32; 2] {
         let [width, height] = size;
         let last = total.saturating_sub(1) as f32;
@@ -96,6 +101,7 @@ impl Direction {
         }
     }
 
+    /// Calculates the offset of an item in the list with the given parameters.
     pub const fn list_item_offset(
         &self,
         size: [f32; 2],
@@ -118,6 +124,7 @@ impl Direction {
         }
     }
 
+    /// Calcualtes the bounds for a list icon.
     pub fn icon_list_bounds(&self, size: [f32; 2], pad: f32, total: usize) -> Rect {
         let [width, height] = size;
         let last = total.saturating_sub(1) as f32;

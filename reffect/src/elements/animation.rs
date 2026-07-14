@@ -13,6 +13,7 @@ use serde::{Deserialize, Serialize};
 use std::num::NonZero;
 use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 
+/// Element animation.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
@@ -25,6 +26,7 @@ pub struct Animation {
 }
 
 impl Animation {
+    /// Renders the animation, returning a token to end its scope.
     pub fn animate<'ui>(&mut self, ui: &'ui Ui, ctx: &RenderCtx) -> impl Drop + 'ui {
         let progress = cycle_progress(ui, self.period);
         self.kind.animate(ui, ctx, progress)
@@ -45,6 +47,7 @@ impl Default for Animation {
 }
 
 impl Animation {
+    /// Renders animation options.
     pub fn render_options(&mut self, ui: &Ui) {
         enum_combo(ui, "Animation", &mut self.kind, ComboBoxFlags::empty());
 
@@ -78,6 +81,7 @@ impl VariantArray for AnimationKind {
 const _: () = check_variant_array::<AnimationKind>();
 
 impl AnimationKind {
+    /// Transforms progress value for back & forth animations.
     fn back_and_forth(progress: f32) -> f32 {
         if progress < 0.5 {
             1.0 - 2.0 * progress
@@ -86,6 +90,7 @@ impl AnimationKind {
         }
     }
 
+    /// Renders the animation with the given progress, returning a token to end its scope.
     pub fn animate<'ui>(&mut self, ui: &'ui Ui, ctx: &RenderCtx, progress: f32) -> impl Drop + 'ui {
         enum Token<'ui> {
             None,
@@ -116,6 +121,7 @@ impl AnimationKind {
         }
     }
 
+    /// Renders animation kind options.
     pub fn render_options(&mut self, _ui: &Ui) {
         match self {
             AnimationKind::Pulse => {}

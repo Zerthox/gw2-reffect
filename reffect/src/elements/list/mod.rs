@@ -26,6 +26,7 @@ use serde::{Deserialize, Serialize};
 
 // TODO: wrapping, sorting options
 
+/// List of icons.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
@@ -50,12 +51,14 @@ pub struct IconList {
 impl TreeNode for IconList {}
 
 impl IconList {
+    /// Loads the icon list.
     pub fn load(&mut self) {
         for list_icon in &mut self.icons {
             list_icon.icon.load();
         }
     }
 
+    /// Renders the icon list.
     pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, _common: &Common) {
         let render_icon = |icon: &mut ListIcon, i, len| {
             let offset = self.direction.list_item_offset(self.size, self.pad, i, len);
@@ -90,6 +93,7 @@ impl IconList {
         };
     }
 
+    /// Renders icon list options.
     pub fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) {
         enum_combo(ui, "Layout", &mut self.layout, ComboBoxFlags::empty());
 
@@ -196,6 +200,7 @@ impl IconList {
         copy_action.apply_to_all(&mut self.icons);
     }
 
+    /// Renders icon list tabs.
     pub fn render_tabs(&mut self, ui: &Ui, ctx: &Context, _common: &Common) {
         if let Some(_token) = ui.tab_item("Condition") {
             const INDENT: f32 = 10.0;
@@ -225,6 +230,7 @@ impl IconList {
         }
     }
 
+    /// Renders icon list filters.
     pub fn render_filters(&mut self, ui: &Ui, ctx: &Context) {
         ui.spacing();
         for (i, icon) in self.icons.iter_mut().enumerate() {
@@ -238,6 +244,7 @@ impl IconList {
         }
     }
 
+    /// Renders icon list debug information.
     pub fn render_debug(&mut self, ui: &Ui, ctx: &RenderCtx) {
         ui.text(format!("Icons: {}", self.icons.len()));
         for (i, icon) in self.icons.iter_mut().enumerate() {

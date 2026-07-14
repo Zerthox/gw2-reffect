@@ -21,6 +21,7 @@ use std::fmt::Write;
 
 pub use self::{decoration::*, fragment::*, process::*, props::*};
 
+/// Text element.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
@@ -45,24 +46,29 @@ pub struct Text {
 }
 
 impl Text {
+    /// Loads the text element.
     pub fn load(&mut self) {
         self.reprocess_next_frame();
     }
 
+    /// Forces the text to be reprocessed next time it renders.
     pub fn reprocess_next_frame(&mut self) {
         self.processing = Processing::Frame;
     }
 
+    /// Checks whether the text neeeds reprocessing before rendering.
     pub fn needs_reprocess(&mut self, ctx: &Context, common: &Common) -> bool {
         ctx.edit.is_edited(common.id) || self.processing.needs_reprocess(ctx, &common.trigger)
     }
 
+    /// Reprocesses the text if needed.
     pub fn reprocess_if_need(&mut self, ctx: &Context, settings: &FormatSettings, common: &Common) {
         if self.needs_reprocess(ctx, common) {
             self.reprocess(ctx, settings, common);
         }
     }
 
+    /// Force reprocesses the text.
     pub fn reprocess(&mut self, ctx: &Context, settings: &FormatSettings, common: &Common) {
         self.processing = Processing::MIN;
         self.processed_text = common.trigger.active().map(|active| {
@@ -79,10 +85,12 @@ impl Text {
         });
     }
 
+    /// Returns the processed text, if present.
     pub fn processed_text(&self) -> Option<&str> {
         self.processed_text.as_deref()
     }
 
+    /// Renders the text.
     pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, common: &Common) {
         self.reprocess_if_need(ctx, &ctx.settings.format, common);
 
@@ -102,10 +110,12 @@ impl Text {
         }
     }
 
+    /// Calculates the text offset.
     fn calc_offset(&self, ui: &Ui, text: &str) -> [f32; 2] {
         self.align.text_offset(ui, text, self.props.scale)
     }
 
+    /// Renders text element options.
     pub fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) {
         let changed = input_text_multi_with_menu(
             ui,
@@ -131,13 +141,14 @@ impl Text {
             ui.text("%% for % sign");
         });
 
-        self.align.render_combo(ui);
+        self.align.render_select(ui);
 
         self.font.render_select(ui, "Font");
 
         self.props.base.render_options(ui, ctx);
     }
 
+    /// Renders text element tabs.
     pub fn render_tabs(&mut self, ui: &Ui, ctx: &RenderCtx, common: &Common) {
         if let Some(_token) = ui.tab_item("Condition") {
             self.props
@@ -145,6 +156,7 @@ impl Text {
         }
     }
 
+    /// Renders text element debug information.
     pub fn render_debug(&mut self, ui: &Ui, _ctx: &RenderCtx) {
         debug_optional(ui, "Font", self.font.as_font());
         ui.text(format!("Processing: {}", self.processing));

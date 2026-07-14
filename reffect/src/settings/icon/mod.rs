@@ -8,6 +8,8 @@ pub use self::{bar::*, duration_text::*, stack_text::*, text::*};
 
 use serde::{Deserialize, Serialize};
 
+// TODO: move to pack?
+
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct IconSettings {

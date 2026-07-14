@@ -1,9 +1,10 @@
 mod build;
 mod combat;
 mod gear;
+mod item;
 mod traits;
 
-pub use self::{build::*, combat::*, gear::*, traits::*};
+pub use self::{build::*, combat::*, gear::*, item::*, traits::*};
 
 use super::TriggerMode;
 use crate::{

@@ -1,6 +1,6 @@
 use super::ProgressActive;
 use crate::{
-    context::AbilityState,
+    context::AbilityInfo,
     named::Named,
     render::{enum_combo_bitflags, helper},
     serde::bitflags,
@@ -13,29 +13,31 @@ use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
+/// Ability info trigger.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
-pub struct AbilityStateTrigger {
+pub struct AbilityInfoTrigger {
     /// Ability states.
     #[serde(with = "bitflags")]
-    #[cfg_attr(feature = "schema", schemars(with = "bitflags::Schema<AbilityState>"))]
-    pub states: BitFlags<AbilityState>,
+    #[cfg_attr(feature = "schema", schemars(with = "bitflags::Schema<AbilityInfo>"))]
+    #[serde(alias = "states")]
+    pub info: BitFlags<AbilityInfo>,
 
     /// Trigger logic mode.
     #[serde(alias = "condition")]
     pub mode: TriggerMode,
 }
 
-impl AbilityStateTrigger {
+impl AbilityInfoTrigger {
     pub fn is_present(&self, active: &ProgressActive) -> bool {
-        self.mode.check_flags(self.states, active.ability_state())
+        self.mode.check_flags(self.info, active.ability_info())
     }
 
     pub fn render_options(&mut self, ui: &Ui) -> bool {
         let mut changed = false;
 
-        changed |= enum_combo_bitflags(ui, "State", &mut self.states, ComboBoxFlags::empty());
+        changed |= enum_combo_bitflags(ui, "State", &mut self.info, ComboBoxFlags::empty());
         helper(ui, || {
             ui.text("Auto Attack: ability is set to auto-attack");
             ui.text("Pressed: ability is pressed");
@@ -48,26 +50,26 @@ impl AbilityStateTrigger {
     }
 }
 
-impl ConstDefault for AbilityStateTrigger {
+impl ConstDefault for AbilityInfoTrigger {
     const DEFAULT: Self = Self {
-        states: make_bitflags!(AbilityState::Pending),
+        info: make_bitflags!(AbilityInfo::Pending),
         mode: TriggerMode::Any,
     };
 }
 
-impl Default for AbilityStateTrigger {
+impl Default for AbilityInfoTrigger {
     fn default() -> Self {
         Self::DEFAULT
     }
 }
 
-impl fmt::Display for AbilityStateTrigger {
+impl fmt::Display for AbilityInfoTrigger {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let states = if !self.states.is_empty() {
-            self.states.iter().map(|state| state.short_name()).join(",")
+        let infos = if !self.info.is_empty() {
+            self.info.iter().map(|info| info.short_name()).join(",")
         } else {
             "...".into()
         };
-        write!(f, "State is {} {states}", self.mode.as_ref())
+        write!(f, "Is {} {infos}", self.mode.as_ref())
     }
 }

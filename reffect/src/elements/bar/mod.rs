@@ -25,6 +25,7 @@ use serde::{Deserialize, Serialize};
 
 // TODO: rounding
 
+/// Progress bar element.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
@@ -56,6 +57,7 @@ pub struct Bar {
 }
 
 impl Bar {
+    /// Loads the progress bar.
     pub fn load(&mut self) {
         self.props.base.load();
         self.props.current.load();
@@ -64,16 +66,19 @@ impl Bar {
         }
     }
 
+    /// Calcualtes the progress in percent.
     fn calc_progress(&self, ctx: &Context, active: &ProgressActive) -> f32 {
         let progress = self.progress_kind.calc_progress(ctx, active, self.max);
         self.process_value(progress).clamp(0.0, 1.0)
     }
 
+    /// Scales the progress value based on lower & upper bounds.
     fn process_value(&self, value: f32) -> f32 {
         let scale = self.props.upper_bound - self.props.lower_bound;
         (value - self.props.lower_bound) / scale
     }
 
+    /// Renders the progress bar.
     pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, common: &Common) {
         if let Some(active) = common.trigger.active() {
             let progress = self.calc_progress(ctx, active);
@@ -164,6 +169,7 @@ impl Bar {
         }
     }
 
+    /// Renders progress bar contents.
     fn render_bar_contents(
         &self,
         draw_list: &DrawListMut,
@@ -183,6 +189,7 @@ impl Bar {
         }
     }
 
+    /// Renders progress bar options.
     pub fn render_options(&mut self, ui: &Ui, _ctx: &Context) {
         enum_combo(
             ui,
@@ -303,6 +310,7 @@ impl Bar {
         }
     }
 
+    /// Renders progress bar tabs.
     pub fn render_tabs(&mut self, ui: &Ui, ctx: &Context, common: &Common) {
         if let Some(_token) = ui.tab_item("Condition") {
             self.props
@@ -310,6 +318,7 @@ impl Bar {
         }
     }
 
+    /// Renders progress bar debug information.
     pub fn render_debug(&mut self, ui: &Ui, _ctx: &Context) {
         ui.text(format!(
             "Progress scale: {}",

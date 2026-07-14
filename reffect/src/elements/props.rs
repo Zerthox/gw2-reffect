@@ -11,6 +11,9 @@ use partial::IntoPartial;
 use serde::{Deserialize, Serialize};
 use std::{fmt, ops};
 
+/// Element properties.
+///
+/// Consists of base properties, conditions, and current properties.
 #[derive(Debug, Default, ConstDefault, Clone, Serialize, Deserialize)]
 #[cfg_attr(
     feature = "schema",
@@ -37,6 +40,7 @@ where
     T: Clone + IntoPartial,
     T::Partial: PartialProps<T>,
 {
+    /// Update the current properties using the conditions.
     pub fn update(&mut self, ctx: &Context, active: Option<&ProgressActive>, force: bool) {
         self.current = self.base.clone();
         if let Some(active) = active {
@@ -65,6 +69,7 @@ where
     T: Clone + IntoPartial + 'static,
     T::Partial: PartialProps<T>,
 {
+    /// Renders condition options.
     pub fn render_condition_options(
         &mut self,
         ui: &Ui,
@@ -149,5 +154,6 @@ where
     T: IntoPartial<Partial = Self>,
     Self: Clone + fmt::Debug + Serialize + for<'de> Deserialize<'de>,
 {
+    /// Renders partial prop options.
     fn render_options(&mut self, ui: &Ui, base: &T);
 }

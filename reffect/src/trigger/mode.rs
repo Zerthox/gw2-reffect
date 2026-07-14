@@ -4,6 +4,7 @@ use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, Display, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 
+/// Trigger mode logic.
 #[derive(
     Debug,
     Clone,
@@ -103,6 +104,7 @@ impl TriggerMode {
         }
     }
 
+    /// Renders mode options.
     pub fn render_options(&mut self, ui: &Ui, label: impl AsRef<str>) -> bool {
         enum_combo(ui, label, self, ComboBoxFlags::empty()).is_some()
     }

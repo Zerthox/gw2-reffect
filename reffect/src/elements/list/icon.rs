@@ -6,6 +6,7 @@ use crate::{
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
+/// Icon in a list element.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
@@ -25,13 +26,16 @@ pub struct ListIcon {
     /// Filter configuration.
     pub filter: FilterTrigger,
 
+    /// Icon.
     #[serde(flatten)]
     pub icon: Icon,
 }
 
 impl ListIcon {
+    /// Forced alignment.
     pub const ALIGN: Align = Align::Center;
 
+    /// Checks whether the list icon is visible.
     pub fn is_visible(&mut self, ctx: &RenderCtx) -> bool {
         self.enabled
             && if ctx.edit.is_editing() {
@@ -41,11 +45,13 @@ impl ListIcon {
             }
     }
 
+    /// Renders the list icon.
     pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, size: [f32; 2]) {
         self.icon
             .render(ui, ctx, self.trigger.active(), size, Self::ALIGN)
     }
 
+    /// Converts the list icon into an icon element.
     pub fn into_element(self, size: [f32; 2]) -> Element {
         Element {
             common: Common {
@@ -63,6 +69,7 @@ impl ListIcon {
         }
     }
 
+    /// Creates a list icon from the given icon element.
     pub fn from_element(common: Common, element: IconElement) -> Self {
         Self {
             enabled: common.enabled,
@@ -73,6 +80,7 @@ impl ListIcon {
         }
     }
 
+    /// Renders icon element options.
     pub fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) -> DynAction<Self> {
         ui.checkbox("Enabled", &mut self.enabled);
         ui.input_text("Name", &mut self.name).build();
@@ -87,6 +95,7 @@ impl ListIcon {
         icon_action.map(|list_icon: &mut Self| &mut list_icon.icon)
     }
 
+    /// Renders icon element debug information.
     pub fn render_debug(&mut self, ui: &Ui, ctx: &RenderCtx) {
         self.trigger.render_debug(ui);
         self.filter.render_debug(ui, ctx);

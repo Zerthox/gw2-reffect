@@ -8,6 +8,7 @@ use nexus::imgui::{ComboBoxFlags, InputTextFlags, Slider, SliderFlags, Ui};
 use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
 
+/// A progress amount type.
 #[derive(
     Debug,
     Clone,
@@ -27,19 +28,21 @@ use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
 )]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub enum AmountType {
-    /// Intensity.
+    /// Progress intensity.
     Intensity,
 
-    /// Duration.
+    /// Primary progress duration.
     Duration,
 
-    /// Progress percent.
+    /// Primary progress percent.
     #[strum(serialize = "Progress %")]
     Percent,
 
+    /// Secondary progress duration.
     #[strum(serialize = "Secondary Duration")]
     SecondaryDuration,
 
+    /// Secondary progress percent.
     #[strum(serialize = "Secondary Progress %")]
     SecondaryPercent,
 }
@@ -55,6 +58,7 @@ impl Default for AmountType {
 }
 
 impl AmountType {
+    /// Returns the corresponding amount.
     pub fn amount(&self, active: &ProgressActive, ctx: &Context) -> f32 {
         match self {
             Self::Intensity => active.intensity() as f32,
@@ -73,6 +77,7 @@ impl AmountType {
         }
     }
 
+    /// Renders the amount input.
     pub fn render_input(
         &self,
         ui: &Ui,
@@ -128,7 +133,8 @@ impl AmountType {
         }
     }
 
-    pub fn render_options(&mut self, ui: &Ui) -> Option<Self> {
+    /// Renders the amount type selection.
+    pub fn render_select(&mut self, ui: &Ui) -> Option<Self> {
         let result = enum_combo(ui, "Amount type", self, ComboBoxFlags::empty());
         helper(ui, || ui.text("Type of amount to check"));
         result

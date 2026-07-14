@@ -15,18 +15,22 @@ use crate::{
 use nexus::imgui::{MenuItem, StyleColor, Ui};
 use serde::{Deserialize, Serialize};
 
+/// Pack element.
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct Element {
+    /// Common.
     #[serde(flatten)]
     pub common: Common, // TODO: move to element types
 
+    /// Element type.
     #[serde(flatten)]
     pub kind: ElementType,
 }
 
 impl Element {
+    /// Creates a new element with the given type.
     pub fn of_type(kind: ElementType) -> Self {
         let mut element = Self {
             kind,
@@ -142,7 +146,7 @@ impl Element {
         false
     }
 
-    /// Renders the element options.
+    /// Renders element options.
     pub fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) {
         if let Some(_token) = ui.tab_item(format!("{}###type", self.kind.as_ref())) {
             self.common.render_options(ui, ctx);

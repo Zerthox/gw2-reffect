@@ -9,10 +9,12 @@ use const_default::ConstDefault;
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 
+/// Icon element.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct IconElement {
+    /// Icon.
     #[serde(flatten)]
     pub icon: Icon,
 
@@ -26,11 +28,13 @@ pub struct IconElement {
 impl TreeNode for IconElement {}
 
 impl IconElement {
+    /// Renders the icon element.
     pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, common: &Common) {
         self.icon
             .render(ui, ctx, common.trigger.active(), self.size, self.align)
     }
 
+    /// Renders icon element options.
     pub fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) {
         input_size(&mut self.size);
 
@@ -39,10 +43,12 @@ impl IconElement {
         self.icon.render_options(ui, ctx);
     }
 
+    /// Renders icon element tabs.
     pub fn render_tabs(&mut self, ui: &Ui, ctx: &RenderCtx, common: &Common) {
         self.icon.render_tabs(ui, ctx, &common.trigger);
     }
 
+    /// Renders icon element debug information.
     pub fn render_debug(&mut self, ui: &Ui, ctx: &RenderCtx, common: &Common) {
         self.icon.render_debug(ui, ctx, &common.trigger)
     }

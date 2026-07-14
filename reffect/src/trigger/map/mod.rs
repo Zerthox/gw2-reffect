@@ -12,6 +12,7 @@ use enumflags2::BitFlags;
 use nexus::imgui::{ComboBoxFlags, Ui};
 use serde::{Deserialize, Serialize};
 
+/// Map trigger.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct MapTrigger {
@@ -52,6 +53,7 @@ impl Default for MapTrigger {
 }
 
 impl MapTrigger {
+    /// Returns a map trigger for non-competitive maps.
     pub fn non_competitive() -> Self {
         Self {
             category: MapCategory::non_competitive(),
@@ -59,6 +61,7 @@ impl MapTrigger {
         }
     }
 
+    /// Returns whether the map trigger is active.
     pub fn is_active(&self) -> bool {
         self.active
     }
@@ -79,6 +82,7 @@ impl Updateable for MapTrigger {
 }
 
 impl MapTrigger {
+    /// Renders map trigger options.
     pub fn render_options(&mut self, ui: &Ui, ctx: &Context) -> bool {
         let _id = ui.push_id("map");
         let mut changed = false;

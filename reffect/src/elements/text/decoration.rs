@@ -9,6 +9,7 @@ use strum::{AsRefStr, EnumIter, VariantArray};
 
 // TODO: avoid rendering same text multiple times, prerender characters as atlas?
 
+/// Text decoration.
 #[derive(
     Debug,
     Clone,
@@ -26,15 +27,20 @@ use strum::{AsRefStr, EnumIter, VariantArray};
 )]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub enum TextDecoration {
+    /// No decoration-
     None,
 
+    /// Simple shadow.
     Shadow,
 
+    /// Thick shadow.
     #[strum(serialize = "Shadow (thick)")]
     ShadowDouble,
 
+    /// Simple outline.
     Outline,
 
+    /// Thick outline.
     #[strum(serialize = "Outline (thick)")]
     OutlineDouble,
 }
@@ -50,10 +56,12 @@ impl Default for TextDecoration {
 }
 
 impl TextDecoration {
+    /// Renders text with the given parameters.
     fn render_at(ui: &Ui, pos: [f32; 2], text: &str, font_scale: f32, color: [f32; 4]) {
         draw_text_bg(ui, text, pos, font_scale, color)
     }
 
+    /// Renders the text decoration.
     pub fn render(
         &self,
         ui: &Ui,
@@ -85,6 +93,7 @@ impl TextDecoration {
         }
     }
 
+    /// Renders decoration selection.
     pub fn render_select(&mut self, ui: &Ui) {
         enum_combo(ui, "Decoration", self, ComboBoxFlags::empty());
         if *self != Self::None {

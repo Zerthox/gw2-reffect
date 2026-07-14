@@ -9,6 +9,7 @@ use const_default::ConstDefault;
 use nexus::imgui::Ui;
 use serde::{Deserialize, Serialize};
 
+/// Group element.
 #[derive(Debug, Default, ConstDefault, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
@@ -24,16 +25,20 @@ impl TreeNode for Group {
 }
 
 impl Group {
+    /// Renders the group.
     pub fn render(&mut self, ui: &Ui, ctx: &RenderCtx, _common: &Common) {
         for member in &mut self.members {
             member.render(ui, ctx);
         }
     }
 
+    /// Renders group options.
     pub fn render_options(&mut self, _ui: &Ui, _ctx: &RenderCtx) {}
 
+    /// Renders group tabs.
     pub fn render_tabs(&mut self, _ui: &Ui, _ctx: &RenderCtx) {}
 
+    /// Renders group debug information.
     pub fn render_debug(&mut self, ui: &Ui, _ctx: &RenderCtx) {
         ui.text(format!("Members: {}", self.members.len()));
     }

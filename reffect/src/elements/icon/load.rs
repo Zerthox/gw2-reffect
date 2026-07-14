@@ -9,6 +9,7 @@ use crate::{
 use nexus::imgui::{self, Ui};
 use windows::core::Interface as _;
 
+/// A loaded texture with its icon source.
 pub type LoadedIcon = LoadedTexture<IconSource>;
 
 impl AsTextureSource for IconSource {
@@ -22,6 +23,7 @@ impl AsTextureSource for IconSource {
 }
 
 impl LoadedIcon {
+    /// Retrieves the texture.
     pub fn get_texture(&self, ui: &Ui, skill: SkillId) -> Option<imgui::TextureId> {
         match self.source() {
             IconSource::Empty => None,
@@ -41,6 +43,7 @@ impl LoadedIcon {
         }
     }
 
+    /// Renders icon source select.
     pub fn render_select(&mut self, ui: &Ui, ctx: &RenderCtx) -> DynAction<IconSource> {
         let mut source = self.source_mut();
         let IconEditResult { reload, action } = source.render_select(ui, ctx);

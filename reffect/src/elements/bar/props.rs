@@ -10,6 +10,7 @@ use nexus::imgui::{InputTextFlags, Ui};
 use partial::Partial;
 use serde::{Deserialize, Serialize};
 
+/// Progress bar properties.
 #[derive(Debug, Clone, Partial, Serialize, Deserialize)]
 #[partial(derive(Debug, Clone, Serialize, Deserialize))]
 #[cfg_attr(
@@ -72,11 +73,13 @@ impl Default for BarProps {
 }
 
 impl BarProps {
+    /// Loads the bar properties.
     pub fn load(&mut self) {
         self.fill_texture.load();
         self.background_texture.load();
     }
 
+    /// Loads the partial bar properties.
     pub fn load_partial(partial: &mut Partial<BarProps>) {
         if let Some(texture) = &mut partial.fill_texture {
             texture.load();
@@ -85,6 +88,8 @@ impl BarProps {
             texture.load();
         }
     }
+
+    // options are rendered by bar
 }
 
 impl PartialProps<BarProps> for Partial<BarProps> {

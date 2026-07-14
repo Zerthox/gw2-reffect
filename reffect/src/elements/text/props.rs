@@ -9,6 +9,7 @@ use nexus::imgui::Ui;
 use partial::Partial;
 use serde::{Deserialize, Serialize};
 
+/// Text properties.
 #[derive(Debug, Clone, Partial, Serialize, Deserialize)]
 #[partial(derive(Debug, Clone, Serialize, Deserialize))]
 #[cfg_attr(
@@ -44,6 +45,7 @@ impl Default for TextProps {
 }
 
 impl TextProps {
+    /// Renders text property options.
     pub fn render_options(&mut self, ui: &Ui, _ctx: &RenderCtx) {
         let Self {
             scale,

@@ -5,14 +5,17 @@ use itertools::Itertools;
 use std::{iter::FusedIterator, str::Chars};
 
 impl<'s> TextFragment<'s> {
+    /// Prefix for variable fragments.
     pub const PREFIX: char = '%';
 
+    /// Parses text fragments from the source text.
     pub fn parse(source: &'s str) -> impl Iterator<Item = Self> {
         SimpleTextFragmentIter {
             iter: source.chars(),
         }
     }
 
+    /// Parses a single text fragment.
     pub fn parse_next(iter: &mut Chars<'s>) -> Option<Self> {
         let start = iter.as_str();
         if Self::peek(iter)? == Self::PREFIX {
@@ -28,6 +31,9 @@ impl<'s> TextFragment<'s> {
         }
     }
 
+    /// Attempts to parse literal text.
+    ///
+    /// The returned literal will range from the given start to the begin of the next non-literal fragment.
     fn parse_literal(iter: &mut Chars<'s>, start: &'s str) -> Option<Self> {
         while iter
             .peeking_take_while(|el| *el != Self::PREFIX)
@@ -47,6 +53,7 @@ impl<'s> TextFragment<'s> {
         }
     }
 
+    /// Attempts to parse a variable fragment without the prefix.
     fn try_parse_prefixed(iter: &mut Chars<'s>) -> Option<Self> {
         let next = Self::peek(iter)?;
         let pretty = next.is_ascii_uppercase();
@@ -85,6 +92,7 @@ impl<'s> TextFragment<'s> {
         }
     }
 
+    /// Attempts to parse a progress value.
     fn parse_value(iter: &mut Chars<'s>) -> ProgressValue {
         match Self::peek(iter) {
             Some('1') => {
@@ -99,6 +107,7 @@ impl<'s> TextFragment<'s> {
         }
     }
 
+    /// Peeks the next [`char`] without consuming it.
     fn peek(iter: &Chars<'s>) -> Option<char> {
         iter.clone().next()
     }

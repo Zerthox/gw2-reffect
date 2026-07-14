@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::fmt;
 use strum::{AsRefStr, EnumCount, EnumIter, IntoStaticStr, VariantArray};
 
+/// Threshold type.
 #[derive(
     Debug, Clone, PartialEq, AsRefStr, IntoStaticStr, EnumIter, EnumCount, Serialize, Deserialize,
 )]
@@ -58,7 +59,9 @@ impl VariantArray for ThresholdType {
 const _: () = check_variant_array::<ThresholdType>();
 
 impl ThresholdType {
-    pub fn no_amount(&self) -> bool {
+    /// Whether the threshold does not depend on the progress amount.
+    #[inline]
+    pub const fn no_amount(&self) -> bool {
         matches!(self, Self::Always | Self::Present | Self::Missing)
     }
 }
