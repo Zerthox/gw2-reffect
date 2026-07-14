@@ -43,11 +43,23 @@ impl GearTrigger {
         self.active
     }
 
-    pub fn needs_item_update(&self, ctx: &Context) -> bool {
+    /// Checks whether the trigger needs updating.
+    pub fn needs_active_update(&self, ctx: &Context) -> bool {
+        ctx.has_update(Update::PlayerGear)
+    }
+
+    /// Checks whether item data need refreshing.
+    pub fn needs_item_refresh(&self, ctx: &Context) -> bool {
         ctx.has_update(Update::Map) && ctx.map.is_valid()
     }
 
-    fn update_items(&mut self) {
+    /// Force updates the trigger.
+    fn update_active(&mut self, ctx: &Context) {
+        self.active = self.weapons_active(ctx) && self.sigils_active(ctx) && self.relic_active(ctx);
+    }
+
+    /// Refreshes item data.
+    fn refresh_items(&mut self) {
         for item in self.sigils.iter_mut().chain(&mut self.relics) {
             item.update();
         }
@@ -153,19 +165,20 @@ impl GearTrigger {
 
 impl Updateable for GearTrigger {
     fn needs_update(&self, ctx: &Context) -> bool {
-        ctx.has_update_or_edit(Update::PlayerGear) || self.needs_item_update(ctx)
+        self.needs_active_update(ctx) || self.needs_item_refresh(ctx)
     }
 
     fn force_update(&mut self, ctx: &Context) {
-        self.active = self.weapons_active(ctx) && self.sigils_active(ctx) && self.relic_active(ctx);
+        self.update_active(ctx);
+        self.refresh_items();
     }
 
     fn update_if_need(&mut self, ctx: &Context) {
-        if self.needs_item_update(ctx) {
-            self.update_items();
+        if self.needs_item_refresh(ctx) {
+            self.refresh_items();
         }
-        if self.needs_update(ctx) {
-            self.force_update(ctx);
+        if self.needs_active_update(ctx) {
+            self.update_active(ctx);
         }
     }
 }
