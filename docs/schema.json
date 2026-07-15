@@ -17,15 +17,9 @@
     }
   ],
   "$defs": {
-    "AbilityState": {
+    "AbilityInfo": {
+      "description": "Ability information flags.",
       "oneOf": [
-        {
-          "type": "string",
-          "enum": [
-            "NoResources",
-            "NoRange"
-          ]
-        },
         {
           "description": "Ability is auto-attack.",
           "type": "string",
@@ -50,26 +44,42 @@
           "description": "Ability is active secondary.",
           "type": "string",
           "const": "ActiveSecondary"
+        },
+        {
+          "description": "Missing resource for ability.",
+          "type": "string",
+          "const": "NoResources"
+        },
+        {
+          "description": "Not in range for ability.",
+          "type": "string",
+          "const": "NoRange"
+        },
+        {
+          "description": "Ground targeted.",
+          "type": "string",
+          "const": "GroundTarget"
         }
       ]
     },
-    "AbilityStateTrigger": {
+    "AbilityInfoTrigger": {
+      "description": "Ability info trigger.",
       "type": "object",
       "properties": {
-        "mode": {
-          "description": "Trigger logic mode.",
-          "$ref": "#/$defs/TriggerMode",
-          "default": "Any"
-        },
-        "states": {
-          "description": "Ability states.",
+        "infos": {
+          "description": "Ability info.",
           "type": "array",
           "default": [
             "Pending"
           ],
           "items": {
-            "$ref": "#/$defs/AbilityState"
+            "$ref": "#/$defs/AbilityInfo"
           }
+        },
+        "mode": {
+          "description": "Trigger logic mode.",
+          "$ref": "#/$defs/TriggerMode",
+          "default": "Any"
         }
       }
     },
@@ -94,28 +104,32 @@
       ]
     },
     "AmountType": {
+      "description": "A progress amount type.",
       "oneOf": [
         {
-          "type": "string",
-          "enum": [
-            "SecondaryDuration",
-            "SecondaryPercent"
-          ]
-        },
-        {
-          "description": "Intensity.",
+          "description": "Progress intensity.",
           "type": "string",
           "const": "Intensity"
         },
         {
-          "description": "Duration.",
+          "description": "Primary progress duration.",
           "type": "string",
           "const": "Duration"
         },
         {
-          "description": "Progress percent.",
+          "description": "Primary progress percent.",
           "type": "string",
           "const": "Percent"
+        },
+        {
+          "description": "Secondary progress duration.",
+          "type": "string",
+          "const": "SecondaryDuration"
+        },
+        {
+          "description": "Secondary progress percent.",
+          "type": "string",
+          "const": "SecondaryPercent"
         }
       ]
     },
@@ -135,6 +149,7 @@
       ]
     },
     "Animation": {
+      "description": "Element animation.",
       "type": "object",
       "properties": {
         "kind": {
@@ -204,6 +219,7 @@
       ]
     },
     "Bar": {
+      "description": "Progress bar element.",
       "type": "object",
       "properties": {
         "align": {
@@ -363,14 +379,15 @@
       }
     },
     "BarTexture": {
+      "description": "Bar texture source.",
       "oneOf": [
         {
+          "description": "No texture, empty.",
           "type": "string",
-          "enum": [
-            "None"
-          ]
+          "const": "None"
         },
         {
+          "description": "Texture from URL.",
           "type": "object",
           "properties": {
             "Url": {
@@ -383,6 +400,7 @@
           ]
         },
         {
+          "description": "Texture from local file.",
           "type": "object",
           "properties": {
             "File": {
@@ -397,12 +415,14 @@
       ]
     },
     "CombatTrigger": {
+      "description": "Combat state trigger.",
       "type": [
         "boolean",
         "null"
       ]
     },
     "Combatant": {
+      "description": "A combatant.",
       "oneOf": [
         {
           "description": "Player controlled character.",
@@ -442,6 +462,7 @@
       ]
     },
     "Condition": {
+      "description": "A property change condition.",
       "type": "object",
       "properties": {
         "properties": {
@@ -459,6 +480,7 @@
       }
     },
     "Condition2": {
+      "description": "A property change condition.",
       "type": "object",
       "properties": {
         "properties": {
@@ -476,6 +498,7 @@
       }
     },
     "Condition3": {
+      "description": "A property change condition.",
       "type": "object",
       "properties": {
         "properties": {
@@ -493,6 +516,7 @@
       }
     },
     "ConditionTrigger": {
+      "description": "Condition trigger.",
       "oneOf": [
         {
           "type": "object",
@@ -509,13 +533,13 @@
         {
           "type": "object",
           "properties": {
-            "AbilityState": {
-              "$ref": "#/$defs/AbilityStateTrigger"
+            "AbilityInfo": {
+              "$ref": "#/$defs/AbilityInfoTrigger"
             }
           },
           "additionalProperties": false,
           "required": [
-            "AbilityState"
+            "AbilityInfo"
           ]
         },
         {
@@ -545,6 +569,7 @@
       ]
     },
     "Direction": {
+      "description": "Direction.",
       "type": "string",
       "enum": [
         "Right",
@@ -556,7 +581,7 @@
       ]
     },
     "Element": {
-      "description": "Common behavior between elements and packs.",
+      "description": "Pack element.",
       "type": "object",
       "properties": {
         "anchor": {
@@ -650,6 +675,7 @@
       },
       "oneOf": [
         {
+          "description": "Group element.",
           "type": "object",
           "properties": {
             "type": {
@@ -663,6 +689,7 @@
           ]
         },
         {
+          "description": "Icon element.",
           "type": "object",
           "properties": {
             "type": {
@@ -676,6 +703,7 @@
           ]
         },
         {
+          "description": "Icon list element.",
           "type": "object",
           "properties": {
             "type": {
@@ -689,6 +717,7 @@
           ]
         },
         {
+          "description": "Text element.",
           "type": "object",
           "properties": {
             "type": {
@@ -702,6 +731,7 @@
           ]
         },
         {
+          "description": "Progress bar element.",
           "type": "object",
           "properties": {
             "type": {
@@ -740,6 +770,7 @@
       ]
     },
     "FilterTrigger": {
+      "description": "Visibility filter.",
       "type": "object",
       "properties": {
         "map": {
@@ -775,6 +806,7 @@
       }
     },
     "Group": {
+      "description": "Group element.",
       "type": "object",
       "properties": {
         "members": {
@@ -788,6 +820,7 @@
       }
     },
     "IconElement": {
+      "description": "Icon element.",
       "type": "object",
       "properties": {
         "align": {
@@ -889,6 +922,7 @@
       }
     },
     "IconList": {
+      "description": "List of icons.",
       "type": "object",
       "properties": {
         "direction": {
@@ -932,16 +966,25 @@
       }
     },
     "IconSource": {
+      "description": "Icon source.",
       "oneOf": [
         {
+          "description": "Empty icon.",
           "type": "string",
-          "enum": [
-            "Empty",
-            "Unknown",
-            "Automatic"
-          ]
+          "const": "Empty"
         },
         {
+          "description": "Unknown skill/buff icon.",
+          "type": "string",
+          "const": "Unknown"
+        },
+        {
+          "description": "Automatically determined icon.",
+          "type": "string",
+          "const": "Automatic"
+        },
+        {
+          "description": "Icon from URL.",
           "type": "object",
           "properties": {
             "Url": {
@@ -954,6 +997,7 @@
           ]
         },
         {
+          "description": "Icon from local file.",
           "type": "object",
           "properties": {
             "File": {
@@ -968,12 +1012,13 @@
       ]
     },
     "Item": {
-      "description": "Item id.",
+      "description": "An item mapped to its hidden buff.",
       "type": "integer",
       "format": "uint32",
       "minimum": 0
     },
     "Layout": {
+      "description": "List layout.",
       "type": "string",
       "enum": [
         "Dynamic",
@@ -981,6 +1026,7 @@
       ]
     },
     "ListIcon": {
+      "description": "Icon in a list element.",
       "type": "object",
       "properties": {
         "border_color": {
@@ -1128,6 +1174,7 @@
       ]
     },
     "MapTrigger": {
+      "description": "Map trigger.",
       "type": "object",
       "properties": {
         "category": {
@@ -1174,7 +1221,7 @@
       ]
     },
     "Pack": {
-      "description": "Common behavior between elements and packs.",
+      "description": "Pack of elements.",
       "type": "object",
       "properties": {
         "anchor": {
@@ -1488,6 +1535,7 @@
       }
     },
     "PlayerTrigger": {
+      "description": "Player gear trigger.",
       "type": "object",
       "properties": {
         "combat": {
@@ -1597,7 +1645,7 @@
           "default": "Any"
         },
         "weapons": {
-          "description": "Equipped weapons.",
+          "description": "Equipped weapon types.",
           "type": "array",
           "default": [],
           "items": {
@@ -1638,15 +1686,32 @@
       ]
     },
     "Progress": {
-      "type": "string",
-      "enum": [
-        "Fixed",
-        "Intensity",
-        "Duration",
-        "SecondaryDuration"
+      "description": "Progress type.",
+      "oneOf": [
+        {
+          "description": "Fixed, no progress.",
+          "type": "string",
+          "const": "Fixed"
+        },
+        {
+          "description": "Trigger intensity.",
+          "type": "string",
+          "const": "Intensity"
+        },
+        {
+          "description": "Trigger primary duration.",
+          "type": "string",
+          "const": "Duration"
+        },
+        {
+          "description": "Trigger secondary duration.",
+          "type": "string",
+          "const": "SecondaryDuration"
+        }
       ]
     },
     "ProgressSource": {
+      "description": "A source of progress.",
       "oneOf": [
         {
           "description": "Inherit from above.",
@@ -1856,6 +1921,7 @@
       ]
     },
     "ProgressThreshold": {
+      "description": "A progress threshold.",
       "type": "object",
       "properties": {
         "amount_type": {
@@ -1873,6 +1939,7 @@
       ]
     },
     "ProgressTrigger": {
+      "description": "A progress trigger.",
       "type": "object",
       "properties": {
         "source": {
@@ -1967,6 +2034,7 @@
       ]
     },
     "Text": {
+      "description": "Text element.",
       "type": "object",
       "properties": {
         "align": {
@@ -2024,16 +2092,37 @@
       }
     },
     "TextDecoration": {
-      "type": "string",
-      "enum": [
-        "None",
-        "Shadow",
-        "ShadowDouble",
-        "Outline",
-        "OutlineDouble"
+      "description": "Text decoration.",
+      "oneOf": [
+        {
+          "description": "No decoration-",
+          "type": "string",
+          "const": "None"
+        },
+        {
+          "description": "Simple shadow.",
+          "type": "string",
+          "const": "Shadow"
+        },
+        {
+          "description": "Thick shadow.",
+          "type": "string",
+          "const": "ShadowDouble"
+        },
+        {
+          "description": "Simple outline.",
+          "type": "string",
+          "const": "Outline"
+        },
+        {
+          "description": "Thick outline.",
+          "type": "string",
+          "const": "OutlineDouble"
+        }
       ]
     },
     "ThresholdType": {
+      "description": "Threshold type.",
       "oneOf": [
         {
           "description": "Always met.",
@@ -2120,6 +2209,7 @@
       ]
     },
     "TraitRequirement": {
+      "description": "A trait requirement.",
       "type": "object",
       "properties": {
         "id": {
@@ -2137,6 +2227,7 @@
       }
     },
     "TriggerMode": {
+      "description": "Trigger mode logic.",
       "type": "string",
       "enum": [
         "Any",
@@ -2146,6 +2237,7 @@
       ]
     },
     "Unit": {
+      "description": "A number unit.",
       "type": "string",
       "enum": [
         "Percent",
