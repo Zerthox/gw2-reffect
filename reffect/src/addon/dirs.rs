@@ -30,10 +30,4 @@ impl Addon {
             log::error!("Failed to open addon folder: {err}");
         }
     }
-
-    pub fn open_packs_folder(&self) {
-        if let Err(err) = open::that_detached(Self::packs_dir()) {
-            log::error!("Failed to open packs folder: {err}");
-        }
-    }
 }

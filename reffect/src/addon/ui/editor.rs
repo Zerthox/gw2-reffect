@@ -62,7 +62,7 @@ impl Addon {
                                 self.open_docs("getting-started");
                             }
                             if ui.button("Install existing") {
-                                self.open_packs_folder()
+                                self.open_addon_folder()
                             }
                             if ui.button("Create my own") {
                                 self.open_create_dialog();
