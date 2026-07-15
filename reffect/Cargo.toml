@@ -5,7 +5,7 @@ authors = ["Zerthox"]
 edition = "2024"
 description = "Customizable effect, resource & ability displays"
 repository = "https://github.com/zerthox/gw2-reffect"
-license = "GPL-3.0-or-later"
+license = "LGPL-3.0-or-later"
 rust-version = "1.95"
 
 [dependencies]

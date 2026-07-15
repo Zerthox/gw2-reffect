@@ -83,7 +83,7 @@ impl Addon {
                 ui.same_line();
                 copyable_text(ui, RUSTC);
 
-                ui.text("Disclosed source licensed under GNU General Public License v3");
+                ui.text("Disclosed source licensed under GNU Lesser General Public License v3");
 
                 ui.spacing();
             }
