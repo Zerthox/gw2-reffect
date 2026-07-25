@@ -129,7 +129,7 @@ impl Ability {
     Deserialize,
 )]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
-#[repr(u8)]
+#[repr(u16)]
 #[bitflags]
 pub enum AbilityInfo {
     /// Ability is auto-attack.
@@ -161,6 +161,10 @@ pub enum AbilityInfo {
     /// Ground targeted.
     #[strum(serialize = "Ground Targeted")]
     GroundTarget = 1 << 7,
+
+    /// Ignore recharge.
+    #[strum(serialize = "Ignore Recharge")]
+    IgnoreRecharge = 1 << 8,
 }
 
 impl Named for AbilityInfo {
@@ -175,9 +179,10 @@ impl Named for AbilityInfo {
             Self::Pending => "Pend",
             Self::ActivePrimary => "Act1",
             Self::ActiveSecondary => "Act2",
-            Self::NoResources => "Res",
-            Self::NoRange => "Range",
+            Self::NoResources => "NoRes",
+            Self::NoRange => "NoRange",
             Self::GroundTarget => "Ground",
+            Self::IgnoreRecharge => "NoRech",
         }
     }
 }
