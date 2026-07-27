@@ -30,10 +30,24 @@ Group member effects are limited to [boons](https://wiki.guildwars2.com/wiki/Boo
 ## Ability/Slot Recharge
 
 Only abilities currently present on the current skillbar are available.
-When there is multiple matches for a list of ability IDs, only the first match is shown.
+When there are multiple matches for a list of ability IDs, only the first match is shown.
+The following meta-information is available for abilities:
+
+| Ability Information | Description                                                                           |
+| ------------------- | ------------------------------------------------------------------------------------- |
+| Auto Attack         | Ability is set to automatically attack.                                               |
+| Pending             | Ability is queued or casting.                                                         |
+| Pressed             | Ability is pressed by the player.                                                     |
+| Active Primary      | Ability is active as Elementalist Attunement, Revenant Legend, or Paragon Chant.      |
+| Active Secondary    | Ability is active as secondary Weaver Attunement.                                     |
+| No Resources        | Missing profession resource, health, endurance, or mount energy required to activate. |
+| No Range            | Target is out of the ability's range bounds.                                          |
+| Ground Targeted     | Ability uses ground targeting.                                                        |
+| Ignore Recharge     | Ability can be activated while recharging.                                            |
 
 ## Health, Barrier, Defiance
 
+Accurate values for player and their pet.
 Normalized to percentage for target and group members.
 
 ## Profession Resources
