@@ -40,7 +40,7 @@ pub struct Bar {
     #[serde(flatten)]
     pub props: Props<BarProps>,
 
-    /// Bar size.
+    /// Bar size in pixels.
     pub size: [f32; 2],
 
     /// Bar alignment.

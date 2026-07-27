@@ -19,7 +19,7 @@ use serde::{Deserialize, Serialize};
 )]
 #[serde(default)]
 pub struct TextProps {
-    /// Text scale.
+    /// Text scale as percentage.
     #[serde(alias = "size")]
     pub scale: f32,
 

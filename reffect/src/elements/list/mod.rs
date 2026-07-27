@@ -37,10 +37,10 @@ pub struct IconList {
     /// List direction.
     pub direction: Direction,
 
-    /// Icon size.
+    /// Icon size in pixels.
     pub size: [f32; 2],
 
-    /// Padding between icons.
+    /// Padding between icons in pixels.
     pub pad: f32,
 
     /// Icons.

@@ -40,7 +40,7 @@ pub struct Common {
     #[serde(deserialize_with = "migrate::<_, _, Anchor>")]
     pub anchor: ElementAnchor,
 
-    /// Relative position offset.
+    /// Position offset in pixels.
     pub pos: [f32; 2],
 
     /// Opacity.

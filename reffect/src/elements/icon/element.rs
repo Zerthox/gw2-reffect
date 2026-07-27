@@ -18,7 +18,7 @@ pub struct IconElement {
     #[serde(flatten)]
     pub icon: Icon,
 
-    /// Icon size.
+    /// Icon size in pixels.
     pub size: [f32; 2],
 
     /// Icon alignment.

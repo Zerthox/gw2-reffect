@@ -45,57 +45,58 @@ impl Resizer {
         });
     }
 
-    fn scale(&self, value: f32) -> f32 {
-        let scaled = value * self.factor;
-        if self.round {
+    fn scale_value(&self, value: &mut f32) {
+        let scaled = *value * self.factor;
+        *value = if self.round {
             scaled.round_ties_even()
         } else {
             scaled
-        }
+        };
     }
 
-    fn scale_vec<T>(&self, vec: T) -> T
-    where
-        T: ComponentWise<f32>,
-    {
+    fn scale_value_no_round(&self, value: &mut f32) {
+        *value *= self.factor;
+    }
+
+    fn scale_vec(&self, vec: &mut impl ComponentWise<f32>) {
         let scaled = vec.mul_scalar(self.factor);
-        if self.round {
+        *vec = if self.round {
             scaled.round_ties_even()
         } else {
             scaled
-        }
+        };
     }
 }
 
 impl VisitMut for Resizer {
     fn visit_common(&mut self, common: &mut Common) {
         if common.anchor == ElementAnchor::Parent {
-            common.pos = self.scale_vec(common.pos);
+            self.scale_vec(&mut common.pos);
         }
         self.visit_children_of(common);
     }
 
     fn visit_icon_list(&mut self, list: &mut IconList) {
-        list.size = self.scale_vec(list.size);
-        list.pad = self.scale(list.pad);
+        self.scale_vec(&mut list.size);
+        self.scale_value(&mut list.pad);
         self.visit_children_of(list);
     }
 
     fn visit_icon_element(&mut self, icon: &mut IconElement) {
-        icon.size = self.scale_vec(icon.size);
+        self.scale_vec(&mut icon.size);
         self.visit_children_of(icon);
     }
 
     fn visit_text(&mut self, text: &mut Text) {
-        text.props.base.scale = self.scale(text.props.base.scale);
+        self.scale_value_no_round(&mut text.props.base.scale);
         for condition in &mut text.props.conditions {
             if let Some(scale) = &mut condition.properties.scale {
-                *scale = self.scale(*scale);
+                self.scale_value_no_round(scale);
             }
         }
     }
 
     fn visit_bar(&mut self, bar: &mut Bar) {
-        bar.size = self.scale_vec(bar.size)
+        self.scale_vec(&mut bar.size)
     }
 }
