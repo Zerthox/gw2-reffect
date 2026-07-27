@@ -1,21 +1,33 @@
 use std::fmt;
 
 #[derive(Debug, Clone, Copy)]
-pub struct Time {
-    millis: u32,
-    min_threshold: u32,
-    milli_threshold: u32,
+pub enum Time {
+    /// Minutes and seconds.
+    Minutes { mins: u32, secs: u32 },
+
+    /// Seconds.
+    Seconds { secs: u32 },
+
+    /// Seconds with milliseconds.
+    Millis { secs: f32 },
 }
 
 impl Time {
+    /// Default threshold to display minutes.
     pub const DEFAULT_MIN_THRESHOLD: u32 = 60_000;
+
+    /// Default threshold to display milliseconds.
     pub const DEFAULT_MILLI_THRESHOLD: u32 = 10_000;
+
+    /// Milliseconds in a second.
     pub const SEC: u32 = 1000;
+
+    /// Milliseconds in a minute.
     pub const MIN: u32 = 60 * Self::SEC;
 
     #[inline]
     pub const fn new(mins: u32, secs: u32, millis: u32) -> Self {
-        Self::with_threshold(
+        Self::new_with_threshold(
             mins,
             secs,
             millis,
@@ -25,46 +37,64 @@ impl Time {
     }
 
     #[inline]
-    pub const fn with_threshold(
+    pub const fn new_with_threshold(
         mins: u32,
         secs: u32,
         millis: u32,
         min_threshold: u32,
         milli_threshold: u32,
     ) -> Self {
-        Self {
-            millis: Self::MIN * mins + Self::SEC * secs + millis,
+        Self::from_millis_with_threshold(
+            Self::MIN * mins + Self::SEC * secs + millis,
             min_threshold,
             milli_threshold,
+        )
+    }
+
+    #[inline]
+    pub const fn from_millis(millis: u32) -> Self {
+        Self::from_millis_with_threshold(
+            millis,
+            Self::DEFAULT_MIN_THRESHOLD,
+            Self::DEFAULT_MILLI_THRESHOLD,
+        )
+    }
+
+    #[inline]
+    pub const fn from_millis_with_threshold(
+        millis: u32,
+        min_threshold: u32,
+        milli_threshold: u32,
+    ) -> Self {
+        if millis >= min_threshold {
+            Self::Minutes {
+                mins: millis / Self::MIN,
+                secs: (millis % Self::MIN) / Self::SEC,
+            }
+        } else if millis >= milli_threshold {
+            Self::Seconds {
+                secs: millis / Self::SEC,
+            }
+        } else {
+            Self::Millis {
+                secs: millis as f32 / Self::SEC as f32,
+            }
         }
     }
 
+    #[inline]
     pub fn format(millis: u32, min_threshold: u32, milli_threshold: u32) -> String {
-        Self {
-            millis,
-            min_threshold,
-            milli_threshold,
-        }
-        .to_string()
+        Self::from_millis_with_threshold(millis, min_threshold, milli_threshold).to_string()
     }
 }
 
 impl fmt::Display for Time {
+    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let Self {
-            millis,
-            min_threshold,
-            milli_threshold,
-        } = *self;
-
-        if millis >= min_threshold {
-            let mins = millis / Self::MIN;
-            let secs = (millis % Self::MIN) as f32 / Self::SEC as f32;
-            write!(f, "{mins}:{secs:02.0}")
-        } else {
-            let secs = millis as f32 / Self::SEC as f32;
-            let prec = if millis >= milli_threshold { 0 } else { 1 };
-            write!(f, "{secs:.prec$}")
+        match self {
+            Self::Minutes { mins, secs } => write!(f, "{mins}:{secs:02}"),
+            Self::Seconds { secs } => write!(f, "{secs}"),
+            Self::Millis { secs } => write!(f, "{secs:.1}"),
         }
     }
 }
@@ -78,6 +108,7 @@ impl<T> Unit<T> {
     const MEGA: f32 = 1_000_000.0;
     const GIGA: f32 = 1_000_000_000.0;
 
+    #[inline]
     pub fn format(value: T) -> String
     where
         Self: fmt::Display,
@@ -87,6 +118,7 @@ impl<T> Unit<T> {
 }
 
 impl fmt::Display for Unit<f32> {
+    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let value = self.0;
         match value {
@@ -99,6 +131,7 @@ impl fmt::Display for Unit<f32> {
 }
 
 impl fmt::Display for Unit<u32> {
+    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         const KILO: u32 = Unit::<u32>::KILO as u32;
         const MEGA: u32 = Unit::<u32>::MEGA as u32;
@@ -120,9 +153,10 @@ mod tests {
 
     #[test]
     fn time() {
-        assert_eq!(Time::new(0, 0, 00).to_string(), "0.0");
-        assert_eq!(Time::new(0, 0, 1234).to_string(), "1.2");
-        assert_eq!(Time::new(3, 4, 567).to_string(), "3:05");
+        assert_eq!(Time::new(0, 0, 0).to_string(), "0.0");
+        assert_eq!(Time::new(0, 1, 234).to_string(), "1.2");
+        assert_eq!(Time::new(0, 30, 999).to_string(), "30");
+        assert_eq!(Time::new(3, 4, 564).to_string(), "3:04");
     }
 
     #[test]
