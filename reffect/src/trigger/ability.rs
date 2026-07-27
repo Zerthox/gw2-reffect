@@ -40,8 +40,13 @@ impl AbilityInfoTrigger {
         changed |= enum_combo_bitflags(ui, "Info", &mut self.infos, ComboBoxFlags::empty());
         helper(ui, || {
             ui.text("Auto Attack: ability is set to auto-attack");
+            ui.text("Pending: ability is queued or casting");
             ui.text("Pressed: ability is pressed");
-            ui.text("Pending: ability is casting or queued");
+            ui.text("Active: ability is passively active");
+            ui.text("No Resources: missing resources to activate");
+            ui.text("No Range: out of ability range");
+            ui.text("Ground Targeted: ability uses ground targeting");
+            ui.text("Ignore Recharge: ability can be activated while recharging");
         });
 
         changed |= self.mode.render_options(ui, "Mode");
