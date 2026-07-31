@@ -1,6 +1,6 @@
 use super::VisitMut;
 use crate::{
-    elements::{Bar, Icon, Text},
+    elements::{Bar, Common, Icon, Text, list::ListIcon},
     trigger::FilterTrigger,
 };
 
@@ -20,6 +20,20 @@ impl Default for Loader {
 }
 
 impl VisitMut for Loader {
+    fn visit_common(&mut self, common: &mut Common) {
+        common.load();
+        self.visit_children_of(common);
+    }
+
+    fn visit_filter_trigger(&mut self, trigger: &mut FilterTrigger) {
+        trigger.load();
+    }
+
+    fn visit_list_icon(&mut self, list_icon: &mut ListIcon) {
+        list_icon.load();
+        self.visit_children_of(list_icon);
+    }
+
     fn visit_icon(&mut self, icon: &mut Icon) {
         icon.load()
     }
@@ -30,9 +44,5 @@ impl VisitMut for Loader {
 
     fn visit_bar(&mut self, bar: &mut Bar) {
         bar.load();
-    }
-
-    fn visit_filter_trigger(&mut self, trigger: &mut FilterTrigger) {
-        trigger.load();
     }
 }

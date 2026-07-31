@@ -23,18 +23,21 @@ impl CombatTrigger {
     }
 
     /// Renders combat trigger options.
-    pub fn render_options(&mut self, ui: &Ui) {
+    pub fn render_options(&mut self, ui: &Ui) -> bool {
+        let mut changed = false;
         if let Some(_token) = ui.begin_combo("Combat", self.label()) {
             for value in Self::VALUES.iter().copied() {
                 let selected = value == *self;
                 if Selectable::new(value.label()).selected(selected).build(ui) {
                     *self = value;
+                    changed = true;
                 }
                 if selected {
                     ui.set_item_default_focus();
                 }
             }
         }
+        changed
     }
 
     /// Returns the corresponding select item label.

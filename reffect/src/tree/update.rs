@@ -19,11 +19,13 @@ pub struct Updater<'ctx, 'p> {
 }
 
 impl<'ctx, 'p> Updater<'ctx, 'p> {
+    /// Force updates the packs.
     pub fn force_update(ctx: &'ctx mut Context, packs: &mut [Pack]) {
         ctx.force_update();
         Self::update(ctx, packs);
     }
 
+    /// Updates the packs if necessary.
     pub fn update(ctx: &'ctx Context, packs: &mut [Pack]) {
         if ctx.has_update(Update::Map) {
             log::debug!("Map changed to {}", ctx.map.id);
@@ -38,6 +40,7 @@ impl<'ctx, 'p> Updater<'ctx, 'p> {
         );
     }
 
+    /// Creates initial updater state.
     fn root(ctx: &'ctx Context) -> Self {
         Self {
             ctx,
@@ -46,6 +49,7 @@ impl<'ctx, 'p> Updater<'ctx, 'p> {
         }
     }
 
+    /// Updates filter & progress trigger and returns the new updater state to use for children.
     #[must_use]
     fn update_and_push(
         &self,
@@ -73,6 +77,7 @@ impl<'ctx, 'p> Updater<'ctx, 'p> {
         }
     }
 
+    /// Returns the current progress active.
     fn active(&self) -> Option<&'p ProgressActive> {
         self.trigger?.active()
     }

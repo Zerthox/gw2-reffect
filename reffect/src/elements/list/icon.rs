@@ -11,8 +11,9 @@ use serde::{Deserialize, Serialize};
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct ListIcon {
-    /// Whether the list icon is enabled.
-    pub enabled: bool,
+    /// Legacy enabled, moved to filter.
+    #[serde(skip_serializing)]
+    enabled: Option<bool>,
 
     /// Custom name for editor.
     pub name: String,
@@ -35,14 +36,25 @@ impl ListIcon {
     /// Forced alignment.
     pub const ALIGN: Align = Align::Center;
 
+    /// Loads the list icon.
+    pub fn load(&mut self) {
+        if let Some(enabled) = self.enabled {
+            self.filter.enabled = enabled;
+        }
+    }
+
+    /// Checks whether the list icon is enabled.
+    pub fn enabled(&self) -> bool {
+        self.filter.enabled
+    }
+
     /// Checks whether the list icon is visible.
     pub fn is_visible(&mut self, ctx: &RenderCtx) -> bool {
-        self.enabled
-            && if ctx.edit.is_editing() {
-                ctx.is_edit_visible()
-            } else {
-                self.filter.is_active(ctx) && self.trigger.is_visible()
-            }
+        if ctx.edit.is_editing() {
+            self.enabled() && ctx.is_edit_visible()
+        } else {
+            self.filter.is_active(ctx) && self.trigger.is_visible()
+        }
     }
 
     /// Renders the list icon.
@@ -55,7 +67,6 @@ impl ListIcon {
     pub fn into_element(self, size: [f32; 2]) -> Element {
         Element {
             common: Common {
-                enabled: self.enabled,
                 name: self.name,
                 trigger: self.trigger,
                 filter: self.filter,
@@ -72,7 +83,7 @@ impl ListIcon {
     /// Creates a list icon from the given icon element.
     pub fn from_element(common: Common, element: IconElement) -> Self {
         Self {
-            enabled: common.enabled,
+            enabled: None,
             name: common.name,
             trigger: common.trigger,
             filter: common.filter,
@@ -82,7 +93,8 @@ impl ListIcon {
 
     /// Renders icon element options.
     pub fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) -> DynAction<Self> {
-        ui.checkbox("Enabled", &mut self.enabled);
+        self.filter.render_enabled(ui, ctx);
+
         ui.input_text("Name", &mut self.name).build();
 
         ui.spacing();
@@ -106,7 +118,7 @@ impl ListIcon {
 impl Default for ListIcon {
     fn default() -> Self {
         Self {
-            enabled: true,
+            enabled: None,
             name: "Unnamed".into(),
             trigger: ProgressTrigger::buff(),
             filter: FilterTrigger::default(),

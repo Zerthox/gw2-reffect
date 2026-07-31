@@ -9,7 +9,7 @@ use crate::{
     },
     schema::Schema,
     tree::{FontLoader, Loader, TreeNode, VisitMut},
-    trigger::{FilterTrigger, MapTrigger},
+    trigger::FilterTrigger,
 };
 use nexus::imgui::{MenuItem, StyleColor, Ui};
 use serde::{Deserialize, Serialize};
@@ -126,7 +126,7 @@ impl Pack {
         let children = &mut self.elements;
 
         let (token, selected) = {
-            let _style = style_disabled_if(ui, !self.common.enabled);
+            let _style = style_disabled_if(ui, !self.common.enabled());
             tree_select_empty(ui, &id, selected, children.is_empty())
         };
         if selected {
@@ -146,7 +146,7 @@ impl Pack {
         });
 
         {
-            let _style = style_disabled_if(ui, !self.common.enabled);
+            let _style = style_disabled_if(ui, !self.common.enabled());
             self.common.render_tree_label(ui, "Pack");
         }
 
@@ -241,10 +241,7 @@ impl Default for Pack {
         Self {
             common: Common {
                 anchor: ElementAnchor::Screen(Anchor::Center),
-                filter: FilterTrigger {
-                    map: MapTrigger::non_competitive(),
-                    ..FilterTrigger::default()
-                },
+                filter: FilterTrigger::non_competitive(),
                 ..Common::default()
             },
             layer: 0,

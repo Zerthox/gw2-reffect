@@ -27,8 +27,9 @@ use std::mem;
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct Common {
-    /// Whether the element is enabled.
-    pub enabled: bool,
+    /// Legacy enabled, moved to filter.
+    #[serde(skip_serializing)]
+    pub enabled: Option<bool>,
 
     #[serde(skip)]
     pub id: Id,
@@ -66,6 +67,18 @@ pub struct Common {
 }
 
 impl Common {
+    /// Loads the common.
+    pub fn load(&mut self) {
+        if let Some(enabled) = self.enabled {
+            self.filter.enabled = enabled;
+        }
+    }
+
+    /// Returns the id as string.
+    pub fn enabled(&self) -> bool {
+        self.filter.enabled
+    }
+
     /// Returns the id as string.
     pub fn id_string(&self) -> String {
         self.id.to_string()
@@ -74,9 +87,9 @@ impl Common {
     /// Checks whether the element is visible.
     pub fn is_visible_or_edit(&mut self, ctx: &RenderCtx) -> bool {
         if ctx.edit.is_editing() {
-            (self.enabled && ctx.is_edit_visible()) || ctx.edit.is_selected_or_parent(self.id)
+            (self.enabled() && ctx.is_edit_visible()) || ctx.edit.is_selected_or_parent(self.id)
         } else {
-            self.enabled && self.filter.is_active(ctx)
+            self.filter.is_active(ctx)
         }
     }
 
@@ -241,7 +254,7 @@ impl Common {
 
     /// Renders common options.
     pub fn render_options(&mut self, ui: &Ui, ctx: &RenderCtx) {
-        ui.checkbox("Enabled", &mut self.enabled);
+        self.filter.render_enabled(ui, ctx);
 
         ui.input_text("Name", &mut self.name).build();
 
@@ -289,7 +302,7 @@ impl Common {
 impl Default for Common {
     fn default() -> Self {
         Self {
-            enabled: true,
+            enabled: None,
             id: ELEMENT_ID.generate(),
             name: "Unnamed".into(),
             anchor: ElementAnchor::default(),

@@ -66,7 +66,7 @@ impl Element {
         let children = self.kind.children();
         let leaf = children.as_ref().is_none_or(|children| children.is_empty());
         let (token, clicked) = {
-            let _style = style_disabled_if(ui, !self.common.enabled);
+            let _style = style_disabled_if(ui, !self.common.enabled());
             tree_select_empty(ui, &id, state.is_selected(self.common.id), leaf)
         };
         if clicked {
@@ -116,7 +116,7 @@ impl Element {
         }
 
         {
-            let _style = style_disabled_if(ui, !self.common.enabled);
+            let _style = style_disabled_if(ui, !self.common.enabled());
             self.common.render_tree_label(ui, kind);
         }
 

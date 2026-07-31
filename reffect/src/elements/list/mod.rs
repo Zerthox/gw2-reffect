@@ -119,7 +119,7 @@ impl IconList {
             let _id = ui.push_id(i as i32);
 
             let mut remains = true;
-            let style = style_disabled_if(ui, !list_icon.enabled);
+            let style = style_disabled_if(ui, !list_icon.enabled());
             let open = CollapsingHeader::new(format!("{}###icon{i}", list_icon.name))
                 .flags(TreeNodeFlags::ALLOW_ITEM_OVERLAP)
                 .begin_with_close_button(ui, &mut remains);
@@ -265,7 +265,7 @@ impl Bounds for IconList {
             Layout::Dynamic => self
                 .icons
                 .iter()
-                .filter(|icon| icon.enabled && icon.trigger.active().is_some())
+                .filter(|icon| icon.enabled() && icon.trigger.active().is_some())
                 .count(),
             Layout::Static => self.icons.len(),
         };
