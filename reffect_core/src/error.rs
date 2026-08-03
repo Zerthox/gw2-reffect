@@ -1,6 +1,7 @@
-use microseh::{Exception, ExceptionCode};
-use std::result;
+use microseh::ExceptionCode;
+use std::{fmt, mem, result};
 use thiserror::Error;
+use windows::Win32::System::Memory::{MEMORY_BASIC_INFORMATION, VirtualQuery};
 
 pub type Result<T> = result::Result<T, Error>;
 
@@ -50,28 +51,31 @@ pub enum Error {
     #[error("Unavailable for character state")]
     CharacterState,
 
-    #[error("Character buffs not found")]
+    #[error("Unknown affinity")]
+    Affinity,
+
+    #[error("Buffs not found")]
     Buffs,
 
-    #[error("Character skillbar not found")]
+    #[error("Skillbar not found")]
     Skillbar,
 
-    #[error("Character health not found")]
+    #[error("Health not found")]
     Health,
 
-    #[error("Character endurance not found")]
+    #[error("Endurance not found")]
     Endurance,
 
-    #[error("Character inventory not found")]
+    #[error("Inventory not found")]
     Inventory,
 
-    #[error("Character profession not found")]
+    #[error("Profession not found")]
     Profession,
 
-    #[error("Character specialization not found")]
+    #[error("Specialization not found")]
     Specialization,
 
-    #[error("Character build not found")]
+    #[error("Build not found")]
     Build,
 
     #[error("Kennel not found")]
@@ -92,21 +96,55 @@ pub enum Error {
     #[error("Group not found")]
     Group,
 
-    #[error("Exception at {address:?}: {code}")]
-    Exception {
-        code: ExceptionCode,
-        address: *mut (),
-    },
+    #[error("{0}")]
+    Exception(Box<Exception>),
 }
 
 unsafe impl Send for Error {}
 
-impl From<Exception> for Error {
+#[derive(Debug, Clone, Error)]
+pub struct Exception {
+    code: ExceptionCode,
+    address: usize,
+    base: usize,
+}
+
+impl fmt::Display for Exception {
     #[inline]
-    fn from(exception: Exception) -> Self {
-        Self::Exception {
-            code: exception.code(),
-            address: exception.address().cast(),
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let Self {
+            code,
+            address,
+            base,
+        } = *self;
+        write!(f, "Exception at ")?;
+        if base != usize::MAX {
+            let rva = address.saturating_sub(base);
+            write!(f, "0x{base:x}+{rva:x}")?
+        } else {
+            write!(f, "0x{address:x}")?
         }
+        write!(f, ": {code}")
+    }
+}
+
+impl From<microseh::Exception> for Error {
+    #[inline]
+    fn from(exception: microseh::Exception) -> Self {
+        let address = exception.address();
+        let mut info = MEMORY_BASIC_INFORMATION::default();
+        let size = mem::size_of_val(&info);
+        let written = unsafe { VirtualQuery(Some(address), &mut info, size) };
+        let base = if size == written {
+            info.BaseAddress as usize
+        } else {
+            usize::MAX
+        };
+
+        Self::Exception(Box::new(Exception {
+            code: exception.code(),
+            address: address as _,
+            base,
+        }))
     }
 }
