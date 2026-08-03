@@ -62,6 +62,8 @@ mod common {
 
     pub const YELLOW: Color = rgb(1.0, 1.0, 0.0);
 
+    pub const ORANGE: Color = rgb(1.0, 0.5, 0.0);
+
     pub const CYAN: Color = rgb(0.0, 1.0, 1.0);
 
     pub const MAGENTA: Color = rgb(1.0, 0.0, 1.0);

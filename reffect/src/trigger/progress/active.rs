@@ -12,7 +12,7 @@ pub enum ProgressActive {
     Resource {
         current: f32,
         max: f32,
-        resource: ResourceType,
+        resource: Option<ResourceType>,
     },
     Buff {
         id: u32,
@@ -38,7 +38,7 @@ impl ProgressActive {
         Self::Resource {
             current: 0.0,
             max: 0.0,
-            resource: ResourceType::DEFAULT,
+            resource: None,
         }
     }
 
@@ -47,7 +47,7 @@ impl ProgressActive {
         Self::Resource {
             current: 1.0,
             max: 1.0,
-            resource: ResourceType::DEFAULT,
+            resource: None,
         }
     }
 
@@ -66,7 +66,7 @@ impl ProgressActive {
         Self::Resource {
             current,
             max: 100.0,
-            resource: resource_type,
+            resource: Some(resource_type),
         }
     }
 
@@ -77,7 +77,7 @@ impl ProgressActive {
             Some(Self::Resource {
                 current,
                 max,
-                resource: resource_type,
+                resource: Some(resource_type),
             })
         } else {
             None
@@ -137,7 +137,7 @@ impl ProgressActive {
         Self::Resource {
             current: (progress * max).round_ties_even(),
             max,
-            resource: resource_type,
+            resource: Some(resource_type),
         }
     }
 
@@ -325,10 +325,10 @@ impl ProgressActive {
     }
 
     /// Retruns the resource type for the progress.
-    pub const fn resource_type(&self) -> ResourceType {
+    pub const fn resource_type(&self) -> Option<ResourceType> {
         match *self {
             Self::Resource { resource, .. } => resource,
-            _ => ResourceType::DEFAULT,
+            _ => None,
         }
     }
 

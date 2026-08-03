@@ -77,12 +77,12 @@ impl Defiance {
     }
 
     #[inline]
-    pub fn resource_type(&self) -> ResourceType {
+    pub fn resource_type(&self) -> Option<ResourceType> {
         match *self {
-            Self::None => ResourceType::Generic,
-            Self::Immune => ResourceType::DefianceImmune,
-            Self::Active(_) => ResourceType::DefianceActive,
-            Self::Recover(_) => ResourceType::DefianceRecover,
+            Self::None => None,
+            Self::Immune => Some(ResourceType::DefianceImmune),
+            Self::Active(_) => Some(ResourceType::DefianceActive),
+            Self::Recover(_) => Some(ResourceType::DefianceRecover),
         }
     }
 }

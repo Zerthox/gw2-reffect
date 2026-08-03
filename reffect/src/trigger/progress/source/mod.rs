@@ -252,7 +252,7 @@ impl ProgressSource {
             Self::Defiance { combatant } => {
                 let defiance = &combatant.resources(ctx)?.defiance;
                 let current = defiance.percent()?;
-                let resource_type = defiance.resource_type();
+                let resource_type = defiance.resource_type()?;
                 Some(ProgressActive::percent(current, resource_type))
             }
             Self::Endurance => {

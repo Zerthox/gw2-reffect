@@ -1,6 +1,12 @@
+use enumflags2::bitflags;
 use serde::{Deserialize, Serialize};
 use std::fmt;
-use strum::{AsRefStr, Display, EnumCount, EnumIter, IntoStaticStr, VariantArray};
+use strum::{AsRefStr, Display, EnumIter, IntoStaticStr, VariantArray};
+
+use crate::{
+    colors::{self, Color, Colored},
+    named::Named,
+};
 
 /// Information about a resource.
 #[derive(Debug, Clone)]
@@ -52,40 +58,67 @@ impl fmt::Display for Resource {
     PartialOrd,
     Ord,
     Hash,
-    Display,
     AsRefStr,
     IntoStaticStr,
-    EnumCount,
+    Display,
     EnumIter,
     VariantArray,
     Serialize,
     Deserialize,
 )]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[repr(u8)]
+#[bitflags]
 pub enum ResourceType {
-    Generic,
+    Health = 1 << 0,
 
-    Health,
-    Barrier,
-    Profession,
-    Endurance,
+    Barrier = 1 << 1,
+
+    Profession = 1 << 2,
+
+    Endurance = 1 << 3,
 
     #[strum(serialize = "Defiance Immune")]
-    DefianceImmune,
+    DefianceImmune = 1 << 4,
 
     #[strum(serialize = "Defiance Active")]
-    DefianceActive,
+    DefianceActive = 1 << 5,
 
     #[strum(serialize = "Defiance Recover")]
-    DefianceRecover,
+    DefianceRecover = 1 << 6,
 }
 
-impl ResourceType {
-    pub const DEFAULT: Self = Self::Generic;
-}
-
-impl Default for ResourceType {
+impl Named for ResourceType {
     #[inline]
-    fn default() -> Self {
-        Self::DEFAULT
+    fn name(&self) -> &'static str {
+        self.into()
+    }
+
+    #[inline]
+    fn short_name(&self) -> &'static str {
+        match self {
+            Self::Health => "Hp",
+            Self::Barrier => "Bar",
+            Self::Profession => "Prof",
+            Self::Endurance => "End",
+            Self::DefianceImmune => "Imm",
+            Self::DefianceActive => "Break",
+            Self::DefianceRecover => "Rec",
+        }
+    }
+}
+
+impl Colored for ResourceType {
+    #[inline]
+    fn colored(&self) -> Option<Color> {
+        match self {
+            Self::Health => Some(colors::RED),
+            Self::Barrier => Some(colors::YELLOW),
+            Self::Profession => Some(colors::BLUE),
+            Self::Endurance => Some(colors::ORANGE),
+            Self::DefianceImmune => Some(colors::LIGHT_GREY),
+            Self::DefianceActive => Some(colors::CYAN),
+            Self::DefianceRecover => Some(colors::ORANGE),
+        }
     }
 }
