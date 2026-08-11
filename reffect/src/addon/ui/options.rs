@@ -53,18 +53,6 @@ impl Addon {
                     let _id = ui.push_id("durabar");
                     self.settings.icon.duration_bar.render_options(ui);
                 }
-
-                ui.checkbox("Debug window", &mut self.debug);
-
-                #[cfg(feature = "profile")]
-                {
-                    use crate::profiling;
-
-                    let mut enabled = profiling::enabled();
-                    if ui.checkbox("Profiling", &mut enabled) {
-                        profiling::toggle(enabled);
-                    }
-                }
             }
 
             if let Some(_token) = ui.tab_item("?") {
@@ -86,6 +74,18 @@ impl Addon {
                 ui.text("Disclosed source licensed under GNU Lesser General Public License v3");
 
                 ui.spacing();
+
+                ui.checkbox("Debug window", &mut self.debug);
+
+                #[cfg(feature = "profile")]
+                {
+                    use crate::profiling;
+
+                    let mut enabled = profiling::enabled();
+                    if ui.checkbox("Profiling", &mut enabled) {
+                        profiling::toggle(enabled);
+                    }
+                }
             }
         }
     }
