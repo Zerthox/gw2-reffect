@@ -71,7 +71,8 @@ impl Defiance {
     #[inline]
     pub fn percent(&self) -> Option<f32> {
         match *self {
-            Self::None | Self::Immune => None, // TODO: treat immune as 100% when defiance state conditions implemented
+            Self::None => None,
+            Self::Immune => Some(100.0),
             Self::Active(percent) | Self::Recover(percent) => Some(percent),
         }
     }
