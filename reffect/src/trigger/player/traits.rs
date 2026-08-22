@@ -1,4 +1,3 @@
-use crate::context::Traits;
 use const_default::ConstDefault;
 use serde::{Deserialize, Serialize};
 
@@ -16,12 +15,9 @@ pub struct TraitRequirement {
 
 impl TraitRequirement {
     /// Checks whether the trait requirement is met.
-    pub fn is_met(&self, traits: &Traits) -> bool {
-        let contains = traits.contains(&self.id);
-        match self.present {
-            true => contains,
-            false => !contains,
-        }
+    pub fn is_met(&self, traits: impl IntoIterator<Item = u32>) -> bool {
+        let contains = traits.into_iter().any(|id| id == self.id);
+        if self.present { contains } else { !contains }
     }
 }
 

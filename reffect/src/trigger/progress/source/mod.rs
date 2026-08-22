@@ -8,7 +8,7 @@ use self::transfer::Transfer;
 use super::ProgressActive;
 use crate::{
     action::Action,
-    context::{Buff, Context, ResourceType, SkillInfo, Slot, Update, Updates},
+    context::{Buff, Context, ResourceState, SkillInfo, Slot, Update, Updates},
     enums::check_variant_array,
     error::Error,
     internal::{Interface, Internal},
@@ -239,37 +239,41 @@ impl ProgressSource {
             }
             Self::Health { combatant } => {
                 let resources = combatant.resources(ctx)?;
-                ProgressActive::from_resource(&resources.health, ResourceType::Health)
+                ProgressActive::from_resource(&resources.health, Some(resources.health_state))
             }
             Self::HealthReduction => {
-                let resources = ctx.player.resources.as_ref().ok()?;
-                ProgressActive::from_resource(&resources.health_reduction, ResourceType::Health)
+                let health = ctx.player.health.as_ref().ok()?;
+                ProgressActive::from_resource(
+                    &health.health_reduction,
+                    Some(health.combatant.health_state),
+                )
             }
             Self::Barrier { combatant } => {
                 let resources = combatant.resources(ctx)?;
-                ProgressActive::from_resource(&resources.barrier, ResourceType::Barrier)
+                ProgressActive::from_resource(&resources.barrier, Some(resources.health_state))
             }
             Self::Defiance { combatant } => {
-                let defiance = &combatant.resources(ctx)?.defiance;
-                let current = defiance.percent()?;
-                let resource_type = defiance.resource_type()?;
-                Some(ProgressActive::percent(current, resource_type))
+                let defiance = combatant.resources(ctx)?.defiance.as_ref()?;
+                Some(ProgressActive::percent(
+                    defiance.percent(),
+                    Some(defiance.state()),
+                ))
             }
             Self::Endurance => {
                 let resources = ctx.player.resources.as_ref().ok()?;
-                ProgressActive::from_resource(&resources.endurance, ResourceType::Endurance)
+                ProgressActive::from_resource(&resources.endurance, None)
             }
             Self::PrimaryResource => {
                 let resources = ctx.player.resources.as_ref().ok()?;
-                ProgressActive::from_resource(&resources.primary, ResourceType::Profession)
+                ProgressActive::from_resource(&resources.primary, None)
             }
             Self::SecondaryResource => {
                 let resources = ctx.player.resources.as_ref().ok()?;
-                ProgressActive::from_resource(&resources.secondary, ResourceType::Profession)
+                ProgressActive::from_resource(&resources.secondary, None)
             }
             Self::ResourceRate => {
                 let resources = ctx.player.resources.as_ref().ok()?;
-                ProgressActive::from_resource(&resources.rate, ResourceType::Profession)
+                ProgressActive::from_resource(&resources.rate, None)
             }
         }
     }
@@ -303,19 +307,19 @@ impl ProgressSource {
                 ProgressActive::edit_ability(skill, progress, ctx.now)
             }
             Self::Health { .. } | Self::HealthReduction => {
-                ProgressActive::edit_resource(progress, 15_000.0, ResourceType::Health)
+                ProgressActive::edit_resource(progress, 15_000.0, Some(ResourceState::HealthAlive))
             }
-            Self::Barrier { .. } => {
-                ProgressActive::edit_resource(0.5 * progress, 15_000.0, ResourceType::Barrier)
-            }
-            Self::Endurance => {
-                ProgressActive::edit_resource(progress, 100.0, ResourceType::Endurance)
-            }
+            Self::Barrier { .. } => ProgressActive::edit_resource(
+                0.5 * progress,
+                15_000.0,
+                Some(ResourceState::HealthAlive),
+            ),
+            Self::Endurance => ProgressActive::edit_resource(progress, 100.0, None),
             Self::Defiance { .. } => {
-                ProgressActive::edit_resource(progress, 100.0, ResourceType::DefianceActive)
+                ProgressActive::edit_resource(progress, 100.0, Some(ResourceState::DefianceActive))
             }
             Self::PrimaryResource | Self::SecondaryResource | Self::ResourceRate => {
-                ProgressActive::edit_resource(progress, 30.0, ResourceType::Profession)
+                ProgressActive::edit_resource(progress, 30.0, None)
             }
         }
     }

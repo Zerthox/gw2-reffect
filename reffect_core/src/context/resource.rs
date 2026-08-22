@@ -69,26 +69,27 @@ impl fmt::Display for Resource {
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[repr(u8)]
 #[bitflags]
-pub enum ResourceType {
-    Health = 1 << 0,
+pub enum ResourceState {
+    #[strum(serialize = "Health Alive")]
+    HealthAlive = 1 << 0,
 
-    Barrier = 1 << 1,
+    #[strum(serialize = "Health Downed")]
+    HealthDowned = 1 << 1,
 
-    Profession = 1 << 2,
-
-    Endurance = 1 << 3,
+    #[strum(serialize = "Health Dead")]
+    HealthDead = 1 << 2,
 
     #[strum(serialize = "Defiance Immune")]
-    DefianceImmune = 1 << 4,
+    DefianceImmune = 1 << 3,
 
     #[strum(serialize = "Defiance Active")]
-    DefianceActive = 1 << 5,
+    DefianceActive = 1 << 4,
 
     #[strum(serialize = "Defiance Recover")]
-    DefianceRecover = 1 << 6,
+    DefianceRecover = 1 << 5,
 }
 
-impl Named for ResourceType {
+impl Named for ResourceState {
     #[inline]
     fn name(&self) -> &'static str {
         self.into()
@@ -97,28 +98,24 @@ impl Named for ResourceType {
     #[inline]
     fn short_name(&self) -> &'static str {
         match self {
-            Self::Health => "Hp",
-            Self::Barrier => "Bar",
-            Self::Profession => "Prof",
-            Self::Endurance => "End",
-            Self::DefianceImmune => "Imm",
-            Self::DefianceActive => "Break",
-            Self::DefianceRecover => "Rec",
+            Self::HealthAlive => "Alive",
+            Self::HealthDowned => "Down",
+            Self::HealthDead => "Dead",
+            Self::DefianceImmune => "Immune",
+            Self::DefianceActive => "Active",
+            Self::DefianceRecover => "Recover",
         }
     }
 }
 
-impl Colored for ResourceType {
+impl Colored for ResourceState {
     #[inline]
     fn colored(&self) -> Option<Color> {
         match self {
-            Self::Health => Some(colors::RED),
-            Self::Barrier => Some(colors::YELLOW),
-            Self::Profession => Some(colors::BLUE),
-            Self::Endurance => Some(colors::ORANGE),
-            Self::DefianceImmune => Some(colors::LIGHT_GREY),
-            Self::DefianceActive => Some(colors::CYAN),
-            Self::DefianceRecover => Some(colors::ORANGE),
+            Self::HealthAlive | Self::HealthDowned | Self::HealthDead => Some(colors::RED),
+            Self::DefianceImmune | Self::DefianceActive | Self::DefianceRecover => {
+                Some(colors::CYAN)
+            }
         }
     }
 }

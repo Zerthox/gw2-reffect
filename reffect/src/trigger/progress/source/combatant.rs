@@ -83,7 +83,7 @@ impl Combatant {
     /// Returns the combatant resources.
     pub fn resources<'ctx>(&self, ctx: &'ctx Context) -> Option<&'ctx CombatantResources> {
         match self {
-            Self::Player => Some(&ctx.player.resources.as_ref().ok()?.combatant),
+            Self::Player => Some(&ctx.player.health.as_ref().ok()?.combatant),
             Self::Pet => ctx.player.resources.as_ref().ok()?.pet.as_ref(),
             Self::Target => ctx.target.resources.as_ref().ok(),
             Self::GroupMember1 => ctx.group.as_ref().ok()?.members[0].resources.as_ref().ok(),

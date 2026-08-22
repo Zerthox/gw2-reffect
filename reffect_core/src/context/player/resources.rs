@@ -1,14 +1,36 @@
 use crate::context::{CombatantResources, resource::Resource};
 
-/// Information about player resources.
+/// Information about player health resources.
 #[derive(Debug, Clone)]
-pub struct PlayerResources {
+pub struct PlayerHealth {
     /// Generic combatant resources.
     pub combatant: CombatantResources,
 
     /// Health reduction.
     pub health_reduction: Resource,
+}
 
+impl PlayerHealth {
+    /// Creates empty health.
+    #[inline]
+    pub const fn empty() -> Self {
+        Self {
+            combatant: CombatantResources::empty(),
+            health_reduction: Resource::empty(),
+        }
+    }
+}
+
+impl Default for PlayerHealth {
+    #[inline]
+    fn default() -> Self {
+        Self::empty()
+    }
+}
+
+/// Information about player resources.
+#[derive(Debug, Clone)]
+pub struct PlayerResources {
     /// Pet resources.
     pub pet: Option<CombatantResources>,
 
@@ -31,8 +53,6 @@ impl PlayerResources {
     #[inline]
     pub const fn empty() -> Self {
         Self {
-            combatant: CombatantResources::empty(),
-            health_reduction: Resource::empty(),
             pet: None,
             endurance: Resource::empty(),
             primary: Resource::empty(),

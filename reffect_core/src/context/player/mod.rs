@@ -36,7 +36,10 @@ pub struct PlayerInfo {
     /// Player selected build.
     pub build: Result<Build, Error>,
 
-    /// Player resources.
+    /// Player health resources.
+    pub health: Result<PlayerHealth, Error>,
+
+    /// Player other resources.
     pub resources: Result<PlayerResources, Error>,
 
     /// Player buffs.
@@ -56,6 +59,7 @@ impl PlayerInfo {
             mount: Err(0),
             gear: Err(Error::Disabled),
             build: Err(Error::Disabled),
+            health: Err(Error::Disabled),
             resources: Err(Error::Disabled),
             buff_info: Err(Error::Disabled),
             skillbar: Err(Error::Disabled),
@@ -71,6 +75,7 @@ impl PlayerInfo {
             mount: Err(0),
             gear: Ok(Gear::empty()),
             build: Ok(Build::empty()),
+            health: Ok(PlayerHealth::empty()),
             resources: Ok(PlayerResources::empty()),
             buff_info: Ok(PlayerBuffInfo::empty()),
             skillbar: Ok(Skillbar::empty()),

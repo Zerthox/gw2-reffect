@@ -1,6 +1,6 @@
 use super::{ProgressActive, ProgressSource, TriggerMode};
 use crate::{
-    context::ResourceType,
+    context::ResourceState,
     named::Named,
     render::{Validation, enum_combo_bitflags},
     serde::bitflags,
@@ -20,15 +20,15 @@ pub struct ResourceInfoTrigger {
     /// Resource types.
     #[serde(with = "bitflags")]
     #[serde(alias = "states")]
-    #[cfg_attr(feature = "schema", schemars(with = "bitflags::Schema<ResourceType>"))]
-    pub types: BitFlags<ResourceType>,
+    #[cfg_attr(feature = "schema", schemars(with = "bitflags::Schema<ResourceState>"))]
+    pub states: BitFlags<ResourceState>,
 }
 
 impl ResourceInfoTrigger {
     pub fn is_active(&self, active: &ProgressActive) -> bool {
         active
             .resource_type()
-            .is_some_and(|resource_type| TriggerMode::Any.check_flags(self.types, resource_type))
+            .is_some_and(|resource_type| TriggerMode::Any.check_flags(self.states, resource_type))
     }
 
     pub fn validate(source: &ProgressSource) -> Validation<&'static str> {
@@ -36,18 +36,18 @@ impl ResourceInfoTrigger {
             ProgressSource::Health { .. }
             | ProgressSource::HealthReduction
             | ProgressSource::Barrier { .. }
-            | ProgressSource::Defiance { .. }
-            | ProgressSource::Endurance
-            | ProgressSource::PrimaryResource
-            | ProgressSource::SecondaryResource
-            | ProgressSource::ResourceRate => Validation::Ok,
+            | ProgressSource::Defiance { .. } => Validation::Ok,
             ProgressSource::Inherit => {
                 Validation::Warn("Inherited trigger source must be resource-like")
             }
             ProgressSource::Always
             | ProgressSource::Buff { .. }
             | ProgressSource::Ability { .. }
-            | ProgressSource::SkillbarSlot { .. } => {
+            | ProgressSource::SkillbarSlot { .. }
+            | ProgressSource::Endurance
+            | ProgressSource::PrimaryResource
+            | ProgressSource::SecondaryResource
+            | ProgressSource::ResourceRate => {
                 Validation::Error("Condition requires a resource-like trigger source")
             }
         }
@@ -56,7 +56,7 @@ impl ResourceInfoTrigger {
     pub fn render_options(&mut self, ui: &Ui) -> bool {
         let mut changed = false;
 
-        changed |= enum_combo_bitflags(ui, "Resources", &mut self.types, ComboBoxFlags::empty());
+        changed |= enum_combo_bitflags(ui, "Resources", &mut self.states, ComboBoxFlags::empty());
 
         changed
     }
@@ -64,7 +64,7 @@ impl ResourceInfoTrigger {
 
 impl ConstDefault for ResourceInfoTrigger {
     const DEFAULT: Self = Self {
-        types: BitFlags::EMPTY,
+        states: BitFlags::EMPTY,
     };
 }
 
@@ -76,8 +76,8 @@ impl Default for ResourceInfoTrigger {
 
 impl fmt::Display for ResourceInfoTrigger {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let types = if !self.types.is_empty() {
-            self.types.iter().map(|info| info.short_name()).join(",")
+        let types = if !self.states.is_empty() {
+            self.states.iter().map(|info| info.short_name()).join(",")
         } else {
             "...".into()
         };

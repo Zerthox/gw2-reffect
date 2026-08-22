@@ -1,6 +1,6 @@
 use super::ProgressValue;
 use crate::{
-    context::{Ability, AbilityInfo, Buff, Resource, ResourceType, SkillId},
+    context::{Ability, AbilityInfo, Buff, Resource, ResourceState, SkillId},
     fmt::{Time, Unit},
     settings::FormatSettings,
 };
@@ -12,7 +12,7 @@ pub enum ProgressActive {
     Resource {
         current: f32,
         max: f32,
-        resource: Option<ResourceType>,
+        state: Option<ResourceState>,
     },
     Buff {
         id: u32,
@@ -38,7 +38,7 @@ impl ProgressActive {
         Self::Resource {
             current: 0.0,
             max: 0.0,
-            resource: None,
+            state: None,
         }
     }
 
@@ -47,7 +47,7 @@ impl ProgressActive {
         Self::Resource {
             current: 1.0,
             max: 1.0,
-            resource: None,
+            state: None,
         }
     }
 
@@ -62,22 +62,22 @@ impl ProgressActive {
     }
 
     /// Creates simple progress percent.
-    pub const fn percent(current: f32, resource_type: ResourceType) -> Self {
+    pub const fn percent(current: f32, state: Option<ResourceState>) -> Self {
         Self::Resource {
             current,
             max: 100.0,
-            resource: Some(resource_type),
+            state,
         }
     }
 
     /// Creates simple progress percent.
-    pub const fn from_resource(resource: &Resource, resource_type: ResourceType) -> Option<Self> {
+    pub const fn from_resource(resource: &Resource, state: Option<ResourceState>) -> Option<Self> {
         let Resource { current, max } = *resource;
         if max != 0.0 {
             Some(Self::Resource {
                 current,
                 max,
-                resource: Some(resource_type),
+                state,
             })
         } else {
             None
@@ -133,11 +133,11 @@ impl ProgressActive {
     }
 
     /// Creates a resource progress for edit mode.
-    pub fn edit_resource(progress: f32, max: f32, resource_type: ResourceType) -> Self {
+    pub fn edit_resource(progress: f32, max: f32, state: Option<ResourceState>) -> Self {
         Self::Resource {
             current: (progress * max).round_ties_even(),
             max,
-            resource: Some(resource_type),
+            state,
         }
     }
 
@@ -325,9 +325,11 @@ impl ProgressActive {
     }
 
     /// Retruns the resource type for the progress.
-    pub const fn resource_type(&self) -> Option<ResourceType> {
+    pub const fn resource_type(&self) -> Option<ResourceState> {
         match *self {
-            Self::Resource { resource, .. } => resource,
+            Self::Resource {
+                state: resource, ..
+            } => resource,
             _ => None,
         }
     }

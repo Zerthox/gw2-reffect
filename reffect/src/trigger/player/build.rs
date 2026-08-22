@@ -83,7 +83,7 @@ impl BuildTrigger {
     fn traits_active(&self, ctx: &Context) -> bool {
         if let Ok(build) = ctx.player.build.as_ref() {
             self.trait_mode
-                .check_slice(&self.traits, |req| req.is_met(&build.traits))
+                .check_slice(&self.traits, |req| req.is_met(build.traits.iter().copied()))
         } else {
             true
         }
