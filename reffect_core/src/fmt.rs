@@ -8,8 +8,8 @@ pub enum Time {
     /// Seconds.
     Seconds { secs: u32 },
 
-    /// Seconds with milliseconds.
-    Millis { secs: f32 },
+    /// Seconds with hundred milliseconds.
+    Millis { secs: u32, hundreds: u32 },
 }
 
 impl Time {
@@ -66,24 +66,27 @@ impl Time {
         min_threshold: u32,
         milli_threshold: u32,
     ) -> Self {
-        if millis >= min_threshold {
+        let ceil_secs = millis.saturating_add(Self::SEC - 1);
+        let ceil_hundreds = millis.saturating_add(99);
+        if min_threshold > 0 && ceil_secs >= min_threshold {
             Self::Minutes {
-                mins: millis / Self::MIN,
-                secs: (millis % Self::MIN) / Self::SEC,
+                mins: ceil_secs / Self::MIN,
+                secs: (ceil_secs % Self::MIN) / Self::SEC,
             }
-        } else if millis >= milli_threshold {
+        } else if ceil_hundreds >= milli_threshold {
             Self::Seconds {
-                secs: millis / Self::SEC,
+                secs: ceil_secs / Self::SEC,
             }
         } else {
             Self::Millis {
-                secs: millis as f32 / Self::SEC as f32,
+                secs: ceil_hundreds / Self::SEC,
+                hundreds: (ceil_hundreds % Self::SEC) / 100,
             }
         }
     }
 
     #[inline]
-    pub fn format(millis: u32, min_threshold: u32, milli_threshold: u32) -> String {
+    pub fn format_with_threshold(millis: u32, min_threshold: u32, milli_threshold: u32) -> String {
         Self::from_millis_with_threshold(millis, min_threshold, milli_threshold).to_string()
     }
 }
@@ -94,7 +97,7 @@ impl fmt::Display for Time {
         match self {
             Self::Minutes { mins, secs } => write!(f, "{mins}:{secs:02}"),
             Self::Seconds { secs } => write!(f, "{secs}"),
-            Self::Millis { secs } => write!(f, "{secs:.1}"),
+            Self::Millis { secs, hundreds } => write!(f, "{secs}.{hundreds}"),
         }
     }
 }
@@ -153,10 +156,23 @@ mod tests {
 
     #[test]
     fn time() {
+        assert_eq!(Time::format_with_threshold(0, 0, 0), "0");
         assert_eq!(Time::new(0, 0, 0).to_string(), "0.0");
-        assert_eq!(Time::new(0, 1, 234).to_string(), "1.2");
-        assert_eq!(Time::new(0, 30, 999).to_string(), "30");
-        assert_eq!(Time::new(3, 4, 564).to_string(), "3:04");
+        assert_eq!(Time::new(0, 0, 1).to_string(), "0.1");
+        assert_eq!(Time::new(0, 0, 99).to_string(), "0.1");
+        assert_eq!(Time::new(0, 0, 100).to_string(), "0.1");
+        assert_eq!(Time::new(0, 1, 234).to_string(), "1.3");
+        assert_eq!(Time::new(0, 9, 900).to_string(), "9.9");
+        assert_eq!(Time::new(0, 9, 901).to_string(), "10");
+        assert_eq!(Time::new(0, 9, 999).to_string(), "10");
+        assert_eq!(Time::new(0, 10, 0).to_string(), "10");
+        assert_eq!(Time::new(0, 10, 1).to_string(), "11");
+        assert_eq!(Time::new(0, 59, 0).to_string(), "59");
+        assert_eq!(Time::new(0, 59, 1).to_string(), "1:00");
+        assert_eq!(Time::new(0, 59, 999).to_string(), "1:00");
+        assert_eq!(Time::new(0, 60, 0).to_string(), "1:00");
+        assert_eq!(Time::new(0, 60, 1).to_string(), "1:01");
+        assert_eq!(Time::new(3, 4, 564).to_string(), "3:05");
     }
 
     #[test]
