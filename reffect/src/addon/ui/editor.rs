@@ -2,7 +2,7 @@ use super::Addon;
 use crate::{
     colors,
     context::Context,
-    elements::{ELEMENT_ID, RenderCtx},
+    elements::RenderCtx,
     error::Error,
     render::{next_window_size_constraints, small_padding},
 };
@@ -11,11 +11,7 @@ use nexus::imgui::{ChildWindow, StyleVar, Ui};
 impl Addon {
     pub fn render_editor(&mut self, ui: &Ui, ctx: &mut Context) {
         if ui.button("Reload packs") {
-            self.packs.clear();
-            ELEMENT_ID.reset();
-            ctx.edit.reset();
-            self.load_packs(ctx);
-            self.reload_fonts(ui.into());
+            self.reload(ui.into(), ctx);
         }
         if ui.is_item_hovered() {
             ui.tooltip_text("Reloads from pack files on disk");

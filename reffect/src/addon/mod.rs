@@ -4,10 +4,12 @@ mod packs;
 mod ui;
 
 use crate::{
+    clipboard::Clipboard,
     context::Context,
-    elements::Pack,
+    elements::{ELEMENT_ID, Pack},
     internal::{Interface, Internal},
     links::Links,
+    render::Io,
     settings::{AddonSettings, GeneralSettings},
     texture::TextureManager,
     worker::StoppableWorker,
@@ -86,10 +88,20 @@ impl Addon {
         addon.load_packs(&mut ctx);
     }
 
+    fn reload(&mut self, io: Io, ctx: &mut Context) {
+        self.packs.clear();
+        ELEMENT_ID.reset();
+        ctx.edit.reset();
+        Clipboard::reset();
+        self.load_packs(ctx);
+        self.reload_fonts(io);
+    }
+
     pub fn unload() {
         log::info!("Reffect v{} unload", Self::VERSION);
 
         let mut addon = Self::lock();
+        Clipboard::reset();
         AddonSettings::new(&addon.settings, &Context::lock()).save();
         let pack_worker = addon.settings.save_on_unload.then(|| addon.save_packs());
 

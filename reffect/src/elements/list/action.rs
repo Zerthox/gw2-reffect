@@ -55,7 +55,7 @@ impl IconAction {
                     common,
                     kind: ElementType::Icon(element),
                     ..
-                }) = Clipboard::take()
+                }) = Clipboard::cloned()
                 {
                     children.insert(index, ListIcon::from_element(common, element));
                 } else {

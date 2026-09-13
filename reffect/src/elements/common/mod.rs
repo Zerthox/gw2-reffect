@@ -237,7 +237,7 @@ impl Common {
                 .enabled(Clipboard::has_some())
                 .build(ui)
             {
-                children.push(Clipboard::take().expect("paste without clipboard"))
+                children.push(Clipboard::cloned().expect("paste without clipboard"))
             }
         }
     }

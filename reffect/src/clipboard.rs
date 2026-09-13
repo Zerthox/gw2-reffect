@@ -15,33 +15,47 @@ impl Clipboard {
         }
     }
 
-    /// Returns the clipboard state.
-    fn get() -> &'static LocalKey<Self> {
+    /// Returns the thread-local clipboard state.
+    fn local() -> &'static LocalKey<Self> {
         thread_local! { static CLIPBOARD: Clipboard = const { Clipboard::new() }; }
         &CLIPBOARD
     }
 
-    /// Sets the clipboard element.
-    pub fn set(element: Element) {
-        Self::get().with(|clipboard| clipboard.element.set(Some(element)))
+    /// Returns an unchecked reference to the clipboard element.
+    unsafe fn get_inner(&self) -> &Option<Element> {
+        unsafe { self.element.as_ptr().as_ref_unchecked() }
     }
 
-    /// Attempts to take the clipboard element.
-    pub fn take() -> Option<Element> {
-        Self::get().with(|clipboard| clipboard.element.take())
+    /// Resets the clipboard state.
+    pub fn reset() {
+        Self::try_set(None);
+    }
+
+    /// Sets or removes the clipboard element.
+    pub fn try_set(value: Option<Element>) {
+        Self::local().with(|clipboard| clipboard.element.set(value))
+    }
+
+    /// Sets the clipboard element.
+    pub fn set(element: Element) {
+        Self::try_set(Some(element))
+    }
+
+    /// Returns the cloned clipboard element.
+    pub fn cloned() -> Option<Element> {
+        Self::local().with(|clipboard| unsafe { clipboard.get_inner() }.clone())
     }
 
     /// Checks whether the clipboard has an element.
     pub fn has_some() -> bool {
-        Self::get()
-            .with(|clipboard| unsafe { clipboard.element.as_ptr().as_ref_unchecked() }.is_some())
+        Self::local().with(|clipboard| unsafe { clipboard.get_inner() }.is_some())
     }
 
     /// Checks whether the clipboard has an icon element.
     pub fn has_icon() -> bool {
-        Self::get().with(|clipboard| {
+        Self::local().with(|clipboard| {
             matches!(
-                unsafe { clipboard.element.as_ptr().as_ref_unchecked() },
+                unsafe { clipboard.get_inner() },
                 Some(Element {
                     kind: ElementType::Icon(_),
                     ..
@@ -52,10 +66,10 @@ impl Clipboard {
 
     /// Renders debug info.
     pub fn debug(ui: &Ui) {
-        Self::get().with(|clipboard| {
+        Self::local().with(|clipboard| {
             ui.text("Clipboard:");
             ui.same_line();
-            match unsafe { clipboard.element.as_ptr().as_ref_unchecked() } {
+            match unsafe { clipboard.get_inner() } {
                 Some(element) => ui.text(&element.kind),
                 None => ui.text_disabled("empty"),
             }
