@@ -68,7 +68,7 @@ impl Time {
     ) -> Self {
         let ceil_secs = millis.saturating_add(Self::SEC - 1);
         let ceil_hundreds = millis.saturating_add(99);
-        if min_threshold > 0 && ceil_secs >= min_threshold {
+        if ceil_secs >= min_threshold {
             Self::Minutes {
                 mins: ceil_secs / Self::MIN,
                 secs: (ceil_secs % Self::MIN) / Self::SEC,
@@ -156,7 +156,7 @@ mod tests {
 
     #[test]
     fn time() {
-        assert_eq!(Time::format_with_threshold(0, 0, 0), "0");
+        assert_eq!(Time::format_with_threshold(0, u32::MAX, 0), "0");
         assert_eq!(Time::new(0, 0, 0).to_string(), "0.0");
         assert_eq!(Time::new(0, 0, 1).to_string(), "0.1");
         assert_eq!(Time::new(0, 0, 99).to_string(), "0.1");
