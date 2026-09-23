@@ -47,6 +47,16 @@ impl Addon {
                 ui.same_line();
                 name_or_unknown_id_colored(ui, ctx.player.mount);
 
+                ui.text("Target affinity:");
+                ui.same_line();
+                match &ctx.target.affinity {
+                    Ok(affinity) => {
+                        let _color = affinity.push_text_color(ui);
+                        ui.text(affinity)
+                    }
+                    Err(err) => ui.text_colored(colors::RED, err.to_string()),
+                }
+
                 ui.text(format!("Map id: {}", ctx.map.id));
                 ui.text(format!("Map category: {}", ctx.map.category));
 
@@ -112,9 +122,7 @@ impl Addon {
                     ui.text("Profession selections:");
                     ui.indent();
                     for info in prof_selections.iter() {
-                        let _color = info
-                            .colored()
-                            .map(|color| ui.push_style_color(StyleColor::Text, color));
+                        let _color = info.push_text_color(ui);
                         ui.text(info);
                         ui.same_line();
                     }
@@ -413,9 +421,7 @@ where
 {
     match value {
         Ok(value) => {
-            let _color = value
-                .colored()
-                .map(|color| ui.push_style_color(StyleColor::Text, color));
+            let _color = value.push_text_color(ui);
             ui.text(value);
         }
         Err(id) => ui.text(format!("Unknown ({id})")),

@@ -1,7 +1,7 @@
 use crate::{colors::Colored, enums::EnumStaticVariants, named::Named};
 use enumflags2::{BitFlag, BitFlags};
 use itertools::Itertools;
-use nexus::imgui::{ComboBoxFlags, Selectable, StyleColor, StyleVar, Ui};
+use nexus::imgui::{ComboBoxFlags, Selectable, StyleVar, Ui};
 use std::mem;
 use strum::VariantArray;
 
@@ -74,9 +74,7 @@ where
 
         for entry in T::VARIANTS.iter().copied() {
             let mut selected = current.contains(entry);
-            let _color = entry
-                .colored()
-                .map(|color| ui.push_style_color(StyleColor::Text, color));
+            let _color = entry.push_text_color(ui);
 
             if ui.checkbox(entry, &mut selected) {
                 changed = true;
