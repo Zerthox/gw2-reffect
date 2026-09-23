@@ -1,5 +1,5 @@
 use nexus::{
-    data_link::mumble::map_id::{fractal, hub, raid},
+    data_link::mumble::map_id::{convergence, fractal, hub, raid},
     imgui::{MenuItem, Ui},
 };
 use std::slice;
@@ -30,7 +30,7 @@ impl MapGroup {
 
 pub fn map_select(ui: &Ui) -> Option<&'static [Map]> {
     let mut selected = None;
-    for group in [GENERAL, FRACTALS, RAID_WINGS, RAID_ENCOUNTERS] {
+    for group in [GENERAL, FRACTALS, RAID_WINGS, RAID_ENCOUNTERS, CONVERGENCES] {
         ui.menu(group.name, || {
             if MenuItem::new("All").build(ui) {
                 selected = Some(group.maps);
@@ -92,6 +92,7 @@ pub const FRACTALS: MapGroup = MapGroup::new(
         Map::new("Silent Surf", fractal::SILENT_SURF),
         Map::new("Lonely Tower", fractal::LONELY_TOWER),
         Map::new("Kinfall", fractal::KINFALL),
+        Map::new("Solitary Throne", fractal::SOLITARY_THRONE),
     ],
 );
 
@@ -134,5 +135,27 @@ pub const RAID_ENCOUNTERS: MapGroup = MapGroup::new(
         Map::new("Cosmic Observatory", raid::COSMIC_OBSERVATORY),
         Map::new("Temple of Febe", raid::TEMPLE_OF_FEBE),
         Map::new("Guardian's Glade", raid::GUARDIANS_GLADE),
+        Map::new("Nexus of Eternity", raid::NEXUS_OF_ETERNITY),
+    ],
+);
+
+pub const CONVERGENCES: MapGroup = MapGroup::new(
+    "Convergences",
+    &[
+        Map::new("Outer Nayos (Public)", convergence::OUTER_NAYOS_PUBLIC),
+        Map::new("Outer Nayos (Private)", convergence::OUTER_NAYOS_PRIVATE),
+        Map::new("Mount Balrior (Public)", convergence::MOUNT_BALRIOR_PUBLIC),
+        Map::new(
+            "Mount Balrior (Private)",
+            convergence::MOUNT_BALRIOR_PRIVATE,
+        ),
+        Map::new(
+            "Nexus of Eternity (Public)",
+            convergence::NEXUS_OF_ETERNITY_PUBLIC,
+        ),
+        Map::new(
+            "Nexus of Eternity (Private)",
+            convergence::NEXUS_OF_ETERNITY_PRIVATE,
+        ),
     ],
 );
